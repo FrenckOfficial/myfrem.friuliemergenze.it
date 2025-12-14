@@ -250,10 +250,6 @@ body {
     margin-bottom: 0;
   }
 
-  .sidebar .logout {
-    display: block;
-  }
-
   .main-content {
     padding: 20px;
   }

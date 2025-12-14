@@ -26,7 +26,7 @@ const bioInput = document.getElementById("bioInput")
 const bioText = document.getElementById("bioText")
 const saveBioBtn = document.getElementById("saveBioBtn");
 
-const preferencesForm = document.getElementById("preferencesForm");
+const preferencesFormButton = document.getElementById("preferencesFormButton");
 const preferencesStatusMsg = document.getElementById("preferencesStatusMsg");
 
 const emailNotificationsCheckbox = document.getElementById("emailNotifications");
@@ -62,10 +62,6 @@ auth.onAuthStateChanged(async user => {
 
   // Carica preferenze da localStorage
   emailNotificationsCheckbox.checked = localStorage.getItem("staff_emailNotifications") === "true";
-  darkModeToggle.checked = localStorage.getItem("staff_darkMode") === "true";
-
-  // Applica tema scuro se attivo
-  if(darkModeToggle.checked) document.body.classList.add("dark-mode");
 });
 
 // ==================== LOGOUT ====================
@@ -133,14 +129,10 @@ saveBioBtn.addEventListener("click", async () => {
 });
 
 // ==================== PREFERENZE STAFF ====================
-preferencesForm.addEventListener("submit", (e) => {
+preferencesFormButton.addEventListener("submit", (e) => {
   e.preventDefault();
 
   localStorage.setItem("staff_emailNotifications", emailNotificationsCheckbox.checked);
-
-  // Applica tema scuro
-  if(darkModeToggle.checked) document.body.classList.add("dark-mode");
-  else document.body.classList.remove("dark-mode");
 
   preferencesStatusMsg.textContent = "✅ Preferenze salvate!";
   preferencesStatusMsg.className = "success";

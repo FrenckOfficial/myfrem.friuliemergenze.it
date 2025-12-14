@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="/staff/dashboard/settings/style.css">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
   <script type="module" src="/staff/dashboard/settings/staff-settings.js"></script>
-  <script type="module" src="/staff/dashboard/settings/2fa-stg.js"></script>
 </head>
 
 <body>
@@ -68,7 +67,7 @@
         <label>Conferma nuova password</label>
         <input type="password" id="confirmPassword" required>
 
-        <button type="submit" id="savePasswordBtn">💾 Cambia password</button>
+        <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
       </form>
       <p id="passwordStatusMsg"></p>
     </section>
@@ -80,7 +79,7 @@
         <label>Nuovo username</label>
         <input type="text" id="newUsername" required>
 
-        <button type="submit" id="saveUsernameBtn">💾 Cambia username</button>
+        <button type="submit" class="btn" id="saveUsernameBtn">💾 Cambia username</button>
     </section>
 
     <section class="settings-section">
@@ -98,7 +97,7 @@
           <input type="checkbox" id="emailNotifications"> Notifiche via email
         </label>
 
-        <button type="submit">💾 Salva preferenze</button>
+        <button type="submit" class="btn" id="preferencesFormButton">💾 Salva preferenze</button>
       </form>
       <p id="preferencesStatusMsg"></p>
     </section>
@@ -108,7 +107,6 @@
       <h2>🖥️ Sistema</h2>
 
       <button id="clearCacheBtn" class="danger-btn">🧹 Svuota cache locale</button>
-      <button id="resetLayoutBtn" class="danger-btn">♻️ Reimposta layout dashboard</button>
     </section>
 
   </main>
