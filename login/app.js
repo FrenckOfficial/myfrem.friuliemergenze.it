@@ -65,7 +65,7 @@ if (loginForm) {
 
       const userData = userDoc.data();
 
-      if (userData.role === "staff") {
+      if (userData.role === "simplestaff", "modstaff", "advstaff") {
         window.location.href = "/staff";
       } else {
         window.location.href = "/dashboard";
