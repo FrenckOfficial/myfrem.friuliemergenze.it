@@ -55,6 +55,8 @@ async function loadUsers() {
 
     if (!u) return;
 
+    if (u.role === "staff") return;
+
     tr.innerHTML = `
       <td>${u.name || ""}</td>
       <td>${u.surname || ""}</td>
