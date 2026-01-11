@@ -38,6 +38,7 @@ form.addEventListener("submit", async (e) => {
       email: currentUser?.email || "Non autenticato",
       subject,
       message,
+      from: "Sistema di contatto MyFrEM",
       createdAt: serverTimestamp(),
       status: "Aperta"
     });
