@@ -36,7 +36,9 @@ onAuthStateChanged(auth, async user => {
   const userDocSnap = await getDoc(userDocRef);
   const userData = userDocSnap.data();
 
-  if (!userData || userData.role !== "staff") {
+  const allowedRoles = ["staff", "simpleadmin", "modstaff", "advstaff"];
+
+  if (!userData || !allowedRoles.includes(userData.role)) {
     alert("Accesso negato: solo staff");
     window.location.href = "/login/";
     return;

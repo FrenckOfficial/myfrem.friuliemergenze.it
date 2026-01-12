@@ -49,7 +49,9 @@ onAuthStateChanged(auth, async (user) => {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
-    if (!userSnap.exists() || userSnap.data().role !== "staff") {
+    const allowedRoles = ["staff", "simpleadmin", "modstaff", "advstaff"];
+
+    if (!userSnap.exists() || !allowedRoles.includes(userSnap.data().role)) {
       window.location.href = "/dashboard";
       return;
     }

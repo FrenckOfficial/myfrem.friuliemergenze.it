@@ -40,7 +40,9 @@ onAuthStateChanged(auth, async (user) => {
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
 
-  if (userDoc.empty || userDoc.docs[0].data().role !== "staff") {
+  const allowedRoles = ["staff", "simpleadmin", "modstaff", "advstaff"];
+
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
     alert("❌ Accesso negato: non sei staff!");
     window.location.href = "/dashboard";
     return;
