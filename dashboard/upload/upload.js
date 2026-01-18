@@ -100,8 +100,12 @@ uploadBtn.addEventListener("click", (e) => {
 
       console.log("🔥 Salvataggio Firestore in corso...");
 
+      const userRef = doc(db, "users", currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      let currentUserData = {};
+
       await addDoc(collection(db, "activities"), {
-        userName: currentUser.name,
+        userName: userSnap.exists() ? userSnap.data().name || "Utente senza nome" : "Utente sconosciuto",
         photoTitle: titleInput.value || "-",
         timestamp: serverTimestamp(),
         type: "photo_submission",

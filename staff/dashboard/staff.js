@@ -150,6 +150,10 @@ async function loadStats() {
           li.textContent = `[${date}] Nuovo report di espulsione aggiunto da "${activity.addStaffer}": "${activity.kickedMember}"`;
         } else if (activity.type === "eventRegistration") {
           li.textContent = `[${date}] ${activity.nameJoiner} si è iscritto all'evento "${activity.eventTitle}" (ID: ${activity.eventId}).`;
+        } else if (activity.type === "new_ticket") {
+          li.innerHTML = `[${date}] Da <b>${activity.from}</b>: Nuovo ticket creato con oggetto "${activity.title}".`;
+        } else if (activity.type === "ticket_close") {
+          li.textContent = `[${date}] Ticket "${activity.title}" chiuso da ${activity.closedBy}.`;
         } else {
           li.textContent = `[${date}] Attività sconosciuta.`;
         };

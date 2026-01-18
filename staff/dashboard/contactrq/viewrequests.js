@@ -1,7 +1,7 @@
 // ✅ Import Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../../configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
@@ -53,9 +53,11 @@ async function loadContactRequests() {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${userData.name}</td>
-                <td>${request.email}</td>
-                <td>${request.subject}</td>
-                <td>${request.message}</td>
+                <td><a href="mailto:${request.email}">${request.email}</a></td>
+                <td>${request.subject || request.title}</td>
+                <td>${request.message || request.description}</td>
+                <td>${request.category || "MyFrEM"}</td>
+                <td>${request.from || "N/A"}</td>
                 <td>${request.status}</td>
                 <td>${createdAt}</td>
                 <td>
@@ -76,6 +78,13 @@ async function loadContactRequests() {
                 await updateRequestStatus(requestId, "Chiusa");
                 alert(`La richiesta di assistenza selezionata è stata chiusa.`)
                 loadContactRequests();
+
+                await addDoc(collection(db, "activities"), {
+                    type: "ticket_close",
+                    title: request.title,
+                    closedBy: auth.currentUser.email,
+                    timestamp: new Date()
+                });
             });
         });
         document.querySelectorAll(".reopenRequestBtn").forEach((btn, doc) => {

@@ -48,7 +48,7 @@ async function loadPublicReport() {
     <p>${data.userName || "—"}</p>
 
     <h3>Numero di contatto utente:</h3>
-    <p>${data.userNumber || "—"}</p>
+    <p>Dato redatto per privacy</p>
 
     <h3>Staff che ha segnalato:</h3>
     <p>${staffName} - ${staffEmail !== "-" ? `<a href="mailto:${staffEmail}">${staffEmail}</a>` : "-"}</p>

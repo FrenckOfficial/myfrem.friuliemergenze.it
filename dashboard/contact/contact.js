@@ -43,6 +43,13 @@ form.addEventListener("submit", async (e) => {
       status: "Aperta"
     });
 
+    await addDoc(collection(db, "activities"), {
+      type: "new_ticket",
+      title: subject,
+      from: "Sistema di contatto MyFrEM",
+      timestamp: new Date()
+    });
+
     result.innerText = "✅ Messaggio inviato! Ti risponderemo al più presto.";
     form.reset();
 
