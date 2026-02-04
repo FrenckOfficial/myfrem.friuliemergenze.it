@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Utenti WhatsApp | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+  <script type="module" src="/staff/dashboard/management/users-whatsapp/users.js"></script>
+</head>
+<body>
+  <!-- Sidebar Staff -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+      <h2>MyFrEM Staff</h2>
+    </div>
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Gestione utenti</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporto di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <h1>WhatsApp - 👥 Gestione Utenti</h1>
+    <div class="list">
+      <a href="/staff/dashboard/management/users-whatsapp/new/" class="btn-primary">➕ Nuovo utente</a>
+      <p id="totalUsers"><b>Utenti totali: <span id="totalUsersCount">0</span></b></p>
+    </div>
+
+    <table id="usersTable" style="margin-top: 10px;">
+        <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefono</th>
+              <th>Tipo account</th>
+              <th>Stato Account</th>
+              <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody">
+            <!-- Gli utenti verranno inseriti qui tramite JS -->
+        </tbody>
+    </table>
+
+    <p id="messageBox"></p>
+  </main>
+</body>
+</html>

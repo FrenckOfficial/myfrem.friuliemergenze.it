@@ -603,6 +603,41 @@ button.reject:active {
   cursor: not-allowed;
 }
 
+.option-btn {
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#platformUsersBtn {
+  background-color: #10b981; /* verde */
+  width: 210px;
+  justify-content: center;
+}
+
+#platformUsersBtn:hover {
+  background-color: #0f9d75; /* verde scuro */
+}
+
+#whatsappUsersBtn {
+  background-color: #3b82f6; /* azzurro */
+  margin-top: 20px;
+  width: 210px;
+  justify-content: center;
+}
+
+#whatsappUsersBtn:hover {
+  background-color: #2563eb; /* blu principale */
+}
+
 /* Responsive: su mobile diventa verticale */
 @media (max-width: 768px) {
   .form-row {

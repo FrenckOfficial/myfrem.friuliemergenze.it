@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica Utente WhatsApp | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/edit/style.css">
+    <script type="module" src="/staff/dashboard/management/users-whatsapp/edit/edit.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff">📊 Dashboard</a>
+        <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+        <a href="/staff/dashboard/users/" class="active">👥 Gestione utenti</a>
+        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporto di espulsione</a>
+        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+        <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+
+    <main class="main-content">
+        <div id="userDetails"></div>
+
+        <form class="editForm">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name">
+
+            <label for="number">Numero:</label>
+            <input type="text" id="number" name="number">
+
+            <label for="joinedDate">Data di iscrizione:</label>
+            <input type="date" id="joinedDate" name="joinedDate">
+
+            <label for="status">Stato:</label>
+            <select id="status" name="status">
+                <option value="">Seleziona uno stato</option>
+                <option value="active">Attivo</option>
+                <option value="kicked">Espulso</option>
+                <option value="suspended">Sospeso</option>
+            </select>
+
+            <label for="notes">Note:</label>
+            <textarea id="notes" name="notes"></textarea>
+
+            <button type="submit" class="btn-primary">💾 Salva Modifiche</button>
+        </form>
+
+        <p id="statusMsg"></p>
+    </main>
+</body>
+</html>
+</html>

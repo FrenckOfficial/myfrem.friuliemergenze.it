@@ -1,0 +1,277 @@
+/* Sidebar */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar .logo img {
+  width: 60px;
+  border-radius: 50%;
+}
+
+.sidebar .logo h2 {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.sidebar nav {
+  flex-grow: 1;
+}
+
+.sidebar nav a {
+  display: block;
+  color: #bbb;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: #444;
+  color: #fff;
+}
+
+.sidebar .logout {
+  background: #e74c3c;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar .logout:hover {
+  background: #c0392b;
+}
+
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  background-color: #f3f4f6;
+}
+
+.main-content h1 {
+  margin-bottom: 20px;
+}
+
+.list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#totalUsers {
+  font-size: 1.5rem;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background-color: #3b82f6;
+  color: white;
+}
+
+tr:hover {
+  background-color: #e0f2fe;
+}
+
+button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:nth-child(1) { background-color: #10b981; color: #fff; } /* Promuovi */
+button:nth-child(2) { background-color: #f59e0b; color: #fff; } /* Sospendi */
+button:nth-child(3) { background-color: #ef4444; color: #fff; } /* Elimina */
+
+#messageBox {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  display: inline-block;
+  background-color: #39be1e;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+  background-color: #0e5e1f;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   RESPONSIVE SIDEBAR + DASHBOARD
+   ================================ */
+
+/* --- Tablet fino a 992px --- */
+@media (max-width: 992px) {
+
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+  }
+
+  .sidebar .logo {
+    margin-bottom: 0;
+    text-align: left;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sidebar nav a {
+    padding: 8px 12px;
+    margin: 0;
+  }
+
+  .sidebar .logout {
+    display: none;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}
+
+/* --- Mobile fino a 768px --- */
+@media (max-width: 768px) {
+
+  .sidebar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .sidebar nav {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .sidebar nav a {
+    padding: 12px;
+    width: 100%;
+  }
+
+  .sidebar .logout {
+    width: 100%;
+    margin-top: 10px;
+    display: block;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .main-content h1 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  /* Tabella scrollabile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* --- Extra small fino a 480px --- */
+@media (max-width: 480px) {
+
+  .sidebar {
+    padding: 12px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  #messageBox {
+    font-size: 0.9rem;
+  }
+}

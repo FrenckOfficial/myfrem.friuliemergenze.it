@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuovo - Report di Espulsione | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="/staff/dashboard/management/users-whatsapp/new/new-user.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
+      <h2>MyFrEM Staff</h2>
+    </div>
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Gestione utenti</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporto di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+  <main class="main-content">
+    <div class="top-bar">
+        <h1>📄 Nuovo Utente WhatsApp</h1>
+    </div>
+
+    <p>Compila il modulo qui sotto per aggiungere un nuovo utente WhatsApp.</p>
+
+    <div class="activity-box">
+        <form id="expulsionReportForm">
+            <div class="form-row">
+              <div class="form-col">
+                <label for="userSelect">👤 Nome utente:</label>
+                <textarea id="userSelect" class="photo-link-input"></textarea>
+              </div>
+
+              <div class="form-col">
+                <label for="userNumber">📞 Numero contatto utente:</label>
+                <input type="tel" id="userNumber" class="photo-link-input">
+              </div>
+            </div>
+            <div class="form-group">
+                <label for="expulsionDate">📅 Data entrata:</label>
+                <input type="date" id="expulsionDate" class="photo-link-input" required>
+            </div>
+            <div class="form-group">
+                <label for="notes">🗒️ Note aggiuntive (facoltativo):</label>
+                <textarea id="notes" class="photo-link-input" placeholder="Eventuali note aggiuntive..."></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="quick-btn">📤 Aggiungi Utente</button>
+                <a href="/staff/dashboard/management/users-whatsapp/" class="quick-btn" style="margin-top: 20px; width: 11.7%;">🔙 Torna alla pagina precedente</a>
+            </div>
+        </form>
+        <div id="statusMsg"></div>
+    </div>
+  </main>
+</body>
+</html>

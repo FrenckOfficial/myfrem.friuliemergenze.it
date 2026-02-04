@@ -1,0 +1,158 @@
+body {
+    margin: 0;
+    background: #eee;
+    color: #333;
+    font-family: system-ui, sans-serif;
+    display: flex;
+}
+
+/* ——— LAYOUT ——————————————— */
+
+.sidebar {
+  width: 11%;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar .logo img {
+  width: 60px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+}
+
+.sidebar .logo h2 {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.sidebar nav a {
+  display: block;
+  color: #bbb;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: #444;
+  color: #fff;
+}
+
+.sidebar .logout {
+  margin-top: 692px;
+  background: #e74c3c;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar .logout:hover {
+  background: #c0392b;
+}
+
+/* ——— MAIN CONTENT ——————————————— */
+
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+form {
+    margin-top: 1.5rem;
+    width: 75%;
+}
+
+/* ——— USER INFO BOX ——————————————— */
+
+.user-box,
+.edit-box {
+    background: #f1ecec;
+    padding: 1.4rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+.user-box p strong {
+    color: #28527c;
+}
+
+/* ——— FORM ——————————————— */
+
+label {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #555;
+}
+
+input[type="text"],
+textarea,
+input[type="date"],
+select {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #333;
+    padding: 0.9rem;
+    border-radius: 10px;
+    color: #111;
+    margin-top: 0.2rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #4aa3ff;
+}
+
+textarea {
+    height: 120px;
+    resize: none;
+}
+
+/* ——— BUTTON ——————————————— */
+
+.btn-primary {
+    background: #0066ff;
+    border: none;
+    color: #fff;
+    padding: 0.9rem 1.4rem;
+    margin-top: 1.4rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #0051cc;
+}
+
+/* ——— STATUS MESSAGE ——————————————— */
+
+#statusMsg {
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+}

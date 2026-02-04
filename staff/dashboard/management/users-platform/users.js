@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../configFirebase.js"
+import { firebaseConfig } from "../../../../configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -84,7 +84,7 @@ async function loadUsers() {
 
 async function updateRole(userId, currentRole) {
   const newRole = currentRole === "staff" ? "user" : "staff";
-  await addDoc(doc(db, "activities"), {
+  await addDoc(collection(db, "activities"), {
     type: "user_role_change",
     userName: auth.currentUser.name,
     newRole: newRole,
@@ -115,7 +115,7 @@ async function deleteUser(userId) {
       const userDocSnap = await getDoc(userDocRef);
       const userData = userDocSnap.data();
       if (userData && userData.status === "eliminato") {
-        await deleteDoc(doc(db, "users", userId));
+        await deleteDoc(collection(db, "users", userId));
       } 
     }, 60 * 24 * 60 * 60 * 1000);
   }

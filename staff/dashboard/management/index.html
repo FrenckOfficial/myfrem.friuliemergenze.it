@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione utenti - Dashboard Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+    <link rel="stylesheet" href="/staff/dashboard/staff.css">
+    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+    <script type="module" src="/staff/dashboard/staff.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+            <h2>MyFrEM Staff</h2>
+        </div>
+        <nav>
+            <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+            <a href="/staff/dashboard/users/">👥 Gestione utenti</a>
+            <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+            <a href="/staff/dashboard/kick-reports/">🗂️ Rapporto di espulsione</a>
+            <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+            <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+        </nav>
+        <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+    <div class="main-content">
+        <h1>👥 Gestione utenti</h1>
+        <h2>Scegli il tipo di utenti da gestire:</h2>
+
+        <div class="user-management-options" style="margin-top: 25px;">
+            <a href="/staff/dashboard/management/users-platform/"><button id="platformUsersBtn" class="option-btn">Utenti Piattaforma MyFrEM</button></a>
+            <a href="/staff/dashboard/management/users-whatsapp/"><button id="whatsappUsersBtn" class="option-btn">Utenti Gruppo WhatsApp</button></a>
+        </div>
+    </div>
+</body>
+</html>
