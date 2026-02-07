@@ -89,6 +89,7 @@ async function loadUsers() {
         <button class="promote">Promuovi</button>
         <button class="delete">Espulsione</button>
         <button class="delete2">Elimina dal database</button>
+        <button class="view">Visualizza</button>
         <button class="modify">Modifica</button>
       </td>
     `;
@@ -99,6 +100,9 @@ async function loadUsers() {
     tr.querySelector(".delete2").addEventListener("click", () => deleteFromDatabase(u.id));
     tr.querySelector(".modify").addEventListener("click", () => {
       window.location.href = `/staff/dashboard/management/users-whatsapp/edit/?id=${u.id}`;
+    });
+    tr.querySelector(".view").addEventListener("click", () => {
+      window.location.href = `/staff/dashboard/management/users-whatsapp/user/?id=${u.id}`;
     });
 
     usersTableBody.appendChild(tr);
@@ -113,7 +117,7 @@ async function updateRole(userId, currentRole) {
 
   await updateDoc(doc(db, "users_whatsapp", userId), { role: newRole });
   await addDoc(collection(db, "activities"), {
-    type: "user_role_update_whatsapp",
+    type: "user_role_change_whatsapp",
     userName: userId,
     newRole,
     timestamp: new Date()

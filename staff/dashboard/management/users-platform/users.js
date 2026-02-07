@@ -70,6 +70,7 @@ async function loadUsers() {
         <button class="promote">Promuovi</button>
         <button class="suspend">Sospendi/Riattiva</button>
         <button class="delete">Elimina</button>
+        <button class="view">Visualizza ID</button>
       </td>
     `;
 
@@ -77,6 +78,9 @@ async function loadUsers() {
     tr.querySelector(".promote").addEventListener("click", () => updateRole(docSnap.id, u.role));
     tr.querySelector(".suspend").addEventListener("click", () => updateStatus(docSnap.id, u.status));
     tr.querySelector(".delete").addEventListener("click", () => deleteUser(docSnap.id));
+    tr.querySelector(".view").addEventListener("click", () => {
+      alert(`ID Utente: ${docSnap.id}`);
+    });
 
     usersTableBody.appendChild(tr);
   });

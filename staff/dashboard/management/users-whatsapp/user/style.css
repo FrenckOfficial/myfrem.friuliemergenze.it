@@ -1,0 +1,111 @@
+/* ======== STRUTTURA GENERALE DELLA PAGINA UTENTE ======== */
+
+.main-content {
+  padding: 40px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #1a1a1a;
+}
+
+/* Titolo pagina */
+.main-content h1 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: #003366;
+  font-weight: 600;
+}
+
+/* Contenitore principale */
+.user-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  border-left: 5px solid #0077cc;
+  max-width: 500px;
+}
+
+/* Testo singola informazione */
+.user-card p {
+  font-size: 17px;
+  margin: 12px 0;
+}
+
+.user-card strong {
+  color: #003366;
+}
+
+/* ======== BOTTONI AZIONI UTENTE ======== */
+
+.user-actions {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+/* Pulsanti generici */
+.user-btn {
+  padding: 12px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+  text-decoration: none;
+  color: white;
+}
+
+/* Modifica */
+.btn-edit {
+  background: #ffaa00;
+}
+.btn-edit:hover {
+  background: #e19700;
+}
+
+/* Elimina */
+.btn-delete {
+  background: #ff4d4d;
+}
+.btn-delete:hover {
+  background: #cc3b3b;
+}
+
+/* Torna indietro */
+.btn-back {
+  background: #2f7ad9;
+}
+.btn-back:hover {
+  background: #1a5fb8;
+}
+
+/* ======== MESSAGGI DI ERRORE E CARICAMENTO ======== */
+
+#userData {
+  font-size: 18px;
+  color: #444;
+}
+
+.error-message {
+  background: #ffe0e0;
+  color: #b20000;
+  padding: 12px 15px;
+  border-left: 4px solid #b20000;
+  border-radius: 6px;
+  max-width: 450px;
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 600px) {
+  .user-card {
+    padding: 20px;
+  }
+
+  .user-actions {
+    flex-direction: column;
+  }
+
+  .user-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

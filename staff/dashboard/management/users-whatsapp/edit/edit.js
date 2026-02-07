@@ -13,6 +13,8 @@ import {
     doc,
     getDoc,
     updateDoc,
+    addDoc,
+    collection,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -22,25 +24,53 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🔐 Auth Check
+// AUTH
 onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "/login";
 });
 
-// 🔐 Logout
+// LOGOUT
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "/login";
 });
 
-// 📌 Prende ID utente da URL
+// URL ID
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get("id");
 
 const userDetails = document.getElementById("userDetails");
 const statusMsg = document.getElementById("statusMsg");
+let linkedMyFremUser = null;
 
-// 📥 Carica utente
+document.getElementById("linkMyFremBtn").onclick = async () => {
+  const id = document.getElementById("myfremIdInput").value.trim();
+  if (!id) return alert("Inserisci un ID!");
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", id));
+
+    if (!userDoc.exists()) {
+      document.getElementById("myfremResult").innerHTML = "❌ Nessun utente trovato.";
+      linkedMyFremUser = null;
+      return;
+    }
+
+    linkedMyFremUser = { id, ...userDoc.data() };
+
+    document.getElementById("myfremResult").innerHTML = `
+      <b>Utente trovato</b><br>
+      Nome: ${linkedMyFremUser.name}<br>
+      Email: ${linkedMyFremUser.email}<br>
+      Ruolo: ${linkedMyFremUser.role}
+    `;
+
+  } catch (err) {
+    console.error(err);
+    alert("Errore durante la ricerca dell'utente MyFrEM.");
+  }
+};
+
 async function loadUser() {
     const ref = doc(db, "users_whatsapp", userId);
     const snap = await getDoc(ref);
@@ -56,48 +86,48 @@ async function loadUser() {
         <p><strong>ID Utente:</strong> ${userId}</p>
         <p><strong>Nome:</strong> ${data.name || "-"}</p>
         <p><strong>Numero:</strong> ${data.phone || "-"}</p>
-        <p><strong>Data di iscrizione:</strong> ${data.date || "-"}</p>
-        <p><strong>Stato:</strong> ${data.status || "-"}</p>
-        <p><strong>Note:</strong> ${data.notes || "-"}</p>
+        <p><strong>Data iscrizione:</strong> ${data.date || "-"}</p>
+        <p><strong>Tag:</strong> ${(data.tags || []).join(", ") || "-"}</p>
+        <p><strong>Linked MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.name ? data.linkedMyFremUser.name + " (" + data.linkedMyFremUser.role + ")" : "-" : "-"}</p>
+        <p><strong>ID MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.id || "-" : "-"}</p>
     `;
 
-    // Compila form
     document.getElementById("name").value = data.name || "";
     document.getElementById("number").value = data.phone || "";
-    document.getElementById("joinedDate").value = data.date  || "";
+    document.getElementById("joinedDate").value = data.date || "";
     document.getElementById("status").value = data.status || "";
     document.getElementById("notes").value = data.notes || "";
 }
 
-// 💾 Salva modifiche
 document.querySelector(".editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+    const tags = Array.from(document.querySelectorAll(".tagCheck:checked"))
+    .map(t => t.value);
 
     const updatedData = {
         name: document.getElementById("name").value.trim(),
         phone: document.getElementById("number").value.trim(),
-        joinedDate: document.getElementById("joinedDate").value.trim(),
+        date: document.getElementById("joinedDate").value.trim(),
         status: document.getElementById("status").value.trim(),
         notes: document.getElementById("notes").value.trim(),
+        tags: tags || [],
+        linkedMyFremUser: linkedMyFremUser || null,
         lastEdit: serverTimestamp(),
         editedBy: auth.currentUser.uid
     };
 
     try {
         await updateDoc(doc(db, "users_whatsapp", userId), updatedData);
-        window.location.href = "/staff/dashboard/management/users-whatsapp/";
 
-        await updateDoc(doc(db, "activities", ), {
+        await addDoc(collection(db, "activities"), {
             type: "user_edit_whatsapp",
-            userName: userId,
-            editedBy: auth.currentUser.email || "unknown",
+            userId,
+            editedBy: auth.currentUser.email,
             timestamp: serverTimestamp()
         });
 
-        statusMsg.textContent = "✅ Modifiche salvate!";
-        statusMsg.style.color = "#4aff4a";
+        window.location.href = "/staff/dashboard/management/users-whatsapp/";
 
-        loadUser();
     } catch (err) {
         console.error(err);
         statusMsg.textContent = "❌ Errore durante il salvataggio.";

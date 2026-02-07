@@ -50,6 +50,21 @@
             <label for="notes">Note:</label>
             <textarea id="notes" name="notes"></textarea>
 
+            <div id="tagsContainer">
+                <label>Tag:</label>
+                <label><input type="checkbox" class="tagCheck" value="Amministratore"> #Amministratore</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Nuovo Utente"> #Nuovo Utente</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Membro"> #Membro</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Membro OG"> #Membro OG (prima del 10/2025)</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Staff"> #Staff</label><br>
+            </div>
+
+            <label>Link utente MyFrEM:</label>
+            <input id="myfremIdInput" type="text" class="photo-link-input" placeholder="ID utente MyFrEM">
+            <button type="button" id="linkMyFremBtn" class="quick-btn" style="margin-top: 5px;">🔍 Collega</button>
+
+            <div id="myfremResult" style="margin-top:10px;font-size:14px;"></div>
+
             <button type="submit" class="btn-primary">💾 Salva Modifiche</button>
         </form>
 

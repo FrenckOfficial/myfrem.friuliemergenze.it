@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nuovo - Report di Espulsione | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Nuovo - Utente WhatsApp | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/staff.css">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
   <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -54,6 +54,24 @@
             <div class="form-group">
                 <label for="notes">🗒️ Note aggiuntive (facoltativo):</label>
                 <textarea id="notes" class="photo-link-input" placeholder="Eventuali note aggiuntive..."></textarea>
+            </div>
+            <div class="form-group">
+              <h3>🏷️ Tag utente</h3>
+              <div id="tagsContainer">
+                <label><input type="checkbox" class="tagCheck" value="Amministratore"> #Amministratore</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Nuovo Utente"> #Nuovo Utente</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Membro"> #Membro</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Membro OG"> #Membro OG (prima del 10/2025)</label><br>
+                <label><input type="checkbox" class="tagCheck" value="Staff"> #Staff</label><br>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <h3>🔗 Collegamento a utente MyFrEM</h3>
+              <input id="myfremIdInput" type="text" class="photo-link-input" placeholder="ID utente MyFrEM">
+              <button type="button" id="linkMyFremBtn" class="quick-btn" style="margin-top: 5px;">🔍 Collega</button>
+
+              <div id="myfremResult" style="margin-top:10px;font-size:14px;"></div>
             </div>
             <div class="form-group">
                 <button type="submit" class="quick-btn">📤 Aggiungi Utente</button>

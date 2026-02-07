@@ -1,4 +1,4 @@
-// ✅ Import Firebase
+// Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -8,31 +8,63 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🔑 Controllo autenticazione
+// Login check
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "/login";
-  }
+  if (!user) window.location.href = "/login";
 });
 
-// 🚪 Logout
-const logoutBtn = document.getElementById("logoutBtn");
-logoutBtn.addEventListener("click", async () => {
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// 📄 Form
-const expulsionForm = document.getElementById("expulsionReportForm");
+// ELEMENTI
+const form = document.getElementById("expulsionReportForm");
 const statusMsg = document.getElementById("statusMsg");
+let linkedMyFremUser = null;
 
-expulsionForm.addEventListener("submit", async (e) => {
+// 🔗 COLLEGAMENTO UTENTE MYFREM
+document.getElementById("linkMyFremBtn").onclick = async () => {
+  const id = document.getElementById("myfremIdInput").value.trim();
+  if (!id) return alert("Inserisci un ID!");
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", id));
+
+    if (!userDoc.exists()) {
+      document.getElementById("myfremResult").innerHTML = "❌ Nessun utente trovato.";
+      linkedMyFremUser = null;
+      return;
+    }
+
+    linkedMyFremUser = { id, ...userDoc.data() };
+
+    document.getElementById("myfremResult").innerHTML = `
+      <b>Utente trovato</b><br>
+      Nome: ${linkedMyFremUser.name}<br>
+      Email: ${linkedMyFremUser.email}<br>
+      Ruolo: ${linkedMyFremUser.role}
+    `;
+
+  } catch (err) {
+    console.error(err);
+    alert("Errore durante la ricerca dell'utente MyFrEM.");
+  }
+};
+
+// 📤 SALVATAGGIO
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const userName = document.getElementById("userSelect").value.trim();
   const userNumber = document.getElementById("userNumber").value.trim();
   const expulsionDate = document.getElementById("expulsionDate").value;
   const notes = document.getElementById("notes").value.trim();
+
+  // TAG
+  const tags = Array.from(document.querySelectorAll(".tagCheck:checked"))
+    .map(t => t.value);
 
   if (!userName || !expulsionDate) {
     statusMsg.textContent = "❌ Compila tutti i campi obbligatori!";
@@ -41,17 +73,20 @@ expulsionForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    // Salvataggio Firestore
+    // 🔥 SALVATAGGIO UTENTE
     await addDoc(collection(db, "users_whatsapp"), {
       name: userName,
       phone: userNumber || null,
       date: expulsionDate,
       notes: notes || null,
+      tags: tags || [],
+      linkedMyFremUser: linkedMyFremUser || null,
       role: "user",
       status: "active",
       createdAt: serverTimestamp()
     });
 
+    // 🔥 LOG ATTIVITÀ
     await addDoc(collection(db, "activities"), {
       type: "user_creation_whatsapp",
       addStaffer: auth.currentUser?.email || "unknown",
@@ -59,14 +94,16 @@ expulsionForm.addEventListener("submit", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    statusMsg.textContent = "✅ Creazione avvenuta con successo!";
+    statusMsg.textContent = "✅ Utente aggiunto con successo!";
     statusMsg.className = "success";
-    expulsionForm.reset();
+    form.reset();
+    linkedMyFremUser = null;
+
     window.location.href = "/staff/dashboard/management/users-whatsapp/";
 
   } catch (err) {
     console.error("Errore creazione utente:", err);
-    statusMsg.textContent = "❌ Errore nella creazione dell'utente. Riprovare.";
+    statusMsg.textContent = "❌ Errore nella creazione dell'utente.";
     statusMsg.className = "error";
   }
 });

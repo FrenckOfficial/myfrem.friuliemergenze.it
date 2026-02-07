@@ -6,8 +6,6 @@ body {
     display: flex;
 }
 
-/* ——— LAYOUT ——————————————— */
-
 .sidebar {
   width: 11%;
   background: #222;
@@ -25,12 +23,6 @@ body {
 .sidebar .logo img {
   width: 60px;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
-}
-
-.sidebar .logo h2 {
-  font-size: 1.2rem;
-  margin-top: 10px;
 }
 
 .sidebar nav a {
@@ -50,89 +42,47 @@ body {
 }
 
 .sidebar .logout {
-  margin-top: 692px;
+  margin-top: auto;
   background: #e74c3c;
   color: white;
   padding: 10px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
 }
-
-.sidebar .logout:hover {
-  background: #c0392b;
-}
-
-/* ——— MAIN CONTENT ——————————————— */
 
 .main-content {
   flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
 }
 
-.page-header h2 {
-    margin: 0;
-    font-size: 28px;
-}
-
-form {
-    margin-top: 1.5rem;
-    width: 75%;
-}
-
-/* ——— USER INFO BOX ——————————————— */
-
-.user-box,
-.edit-box {
-    background: #f1ecec;
+.user-box {
+    background: #f8f8f8;
     padding: 1.4rem;
     border-radius: 12px;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
-
-.user-box p strong {
-    color: #28527c;
-}
-
-/* ——— FORM ——————————————— */
 
 label {
     display: block;
     margin-top: 1rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
     font-weight: 600;
-    color: #555;
 }
 
-input[type="text"],
+input,
 textarea,
-input[type="date"],
 select {
     width: 100%;
+    padding: 0.9rem;
     background: #fff;
     border: 1px solid #333;
-    padding: 0.9rem;
     border-radius: 10px;
-    color: #111;
-    margin-top: 0.2rem;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #4aa3ff;
 }
 
 textarea {
-    height: 120px;
     resize: none;
 }
-
-/* ——— BUTTON ——————————————— */
 
 .btn-primary {
     background: #0066ff;
@@ -142,17 +92,20 @@ textarea {
     margin-top: 1.4rem;
     border-radius: 10px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
-.btn-primary:hover {
-    background: #0051cc;
+.quick-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
-/* ——— STATUS MESSAGE ——————————————— */
-
-#statusMsg {
-    margin-top: 1rem;
-    font-size: 1rem;
-    font-weight: 600;
+.quick-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
 }
