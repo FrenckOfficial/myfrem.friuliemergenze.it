@@ -58,6 +58,13 @@ if (loginForm) {
 
       const userDoc = await db.collection("users").doc(user.uid).get();
 
+      const loginsRef = db.collection("logins");
+      await loginsRef.add({
+        userId: user.uid,
+        email: user.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       if (!userDoc.exists) {
         alert("Profilo non trovato");
         return;
@@ -133,6 +140,12 @@ if (googleBtn) {
       } else {
         window.location.href = "/dashboard";
       }
+
+      await db.collection("logins").add({
+        userId: user.uid,
+        email: user.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
     } catch (err) {
       crr("❌ Errore Google:", err);

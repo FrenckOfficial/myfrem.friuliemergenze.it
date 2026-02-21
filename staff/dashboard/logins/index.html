@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestione Utenti WhatsApp | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Gestione Logins | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
-  <script type="module" src="/staff/dashboard/management/users-whatsapp/users.js"></script>
+  <script type="module" src="/staff/dashboard/logins/load.js"></script>
 </head>
 <body>
   <!-- Sidebar Staff -->
@@ -29,32 +30,15 @@
 
   <!-- Main content -->
   <main class="main-content">
-    <h1>WhatsApp - 👥 Gestione Utenti</h1>
-
-    <div class="list">
-      <a href="/staff/dashboard/management/users-whatsapp/new/" class="btn-primary">➕ Nuovo utente</a>
-      <p id="totalUsers"><b>Utenti totali: <span id="totalUsersCount">0</span></b></p>
-    </div>
-
-    <div class="gallery-search" style="margin-top: 10px;">
-      <input type="text" id="searchInput" placeholder="Cerca un utente..." style="
-        width: 50%;
-        padding: 0.75rem;
-        margin: 1rem 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 1rem;
-      ">
-    </div>
+    <h1>Tutti i logins</h1>
 
     <!-- Tabella utenti -->
     <table id="usersTable">
       <thead>
         <tr>
           <th>Nome</th>
-          <th>Telefono</th>
-          <th>Tipo account</th>
-          <th>Stato Account</th>
+          <th>Data e ora accesso</th>
+          <th>UID</th>
           <th>Azioni</th>
         </tr>
       </thead>
@@ -64,20 +48,6 @@
     </table>
 
     <p id="messageBox"></p>
-    <script>
-      const searchInput = document.getElementById("searchInput");
-      const tableBody = document.getElementById("usersTableBody");
-
-      searchInput.addEventListener("keyup", () => {
-        const filter = searchInput.value.toLowerCase();
-        const rows = tableBody.querySelectorAll("tr");
-
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(filter) ? "" : "none";
-        });
-      });
-    </script>
   </main>
 </body>
 </html>
