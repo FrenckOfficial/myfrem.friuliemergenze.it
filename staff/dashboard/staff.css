@@ -617,7 +617,7 @@ button.reject:active {
   justify-content: center;
 }
 
-#functionsBtn {
+.functionsBtn {
   width: 300px;
   height: 40px;
   margin-left: 250px;
@@ -646,7 +646,7 @@ button.reject:active {
   margin-top: 20px;
 }
 
-#reunionsBtn {
+#reunionsBtn:hover {
   background-color: #9c2e21;
 }
 
