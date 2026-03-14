@@ -666,6 +666,9 @@ button.reject:active {
   .form-row {
     flex-direction: column;
   }
+  .functionsBtn {
+    margin-left: 0px;
+  }
 }
 
 /* Responsive form */
