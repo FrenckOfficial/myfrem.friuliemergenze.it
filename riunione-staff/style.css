@@ -1,0 +1,311 @@
+/* ================================
+   Reset e base
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f6f9;
+  color: #333;
+}
+
+/* ================================
+   Sidebar
+================================ */
+.sidebar {
+  width: 650px;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar .logo img {
+  width: 60px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+}
+
+.sidebar .logo h2 {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.sidebar nav a {
+  display: block;
+  color: #bbb;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+  background: #444;
+  color: #fff;
+}
+
+.sidebar .logout {
+  margin-top: 692px;
+  background: #e74c3c;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar .logout:hover {
+  background: #c0392b;
+}
+
+/* ================================
+   Main Content
+================================ */
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.page-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  display: inline-block;
+  background-color: #2563eb;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  margin-top: 25px;
+  display: inline-block;
+  background-color: #ff1100;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-secondary:hover {
+  background-color: #860a0a;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   Report Box
+================================ */
+.activity-box {
+  background: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
+
+.activity-box h3 {
+  margin-top: 15px;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.activity-box p {
+  background: #f4f6f9;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.reports-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.reports-table thead {
+  background: #222;
+}
+
+.reports-table th, .reports-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.reports-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reports-table .empty {
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ================================
+   Status messages
+================================ */
+.error {
+  color: #b91c1c;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.success {
+  color: #166534;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* ================================
+   Table lista report (opzionale)
+================================ */
+.reports-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.reports-table th,
+.reports-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.reports-table th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+}
+
+.reports-table tbody tr:hover {
+  background-color: #f0f4f8;
+}
+
+/* ================================
+   Responsive
+================================ */
+@media (max-width: 992px) {
+  body {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+  }
+
+  .sidebar .logo {
+    margin: 0;
+  }
+
+  .sidebar nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sidebar nav a {
+    padding: 8px 12px;
+    margin-bottom: 0;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .sidebar nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar nav a {
+    padding: 12px;
+  }
+
+  .sidebar .logout {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* -------------------------
+     Main content
+  ------------------------- */
+  .main-content h1 {
+    font-size: 1.4rem;
+  }
+
+  .activity-box p {
+    font-size: 0.9rem;
+  }
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h2 {
+    font-size: 1.4rem;
+  }
+  .activity-box {
+    padding: 18px;
+  }
+  .activity-box p {
+    font-size: 0.85rem;
+  }
+}
