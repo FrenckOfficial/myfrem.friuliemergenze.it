@@ -19,7 +19,7 @@ async function loadPublicReport() {
   titleReport.innerHTML = `Report ${reportId} | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`
 
   // Prendi il report
-  const docRef = doc(db, "reunionReports", reportId);
+  const docRef = doc(db, "reunionsReports", reportId);
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {

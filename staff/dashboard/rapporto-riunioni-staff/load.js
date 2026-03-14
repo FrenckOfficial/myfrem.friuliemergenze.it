@@ -40,7 +40,7 @@ async function loadReports() {
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>#${reportId}</td>
-                <td>${data.stardDate} - ${data.endDate}</td>
+                <td>${data.startDate} - ${data.endDate}</td>
                 <td>${data.order}</td>
                 <td>${data.opener}</td>
                 <td><a href="/riunione-staff/?rid=${reportId}" target="_blank">${reportId}</a></td>
