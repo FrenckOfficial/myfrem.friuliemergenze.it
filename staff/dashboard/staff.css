@@ -617,10 +617,15 @@ button.reject:active {
   justify-content: center;
 }
 
+#functionsBtn {
+  width: 300px;
+  height: 40px;
+  margin-left: 250px;
+  justify-content: center;
+}
+
 #platformUsersBtn {
   background-color: #10b981; /* verde */
-  width: 210px;
-  justify-content: center;
 }
 
 #platformUsersBtn:hover {
@@ -630,8 +635,6 @@ button.reject:active {
 #whatsappUsersBtn {
   background-color: #3b82f6; /* azzurro */
   margin-top: 20px;
-  width: 210px;
-  justify-content: center;
 }
 
 #whatsappUsersBtn:hover {
@@ -641,8 +644,6 @@ button.reject:active {
 #reunionsBtn {
   background-color: #c0392b;
   margin-top: 20px;
-  width: 210px;
-  justify-content: center;
 }
 
 #reunionsBtn {
