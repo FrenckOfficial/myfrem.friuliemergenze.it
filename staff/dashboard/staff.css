@@ -7,7 +7,6 @@
 }
 
 body {
-  display: flex;
   height: 100vh;
   background-color: #f4f6f9;
   color: #333;
@@ -21,6 +20,11 @@ body {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -76,7 +80,7 @@ body {
 .main-content {
   flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
+  margin-left: 250px;
 }
 
 .main-content h1 {
@@ -617,11 +621,52 @@ button.reject:active {
   justify-content: center;
 }
 
-.functionsBtn {
-  width: 300px;
-  height: 40px;
-  margin-left: 250px;
-  justify-content: center;
+.user-management-options {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+}
+
+.option-box {
+    text-decoration: none;
+}
+
+.option-content {
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8f8f8;
+    text-align: center;
+    border: 2px solid #dcdcdc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    transition: 0.3s ease;
+}
+
+.option-content:hover {
+    background: #ffffff;
+    border-color: #bfbfbf;
+    transform: translateY(-5px);
+}
+
+.option-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.option-icon svg {
+    width: 70%;
+    height: 70%;
+    fill: #444; /* colore icona */
+}
+
+.option-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
 }
 
 #platformUsersBtn {

@@ -10,6 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
   <div class="container">
@@ -44,5 +45,18 @@
   </div>
 
   <script type="module" src="/login/app.js"></script>
+  <script>
+    function togglePassword(inputId, button) {
+      const input = document.getElementById(inputId);
+
+      if (input.type === "password") {
+        input.type = "text";
+        button.innerHTML = `<i class="far fa-eye fa-eye-custom togglePassword fa-eye-slash"></i>`
+      } else {
+        input.type = "password";
+        button.innerHTML = `<i class="far fa-eye fa-eye-custom togglePassword"></i>`
+      }
+    }
+  </script>
 </body>
 </html>

@@ -6,6 +6,10 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const loginTable = document.getElementById("usersTableBody");
 
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  window.location.href = "/login"
+})
+
 loadUsers();
 
 async function loadUsers() {
@@ -33,6 +37,7 @@ async function loadUsers() {
         <td>${data.email ?? "—"}</td>
         <td>${timestamp}</td>
         <td>${data.userId ?? "—"}</td>
+        <td>${data.ip ?? "N/D"}</td>
         <td><a href="mailto:${data.email}" class="btn btn-sm btn-outline-primary">Contatta</a></td>
       </tr>
     `;

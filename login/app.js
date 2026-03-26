@@ -6,6 +6,7 @@ import { firebaseConfig } from "../configFirebase.js";
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 const db = firebase.firestore();
 
 const clg = console.log;
@@ -57,9 +58,21 @@ if (loginForm) {
       localStorage.setItem("userToken", token);
 
       const userDoc = await db.collection("users").doc(user.uid).get();
+      const sessionId = crypto.randomUUID();
+      
+      await db.collection("users").doc(user.uid).update({
+        sessionId
+      });
+      localStorage.setItem("sessionId", sessionId)
+
+      // Login con salvataggio IP
+      const ipResponse = await fetch('https://ipify.org');
+      const ipData = await ipResponse.json();
+      const ipAddress = ipData.ip();
 
       const loginsRef = db.collection("logins");
       await loginsRef.add({
+        ip: ipAddress,
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -71,15 +84,6 @@ if (loginForm) {
       }
 
       const userData = userDoc.data();
-
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
-
-      // 🚀 Redirect
-      if (allowedRoles.includes(userData.role)) {
-        window.location.href = "/staff";
-      } else {
-        window.location.href = "/dashboard";
-      }
 
       if (userData.status === "sospeso") {
         alert("❌ Il tuo account è sospeso. Contatta un amministratore.");
@@ -93,8 +97,17 @@ if (loginForm) {
         return;
       }
 
-      if (userData.emailVerified === "false") {
+      if (!userData.emailVerified) {
         alert("⚠️ Attenzione: email non verificata. Verifica la tua email per accedere.");
+        await auth.signOut();
+        return;
+      }
+
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
+      if (allowedRoles.includes(userData.role)) {
+        window.location.href = "/staff";
+      } else {
+        window.location.href = "/dashboard";
       }
 
     } catch (err) {
@@ -134,14 +147,21 @@ if (googleBtn) {
 
       const finalDoc = await userRef.get();
       const data = finalDoc.data();
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
 
-      if (data.role === "staff") {
+      if (allowedRoles.includes(data.role)) {
         window.location.href = "/staff";
       } else {
         window.location.href = "/dashboard";
       }
 
+      // Login con salvataggio IP
+      const ipResponse = await fetch('https://ipify.org');
+      const ipData = await ipResponse.json();
+      const ipAddress = ipData.ip();
+
       await db.collection("logins").add({
+        ip: ipAddress,
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -169,6 +189,7 @@ if (registerForm) {
     const email = document.getElementById("registerEmail").value;
     const username = document.getElementById("registerUsername").value;
     const password = document.getElementById("registerPassword").value;
+    const reb = document.getElementById("resetEmailButton");
 
     try {
       const existing = await db
@@ -207,6 +228,12 @@ if (registerForm) {
         emailVerified: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      reb.addEventListener("submit", () => {
+        db.collection("users").doc(user.uid).set({
+          emailVerified: true
+        })
+      })
 
       await auth.signOut();
 
@@ -247,26 +274,25 @@ if (resetForm) {
 // ==========================
 auth.onAuthStateChanged(async (user) => {
   if (user) {
+
     clg("👤 Utente loggato:", user.uid);
+
     const token = await user.getIdToken();
     localStorage.setItem("userToken", token);
+
+    const userDoc = await db.collection("users").doc(user.uid).get();
+
+    if (!userDoc.exists) return;
+
+    const userData = userDoc.data();
+    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
+
+    if (allowedRoles.includes(userData.role)) {
+      window.location.href = "/staff";
+    } else {
+      window.location.href = "/dashboard"
+    }
   } else {
-    clg("⚠️ Nessun utente");
+    clg("⚠️ Nessun utente loggato");
   }
 });
-
-
-// ==========================
-// 👁 TOGGLE PASSWORD
-// ==========================
-function togglePassword(inputId, button) {
-  const input = document.getElementById(inputId);
-
-  if (input.type === "password") {
-    input.type = "text";
-    button.textContent = "🚫";
-  } else {
-    input.type = "password";
-    button.textContent = "👁";
-  }
-}

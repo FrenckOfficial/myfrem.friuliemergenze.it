@@ -24,7 +24,7 @@
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporto di espulsione</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
       <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
       <a href="/staff/dashboard/settings/" class="active">⚙️ Impostazioni</a>
     </nav>
@@ -59,13 +59,13 @@
       <h2>🔐 Cambia Password</h2>
       <form id="changePasswordForm">
         <label>Password attuale</label>
-        <input type="password" id="currentPassword" required>
+        <input type="password" id="currentPassword" required autocomplete="current-password">
 
         <label>Nuova password</label>
-        <input type="password" id="newPassword" required>
+        <input type="password" id="newPassword" required autocomplete="new-password">
 
         <label>Conferma nuova password</label>
-        <input type="password" id="confirmPassword" required>
+        <input type="password" id="confirmPassword" required autocomplete="new-password">
 
         <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
       </form>
@@ -88,28 +88,6 @@
       <textarea id="bioInput" class="textarea"></textarea>
       <button id="saveBioBtn" class="btn" type="submit">💾 Salva bio</button>
     </section>
-
-    <!-- ===== PREFERENZE STAFF ===== -->
-    <section class="settings-section">
-      <h2>⚙️ Preferenze Staff</h2>
-      <form id="preferencesForm">
-        <label class="checkbox">
-          <input type="checkbox" id="emailNotifications"> Notifiche via email
-        </label>
-
-        <button type="submit" class="btn" id="preferencesFormButton">💾 Salva preferenze</button>
-      </form>
-      <p id="preferencesStatusMsg"></p>
-    </section>
-
-    <!-- ===== SISTEMA ===== -->
-    <section class="settings-section">
-      <h2>🖥️ Sistema</h2>
-
-      <button id="clearCacheBtn" class="danger-btn">🧹 Svuota cache locale</button>
-    </section>
-
   </main>
-
 </body>
 </html>

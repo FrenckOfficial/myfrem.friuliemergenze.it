@@ -26,15 +26,6 @@ const bioInput = document.getElementById("bioInput")
 const bioText = document.getElementById("bioText")
 const saveBioBtn = document.getElementById("saveBioBtn");
 
-const preferencesFormButton = document.getElementById("preferencesFormButton");
-const preferencesStatusMsg = document.getElementById("preferencesStatusMsg");
-
-const emailNotificationsCheckbox = document.getElementById("emailNotifications");
-const darkModeToggle = document.getElementById("darkModeToggle");
-
-const clearCacheBtn = document.getElementById("clearCacheBtn");
-const resetLayoutBtn = document.getElementById("resetLayoutBtn");
-
 let currentUserId = null;
 let currentUser = null
 
@@ -59,9 +50,6 @@ auth.onAuthStateChanged(async user => {
   staffRole.textContent = data.role || "Non disponibile.";
   usernameText.textContent = data.username || "Non disponibile.";
   bioText.textContent = data.bio || "Non disponibile."
-
-  // Carica preferenze da localStorage
-  emailNotificationsCheckbox.checked = localStorage.getItem("staff_emailNotifications") === "true";
 });
 
 // ==================== LOGOUT ====================
@@ -126,30 +114,4 @@ saveBioBtn.addEventListener("click", async () => {
   });
 
   alert("Biografia aggiornata!");
-});
-
-// ==================== PREFERENZE STAFF ====================
-preferencesFormButton.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  localStorage.setItem("staff_emailNotifications", emailNotificationsCheckbox.checked);
-
-  preferencesStatusMsg.textContent = "✅ Preferenze salvate!";
-  preferencesStatusMsg.className = "success";
-
-  setTimeout(() => { preferencesStatusMsg.textContent = ""; }, 3000);
-});
-
-// ==================== SISTEMA ====================
-clearCacheBtn.addEventListener("click", () => {
-  localStorage.clear();
-  alert("Cache locale svuotata!");
-});
-
-resetLayoutBtn.addEventListener("click", () => {
-  // Resetta solo layout / temi / preferenze
-  localStorage.removeItem("staff_darkMode");
-  localStorage.removeItem("staff_emailNotifications");
-  document.body.classList.remove("dark-mode");
-  alert("Layout dashboard reimpostato!");
 });

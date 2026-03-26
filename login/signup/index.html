@@ -57,10 +57,10 @@
 
       if (input.type === "password") {
         input.type = "text";
-        button.textContent = "🚫";
+        button.innerHTML = `<i class="far fa-eye fa-eye-custom togglePassword fa-eye-slash"></i>`
       } else {
         input.type = "password";
-        button.textContent = "👁";
+        button.innerHTML = `<i class="far fa-eye fa-eye-custom togglePassword"></i>`
       }
     }
   </script>

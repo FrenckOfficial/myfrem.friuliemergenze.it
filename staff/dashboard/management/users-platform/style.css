@@ -1,8 +1,7 @@
 /* Sidebar */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  display: flex;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
 }
 
@@ -14,6 +13,12 @@ body {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -67,9 +72,10 @@ body {
 
 /* Main content */
 .main-content {
-  flex-grow: 1;
   padding: 30px;
   background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 250px;
 }
 
 .main-content h1 {

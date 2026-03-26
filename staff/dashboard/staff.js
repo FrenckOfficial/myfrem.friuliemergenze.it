@@ -21,6 +21,7 @@ const approvedEventsEl = document.getElementById("approvedEvents");
 const rejectedEventsEl = document.getElementById("rejectedEvents");
 const organizedEventsEl = document.getElementById("organizedEvents");
 const recentActivityListEl = document.getElementById("recentActivityList");
+const recentLoginsListEl = document.getElementById("recentLoginsList");
 const logoutBtn = document.getElementById("logoutBtn");
 
 // 🚪 Logout
@@ -119,11 +120,11 @@ async function loadStats() {
     const activitiesSnap = await getDocs(collection(db, "activities"));
     recentActivityListEl.innerHTML = "";
 
-    const sorted = activitiesSnap.docs
+    const sortedActivities = activitiesSnap.docs
       .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
       .slice(0, 5);
 
-    for (const docSnap of sorted) {
+    for (const docSnap of sortedActivities) {
       const activity = docSnap.data();
       const li = document.createElement("li");
       const date = activity.timestamp.toDate().toLocaleString();
@@ -146,6 +147,36 @@ async function loadStats() {
       recentActivityListEl.appendChild(li);
     }
 
+    // 🔹 Ultimi logins generali
+    const loginsSnap = await getDocs(collection(db, "logins"));
+    recentLoginsListEl.innerHTML = "";
+
+    const sortedLogins = loginsSnap.docs
+      .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
+      .slice(0, 5);
+
+    for (const docSnap of sortedLogins) {
+      const activity = docSnap.data();
+      const li = document.createElement("li");
+      const date = activity.timestamp.toDate().toLocaleString();
+      const email = activity.email;
+
+      li.innerHTML = `Accesso di <a mailto:${email}>${email}</a> in data ${date}`;
+
+      recentLoginsListEl.appendChild(li);
+    }
+
+    if (recentLoginsListEl.children.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nessuna attività recente.";
+      recentLoginsListEl.appendChild(li);
+    }
+
+    if (recentLoginsListEl.children.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nessuna attività recente.";
+      recentLoginsListEl.appendChild(li);
+    }
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
   }
