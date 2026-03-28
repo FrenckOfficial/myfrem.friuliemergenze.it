@@ -87,7 +87,7 @@ if (loginForm) {
         return;
       }
 
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
       if (allowedRoles.includes(userData.role)) {
         window.location.href = "/staff";
       } else {
@@ -137,7 +137,7 @@ if (googleBtn) {
 
       const finalDoc = await userRef.get();
       const data = finalDoc.data();
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
 
       if (allowedRoles.includes(data.role)) {
         window.location.href = "/staff";
@@ -264,7 +264,7 @@ auth.onAuthStateChanged(async (user) => {
     if (!userDoc.exists) return;
 
     const userData = userDoc.data();
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
+    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
 
     if (allowedRoles.includes(userData.role)) {
       window.location.href = "/staff";

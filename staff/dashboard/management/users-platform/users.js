@@ -20,13 +20,12 @@ logoutBtn.addEventListener("click", async () => {
 
 // Verifica login e ruolo staff
 onAuthStateChanged(auth, async user => {
-  const staffUids = [
-    "J1eRe4W2edgovr1sgUw8fqJv76E2",
-    "mPMuZvCRnSWqHVfZLicKFeq5f2O2"
-  ]
-  if (!staffUids.includes(user.uid)) {
+  const userDocRef = doc(db, "users", user.uid);
+  const userDocSnap = await getDoc(userDocRef);
+  const userData = userDocSnap.data();
+  if (userData.role !== "advstaffplus") {
     alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
-    window.location.href = "/staff/dashboard/";
+    window.location.href = "/staff/dashboard/management";
     auth.keptSignIn = true;
     return;
   }
@@ -37,11 +36,7 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
-  const userData = userDocSnap.data();
-
-  const allowedRoles = ["staff", "simpleadmin", "modstaff", "advstaff"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
 
   if (!userData || !allowedRoles.includes(userData.role)) {
     alert("Accesso negato: solo staff");
