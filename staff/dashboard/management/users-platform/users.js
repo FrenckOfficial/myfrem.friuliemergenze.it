@@ -87,7 +87,10 @@ async function loadUsers() {
 }
 
 async function updateRole(userId, currentRole) {
-  const newRole = currentRole === "staff" ? "user" : "staff";
+  const roleHierarchy = ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus"];
+  const currentIndex = roleHierarchy.indexOf(currentRole);
+  const newIndex = (currentIndex + 1) % roleHierarchy.length;
+  const newRole = roleHierarchy[newIndex];
   await addDoc(collection(db, "activities"), {
     type: "user_role_change",
     userName: auth.currentUser.name,
