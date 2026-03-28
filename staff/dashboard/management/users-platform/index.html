@@ -35,7 +35,18 @@
 
   <!-- Main content -->
   <main class="main-content">
-    <h1>MyFrEM - 👥 Funzionalità</h1>
+    <h1>Gestione utenze MyFrEM - 👥 Funzionalità</h1>
+
+    <div class="gallery-search" style="margin-top: 10px;">
+      <input type="text" id="searchInput" placeholder="Cerca un utente..." style="
+        width: 50%;
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      ">
+    </div>
 
     <table id="usersTable">
         <thead>
@@ -55,6 +66,20 @@
     </table>
 
     <p id="messageBox"></p>
+    <script>
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("usersTableBody");
+
+      searchInput.addEventListener("keyup", () => {
+        const filter = searchInput.value.toLowerCase();
+        const rows = tableBody.querySelectorAll("tr");
+
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
+        });
+      });
+    </script>
   </main>
 </body>
 </html>

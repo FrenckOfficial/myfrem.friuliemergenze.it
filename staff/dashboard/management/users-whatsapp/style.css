@@ -162,80 +162,72 @@ button:nth-child(3) { background-color: #ef4444; color: #fff; } /* Elimina */
 /* ================================
    RESPONSIVE SIDEBAR + DASHBOARD
    ================================ */
-
-/* --- Tablet fino a 992px --- */
-@media (max-width: 992px) {
-
-  body {
-    flex-direction: column;
-  }
+/* ============================
+   TABLET — max-width: 1024px
+   ============================ */
+@media (max-width: 1024px) {
 
   .sidebar {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-  }
-
-  .sidebar .logo {
-    margin-bottom: 0;
-    text-align: left;
-  }
-
-  .sidebar nav {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .sidebar nav a {
-    padding: 8px 12px;
-    margin: 0;
-  }
-
-  .sidebar .logout {
-    display: none;
+    width: 200px;
+    padding: 18px;
   }
 
   .main-content {
-    padding: 20px;
+    padding: 25px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1.1rem;
+  }
+
+  .sidebar nav a {
+    padding: 9px;
+    font-size: 0.95rem;
   }
 }
 
-/* --- Mobile fino a 768px --- */
+
+/* ============================
+   MOBILE — max-width: 768px
+   ============================ */
 @media (max-width: 768px) {
 
+  /* Sidebar diventa in alto */
   .sidebar {
+    position: relative;
+    width: 95.5%;
+    height: auto;
+    padding: 15px 15px 10px;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
   }
 
-  .sidebar nav {
-    width: 100%;
-    flex-direction: column;
+  .sidebar .logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
   }
 
   .sidebar nav a {
-    padding: 12px;
-    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
   }
 
-  .sidebar .logout {
-    width: 100%;
-    margin-top: 10px;
-    display: block;
-  }
-
+  /* Il contenuto si sposta sotto */
   .main-content {
+    margin-left: 0;
     padding: 20px;
   }
 
   .main-content h1 {
-    font-size: 1.4rem;
-    text-align: center;
+    font-size: 1.6rem;
   }
 
   /* Tabella scrollabile */

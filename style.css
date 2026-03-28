@@ -87,6 +87,18 @@ section p {
   font-size: 1.1rem;
 }
 
+/* NOVITA' */
+.nuntii-proximi {
+  margin-top: 100px;
+  background-color: #d3d0d0;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.none {
+  display: none;
+}
+
 /* FEATURES */
 .features .grid {
   display: grid;

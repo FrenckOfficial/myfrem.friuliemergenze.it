@@ -756,38 +756,32 @@ button.reject:active {
    ========================================= */
 
 /* ----- TABLET (fino a 992px) ----- */
-@media (max-width: 992px) {
-  body {
-    flex-direction: column;
-  }
+/* ============================
+   TABLET — max-width: 1024px
+   ============================ */
+@media (max-width: 1024px) {
 
   .sidebar {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
+    width: 200px;
+    padding: 18px;
   }
 
-  .sidebar .logo {
-    margin: 0;
+  .main-content {
+    margin-left: 200px;
+    padding: 25px;
   }
 
-  .sidebar nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1.1rem;
   }
 
   .sidebar nav a {
-    padding: 8px 12px;
-    margin-bottom: 0;
-  }
-
-  
-
-  .main-content {
-    padding: 20px;
+    padding: 9px;
+    font-size: 0.95rem;
   }
 
   .stats-grid {
@@ -804,35 +798,38 @@ button.reject:active {
 /* ----- MOBILE (fino a 768px) ----- */
 @media (max-width: 768px) {
 
-  /* ------------------------- 
-     Sidebar stile mobile
-  ------------------------- */
+  /* Sidebar diventa in alto */
   .sidebar {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .sidebar nav {
+    position: relative;
     width: 100%;
+    height: auto;
+    padding: 15px 15px 10px;
     display: flex;
     flex-direction: column;
   }
 
+  .sidebar .logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
   .sidebar nav a {
-    padding: 12px;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
   }
 
-  .sidebar .logout {
-    width: 100%;
-    margin-top: 10px;
+  /* Il contenuto si sposta sotto */
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
   }
 
-  /* -------------------------
-     Main content
-  ------------------------- */
   .main-content h1 {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 
   .stats-grid {

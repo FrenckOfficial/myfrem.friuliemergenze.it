@@ -25,11 +25,12 @@ onAuthStateChanged(auth, async user => {
     "mPMuZvCRnSWqHVfZLicKFeq5f2O2"
   ]
   if (!staffUids.includes(user.uid)) {
-    alert("Accesso negato: solo Francesco può accedere a questa pagina.");
+    alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
     window.location.href = "/staff/dashboard/";
     auth.keptSignIn = true;
     return;
   }
+
 
   if (!user) {
     window.location.href = "/login/";

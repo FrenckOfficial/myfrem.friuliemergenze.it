@@ -209,7 +209,8 @@ if (registerForm) {
       clg("✅ Registrazione OK:", user.uid);
 
       await user.sendEmailVerification({
-        url: "https://myfrem.friuliemergenze.it/login/"
+        url: "https://myfrem.friuliemergenze.it/login/",
+        linkDomain: "https://link.myfrem.friuliemergenze.it/"
       });
 
       await db.collection("activities").add({

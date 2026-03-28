@@ -248,3 +248,73 @@ body {
 .opener-input {
     margin-top: 15px;
 }
+
+/* ============================
+   TABLET — max-width: 1024px
+   ============================ */
+@media (max-width: 1024px) {
+
+  .sidebar {
+    width: 200px;
+    padding: 18px;
+  }
+
+  .main-content {
+    margin-left: 200px;
+    padding: 25px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1.1rem;
+  }
+
+  .sidebar nav a {
+    padding: 9px;
+    font-size: 0.95rem;
+  }
+}
+
+
+/* ============================
+   MOBILE — max-width: 768px
+   ============================ */
+@media (max-width: 768px) {
+
+  /* Sidebar diventa in alto */
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 15px 15px 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar .logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar nav a {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  /* Il contenuto si sposta sotto */
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .main-content h1 {
+    font-size: 1.6rem;
+  }
+}

@@ -52,9 +52,6 @@ async function loadUsers() {
     const u = docSnap.data();
     if (!u) return;
 
-    // Evita staff WhatsApp se non vuoi mostrarli
-    if (u.role === "staff") return;
-
     users.push({
       id: docSnap.id,
       ...u,
