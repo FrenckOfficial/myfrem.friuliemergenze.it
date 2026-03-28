@@ -55,7 +55,7 @@ async function loadUsers() {
 async function deleteDB(userId) {
   if (confirm("Sei sicuro di voler eliminare definitivamente questo login dal database? Questa azione è irreversibile.")) {
     await deleteDoc(doc(db, "logins", userId));
-    loadUsers();
-    alert("Login eliminato.")
+    alert("Login eliminato.");
+    window.location.reload();
   }
 }

@@ -54,6 +54,9 @@ async function loadPublicEvent() {
         <h4><b>📝 Descrizione:</b></h4>
         <p>${e.description || "Non specificata."}</p>
 
+        <h4><b>Data e ora:</b></h4>
+        <p>${e.date || "N/D"} alle ${e.time || "N/D"}</p>
+
         <h4><b>📲 Stato di revisione staff:</b></h4>
         <p class="status null">${e.status || "Non trovato."}</p>
 

@@ -74,13 +74,14 @@ onAuthStateChanged(auth, async (user) => {
 
       // Eventi pulsanti
         div.querySelector(".btn-organized").onclick = async () => {
+          const userRef = doc(db, "events", docSnap.id);
+          window.location.href = `/staff/dashboard/events/completeorganization/?event_id=${docSnap.id}`
           await addDoc(collection(db, "activities"), {
             organizationStaffer: auth.currentUser.email || "-",
             eventTitle: e.title,
             timestamp: new Date(),
             type: "event_organized",
           });
-          const userRef = doc(db, "events", docSnap.id);
           await updateDoc(userRef, { status: "Organizzato" });
           div.querySelector(".status").textContent = "Organizzato";
           div.querySelector(".status").className = "status organized";
@@ -93,8 +94,6 @@ onAuthStateChanged(auth, async (user) => {
             timestamp: new Date(),
             type: "event_approval",
           });
-          const userRef = doc(db, "events", docSnap.id);
-          await updateDoc(userRef, { status: "Organizzato" });
           div.querySelector(".status").textContent = "Approvato";
           div.querySelector(".status").className = "status approved";
         };

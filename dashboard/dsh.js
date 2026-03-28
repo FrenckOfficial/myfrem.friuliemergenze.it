@@ -88,7 +88,7 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     // --- EVENTI ---
-    eventsListEl.innerHTML = "";
+    eventsListEl.innerHTML = "<p>Nessun evento disponibile per l'iscrizione.</p>";
     const eventsSnap = await db.collection("events")
       .orderBy("createdAt", "desc")
       .limit(5)
@@ -98,7 +98,6 @@ auth.onAuthStateChanged(async (user) => {
       const event = doc.data();
       if (event.status === "Organizzato") {
         eventsListEl.innerHTML += `
-          <h2>📅 Eventi </h2>
           <div class="event-card">
             <h3>${event.title}</h3>
             <p>Data e ora: ${event.date || "Data e/o ora sconosciute"}  ${event.time || ""}</p>

@@ -7,7 +7,6 @@
 }
 
 body {
-  display: flex;
   height: 100vh;
   background-color: #f4f6f9;
   color: #333;
@@ -15,12 +14,17 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 11%;
+  width: 250px;
   background: #222;
   color: #fff;
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -74,9 +78,14 @@ body {
 
 /* Main Content */
 .main-content {
-  flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 250px;
+}
+
+.main-content h1 {
+  margin-bottom: 20px;
 }
 
 .page-header h2 {
@@ -236,59 +245,53 @@ body {
 /* ================================
    Responsive
 ================================ */
-@media (max-width: 992px) {
-  body {
-    flex-direction: column;
-  }
+@media (max-width: 1024px) {
   .sidebar {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
+    width: 200px;
+    padding: 18px;
   }
 
-  .sidebar .logo {
-    margin: 0;
+  .main-content {
+    margin-left: 200px;
+    padding: 25px;
   }
 
-  .sidebar nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1.1rem;
   }
 
   .sidebar nav a {
-    padding: 8px 12px;
-    margin-bottom: 0;
-  }
-
-  
-
-  .main-content {
-    padding: 20px;
+    padding: 9px;
+    font-size: 0.95rem;
   }
 }
 
 @media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
-
   .sidebar {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .sidebar nav {
+    position: relative;
     width: 100%;
+    height: auto;
+    padding: 15px 15px 10px;
     display: flex;
     flex-direction: column;
   }
 
+  .sidebar .logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
   .sidebar nav a {
-    padding: 12px;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
   }
 
   .sidebar .logout {
@@ -299,8 +302,13 @@ body {
   /* -------------------------
      Main content
   ------------------------- */
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
   .main-content h1 {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 
   .activity-box p {
@@ -314,6 +322,18 @@ body {
 }
 
 @media (max-width: 480px) {
+  .sidebar {
+    padding: 12px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
   .page-header h2 {
     font-size: 1.4rem;
   }

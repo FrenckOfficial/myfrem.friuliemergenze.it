@@ -1,20 +1,27 @@
 body {
-    margin: 0;
-    background: #111;
-    color: #eee;
-    font-family: system-ui, sans-serif;
-    display: flex;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+html, body {
+  height: 100%;
 }
 
 /* ——— LAYOUT ——————————————— */
 
 .sidebar {
-  width: 11%;
+  width: 210px;
   background: #222;
   color: #fff;
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -25,7 +32,6 @@ body {
 .sidebar .logo img {
   width: 60px;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
 }
 
 .sidebar .logo h2 {
@@ -50,7 +56,6 @@ body {
 }
 
 .sidebar .logout {
-  margin-top: 692px;
   background: #e74c3c;
   color: white;
   padding: 10px;
@@ -58,6 +63,8 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
+  margin-top: auto;
+  margin-bottom: 40px;
 }
 
 .sidebar .logout:hover {
@@ -68,22 +75,31 @@ body {
    Main Content
 ================================ */
 .main-content {
-  flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 250px;
+}
+
+.main-content h1 {
+  margin-bottom: 20px;
 }
 
 /* ——— CONTENT BOXES —————————— */
 
 .page-header h2 {
-    margin: 0;
+    margin-left: 25px;
     font-size: 28px;
+}
+
+.page-header p {
+  margin-left: 25px;
 }
 
 .report-box,
 .add-note-box,
 .notes-list {
-    background: #1a1a1a;
+    background: #f1f1f1;
     padding: 1.4rem;
     border-radius: 12px;
     margin-top: 1.5rem;
@@ -92,7 +108,7 @@ body {
 textarea,
 input[type="url"] {
     width: 100%;
-    background: #111;
+    background: #f0f0f0;
     border: 1px solid #333;
     padding: 0.9rem;
     border-radius: 10px;
@@ -126,7 +142,7 @@ textarea {
 }
 
 .notes-list li {
-    background: #131313;
+    background: #f1f1f1;
     padding: 1rem;
     border: 1px solid #222;
     border-radius: 10px;
@@ -137,4 +153,84 @@ textarea {
     display: block;
     margin-top: 4px;
     color: #4aa3ff;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 95.5%;
+    height: auto;
+    padding: 15px 15px 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar .logo {
+    margin-bottom: 20px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar nav a {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  /* Il contenuto si sposta sotto */
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .main-content h1 {
+    font-size: 1.6rem;
+  }
+
+  /* Tabella scrollabile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    padding: 12px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+
+  #messageBox {
+    font-size: 0.9rem;
+  }
 }
