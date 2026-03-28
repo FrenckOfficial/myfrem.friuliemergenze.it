@@ -6,7 +6,6 @@ import { firebaseConfig } from "../configFirebase.js";
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 const db = firebase.firestore();
 
 const clg = console.log;
@@ -51,32 +50,17 @@ if (loginForm) {
       const cred = await auth.signInWithEmailAndPassword(emailToUse, password);
       const user = cred.user;
 
-      clg("✅ Login riuscito:", user.username || user.email);
-      clg("🔑 Stato account:", user.status);
-
-      const token = await user.getIdToken();
-      localStorage.setItem("userToken", token);
-
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      const sessionId = crypto.randomUUID();
-      
-      await db.collection("users").doc(user.uid).update({
-        sessionId
-      });
-      localStorage.setItem("sessionId", sessionId)
-
-      // Login con salvataggio IP
-      const ipResponse = await fetch('https://ipify.org');
-      const ipData = await ipResponse.json();
-      const ipAddress = ipData.ip();
-
       const loginsRef = db.collection("logins");
       await loginsRef.add({
-        ip: ipAddress,
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      clg("✅ Login riuscito:", user.username || user.email);
+      clg("🔑 Stato account:", user.status);
+
+      const userDoc = await db.collection("users").doc(user.uid).get();
 
       if (!userDoc.exists) {
         alert("Profilo non trovato");
@@ -145,6 +129,12 @@ if (googleBtn) {
         });
       }
 
+      await db.collection("logins").add({
+        userId: user.uid,
+        email: user.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       const finalDoc = await userRef.get();
       const data = finalDoc.data();
       const allowedRoles = ["simplestaff", "modstaff", "advstaff", "staff"];
@@ -154,18 +144,6 @@ if (googleBtn) {
       } else {
         window.location.href = "/dashboard";
       }
-
-      // Login con salvataggio IP
-      const ipResponse = await fetch('https://ipify.org');
-      const ipData = await ipResponse.json();
-      const ipAddress = ipData.ip();
-
-      await db.collection("logins").add({
-        ip: ipAddress,
-        userId: user.uid,
-        email: user.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
 
     } catch (err) {
       crr("❌ Errore Google:", err);
