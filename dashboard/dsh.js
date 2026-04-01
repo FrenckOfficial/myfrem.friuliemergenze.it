@@ -88,7 +88,6 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     // --- EVENTI ---
-    eventsListEl.innerHTML = "<p>Nessun evento disponibile per l'iscrizione.</p>";
     const eventsSnap = await db.collection("events")
       .orderBy("createdAt", "desc")
       .limit(5)

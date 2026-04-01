@@ -106,7 +106,7 @@ onAuthStateChanged(auth, async (user) => {
             type: "event_rejection",
           });
           const userRef = doc(db, "events", docSnap.id);
-          await updateDoc(userRef, { status: "Organizzato" });
+          await updateDoc(userRef, { status: "Rifiutato" });
           div.querySelector(".status").textContent = "Rifiutato";
           div.querySelector(".status").className = "status rejected";
         };

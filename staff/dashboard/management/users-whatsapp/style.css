@@ -199,7 +199,7 @@ button:nth-child(3) { background-color: #ef4444; color: #fff; } /* Elimina */
   /* Sidebar diventa in alto */
   .sidebar {
     position: relative;
-    width: 95.5%;
+    width: 100%;
     height: auto;
     padding: 15px 15px 10px;
     display: flex;

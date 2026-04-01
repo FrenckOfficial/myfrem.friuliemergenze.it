@@ -46,8 +46,8 @@ async function loadEventPage() {
         <h4><b>📅 Data evento:</b></h4>
         <input type="date" id="eventDate" value="${event.date || ""}">
 
-        <h4><b>🕜 Ora evento:</b></h4>
-        <input type="time" id="eventTime" value="${event.time || ""}">
+        <h4><b>🕜 Ora inizio evento:</b></h4>
+        <input type="time" id="eventTimeStart" value="${event.time || ""}">
 
         <button id="confirmBtn" class="btn-close_window">Conferma</button>
     `;
@@ -60,12 +60,12 @@ async function loadEventPage() {
 async function confirmOrg() {
     const placeEl = document.getElementById("eventPlace").value;
     const dateEl = document.getElementById("eventDate").value;
-    const timeEl = document.getElementById("eventTime").value;
+    const startTimeEl = document.getElementById("eventTimeStart").value;
 
     if (confirm("Conferma organizzazione evento con questi dati?")) {
         await updateDoc(doc(db, "events", eventId), {
             date: dateEl,
-            time: timeEl,
+            startTime: startTimeEl,
             location: placeEl,
             status: "Organizzato",
         });

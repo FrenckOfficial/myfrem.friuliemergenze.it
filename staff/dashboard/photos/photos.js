@@ -106,29 +106,29 @@ async function loadPendingPhotos() {
         </td>
       `;
       photosTableBody.appendChild(tr);
-    });
 
-    document.querySelectorAll(".approve").forEach(btn => {
-      addDoc(collection(db, "activities"), {
-        type: "photo_approval",
-        approvalStaffer: auth.currentUser.email || "-",
-        photoTitle: photo.title || "-",
-        timestamp: serverTimestamp()
+      document.querySelectorAll(".approve").forEach(btn => {
+        addDoc(collection(db, "activities"), {
+          type: "photo_approval",
+          approvalStaffer: auth.currentUser.email || "-",
+          photoTitle: photo.title || "-",
+          timestamp: serverTimestamp()
+        });
+        btn.addEventListener("click", () => {
+          updatePhotoStatus(btn.dataset.id, "Approvata ✅");
+        });
       });
-      btn.addEventListener("click", () => {
-        updatePhotoStatus(btn.dataset.id, "Approvata ✅");
-      });
-    });
 
-    document.querySelectorAll(".reject").forEach(btn => {
-      addDoc(collection(db, "activities"), {
-        type: "photo_rejection",
-        rejectionStaffer: auth.currentUser.email || "-",
-        photoTitle: photo.title || "-",
-        timestamp: serverTimestamp()
-      });
-      btn.addEventListener("click", () => {
-        updatePhotoStatus(btn.dataset.id, "Rifiutata ❌");
+      document.querySelectorAll(".reject").forEach(btn => {
+        addDoc(collection(db, "activities"), {
+          type: "photo_rejection",
+          rejectionStaffer: auth.currentUser.email || "-",
+          photoTitle: photo.title || "-",
+          timestamp: serverTimestamp()
+        });
+        btn.addEventListener("click", () => {
+          updatePhotoStatus(btn.dataset.id, "Rifiutata ❌");
+        });
       });
     });
 

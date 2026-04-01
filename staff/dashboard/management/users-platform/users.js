@@ -51,13 +51,42 @@ async function loadUsers() {
   usersTableBody.innerHTML = "";
   const usersSnap = await getDocs(collection(db, "users"));
 
+  let users = [];
+
   usersSnap.forEach(docSnap => {
     const u = docSnap.data();
-    const tr = document.createElement("tr");
-
     if (!u) return;
+    users.push({ id: docSnap.id, ...u });
+  });
 
-    if (u.role === "staff") return;
+  const rolePriority = {
+    advstaffplus: 1,
+    advstaff: 2,
+    modstaff: 3,
+    simplestaff: 4,
+    user: 5
+  };
+
+  const getAlphabetKey = (str) => (str.username || str.name || str.surname || "").toString().toLowerCase();
+
+  // 🔥 Ordinamento utenti
+  users.sort((a, b) => {
+    const roleA = rolePriority[a.role] || 999;
+    const roleB = rolePriority[b.role] || 999;
+
+    if (roleA !== roleB) return roleA - roleB;
+
+    if (a.role === "user" && b.role === "user") {
+      const nameA = getAlphabetKey(a);
+      const nameB = getAlphabetKey(b);
+      return nameA.localeCompare(nameB);
+    }
+
+    return 0;
+  });
+
+  users.forEach(u => {
+    const tr = document.createElement("tr");
 
     tr.innerHTML = `
       <td>${u.name || ""}</td>
@@ -74,12 +103,11 @@ async function loadUsers() {
       </td>
     `;
 
-    // Eventi pulsanti
-    tr.querySelector(".promote").addEventListener("click", () => updateRole(docSnap.id, u.role));
-    tr.querySelector(".suspend").addEventListener("click", () => updateStatus(docSnap.id, u.status));
-    tr.querySelector(".delete").addEventListener("click", () => deleteUser(docSnap.id));
+    tr.querySelector(".promote").addEventListener("click", () => updateRole(u.id, u.role));
+    tr.querySelector(".suspend").addEventListener("click", () => updateStatus(u.id, u.status));
+    tr.querySelector(".delete").addEventListener("click", () => deleteUser(u.id));
     tr.querySelector(".view").addEventListener("click", () => {
-      alert(`ID Utente: ${docSnap.id}`);
+      alert(`ID Utente: ${u.id}`);
     });
 
     usersTableBody.appendChild(tr);
