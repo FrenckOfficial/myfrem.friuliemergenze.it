@@ -1,27 +1,28 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { supa } from "/configSupabase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ─── DOM ─────────────────────────────────────────────────────
-const fileInput   = document.getElementById("inp-upl");
-const uploadBtn   = document.getElementById("btn-upl");
-const statusMsg   = document.getElementById("statusMsg");
-const fileNameSpan= document.getElementById("file-name");
-const titleInput  = document.getElementById("title");
-const descInput   = document.getElementById("description");
+const supabase = createClient(supa.url, supa.anonKey);
 
-// fallback se non esistono in HTML
-const progressBar = document.getElementById("progressBar") || { style:{}, value:0 };
-const progressText= document.getElementById("progressText") || { textContent:"" };
+const uploadForm = document.getElementById("uploadForm");
+const fileInput = document.getElementById("inp-upl");
+const uploadBtn = document.getElementById("btn-upl");
+const statusMsg = document.getElementById("statusMsg");
+const fileNameSpan = document.getElementById("file-name");
+const titleInput = document.getElementById("title");
+const descInput = document.getElementById("description");
+const progressBar = document.getElementById("progressBar") || { style: {}, value: 0 };
+const progressText = document.getElementById("progressText") || { textContent: "" };
 
 let currentUser = null;
 
-// ─── Stato login ─────────────────────────────────────────────
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 
@@ -33,7 +34,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// ─── UI helpers ──────────────────────────────────────────────
 function setStatus(msg) {
   console.log("STATUS:", msg);
   statusMsg.textContent = msg;
@@ -47,9 +47,9 @@ fileInput.addEventListener("change", () => {
   }
 });
 
-// ─── Upload click ────────────────────────────────────────────
-uploadBtn.addEventListener("click", (e) => {
+uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
+
   console.log("📤 Click su upload");
 
   if (!currentUser) {
@@ -64,85 +64,73 @@ uploadBtn.addEventListener("click", (e) => {
     return;
   }
 
-  const path = `uploads/${currentUser.uid}/${Date.now()}-${file.name}`;
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("path", path);
+  const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
 
   setStatus("⏳ Upload in corso...");
 
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "/api/upload", true);
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from("MyFrEM Photos")
+    .upload(path, file, { upsert: false });
 
-  // progress
-  xhr.upload.onprogress = (event) => {
-    if (event.lengthComputable && progressBar.style) {
-      const percent = Math.round((event.loaded / event.total) * 100);
-      progressBar.value = percent;
-      progressText.textContent = percent + "%";
-    }
-  };
+  if (uploadError) {
+    console.error("Errore upload Supabase:", uploadError);
+    setStatus("❌ Upload fallito: " + uploadError.message);
+    return;
+  }
 
-  // ✅ RISPOSTA DAL SERVER
-  xhr.onload = async () => {
-    console.log("✅ onload chiamato");
-    console.log("HTTP Status:", xhr.status);
-    console.log("Raw response:", xhr.responseText);
+  const { data: publicURL } = supabase.storage
+    .from("MyFrEM Photos")
+    .getPublicUrl(path);
 
-    try {
-      const data = JSON.parse(xhr.responseText);
-      console.log("Parsed JSON:", data);
+  const fileUrl = publicURL.publicUrl;
 
-      if (!data.url) {
-        throw new Error(data.error || "URL non ricevuto");
-      }
+  if (!fileUrl) {
+    setStatus("❌ Errore: impossibile ottenere URL pubblica");
+    return;
+  }
 
-      console.log("🔥 Salvataggio Firestore in corso...");
+  console.log("📸 URL pubblica:", fileUrl);
 
-      const activityRef = await addDoc(collection(db, "activities"), {
-        userName: currentUser.uid,
-        photoTitle: titleInput.value || "-",
-        timestamp: serverTimestamp(),
-        type: "photo_submission",
-      });
+  progressBar.value = 100;
+  progressText.textContent = "100%";
 
-      const docRef = await addDoc(collection(db, "photos"), {
-        userId: currentUser.uid,
-        title: titleInput.value || "",
-        description: descInput.value || "",
-        name: file.name,
-        url: data.url,
-        status: "Foto in attesa di approvazione ⌛",
-        createdAt: serverTimestamp()
-      });
+  try {
+    console.log("🔥 Salvataggio su Firestore...");
 
-      console.log("✅ Salvato in Firebase con ID:", docRef.id + "e attività ID:", activityRef.id);
+    const activityRef = await addDoc(collection(db, "activities"), {
+      userName: currentUser.uid,
+      photoTitle: titleInput.value || "-",
+      timestamp: serverTimestamp(),
+      type: "photo_submission",
+    });
 
-      setStatus("✅ Foto caricata e salvata!");
-      fileInput.value = "";
-      fileNameSpan.textContent = "Nessun file";
-      progressText.textContent = "Completato ✅";
+    const docRef = await addDoc(collection(db, "photos"), {
+      userId: currentUser.uid,
+      title: titleInput.value || "",
+      description: descInput.value || "",
+      name: file.name,
+      url: fileUrl,
+      status: "Foto in attesa di approvazione ⌛",
+      createdAt: serverTimestamp()
+    });
 
-    } catch (err) {
-      console.error("❌ Errore interno:", err);
-      setStatus("❌ Errore: " + err.message);
-    }
-  };
+    console.log("✅ Salvato! Photo ID:", docRef.id, "Activity ID:", activityRef.id);
 
-  // ❌ ERRORI DI RETE
-  xhr.onerror = () => {
-    console.error("❌ xhr.onerror chiamato");
-    setStatus("❌ Errore di rete");
-  };
+    setStatus("✅ Foto caricata e salvata!");
+    fileInput.value = "";
+    fileNameSpan.textContent = "Nessun file";
+    progressText.textContent = "Completato ✅";
 
-  xhr.send(formData);
+  } catch (err) {
+    console.error("❌ Errore Firestore:", err);
+    setStatus("❌ Errore nel salvataggio DB");
+  }
+
+  uploadForm.reset();
 });
 
-// --- Logout ---
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  console.log("🚪 Logout in corso...");
+  console.log("🚪 Logout...");
   await auth.signOut();
-  console.log("✅ Logout completato, redirect...");
   window.location.href = "/login/";
 });
