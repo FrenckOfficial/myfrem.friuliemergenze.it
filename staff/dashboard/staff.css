@@ -874,6 +874,22 @@ button.reject:active {
   .preview {
     width: 60px;
   }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
 }
 
 /* ----- EXTRA SMALL (fino a 480px) ----- */

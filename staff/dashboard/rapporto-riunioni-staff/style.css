@@ -1,15 +1,11 @@
-* {
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
 }
 
-body {
-  display: flex;
-  height: 100vh;
-  background-color: #f4f6f9;
-  color: #333;
+html, body {
+  height: 100%;
 }
 
 /* Sidebar */
@@ -20,6 +16,12 @@ body {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -71,10 +73,12 @@ body {
   background: #c0392b;
 }
 
+/* Main content */
 .main-content {
-  flex-grow: 1;
   padding: 30px;
-  overflow-y: auto;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 270px;
 }
 
 .main-content h1 {
@@ -287,7 +291,7 @@ body {
   /* Sidebar diventa in alto */
   .sidebar {
     position: relative;
-    width: 100%;
+    width: 94.5%;
     height: auto;
     padding: 15px 15px 10px;
     display: flex;
@@ -316,5 +320,21 @@ body {
 
   .main-content h1 {
     font-size: 1.6rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
   }
 }

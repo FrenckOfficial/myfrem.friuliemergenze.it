@@ -140,7 +140,7 @@ button:nth-child(3) { background-color: #ef4444; color: #fff; } /* Elimina */
 
   .sidebar {
     position: relative;
-    width: 95.5%;
+    width: 94.5%;
     height: auto;
     padding: 15px 15px 10px;
     display: flex;
