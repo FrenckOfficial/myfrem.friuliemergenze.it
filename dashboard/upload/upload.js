@@ -25,13 +25,7 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
-
-  if (user) {
-    console.log("✅ Utente loggato:", user.uid);
-  } else {
-    console.log("❌ Nessun utente loggato");
-    setStatus("⚠️ Devi essere loggato");
-  }
+  if (!user) setStatus("⚠️ Devi essere loggato");
 });
 
 function setStatus(msg) {
@@ -41,7 +35,7 @@ function setStatus(msg) {
 
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length > 0) {
-    fileNameSpan.textContent = `✅ ${fileInput.files[0].name}`;
+    fileNameSpan.textContent = `📸 ${fileInput.files.length} foto selezionate`;
   } else {
     fileNameSpan.textContent = "Nessun file";
   }
@@ -49,62 +43,44 @@ fileInput.addEventListener("change", () => {
 
 uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
+  if (!currentUser) return setStatus("❌ Devi essere loggato");
 
-  console.log("📤 Click su upload");
+  const files = fileInput.files;
+  if (files.length === 0) return setStatus("❌ Seleziona almeno una foto");
 
-  if (!currentUser) {
-    setStatus("❌ Devi essere loggato");
-    return;
-  }
+  setStatus("⏳ Upload foto in corso...");
 
-  const file = fileInput.files[0];
+  const activityRef = await addDoc(collection(db, "activities"), {
+    userName: currentUser.uid,
+    photoTitle: titleInput.value || "-",
+    timestamp: serverTimestamp(),
+    type: "photo_submission_multi",
+  });
 
-  if (!file) {
-    setStatus("❌ Seleziona una foto");
-    return;
-  }
+  console.log("📘 Activity ID:", activityRef.id);
 
-  const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
+  let uploadedCount = 0;
 
-  setStatus("⏳ Upload in corso...");
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
 
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from("MyFrEM Photos")
-    .upload(path, file, { upsert: false });
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("MyFrEM Photos")
+      .upload(path, file, { upsert: false });
 
-  if (uploadError) {
-    console.error("Errore upload Supabase:", uploadError);
-    setStatus("❌ Upload fallito: " + uploadError.message);
-    return;
-  }
+    if (uploadError) {
+      console.error("❌ Upload fallito:", uploadError);
+      continue;
+    }
 
-  const { data: publicURL } = supabase.storage
-    .from("MyFrEM Photos")
-    .getPublicUrl(path);
+    const { data: publicURL } = supabase.storage
+      .from("MyFrEM Photos")
+      .getPublicUrl(path);
 
-  const fileUrl = publicURL.publicUrl;
+    const fileUrl = publicURL.publicUrl;
 
-  if (!fileUrl) {
-    setStatus("❌ Errore: impossibile ottenere URL pubblica");
-    return;
-  }
-
-  console.log("📸 URL pubblica:", fileUrl);
-
-  progressBar.value = 100;
-  progressText.textContent = "100%";
-
-  try {
-    console.log("🔥 Salvataggio su Firestore...");
-
-    const activityRef = await addDoc(collection(db, "activities"), {
-      userName: currentUser.uid,
-      photoTitle: titleInput.value || "-",
-      timestamp: serverTimestamp(),
-      type: "photo_submission",
-    });
-
-    const docRef = await addDoc(collection(db, "photos"), {
+    await addDoc(collection(db, "photos"), {
       userId: currentUser.uid,
       title: titleInput.value || "",
       description: descInput.value || "",
@@ -114,23 +90,23 @@ uploadBtn.addEventListener("click", async (e) => {
       createdAt: serverTimestamp()
     });
 
-    console.log("✅ Salvato! Photo ID:", docRef.id, "Activity ID:", activityRef.id);
+    uploadedCount++;
 
-    setStatus("✅ Foto caricata e salvata!");
-    fileInput.value = "";
-    fileNameSpan.textContent = "Nessun file";
-    progressText.textContent = "Completato ✅";
-
-  } catch (err) {
-    console.error("❌ Errore Firestore:", err);
-    setStatus("❌ Errore nel salvataggio DB");
+    const percent = Math.round(((i + 1) / files.length) * 100);
+    progressBar.value = percent;
+    progressText.textContent = percent + "%";
   }
 
+  setStatus(`✅ Caricate ${uploadedCount}/${files.length} foto!`);
+  fileInput.value = "";
+  fileNameSpan.textContent = "Nessun file";
   uploadForm.reset();
+
+  progressText.textContent = "Completato ✅";
+  progressBar.value = 100;
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  console.log("🚪 Logout...");
   await auth.signOut();
   window.location.href = "/login/";
 });

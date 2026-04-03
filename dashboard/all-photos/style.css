@@ -1,16 +1,12 @@
 /* ===== Reset base ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 body {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f5f6fa;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f7fa;
   color: #333;
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
 }
 
 /* --- SIDEBAR --- */
@@ -73,11 +69,14 @@ body {
   background: #e60000;
 }
 
-/* ===== Main content ===== */
 .main-content {
-  margin-left: 240px; /* sidebar width + margin */
-  padding: 40px 30px;
+  margin-left: 5%;
+  margin-right: 5%;
   flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 .main-content h1 {
@@ -108,61 +107,6 @@ h1 {
   color: #222;
 }
 
-/* Form */
-form {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-form label {
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-form input[type="text"],
-form input[type="password"],
-form input[type="email"],
-form input[type="checkbox"] {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-form button {
-  padding: 12px;
-  border-radius: 6px;
-  border: none;
-  background-color: #007bff;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-form button:hover {
-  background-color: #0056b3;
-}
-
-/* Messaggi di status */
-.info {
-  color: #555;
-}
-
-.success {
-  color: #28a745;
-}
-
-.error {
-  color: #dc3545;
-  font-weight: bold;
-}
-
 .photo-info {
   margin-top: 15px;
   font-size: 1.1rem;
@@ -183,8 +127,8 @@ form button:hover {
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   margin-bottom: 30px;
-  width: 400px;
-  height: 450px;
+  width: auto;
+  height: auto;
   float: left;
   margin-right: 20px;
   display: flex;
@@ -194,10 +138,11 @@ form button:hover {
 }
 
 .photo-img {
-  width: 50%;
-  height: auto;
+  width: auto;
+  height: 500px;
   border-radius: 8px;
   margin-bottom: 15px;
+
 }
 
 /* Tablet: max-width 992px */
@@ -257,6 +202,7 @@ form button:hover {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    width: auto;
   }
 
   .sidebar nav {
@@ -280,11 +226,24 @@ form button:hover {
   }
 
   .photo-card {
-    width: 100%;
+    width: 95%;
     margin-right: 0;
     margin-bottom: 20px;
     flex-direction: column;
     align-items: center;
+  }
+
+  .photo-info {
+    flex-direction: column;
+  }
+
+  .photo-info .status {
+    margin-top: 10px;
+  }
+
+  .photo-img {
+    width: 100%;
+    height: auto;
   }
 
   form {

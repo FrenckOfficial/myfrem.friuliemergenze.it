@@ -1,16 +1,12 @@
 /* ===== Reset base ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 body {
-  display: flex;
-  min-height: 100vh;
-  background-color: #f0f2f5;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f7fa;
   color: #333;
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
 }
 
 /* --- SIDEBAR --- */
@@ -261,7 +257,7 @@ form button:hover {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 100%;
+    width: auto;
   }
 
   .sidebar nav {

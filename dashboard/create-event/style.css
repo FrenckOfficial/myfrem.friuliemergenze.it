@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f4f7fa;
+  color: #333;
   display: flex;
   flex-direction: row;
   min-height: 100vh;
@@ -67,9 +68,9 @@ body {
   background: #e60000;
 }
 
-/* Main content */
 .main-content {
-  margin-left: 250px;
+  margin-left: 5%;
+  margin-right: 5%;
   flex: 1;
   flex-direction: column;
   align-items: center;
@@ -207,7 +208,7 @@ textarea {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 91.7%;
+    width: auto;
   }
 
   .sidebar nav {

@@ -60,8 +60,20 @@ async function loadStats() {
       const li = document.createElement("li");
       li.textContent = "Nessuna attività recente.";
       recentActivityListEl.appendChild(li);
+      li.onclick = deleteDoc();
     }
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
   }
 }
+
+async function deleteDoc() {
+  const activitiesSnap = await getDocs(collection(db, "activities"));
+  for (const docSnap of activitiesSnap.docs) {
+    if (confirm("Vuoi eliminare quest'attività dal database! Questa azione è irreversibile!")) {
+      await deleteDoc(doc(db, "activities", docSnap.id));
+      alert("Attività eliminata.");
+      window.location.reload();
+    }
+  }
+};
