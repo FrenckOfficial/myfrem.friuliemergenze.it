@@ -102,7 +102,7 @@ async function loadPendingPhotos() {
       `;
       photosTableBody.appendChild(tr);
 
-      document.querySelector(".approve").forEach(btn => {
+      document.querySelectorAll(".approve").forEach(btn => {
         btn.addEventListener("click", () => {
           addDoc(collection(db, "activities"), {
             type: "photo_approval",
@@ -114,7 +114,7 @@ async function loadPendingPhotos() {
         });
       });
 
-      document.querySelector(".reject").forEach(btn => {
+      document.querySelectorAll(".reject").forEach(btn => {
         btn.addEventListener("click", () => {
           addDoc(collection(db, "activities"), {
             type: "photo_rejection",
