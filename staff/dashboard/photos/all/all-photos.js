@@ -25,20 +25,17 @@ const messageBox = document.getElementById("messageBox");
 
 let usersMap = {};
 
-// Logout
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// Helper messaggi
 function setStatus(message, type = "info") {
   if (!statusMsg) return;
   statusMsg.textContent = message;
   statusMsg.className = type;
 }
 
-// Auth + check staff
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
@@ -64,7 +61,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Mappa utenti
 async function loadUsersMap() {
   const snap = await getDocs(collection(db, "users"));
   snap.forEach(docSnap => {
@@ -72,7 +68,6 @@ async function loadUsersMap() {
   });
 }
 
-// Carica tutte le foto
 async function loadAllPhotos() {
   try {
     setStatus("⏳ Caricamento tutte le foto...");
@@ -155,7 +150,6 @@ async function loadAllPhotos() {
   }
 }
 
-// ✅ Save link mezzo (senza log per ora)
 window.saveVehicleLink = async (photoId) => {
   const input = document.getElementById(`link-${photoId}`);
   const link = input.value.trim();
@@ -183,7 +177,6 @@ window.saveVehicleLink = async (photoId) => {
   }
 };
 
-// ✏️ Abilita modifica
 window.editLink = (photoId) => {
   const view = document.getElementById(`link-view-${photoId}`);
   const input = document.getElementById(`link-input-${photoId}`);
@@ -194,7 +187,6 @@ window.editLink = (photoId) => {
   saveBtn.classList.remove("hidden");
 };
 
-// 💾 Salva link
 window.saveVehicleLink = async (photoId) => {
   const input = document.getElementById(`link-input-${photoId}`);
   const link = input.value.trim();
@@ -209,7 +201,6 @@ window.saveVehicleLink = async (photoId) => {
       vehicleLink: link
     });
 
-    // Aggiorna UI
     const view = document.getElementById(`link-view-${photoId}`);
     const saveBtn = document.getElementById(`save-${photoId}`);
 

@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -43,7 +43,6 @@ async function loadUsers() {
       </td>
     `;
 
-    // 🔥 Usa il bottone appena creato (non querySelector su tutta la tabella)
     row.querySelector(".dbdelete").addEventListener("click", () => {
       deleteDB(docSnap.id);
     });

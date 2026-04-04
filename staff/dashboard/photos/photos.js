@@ -12,7 +12,7 @@ import {
   serverTimestamp,
   addDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../configFirebase.js"
+import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -24,20 +24,17 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let usersMap = {};
 
-// Logout
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// Helper messaggi
 function setStatus(message, type = "info") {
   if (!statusMsg) return;
   statusMsg.textContent = message;
   statusMsg.className = type;
 }
 
-// Auth + controllo ruolo
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
@@ -63,7 +60,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Mappa UID -> username
 async function loadUsersMap() {
   const snap = await getDocs(collection(db, "users"));
   snap.forEach(docSnap => {
@@ -71,7 +67,6 @@ async function loadUsersMap() {
   });
 }
 
-// Carica foto da moderare
 async function loadPendingPhotos() {
   try {
     setStatus("⏳ Caricamento foto...");
@@ -107,26 +102,26 @@ async function loadPendingPhotos() {
       `;
       photosTableBody.appendChild(tr);
 
-      document.querySelectorAll(".approve").forEach(btn => {
-        addDoc(collection(db, "activities"), {
-          type: "photo_approval",
-          approvalStaffer: auth.currentUser.email || "-",
-          photoTitle: photo.title || "-",
-          timestamp: serverTimestamp()
-        });
+      document.querySelector(".approve").forEach(btn => {
         btn.addEventListener("click", () => {
+          addDoc(collection(db, "activities"), {
+            type: "photo_approval",
+            approvalStaffer: auth.currentUser.email || "-",
+            photoTitle: photo.title || "-",
+            timestamp: serverTimestamp()
+          });
           updatePhotoStatus(btn.dataset.id, "Approvata ✅");
         });
       });
 
-      document.querySelectorAll(".reject").forEach(btn => {
-        addDoc(collection(db, "activities"), {
-          type: "photo_rejection",
-          rejectionStaffer: auth.currentUser.email || "-",
-          photoTitle: photo.title || "-",
-          timestamp: serverTimestamp()
-        });
+      document.querySelector(".reject").forEach(btn => {
         btn.addEventListener("click", () => {
+          addDoc(collection(db, "activities"), {
+            type: "photo_rejection",
+            rejectionStaffer: auth.currentUser.email || "-",
+            photoTitle: photo.title || "-",
+            timestamp: serverTimestamp()
+          });
           updatePhotoStatus(btn.dataset.id, "Rifiutata ❌");
         });
       });
@@ -139,7 +134,6 @@ async function loadPendingPhotos() {
   }
 }
 
-// Approva / Rifiuta + LOG staff
 async function updatePhotoStatus(photoId, status) {
   try {
     setStatus("⏳ Aggiornamento...");

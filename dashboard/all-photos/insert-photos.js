@@ -7,11 +7,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🔹 DOM references
 const photosContainer = document.getElementById("photosContainer");
 const statusMsg = document.getElementById("statusMsg");
 
-// 🟢 Controllo autenticazione
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login/";
@@ -20,7 +18,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// 📂 Carica tutte le foto dell'utente
 async function loadAllPhotos(userId) {
   try {
     statusMsg.textContent = "⏳ Caricamento foto...";
@@ -73,7 +70,6 @@ async function loadAllPhotos(userId) {
   }
 }
 
-// --- Logout ---
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
   await auth.signOut();

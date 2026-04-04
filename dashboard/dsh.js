@@ -1,13 +1,11 @@
 import { firebaseConfig } from "../configFirebase.js";
 
-// --- Init Firebase ---
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 console.log("👉 Inizializzo Firebase...");
 
-// --- Elementi UI ---
 const userNameEl = document.getElementById("userName");
 const totalPhotosEl = document.getElementById("totalPhotos");
 const approvedPhotosEl = document.getElementById("approvedPhotos");
@@ -21,11 +19,9 @@ const pendingEventsEl = document.getElementById("pendingEvents");
 const rejectedEventsEl = document.getElementById("rejectedEvents");
 const organizedEventsEl = document.getElementById("organizedEvents");
 
-// --- Controllo autenticazione ---
 auth.onAuthStateChanged(async (user) => {
   console.log("👀 onAuthStateChanged triggered, user:", user);
 
-  // PRIMA cosa: controlla se user esiste
   if (!user) {
     console.warn("⚠️ Nessun utente loggato, redirect al login...");
     window.location.href = "/login/";
@@ -33,25 +29,21 @@ auth.onAuthStateChanged(async (user) => {
   }
 
   try {
-    // Recupera dati Firestore dell’utente
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
 
-    // Verifica ruolo SOLO se userData esiste
     if (userData?.role === "staff") {
       alert("Accesso negato: solo utenti normali possono accedere a questa pagina. Utilizza il tuo account personale.");
       window.location.href = "/staff/dashboard/";
       return;
     }
 
-    // Mostra nome utente
     if (userData) {
       userNameEl.textContent = `${userData.name} (${userData.username})`;
     } else {
       userNameEl.textContent = "Utente";
     }
 
-    // --- FOTO ---
     const photosSnap = await db.collection("photos")
       .where("userId", "==", user.uid)
       .orderBy("createdAt", "desc")
@@ -87,7 +79,6 @@ auth.onAuthStateChanged(async (user) => {
       activityListEl.innerHTML = "<li>Nessuna attività recente.</li>";
     }
 
-    // --- EVENTI ---
     const eventsSnap = await db.collection("events")
       .orderBy("createdAt", "desc")
       .limit(5)
@@ -111,7 +102,6 @@ auth.onAuthStateChanged(async (user) => {
     console.error("[FOTO] ❌ Errore durante il recupero dati Firestore:", err);
   }
 
-  // --- EVENTI ---
   try {
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
@@ -145,7 +135,6 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-// --- Logout ---
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
   await auth.signOut();

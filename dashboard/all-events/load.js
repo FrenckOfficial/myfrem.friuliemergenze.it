@@ -7,13 +7,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Logout
 document.getElementById("logoutBtn").onclick = async () => {
   await signOut(auth);
   window.location.href = "/login";
 };
 
-// DOM
 const eventsList = document.getElementById("eventsList");
 const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -23,7 +21,6 @@ logoutBtn.onclick = async () => {
   window.location.href = "/login";
 };
 
-// Carica eventi dell’utente loggato
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
@@ -49,7 +46,6 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // Puliamo la lista prima
     eventsList.innerHTML = "";
 
     snap.forEach(doc => {
@@ -58,7 +54,6 @@ onAuthStateChanged(auth, async (user) => {
       const div = document.createElement("div");
       div.className = "photo-card";
 
-      // Stato evento pulito
       let statusText = "In revisione...";
       if (e.status === "In approvazione") statusText = "In approvazione.";
       else if (e.status === "Organizzato") statusText = "Organizzato.";

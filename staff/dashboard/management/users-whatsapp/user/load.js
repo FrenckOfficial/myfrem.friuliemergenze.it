@@ -5,7 +5,6 @@ import { firebaseConfig } from "../../../../../configFirebase.js";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 📌 Leggi l'ID dall’URL
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get("id");
 
@@ -43,11 +42,10 @@ async function loadUser() {
       <button id="editBtn" class="user-btn btn-edit">✏️ Modifica utente</button>
     </div>
   `;
-  // Torna al link di provenienza
   document.getElementById("backBtn").addEventListener("click", () => {
     window.history.back();
   });
-  // Vai alla pagina di modifica
+  
   document.getElementById("editBtn").addEventListener("click", () => {
     window.location.href = `/staff/dashboard/management/users-whatsapp/edit/?id=${userId.valueOf()}`;
   })

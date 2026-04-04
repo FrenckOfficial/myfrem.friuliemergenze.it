@@ -10,7 +10,6 @@ const db = getFirestore(app);
 const resendBtn = document.getElementById("resendBtn");
 const statusMsg = document.getElementById("statusMsg");
 
-// 🔁 Reinvia verifica
 resendBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
 

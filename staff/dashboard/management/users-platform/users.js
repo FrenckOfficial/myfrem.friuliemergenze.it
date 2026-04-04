@@ -10,7 +10,6 @@ const db = getFirestore(app);
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// Logout
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
   await auth.signOut();
@@ -18,7 +17,6 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "/login/";
 });
 
-// Verifica login e ruolo staff
 onAuthStateChanged(auth, async user => {
   const userDocRef = doc(db, "users", user.uid);
   const userDocSnap = await getDoc(userDocRef);
@@ -69,7 +67,6 @@ async function loadUsers() {
 
   const getAlphabetKey = (str) => (str.username || str.name || str.surname || "").toString().toLowerCase();
 
-  // 🔥 Ordinamento utenti
   users.sort((a, b) => {
     const roleA = rolePriority[a.role] || 999;
     const roleB = rolePriority[b.role] || 999;
@@ -99,16 +96,13 @@ async function loadUsers() {
         <button class="promote">Promuovi</button>
         <button class="suspend">Sospendi/Riattiva</button>
         <button class="delete">Elimina</button>
-        <button class="view">Visualizza ID</button>
+        <button class="view"><a href="/profile/?userid=${u.id}" target="_blank" id="viewProfileBtn">Visualizza profilo</a></button>
       </td>
     `;
 
     tr.querySelector(".promote").addEventListener("click", () => updateRole(u.id, u.role));
     tr.querySelector(".suspend").addEventListener("click", () => updateStatus(u.id, u.status));
     tr.querySelector(".delete").addEventListener("click", () => deleteUser(u.id));
-    tr.querySelector(".view").addEventListener("click", () => {
-      alert(`ID Utente: ${u.id}`);
-    });
 
     usersTableBody.appendChild(tr);
   });

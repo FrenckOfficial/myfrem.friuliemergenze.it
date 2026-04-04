@@ -2,29 +2,26 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ✅ Riferimenti DOM
 const requestsContainer = document.getElementById("contactRequestsTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// 🚪 Logout
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "/login";
 });
 
-// 🔑 Controllo autenticazione + ruolo staff
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = "/login";
         return;
     };
-    // Verifica che sia staff
+
     const userDoc = await getDocs(
         query(collection(db, "users"), where("__name__", "==", user.uid))
     );
@@ -36,11 +33,10 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = "/dashboard";
         return;
     }
-    // ✅ Se staff, carica le richieste di contatto
+
     loadContactRequests();
 });
 
-// 📞 Funzione per caricare richieste di contatto
 async function loadContactRequests() {
     try {
         const userSnap = await getDocs(collection(db, "users"));
@@ -67,7 +63,7 @@ async function loadContactRequests() {
             `;
             requestsContainer.appendChild(row);
         });
-        // Aggiungi event listeners ai bottoni
+        
         document.querySelectorAll(".closeRequestBtn").forEach((btn, doc) => {
             btn.addEventListener("click", async (e) => {
                 const request = requestsSnap.docs.find(r => r.id === e.target.getAttribute("data-id")).data();

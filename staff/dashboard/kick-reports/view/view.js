@@ -1,28 +1,23 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Logout
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// Controllo autenticazione
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "/login";
 });
 
-// Riferimento al contenitore
 const reportDetails = document.getElementById("reportDetails");
-const pageHeader = document.getElementsByClassName("page-header")
 
-// Ottieni ID dalla query string
 const params = new URLSearchParams(window.location.search);
 const reportId = params.get("id");
 

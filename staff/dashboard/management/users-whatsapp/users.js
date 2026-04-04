@@ -11,7 +11,6 @@ const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 const totalUsersCountEl = document.getElementById("totalUsersCount");
 
-// Logout
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
   await auth.signOut();
@@ -19,7 +18,6 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "/login/";
 });
 
-// Verifica login e ruolo staff
 onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = "/login/";
@@ -55,25 +53,21 @@ async function loadUsers() {
     users.push({
       id: docSnap.id,
       ...u,
-      joinedAt: u.joinedAt ? new Date(u.joinedAt) : new Date(0) // Se manca la data → molto vecchio
+      joinedAt: u.joinedAt ? new Date(u.joinedAt) : new Date(0)
     });
   });
 
-  // 📌 ORDINA PER RUOLO (admin → moderator → user)
   const roleOrder = { admin: 1, moderator: 2, user: 3 };
 
   users.sort((a, b) => {
     const roleA = roleOrder[a.role] || 999;
     const roleB = roleOrder[b.role] || 999;
 
-    // Prima ordino per importanza ruolo
     if (roleA !== roleB) return roleA - roleB;
 
-    // Poi ordino per data di aggiunta (dal più vecchio al più nuovo)
     return a.joinedAt - b.joinedAt;
   });
 
-  // 📌 Popolamento tabella ordinata
   users.forEach(u => {
     const tr = document.createElement("tr");
 
@@ -91,7 +85,6 @@ async function loadUsers() {
       </td>
     `;
 
-    // Eventi pulsanti
     tr.querySelector(".promote").addEventListener("click", () => updateRole(u.id, u.role));
     tr.querySelector(".delete").addEventListener("click", () => deleteUser(u.id));
     tr.querySelector(".delete2").addEventListener("click", () => deleteFromDatabase(u.id));

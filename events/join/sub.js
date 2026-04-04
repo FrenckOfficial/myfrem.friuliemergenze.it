@@ -5,16 +5,13 @@ import { firebaseConfig } from "../../configFirebase.js";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM
 const eventsList = document.getElementById("eventsList");
 const titleEvent = document.getElementById("titleEvent");
 const eventIdh = document.getElementById("eventId");
 
-// Recupero ID dall’URL
 const idParam = new URLSearchParams(window.location.search);
 const eventId = idParam.get("event");
 
-// Se non c’è ID → errore
 if (!eventId) {
   eventsList.innerHTML = "<p class='error'>❌ Nessun ID evento fornito nell'URL.</p>";
   throw new Error("Missing event ID");
@@ -65,7 +62,6 @@ async function loadPublicEvent() {
 
     eventsList.appendChild(div);
 
-    // 🔥 ORA il bottone esiste
     const joinBtnEl = document.getElementById("joinBtn");
 
     joinBtnEl.addEventListener("click", async () => {

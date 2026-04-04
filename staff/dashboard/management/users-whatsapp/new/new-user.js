@@ -13,18 +13,15 @@ onAuthStateChanged(auth, (user) => {
   if (!user) window.location.href = "/login";
 });
 
-// Logout
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// ELEMENTI
 const form = document.getElementById("expulsionReportForm");
 const statusMsg = document.getElementById("statusMsg");
 let linkedMyFremUser = null;
 
-// 🔗 COLLEGAMENTO UTENTE MYFREM
 document.getElementById("linkMyFremBtn").onclick = async () => {
   const id = document.getElementById("myfremIdInput").value.trim();
   if (!id) return alert("Inserisci un ID!");
@@ -53,7 +50,6 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
   }
 };
 
-// 📤 SALVATAGGIO
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -62,7 +58,6 @@ form.addEventListener("submit", async (e) => {
   const expulsionDate = document.getElementById("expulsionDate").value;
   const notes = document.getElementById("notes").value.trim();
 
-  // TAG
   const tags = Array.from(document.querySelectorAll(".tagCheck:checked"))
     .map(t => t.value);
 
@@ -73,7 +68,6 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    // 🔥 SALVATAGGIO UTENTE
     await addDoc(collection(db, "users_whatsapp"), {
       name: userName,
       phone: userNumber || null,
@@ -86,7 +80,6 @@ form.addEventListener("submit", async (e) => {
       createdAt: serverTimestamp()
     });
 
-    // 🔥 LOG ATTIVITÀ
     await addDoc(collection(db, "activities"), {
       type: "user_creation_whatsapp",
       addStaffer: auth.currentUser?.email || "unknown",

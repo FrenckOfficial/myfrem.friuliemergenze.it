@@ -17,24 +17,21 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import { firebaseConfig } from "../../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Auth Check
 onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "/login";
 });
 
-// Logout
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "/login";
 });
 
-// Get report ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const reportId = urlParams.get("id");
 
@@ -42,7 +39,6 @@ const reportDetails = document.getElementById("reportDetails");
 const notesContainer = document.getElementById("notesContainer");
 const statusMsg = document.getElementById("statusMsg");
 
-// Load report
 async function loadReport() {
     const ref = doc(db, "expulsionReports", reportId);
     const snap = await getDoc(ref);
@@ -65,7 +61,6 @@ async function loadReport() {
     loadNotes(data.notesHistory || []);
 }
 
-// Load existing notes
 function loadNotes(notes) {
     notesContainer.innerHTML = "";
 
@@ -80,7 +75,6 @@ function loadNotes(notes) {
     });
 }
 
-// Add note
 document.getElementById("addNoteForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 

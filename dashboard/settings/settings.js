@@ -21,7 +21,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// DOM
 const nameInput = document.getElementById("nameInput");
 const surnameInput = document.getElementById("surnameInput");
 const fullNameText = document.getElementById("fullNameText");
@@ -48,7 +47,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 let currentUserId = null;
 let currentUser = null;
 
-// 🔥 LOGIN CHECK
 onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = "/login/";
@@ -61,7 +59,6 @@ onAuthStateChanged(auth, async user => {
   await loadUserData(user.uid);
 });
 
-// 🔎 LOAD USER DATA
 async function loadUserData(uid) {
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
@@ -76,7 +73,6 @@ async function loadUserData(uid) {
   bioInput.value = data.bio || "";
 }
 
-// 📝 SALVA NOME E COGNOME
 saveFullNameBtn.addEventListener("click", async () => {
   const newName = nameInput.value.trim();
   const newSurname = surnameInput.value.trim();
@@ -91,7 +87,6 @@ saveFullNameBtn.addEventListener("click", async () => {
   alert("Nome e cognome aggiornati!");
 });
 
-// 📝 SALVA USERNAME
 saveUsernameBtn.addEventListener("click", async () => {
   const newUsername = usernameInput.value.trim();
   if (newUsername.length < 3) return alert("Minimo 3 caratteri!");
@@ -103,7 +98,6 @@ saveUsernameBtn.addEventListener("click", async () => {
   alert("Username aggiornato!");
 });
 
-// 📝 SALVA MAIL
 saveMailBtn.addEventListener("click", async () => {
   const newMail = mailInput.value.trim();
   if (newMail.length < 5 || !newMail.includes("@")) return alert("Inserisci una mail valida!");
@@ -115,7 +109,6 @@ saveMailBtn.addEventListener("click", async () => {
   alert("E-Mail aggiornato!");
 });
 
-// 📝 SALVA BIO
 saveBioBtn.addEventListener("click", async () => {
   const newBio = bioInput.value.trim();
 
@@ -126,19 +119,18 @@ saveBioBtn.addEventListener("click", async () => {
   alert("Biografia aggiornata!");
 });
 
-// 📝 SALVA PASSWORD
 savePasswordBtn.addEventListener("click", async () => {
   const currentPassword = currentPasswordInput.value;
   const newPassword = newPasswordInput.value;
   const confirmPassword = confirmPasswordInput.value;
-  // Controllo password attuale
+  
   if (currentPassword !== auth.currentUser.password) {
     return alert("Password attuale errata!");
   }
   if (currentPassword.length === 0) return alert("Inserisci la password attuale!");
   if (newPassword.length < 6) return alert("La nuova password deve essere di almeno 6 caratteri!");
   if (newPassword !== confirmPassword) return alert("Le nuove password non corrispondono!");
-  // Re-authenticate user
+  
   const credential = auth.EmailAuthProvider.credential(
     currentUser.email,
     currentPassword
@@ -156,7 +148,6 @@ savePasswordBtn.addEventListener("click", async () => {
   }
 });
 
-// 🚪 LOGOUT
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.href = "/login/";

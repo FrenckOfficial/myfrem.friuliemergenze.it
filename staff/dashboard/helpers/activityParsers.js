@@ -4,7 +4,6 @@ export async function parseActivity(activity, date) {
 
     switch (activity.type) {
 
-        /** FOTO */
         case "photo_submission": {
             const user = await getNameById("users", activity.userName);
             const photo = await getNameById("photos", activity.photoId);
@@ -30,7 +29,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** EVENTI */
         case "event_creation": {
             const staff = await getNameById("users", activity.userName);
             const event = await getNameById("events", activity.eventId);
@@ -62,7 +60,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** UTENTI */
         case "user_role_change": {
             const user = await getNameById("users", activity.userName);
             const staff = await getNameById("users", activity.changeStaffer);
@@ -80,7 +77,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** KICK / REPORT */
         case "kick_add": {
             const staff = await getNameById("users", activity.addStaffer);
             const kicked = await getNameById("users", activity.kickedMember);
@@ -88,7 +84,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** TICKET */
         case "new_ticket": {
             const from = await getNameById("users", activity.fromId);
             return `[${date}] Da ${from}: Nuovo ticket creato con oggetto "${activity.title}".`;
@@ -100,7 +95,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** WHATSAPP */
         case "user_creation_whatsapp": {
             const user = await getNameById("users_whatsapp", activity.userName);
             return `[${date}] Nuovo utente WhatsApp registrato: "${user}"`;
@@ -127,7 +121,6 @@ export async function parseActivity(activity, date) {
         }
 
 
-        /** DEFAULT */
         default:
             return `[${date}] Attività sconosciuta.`;
     }

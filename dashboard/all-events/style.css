@@ -253,6 +253,36 @@ form button:hover {
 }
 
 @media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: auto;
+  }
+
+  .sidebar nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar nav a {
+    padding: 12px;
+  }
+
+  .sidebar .logout {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
   .sidebar {
     flex-direction: column;
     align-items: center;

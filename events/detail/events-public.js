@@ -5,23 +5,19 @@ import { firebaseConfig } from "../../configFirebase.js"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM
 const eventsList = document.getElementById("eventsList");
 const statusMsg = document.getElementById("statusMsg");
 const titleEvent = document.getElementById("titleEvent");
 const eventIdh = document.getElementById("eventId");
 
-// Recupero ID dall’URL
 const idParam = new URLSearchParams(window.location.search);
 const eventId = idParam.get('id');
 
-// Se non c’è ID → errore
 if (!eventId) {
     eventsList.innerHTML = "<p class='error'>❌ Nessun ID evento fornito nell'URL.</p>";
     throw new Error("Missing event ID");
 }
 
-// Carica evento specifico
 async function loadPublicEvent() {
   try {
     const ref = doc(db, "events", eventId);
@@ -33,9 +29,8 @@ async function loadPublicEvent() {
     }
 
     const e = snap.data();
-    eventsList.innerHTML = ""; // pulizia
+    eventsList.innerHTML = "";
 
-    // Titoli dinamici
     eventIdh.textContent = `📅 Evento: ${e.title}`;
     titleEvent.textContent = `${e.title} - Registro Eventi | MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`;
 
@@ -77,5 +72,4 @@ async function loadPublicEvent() {
   }
 }
 
-// Avvio caricamento
 loadPublicEvent();

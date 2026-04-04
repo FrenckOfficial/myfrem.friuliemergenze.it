@@ -1,8 +1,5 @@
 import { firebaseConfig } from "../configFirebase.js";
 
-// ==========================
-// ✅ Init Firebase
-// ==========================
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
@@ -13,10 +10,6 @@ const crr = console.error;
 
 clg("✅ Firebase inizializzato");
 
-
-// ==========================
-// 🟢 LOGIN EMAIL o USERNAME
-// ==========================
 const loginForm = document.getElementById("loginForm");
 
 if (loginForm) {
@@ -102,9 +95,6 @@ if (loginForm) {
 }
 
 
-// ==========================
-// 🔵 LOGIN CON GOOGLE
-// ==========================
 const googleBtn = document.getElementById("googleLoginBtn");
 
 if (googleBtn) {
@@ -153,9 +143,6 @@ if (googleBtn) {
 }
 
 
-// ==========================
-// 🟣 REGISTRAZIONE
-// ==========================
 const registerForm = document.getElementById("registerForm");
 
 if (registerForm) {
@@ -226,9 +213,6 @@ if (registerForm) {
 }
 
 
-// ==========================
-// 🔁 RESET PASSWORD
-// ==========================
 const resetForm = document.getElementById("resetForm");
 
 if (resetForm) {
@@ -248,9 +232,6 @@ if (resetForm) {
 }
 
 
-// ==========================
-// 👀 SESSIONE UTENTE
-// ==========================
 auth.onAuthStateChanged(async (user) => {
   if (user) {
 

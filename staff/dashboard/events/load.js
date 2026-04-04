@@ -7,14 +7,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Logout
 document.getElementById("logoutBtn").onclick = () => signOut(auth);
 
-// DOM
 const eventsList = document.getElementById("eventsList");
 const statusMsg = document.getElementById("statusMsg");
 
-// Carica eventi
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
@@ -71,8 +68,7 @@ onAuthStateChanged(auth, async (user) => {
         div.querySelector(".btn-reject").disabled = true;
         div.querySelector(".btn-organized").disabled = true;
       }
-
-      // Eventi pulsanti
+      
         div.querySelector(".btn-organized").onclick = async () => {
           const userRef = doc(db, "events", docSnap.id);
           window.location.href = `/staff/dashboard/events/completeorganization/?event_id=${docSnap.id}`

@@ -20,13 +20,11 @@ const db = getFirestore(app);
 const surveyList = document.getElementById("surveyTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// LOGOUT
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "/login";
 });
 
-// AUTH CHECK
 onAuthStateChanged(auth, async (user) => {
     console.log("Auth state:", user);
 
@@ -37,7 +35,6 @@ onAuthStateChanged(auth, async (user) => {
 
     console.log("User logged:", user.uid);
 
-    // Look up user document by UID
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
@@ -61,12 +58,10 @@ onAuthStateChanged(auth, async (user) => {
     loadSurveys();
 });
 
-// LOAD SURVEYS (ordered by timestamp DESC)
 async function loadSurveys() {
     try {
         console.log("Loading surveys...");
 
-        // Query ordinata per timestamp (più recente → più vecchio)
         const surveysQuery = query(
             collection(db, "sondaggi_gradimento"),
             orderBy("timestamp", "desc")

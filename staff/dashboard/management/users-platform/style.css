@@ -86,6 +86,11 @@ html, body {
   margin-bottom: 20px;
 }
 
+#viewProfileBtn {
+  text-decoration: none;
+  color: black;
+}
+
 /* Table */
 table {
   width: 100%;

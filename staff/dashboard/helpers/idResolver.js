@@ -12,7 +12,6 @@ const cache = {};
 export async function getNameById(collectionName, id) {
     if (!id) return "Sconosciuto";
 
-    // Se è un'email → restituisci direttamente
     if (id.includes("@")) return id;
 
     const cacheKey = `${collectionName}_${id}`;

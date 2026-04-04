@@ -18,7 +18,6 @@ async function loadPublicReport() {
 
   titleReport.innerHTML = `Report ${reportId} | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`
 
-  // Prendi il report
   const docRef = doc(db, "reunionsReports", reportId);
   const docSnap = await getDoc(docRef);
 
@@ -29,7 +28,6 @@ async function loadPublicReport() {
 
   const data = docSnap.data();
 
-  // Prendi l'email dello staffer usando l'ID
   let staffEmail = "-";
   let staffName = "-"
   if (data.reportedBy) {

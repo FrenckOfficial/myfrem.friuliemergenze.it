@@ -7,7 +7,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ==================== DOM ====================
 const logoutBtn = document.getElementById("logoutBtn");
 
 const staffUsername = document.getElementById("staffUsername");
@@ -29,7 +28,6 @@ const saveBioBtn = document.getElementById("saveBioBtn");
 let currentUserId = null;
 let currentUser = null
 
-// ==================== LOGIN CHECK & CARICAMENTO PROFILO ====================
 auth.onAuthStateChanged(async user => {
   if (!user) {
     window.location.href = "/login/";
@@ -52,13 +50,11 @@ auth.onAuthStateChanged(async user => {
   bioText.textContent = data.bio || "Non disponibile."
 });
 
-// ==================== LOGOUT ====================
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
   window.location.href = "/login/";
 });
 
-// ==================== CAMBIO PASSWORD ====================
 changePasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -90,7 +86,6 @@ changePasswordForm.addEventListener("submit", async (e) => {
   }
 });
 
-// ==================== CAMBIO USERNAME ====================
 changeUsernameForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const newUsername = newUsernameInput.value.trim();
@@ -105,7 +100,6 @@ changeUsernameForm.addEventListener("submit", async (e) => {
   alert("Username aggiornato!");
 });
 
-// ==================== BIO ====================
 saveBioBtn.addEventListener("click", async () => {
   const newBio = bioInput.value.trim();
 

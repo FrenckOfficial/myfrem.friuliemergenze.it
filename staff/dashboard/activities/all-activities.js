@@ -8,17 +8,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// DOM
 const recentActivityListEl = document.getElementById("activitiesList");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// Logout
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-// Auth check
 onAuthStateChanged(auth, async (user) => {
   if (!user) return window.location.href = "/login";
 

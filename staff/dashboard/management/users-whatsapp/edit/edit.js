@@ -18,24 +18,21 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import { firebaseConfig } from "../../../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// AUTH
 onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "/login";
 });
 
-// LOGOUT
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     await signOut(auth);
     window.location.href = "/login";
 });
 
-// URL ID
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get("id");
 

@@ -1,4 +1,3 @@
-// IMPORT FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -8,7 +7,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// FORM
 const form = document.getElementById("eventForm");
 const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -20,12 +18,10 @@ logoutBtn.onclick = async () => {
 
 let currentUser = null;
 
-// CONTROLLA LOGIN
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 });
 
-// INVIO PROPOSTA
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 

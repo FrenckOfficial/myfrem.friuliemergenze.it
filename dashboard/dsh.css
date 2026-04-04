@@ -286,7 +286,6 @@ button {
 
 /* Mobile: max-width 768px */
 @media (max-width: 768px) {
-  /* Sidebar sopra, main sotto */
   body {
     flex-direction: column;
   }
