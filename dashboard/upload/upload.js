@@ -54,7 +54,7 @@ uploadBtn.addEventListener("click", async (e) => {
     userName: currentUser.uid,
     photoTitle: titleInput.value || "-",
     timestamp: serverTimestamp(),
-    type: "photo_submission_multi",
+    type: "photo_submission",
   });
 
   console.log("📘 Activity ID:", activityRef.id);
