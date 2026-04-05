@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carica un documento - Dashboard Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/upload-documents/style.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+      <h2>MyFrEM Staff</h2>
+    </div>
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+
+  <div class="main-content">
+    <h1>🗂️ Carica un documento</h1>
+
+    <form id="uploadForm">
+      <label>Nome documento (richiesto)</label>
+      <input type="text" id="title" required>
+
+      <label>Descrizione documento (richiesto)</label>
+      <textarea id="description" required></textarea>
+
+      <input type="file" id="inp-upl" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,image/*">
+      <label for="inp-upl">📤 Scegli file</label>
+      <span id="file-name">Nessun file</span>
+
+      <progress id="progressBar" value="0" max="100" style="width:100%;display:none;"></progress>
+      <p id="progressText"></p>
+
+      <button id="btn-upl">📤 Carica</button>
+    </form>
+
+    <p id="statusMsg"></p>
+  </div>
+
+  <script type="module" src="/staff/dashboard/management/upload-documents/upload.js"></script>
+</body>
+</html>
