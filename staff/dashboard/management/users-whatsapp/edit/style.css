@@ -1,18 +1,25 @@
 body {
-    margin: 0;
-    background: #eee;
-    color: #333;
-    font-family: system-ui, sans-serif;
-    display: flex;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
 }
 
+html, body {
+  height: 100%;
+} 
+
 .sidebar {
-  width: 11%;
+  width: 250px;
   background: #222;
   color: #fff;
   display: flex;
   flex-direction: column;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
 }
 
 .sidebar .logo {
@@ -23,6 +30,15 @@ body {
 .sidebar .logo img {
   width: 60px;
   border-radius: 50%;
+}
+
+.sidebar .logo h2 {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.sidebar nav {
+  flex-grow: 1;
 }
 
 .sidebar nav a {
@@ -42,18 +58,25 @@ body {
 }
 
 .sidebar .logout {
-  margin-top: auto;
   background: #e74c3c;
   color: white;
   padding: 10px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.sidebar .logout:hover {
+  background: #c0392b;
 }
 
 .main-content {
-  flex-grow: 1;
   padding: 30px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 270px;
+  width: calc(100% - 335px);
 }
 
 .user-box {

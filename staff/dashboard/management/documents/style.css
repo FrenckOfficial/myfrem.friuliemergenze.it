@@ -129,6 +129,15 @@ button:hover {
   opacity: 0.85;
 }
 
+a {
+  text-decoration: none;
+  color: #3b82f6;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 #messageBox {
   margin-top: 15px;
   font-weight: bold;

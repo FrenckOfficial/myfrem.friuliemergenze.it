@@ -94,6 +94,14 @@ async function loadUser() {
     document.getElementById("joinedDate").value = data.date || "";
     document.getElementById("status").value = data.status || "";
     document.getElementById("notes").value = data.notes || "";
+    document.getElementById("myfremIdInput").value = data.linkedMyFremUser ? data.linkedMyFremUser.id || "" : "";
+
+    if (data.tags && Array.isArray(data.tags)) {
+        data.tags.forEach(tag => {
+            const checkbox = document.querySelector(`.tagCheck[value="${tag}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    }
 }
 
 document.querySelector(".editForm").addEventListener("submit", async (e) => {
@@ -108,7 +116,7 @@ document.querySelector(".editForm").addEventListener("submit", async (e) => {
         status: document.getElementById("status").value.trim(),
         notes: document.getElementById("notes").value.trim(),
         tags: tags || [],
-        linkedMyFremUser: linkedMyFremUser || null,
+        linkedMyFremUser: linkedMyFremUser || data.linkedMyFremUser || null,
         lastEdit: serverTimestamp(),
         editedBy: auth.currentUser.uid
     };

@@ -80,7 +80,7 @@ async function loadAllFiles() {
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><a href="${file.url}" target="_blank" style="justify-content: center; align-items: center;">${file.name}</a></td>
+        <td><a href="${file.url}" target="_blank">${file.name}</a></td>
         <td>${usersMap[file.userId] || "Sconosciuto"}</td>
         <td>${file.title || "-"}</td>
         <td>${file.description || "-"}</td>
