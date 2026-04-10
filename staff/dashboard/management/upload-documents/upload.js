@@ -54,7 +54,7 @@ uploadBtn.addEventListener("click", async (e) => {
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
+    const path = `${currentUser.uid}/${file.name}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("MyFrEM Staff Documents")
