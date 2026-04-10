@@ -32,7 +32,6 @@ async function exportData() {
     if (userId) {
       q = query(
         collection(db, "logins"),
-        where("user_id", "==", userId),
         where("timestamp", ">=", past),
         orderBy("timestamp", "desc")
       );
@@ -46,10 +45,8 @@ async function exportData() {
       const data = doc.data();
 
       rows.push({
-        user_id: data.user_id || "",
+        user_id: data.email || "",
         timestamp: formatDate(data.timestamp),
-        action: data.action || "",
-        ip: data.ip || ""
       });
     });
 

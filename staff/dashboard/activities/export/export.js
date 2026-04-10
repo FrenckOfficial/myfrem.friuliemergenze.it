@@ -28,16 +28,6 @@ async function exportData() {
       orderBy("timestamp", "desc")
     );
 
-    // filtro utente opzionale
-    if (userId) {
-      q = query(
-        collection(db, "activities"),
-        where("user_id", "==", userId),
-        where("timestamp", ">=", past),
-        orderBy("timestamp", "desc")
-      );
-    }
-
     const snapshot = await getDocs(q);
 
     let rows = [];
@@ -45,11 +35,14 @@ async function exportData() {
     snapshot.forEach(doc => {
       const data = doc.data();
 
+      const stafferKey = Object.keys(data).find(key =>
+        key.includes("Staffer", "userName")
+      );
+
       rows.push({
-        user_id: data.user_id || "",
+        user_id: stafferKey ? data[stafferKey] : "",
         timestamp: formatDate(data.timestamp),
-        action: data.action || "",
-        ip: data.ip || ""
+        action: data.type || ""
       });
     });
 

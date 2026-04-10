@@ -54,8 +54,8 @@ export async function parseActivity(activity, date) {
         }
 
         case "eventRegistration": {
-            const user = await getNameById("users", activity.joinerId);
-            const event = await getNameById("events", activity.eventId);
+            const user = await getNameById("eventRegistrations", activity.mail);
+            const event = await getNameById("eventRegistrations", activity.eventId);
             return `[${date}] ${user} si è iscritto all'evento "${event}".`;
         }
 
