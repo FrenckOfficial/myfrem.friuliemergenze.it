@@ -43,7 +43,7 @@ async function loadPublicEvent() {
       <p>${e.location || "Non specificato."}</p>
 
       <h4><b>📅 Data e ora:</b></h4>
-      <p>${e.date || "Non specificata."} ${e.time || ""}</p>  
+      <p>${e.date || "Non specificata."} ${e.startTime || ""}</p>  
 
       <h4><b>📝 Descrizione:</b></h4>
       <p>${e.description || "Non specificata."}</p>
