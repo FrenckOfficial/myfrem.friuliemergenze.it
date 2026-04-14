@@ -80,7 +80,7 @@ if (loginForm) {
         return;
       }
 
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
       if (allowedRoles.includes(userData.role)) {
         window.location.href = "/staff";
       } else {
@@ -127,7 +127,7 @@ if (googleBtn) {
 
       const finalDoc = await userRef.get();
       const data = finalDoc.data();
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
       if (allowedRoles.includes(data.role)) {
         window.location.href = "/staff";
@@ -154,7 +154,6 @@ if (registerForm) {
     const email = document.getElementById("registerEmail").value;
     const username = document.getElementById("registerUsername").value;
     const password = document.getElementById("registerPassword").value;
-    const reb = document.getElementById("resetEmailButton");
 
     try {
       const existing = await db
@@ -194,12 +193,6 @@ if (registerForm) {
         emailVerified: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-
-      reb.addEventListener("submit", () => {
-        db.collection("users").doc(user.uid).set({
-          emailVerified: true
-        })
-      })
 
       await auth.signOut();
 
@@ -245,7 +238,7 @@ auth.onAuthStateChanged(async (user) => {
     if (!userDoc.exists) return;
 
     const userData = userDoc.data();
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
     if (allowedRoles.includes(userData.role)) {
       window.location.href = "/staff";

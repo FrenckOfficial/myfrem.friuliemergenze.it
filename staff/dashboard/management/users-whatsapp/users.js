@@ -28,7 +28,7 @@ onAuthStateChanged(auth, async user => {
   const userDocSnap = await getDoc(userDocRef);
   const userData = userDocSnap.data();
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (!userData || !allowedRoles.includes(userData.role)) {
     alert("Accesso negato: solo staff");

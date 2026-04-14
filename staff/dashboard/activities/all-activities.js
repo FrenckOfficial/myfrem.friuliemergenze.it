@@ -23,7 +23,7 @@ onAuthStateChanged(auth, async (user) => {
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
     alert("❌ Accesso negato: non sei staff!");

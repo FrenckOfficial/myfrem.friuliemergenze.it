@@ -34,7 +34,7 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (!userData || !allowedRoles.includes(userData.role)) {
     alert("Accesso negato: solo staff");
@@ -109,7 +109,7 @@ async function loadUsers() {
 }
 
 async function updateRole(userId, currentRole) {
-  const roleHierarchy = ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus"];
+  const roleHierarchy = ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
   const currentIndex = roleHierarchy.indexOf(currentRole);
   const newIndex = (currentIndex + 1) % roleHierarchy.length;
   const newRole = roleHierarchy[newIndex];

@@ -45,7 +45,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const userData = userSnap.data();
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus"];
+    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
     console.log("User role:", userData.role);
 

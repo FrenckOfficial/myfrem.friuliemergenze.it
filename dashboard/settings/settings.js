@@ -43,6 +43,7 @@ const confirmPasswordInput = document.getElementById("confirmPassword");
 const savePasswordBtn = document.getElementById("savePasswordBtn");
 
 const logoutBtn = document.getElementById("logoutBtn");
+const logoutBtnSettings = document.getElementById("logoutBtnSettings");
 
 let currentUserId = null;
 let currentUser = null;
@@ -149,6 +150,12 @@ savePasswordBtn.addEventListener("click", async () => {
 });
 
 logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.href = "/login/";
+  });
+});
+
+logoutBtnSettings.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.href = "/login/";
   });
