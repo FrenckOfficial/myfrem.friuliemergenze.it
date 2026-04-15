@@ -21,7 +21,7 @@ onAuthStateChanged(auth, async user => {
   const userDocRef = doc(db, "users", user.uid);
   const userDocSnap = await getDoc(userDocRef);
   const userData = userDocSnap.data();
-  if (userData.role !== "advstaffplus") {
+  if (!userData.role.includes("advstaffplus") || !userData.role.includes("superadmin")) {
     alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
     window.location.href = "/staff/dashboard/management";
     auth.keptSignIn = true;
