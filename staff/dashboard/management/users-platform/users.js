@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../../configFirebase.js"
+import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -21,7 +21,8 @@ onAuthStateChanged(auth, async user => {
   const userDocRef = doc(db, "users", user.uid);
   const userDocSnap = await getDoc(userDocRef);
   const userData = userDocSnap.data();
-  if (!userData.role.includes("advstaffplus") || !userData.role.includes("superadmin")) {
+  const allowedPageRoles = ["advstaffplus", "superadmin"];
+  if (!userData || !allowedPageRoles.includes(userData.role)) {
     alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
     window.location.href = "/staff/dashboard/management";
     auth.keptSignIn = true;
