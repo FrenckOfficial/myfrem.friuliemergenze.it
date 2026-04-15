@@ -58,11 +58,12 @@ async function loadUsers() {
   });
 
   const rolePriority = {
-    advstaffplus: 1,
-    advstaff: 2,
-    modstaff: 3,
-    simplestaff: 4,
-    user: 5
+    superadmin: 1,
+    advstaffplus: 2,
+    advstaff: 3,
+    modstaff: 4,
+    simplestaff: 5,
+    user: 6
   };
 
   const getAlphabetKey = (str) => (str.username || str.name || str.surname || "").toString().toLowerCase();
