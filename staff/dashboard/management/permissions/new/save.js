@@ -86,7 +86,7 @@ form.addEventListener("submit", async (e) => {
     statusMsg.textContent = "✅ Permesso salvato con successo!";
     statusMsg.style.color = "green";
 
-    form.reset();
+    window.location.href = "/staff/dashboard/management/permissions";
     userNumber.value = "";
 
     Array.from(userSelect.options).forEach(opt => {
