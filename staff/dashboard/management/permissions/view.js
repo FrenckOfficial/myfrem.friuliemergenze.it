@@ -40,7 +40,7 @@ onAuthStateChanged(auth, async user => {
 });
 
 async function loadPermissions() {
-  permissionsTableBody.innerHTML = `<tr><td colspan="5">Caricamento...</td></tr>`;
+  permissionsTableBody.innerHTML = "";
 
   const permissionsSnap = await getDocs(collection(db, "groupPermissions"));
   totalPermissionsCountEl.textContent = permissionsSnap.size;
@@ -65,11 +65,21 @@ async function loadPermissions() {
   permissions.forEach(u => {
     const tr = document.createElement("tr");
 
+    let permissionType = [];
+
+    if (u.permissionType === "photovideo_extra_fvg") {
+      permissionType.push("📸 Extra Regionali");
+    } else if (u.permissionType === "photovideo_extra_ita") {
+      permissionType.push("🎥 Extra Italiani");
+    } else {
+      permissionType.push("N/A");
+    }
+
     tr.innerHTML = `
       <td>${u.name || "N/A"}</td>
       <td>${u.phone || "N/A"}</td>
-      <td>${u.type || "N/A"}</td>
-      <td>${u.status || "N/A"}</td>
+      <td>${permissionType || "N/A"}</td>
+      <td>${u.notes || "N/A"}</td>
       <td>
         <button class="delete">Elimina</button>
       </td>
