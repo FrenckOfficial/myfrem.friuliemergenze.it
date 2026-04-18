@@ -8,7 +8,6 @@ const db = getFirestore(app);
 const userSelect = document.getElementById("userSelect");
 const userNumber = document.getElementById("userNumber");
 const permissionType = document.getElementById("permissionType");
-const expulsionDate = document.getElementById("expulsionDate");
 const notes = document.getElementById("notes");
 const statusMsg = document.getElementById("statusMsg");
 const form = document.getElementById("expulsionReportForm");
@@ -68,7 +67,7 @@ form.addEventListener("submit", async (e) => {
   const userData = usersMap[userId];
   const perm = permissionType.value;
 
-  if (!userId || !perm || !expulsionDate.value) {
+  if (!userId || !perm || !notes.value) {
     statusMsg.textContent = "❌ Compila tutti i campi obbligatori";
     statusMsg.style.color = "red";
     return;
@@ -80,7 +79,6 @@ form.addEventListener("submit", async (e) => {
       name: userData.name || "",
       phone: userData.phone || "",
       permissionType: perm,
-      joinedAt: new Date(expulsionDate.value),
       notes: notes.value || "",
       createdAt: new Date()
     });
