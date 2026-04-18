@@ -67,7 +67,7 @@ form.addEventListener("submit", async (e) => {
   const userData = usersMap[userId];
   const perm = permissionType.value;
 
-  if (!userId || !perm || !notes.value) {
+  if (!userId || !perm) {
     statusMsg.textContent = "❌ Compila tutti i campi obbligatori";
     statusMsg.style.color = "red";
     return;
