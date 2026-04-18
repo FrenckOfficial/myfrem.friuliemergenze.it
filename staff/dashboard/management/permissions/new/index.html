@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuovo - Permesso WhatsApp | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="/staff/dashboard/management/permissions/new/save.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
+      <h2>MyFrEM Staff</h2>
+    </div>
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+  <main class="main-content">
+    <div class="top-bar">
+        <h1>📄 Nuovo Permesso WhatsApp</h1>
+    </div>
+
+    <p>Compila il modulo qui sotto per aggiungere un nuovo permesso per utente WhatsApp.</p>
+
+    <div class="activity-box">
+        <form id="expulsionReportForm" style="min-height: 78vh;">
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label for="userSelect">👤 Nome utente:</label>
+                    <select id="userSelect" class="photo-link-input" style="height: 50px">
+                    <option value="" id="userSelection">-- Seleziona utente --</option>
+                    <!-- JS Loading -->
+                    </select>
+                </div>
+
+                <div class="form-col">
+                    <label for="userNumber">📞 Numero contatto utente:</label>
+                    <input type="tel" id="userNumber" class="photo-link-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="permissionType">🔐 Tipo di permesso:</label>
+                <select id="permissionType" class="photo-link-input" required>
+                    <option value="">-- Seleziona permesso --</option>
+                    <option value="photovideo_extra_fvg">📸 Invio foto e video extra Regionali</option>
+                    <option value="photovideo_extra_ita">🎥 Invio foto e video extra Italiani</option>
+                    <option value="all_media">✅ Tutti i media</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">🗒️ Note aggiuntive (facoltativo):</label>
+                <textarea id="notes" class="photo-link-input" placeholder="Eventuali note aggiuntive..." style="height: 500px;"></textarea>
+            </div>
+
+        </form>
+
+        <div id="statusMsg"></div>
+    </div>
+  </main>
+</body>
+</html>
