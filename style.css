@@ -4,6 +4,15 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
 :root {
   --primary: #e53935;
   --primary-dark: #c62828;
