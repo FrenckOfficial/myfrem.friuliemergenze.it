@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -42,7 +42,9 @@ onAuthStateChanged(auth, async user => {
 async function loadPermissions() {
   permissionsTableBody.innerHTML = "";
 
-  const permissionsSnap = await getDocs(collection(db, "groupPermissions"));
+  const q = query(collection(db, "groupPermissions"), orderBy("createdAt", "desc"));
+
+  const permissionsSnap = await getDocs(q);
   totalPermissionsCountEl.textContent = permissionsSnap.size;
 
   if (permissionsSnap.empty) {
@@ -82,6 +84,7 @@ async function loadPermissions() {
       <td>${u.phone || "N/A"}</td>
       <td>${permissionType || "N/A"}</td>
       <td>${u.notes || "N/A"}</td>
+      <td>${u.createdAt ? u.createdAt.toDate().toLocaleString() : "N/A"}</td>
       <td>
         <button class="delete">Elimina</button>
       </td>

@@ -111,12 +111,9 @@ if (googleBtn) {
       const snap = await userRef.get();
 
       if (!snap.exists) {
-        await userRef.set({
-          email: user.email,
-          name: user.displayName || "",
-          role: "user",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        alert("Accesso negato: crea prima un account con questo indirizzo email per accedere.");
+        await auth.signOut();
+        return;
       }
 
       await db.collection("logins").add({
@@ -125,8 +122,7 @@ if (googleBtn) {
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      const finalDoc = await userRef.get();
-      const data = finalDoc.data();
+      const data = snap.data();
       const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
       if (allowedRoles.includes(data.role)) {
