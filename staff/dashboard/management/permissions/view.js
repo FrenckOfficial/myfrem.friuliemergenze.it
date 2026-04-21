@@ -71,6 +71,8 @@ async function loadPermissions() {
       permissionType.push("📸 Extra Regionali");
     } else if (u.permissionType === "photovideo_extra_ita") {
       permissionType.push("🎥 Extra Italiani");
+    } else if (u.permissionType === "all_media") {
+      permissionType.push("📸🎥 Tutti i tipi");
     } else {
       permissionType.push("N/A");
     }
