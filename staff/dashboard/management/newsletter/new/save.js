@@ -16,8 +16,6 @@ import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const BREVO_API_KEY = process.env.BREVO_API_KEY
-
 const title = document.getElementById("title");
 const type = document.getElementById("type");
 const photo = document.getElementById("image");
@@ -134,24 +132,15 @@ sendBtn.addEventListener("click", async () => {
         email: userEmail
       });
 
-      await fetch("https://api.brevo.com/v3/smtp/email", {
+      await fetch("/api/sendNewsletter", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "api-key": BREVO_API_KEY
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          sender: {
-            name: "Friuli Emergenze",
-            email: "newsletter@friuliemergenze.it",
-          },
-          to: [{ email: userEmail }],
-          subject: title.value,
+          userEmail,
           htmlContent,
-          replyTo: {
-            email: "soem@friuliemergenze.it",
-            name: "Friuli Emergenze"
-          }
+          title: title.value
         })
       });
 
