@@ -16,7 +16,7 @@ import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const BREVO_API_KEY = "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";
+const BREVO_API_KEY = process.env.BREVO_API_KEY
 
 const title = document.getElementById("title");
 const type = document.getElementById("type");
