@@ -113,7 +113,7 @@ sendBtn.addEventListener("click", async () => {
     const snap = await getDocs(
       query(
         collection(db, "newsletterSubs"),
-        where("verified", "==", true)
+        where("verified", "==", false)
       )
     );
 
@@ -121,7 +121,7 @@ sendBtn.addEventListener("click", async () => {
 
     for (const docSnap of snap.docs) {
       const user = docSnap.data();
-      const userEmail = user.email;
+      const userEmail = 'onlyfrenckyt@gmail.com';
 
       const htmlContent = buildEmail({
         type: type.value,
@@ -132,7 +132,7 @@ sendBtn.addEventListener("click", async () => {
         email: userEmail
       });
 
-      await fetch("/api/sendNewsletter", {
+      await fetch("https://myfrem.friuliemergenze.it/api/sendNewsletter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
