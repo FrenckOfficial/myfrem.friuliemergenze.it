@@ -121,7 +121,7 @@ sendBtn.addEventListener("click", async () => {
 
     for (const docSnap of snap.docs) {
       const user = docSnap.data();
-      const userEmail = 'onlyfrenckyt@gmail.com';
+      const userEmail = user.email;
 
       const htmlContent = buildEmail({
         type: type.value,
