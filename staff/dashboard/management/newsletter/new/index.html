@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuovo - Messaggio Newsletter | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <script type="module" src="/staff/dashboard/management/newsletter/new/save.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
+      <h2>MyFrEM Staff</h2>
+    </div>
+
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div class="top-bar">
+      <h1>📨 Nuova Newsletter</h1>
+    </div>
+
+    <p>
+      Crea una nuova newsletter. Il sistema salverà automaticamente la bozza e mostrerà una preview in tempo reale.
+    </p>
+
+    <div class="activity-box">
+
+      <form id="newsletterForm">
+
+        <!-- ROW 1 -->
+        <div class="form-row">
+
+          <div class="form-col">
+            <label for="title">📰 Titolo newsletter:</label>
+            <input type="text" id="title" class="photo-link-input" placeholder="Es: Nuovo photobook disponibile" required>
+          </div>
+
+          <div class="form-col">
+            <label for="type">📂 Categoria:</label>
+            <select id="type" class="photo-link-input" required>
+              <option value="">-- Seleziona tipo --</option>
+              <option value="photo">📸 Foto</option>
+              <option value="photobook">📸 Photobook</option>
+              <option value="news">📰 News</option>
+              <option value="update">⚙️ Aggiornamento</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="image">🖼️ Immagine</label>
+          <input type="url" id="image" class="photo-link-input" placeholder="Inserire l'URL dell'immagine. L'upload non è consentito.">
+        </div>
+
+        <!-- CONTENT -->
+        <div class="form-group">
+          <label for="content">✏️ Contenuto:</label>
+          <textarea id="content" class="photo-link-input" placeholder="Scrivi il contenuto della newsletter..." style="height: 220px;" required></textarea>
+        </div>
+
+        <!-- LINK -->
+        <div class="form-group">
+          <label for="link">🔗 Link:</label>
+          <input type="url" id="link" class="photo-link-input" placeholder="https://..." required>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="form-row">
+
+          <button type="button" id="sendNewsletter" class="btn-primary">
+            🚀 Invia newsletter
+          </button>
+
+        </div>
+
+      </form>
+
+      <div class="preview-box" style="margin-top:20px;">
+        <h3>👀 Preview email</h3>
+        <div id="emailPreview" style="padding:15px; border:1px solid #ddd; border-radius:10px;">
+          <!-- JS LIVE -->
+        </div>
+      </div>
+
+      <!-- STATUS -->
+      <div id="statusMsg"></div>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

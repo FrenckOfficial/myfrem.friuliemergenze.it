@@ -545,6 +545,7 @@ button.reject:active {
   text-decoration: none;
   font-weight: 600;
   transition: 0.2s;
+  height: fit-content;
 }
 
 .btn-primary:hover {
