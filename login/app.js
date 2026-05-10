@@ -42,12 +42,6 @@ if (loginForm) {
 
       await user.reload();
 
-      if (!auth.currentUser.emailVerified) {
-        alert("⚠️ Verifica la tua email prima di accedere.");
-        await auth.signOut();
-        return;
-      }
-
       const userDoc = await db.collection("users").doc(user.uid).get();
 
       if (!userDoc.exists) {
@@ -56,6 +50,12 @@ if (loginForm) {
       }
 
       const userData = userDoc.data();
+
+      if (userData.emailVerified === false) {
+        alert("❌ Verifica il tuo indirizzo email prima di accedere.");
+        await auth.signOut();
+        return;
+      }
 
       if (userData.status === "sospeso") {
         alert("❌ Il tuo account è sospeso. Contatta un amministratore.");
