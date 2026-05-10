@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, "Lexend", sans-serif;
   background: #f4f7fa;
   color: #333;
   display: flex;
@@ -16,6 +16,14 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
 }
 
 .sidebar .logo {

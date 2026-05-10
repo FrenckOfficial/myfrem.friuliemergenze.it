@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, "Lexend", sans-serif;;
   min-height: 100vh;
 }
 
@@ -21,6 +21,14 @@ html, body {
   height: 100vh;
   overflow-y: auto;
   z-index: 1000;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
 }
 
 .sidebar .logo {

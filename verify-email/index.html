@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verifica email - Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+</head>
+
+<body>
+
+  <header class="hero">
+    <img src="https://friuliemergenze.it/assets/logo.png" class="logo" />
+    <h1>Verifica email</h1>
+    <p class="subtitle">Completa la registrazione del tuo account MyFrEM</p>
+  </header>
+
+  <section class="about" style="text-align:center;margin-top:50px;">
+    <h2>Ultimo passo</h2>
+    <p>
+      Stiamo verificando il tuo account. Se il token è valido,
+      il tuo indirizzo email verrà confermato automaticamente.
+    </p>
+
+    <div id="statusBox" style="
+      margin-top:20px;
+      padding:15px;
+      border-radius:10px;
+      background:#f5f5f5;
+      text-align:center;
+      font-weight:bold;
+    ">
+      Verifica in corso...
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Problemi?</h2>
+    <p>Se il link è scaduto puoi richiedere una nuova email di verifica.</p>
+    <a href="/login/signup" class="cta-btn">Riprova registrazione</a>
+  </section>
+
+  <footer>
+    <p>© 2026 Friuli Emergenze - Tutti i diritti riservati</p>
+    <p>
+      <a href="https://myfrem.friuliemergenze.it/login/signin">Login</a> · 
+      <a href="https://myfrem.friuliemergenze.it/login/signup">Registrati</a> · 
+      <a href="https://friuliemergenze.it/policies/privacy-policy" target="_blank">Privacy Policy</a> · 
+      <a href="https://friuliemergenze.it/contact-us" target="_blank">Contatti</a>
+    </p>
+  </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script type="module">
+        import { firebaseConfig } from "/firebaseConfig.js";
+
+        firebase.initializeApp(firebaseConfig);
+
+        const db = firebase.firestore();
+
+        const statusBox = document.getElementById("statusBox");
+
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+
+        async function verify() {
+            if (!token) {
+                statusBox.innerText = "❌ Token mancante";
+                statusBox.style.color = "red";
+                return;
+            }
+
+            try {
+            const docRef = db.collection("emailVerifications").doc(token);
+            const doc = await docRef.get();
+
+            if (!doc.exists) {
+                statusBox.innerText = "❌ Token non valido o scaduto";
+                statusBox.style.color = "red";
+                return;
+            }
+
+            const data = doc.data();
+
+            if (data.used) {
+                statusBox.innerText = "❌ Token già utilizzato";
+                statusBox.style.color = "red";
+                return;
+            }
+
+            if (Date.now() > data.expiresAt) {
+                statusBox.innerText = "❌ Token scaduto";
+                statusBox.style.color = "red";
+                return;
+            }
+
+            const userSnap = await db
+                .collection("users")
+                .where("email", "==", data.email)
+                .limit(1)
+                .get();
+
+            if (userSnap.empty) {
+                statusBox.innerText = "❌ Utente non trovato";
+                statusBox.style.color = "red";
+                return;
+            }
+
+            const userDoc = userSnap.docs[0];
+
+            await userDoc.ref.update({
+                emailVerified: true
+            });
+
+            await docRef.update({
+                used: true
+            });
+
+            statusBox.innerText = "✅ Email verificata con successo!";
+            statusBox.style.color = "green";
+
+            setTimeout(() => {
+                window.location.href = "/login/signin";
+            }, 2000);
+
+            } catch (err) {
+            console.error(err);
+            statusBox.innerText = "❌ Errore server";
+            statusBox.style.color = "red";
+            }
+        }
+
+        verify();
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, "Lexend", sans-serif;
 }
 
 body {
@@ -25,6 +25,14 @@ body {
   left: 0;
   height: 100vh;
   z-index: 1000;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
 }
 
 .sidebar .logo {

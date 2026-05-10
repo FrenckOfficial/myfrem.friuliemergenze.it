@@ -23,8 +23,6 @@ if (loginForm) {
 
     try {
       if (!identifier.includes("@")) {
-        clg("🔍 Cerco username:", identifier);
-
         const snap = await db
           .collection("users")
           .where("username", "==", identifier)
@@ -37,21 +35,18 @@ if (loginForm) {
         }
 
         emailToUse = snap.docs[0].data().email;
-        clg("✅ Username risolto in email:", emailToUse);
       }
 
       const cred = await auth.signInWithEmailAndPassword(emailToUse, password);
       const user = cred.user;
 
-      const loginsRef = db.collection("logins");
-      await loginsRef.add({
-        userId: user.uid,
-        email: user.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await user.reload();
 
-      clg("✅ Login riuscito:", user.username || user.email);
-      clg("🔑 Stato account:", user.status);
+      if (!auth.currentUser.emailVerified) {
+        alert("⚠️ Verifica la tua email prima di accedere.");
+        await auth.signOut();
+        return;
+      }
 
       const userDoc = await db.collection("users").doc(user.uid).get();
 
@@ -69,18 +64,25 @@ if (loginForm) {
       }
 
       if (userData.status === "eliminato") {
-        alert("❌ Il tuo account è stato eliminato. E' possibile riattivarlo entro 60 giorni dall'eliminazione contattando un amministratore.");
+        alert("❌ Il tuo account è stato eliminato.");
         await auth.signOut();
         return;
       }
 
-      if (!userData.emailVerified) {
-        alert("⚠️ Attenzione: email non verificata. Verifica la tua email per accedere.");
-        await auth.signOut();
-        return;
-      }
+      await db.collection("logins").add({
+        userId: user.uid,
+        email: user.email,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+      const allowedRoles = [
+        "simplestaff",
+        "modstaff",
+        "advstaff",
+        "advstaffplus",
+        "superadmin"
+      ];
+
       if (allowedRoles.includes(userData.role)) {
         window.location.href = "/staff";
       } else {
@@ -94,7 +96,6 @@ if (loginForm) {
   });
 }
 
-
 const googleBtn = document.getElementById("googleLoginBtn");
 
 if (googleBtn) {
@@ -105,13 +106,25 @@ if (googleBtn) {
       const result = await auth.signInWithPopup(provider);
       const user = result.user;
 
-      clg("✅ Login Google:", user.uid);
-
       const userRef = db.collection("users").doc(user.uid);
       const snap = await userRef.get();
 
       if (!snap.exists) {
-        alert("Accesso negato: crea prima un account con questo indirizzo email per accedere.");
+        alert("Accesso negato: crea prima un account.");
+        await auth.signOut();
+        return;
+      }
+
+      const data = snap.data();
+
+      if (data.status === "sospeso") {
+        alert("❌ Il tuo account è sospeso.");
+        await auth.signOut();
+        return;
+      }
+
+      if (data.status === "eliminato") {
+        alert("❌ Il tuo account è stato eliminato.");
         await auth.signOut();
         return;
       }
@@ -122,8 +135,13 @@ if (googleBtn) {
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      const data = snap.data();
-      const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+      const allowedRoles = [
+        "simplestaff",
+        "modstaff",
+        "advstaff",
+        "advstaffplus",
+        "superadmin"
+      ];
 
       if (allowedRoles.includes(data.role)) {
         window.location.href = "/staff";
@@ -137,7 +155,6 @@ if (googleBtn) {
     }
   });
 }
-
 
 const registerForm = document.getElementById("registerForm");
 
@@ -166,16 +183,40 @@ if (registerForm) {
       const cred = await auth.createUserWithEmailAndPassword(email, password);
       const user = cred.user;
 
-      clg("✅ Registrazione OK:", user.uid);
+      const token = crypto.randomUUID();
 
-      await user.sendEmailVerification({
-        url: "https://myfrem.friuliemergenze.it/login/",
-        linkDomain: "https://link.myfrem.friuliemergenze.it/"
+      const expiresAt = Date.now() + 1000 * 60 * 60 * 24;
+
+      await db.collection("emailVerifications").doc(token).set({
+        email,
+        userId: user.uid,
+        expiresAt,
+        used: false
+      });
+
+      const verifyLink =
+        `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+
+      const htmlContent = buildEmail({
+        verifyLink,
+        name,
+        email
+      });
+
+      await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userEmail: email,
+          htmlContent
+        })
       });
 
       await db.collection("activities").add({
         type: "user_creation",
-        userName: name + " " + surname,
+        userName: `${name} ${surname}`,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -192,7 +233,8 @@ if (registerForm) {
 
       await auth.signOut();
 
-      window.location.href = "/login/signup/verify-email/";
+      alert("✅ Registrazione avvenuta! Controlla la tua email per verificare il tuo account. Assicurati di controllare anche la cartella spam.");
+      window.location.href = "/login";
 
     } catch (err) {
       crr("❌ Errore registrazione:", err);
@@ -200,7 +242,6 @@ if (registerForm) {
     }
   });
 }
-
 
 const resetForm = document.getElementById("resetForm");
 
@@ -220,13 +261,10 @@ if (resetForm) {
   });
 }
 
-
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-
-    clg("👤 Utente loggato:", user.uid);
-
     const token = await user.getIdToken();
+
     localStorage.setItem("userToken", token);
 
     const userDoc = await db.collection("users").doc(user.uid).get();
@@ -234,14 +272,144 @@ auth.onAuthStateChanged(async (user) => {
     if (!userDoc.exists) return;
 
     const userData = userDoc.data();
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
+    const allowedRoles = [
+      "simplestaff",
+      "modstaff",
+      "advstaff",
+      "advstaffplus",
+      "superadmin"
+    ];
 
     if (allowedRoles.includes(userData.role)) {
       window.location.href = "/staff";
     } else {
-      window.location.href = "/dashboard"
+      window.location.href = "/dashboard";
     }
+
   } else {
     clg("⚠️ Nessun utente loggato");
   }
 });
+
+function buildEmail({ verifyLink, email, name }) {
+
+  const footer = `
+    <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
+      MyFrEM · Friuli Emergenze<br>
+      Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
+      Se non sei stato tu, puoi ignorare questa email.
+      <br><br>
+      <a href="https://friuliemergenze.it">
+        friuliemergenze.it
+      </a>
+      ·
+      <a href="mailto:soem@friuliemergenze.it">
+        soem@friuliemergenze.it
+      </a>
+    </p>
+  `;
+
+  return `
+    <div style="
+      font-family:Arial,sans-serif;
+      background:#f5f5f5;
+      padding:20px;
+    ">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+
+            <table style="
+              max-width:520px;
+              width:100%;
+              background:#ffffff;
+              border-radius:14px;
+              overflow:hidden;
+              box-shadow:0 2px 10px rgba(0,0,0,0.05);
+            ">
+
+              <tr>
+                <td style="padding:35px;text-align:center;">
+
+                  <img
+                    src="https://friuliemergenze.it/assets/logo.png"
+                    style="width:80px;margin-bottom:20px;"
+                  >
+
+                  <h1 style="
+                    color:#ff3b3b;
+                    margin:0;
+                    font-size:28px;
+                  ">
+                    Verifica il tuo account
+                  </h1>
+
+                  ${name ? `
+                    <p style="
+                      font-size:18px;
+                      color:#333;
+                      margin-top:25px;
+                      margin-bottom:10px;
+                    ">
+                      Ciao <b>${name}</b>,
+                    </p>
+                  ` : ""}
+
+                  <p style="
+                    color:#555;
+                    line-height:1.7;
+                    font-size:17px;
+                    margin-top:20px;
+                  ">
+                    Benvenuto su <b>MyFrEM</b> 👋<br><br>
+
+                    Per completare la registrazione del tuo account
+                    e confermare il tuo indirizzo email
+                    <b>${email}</b>,
+                    clicca sul pulsante qui sotto.
+                  </p>
+
+                  <a
+                    href="${verifyLink}"
+                    style="
+                      display:inline-block;
+                      padding:15px 24px;
+                      background:#ff3b3b;
+                      color:#ffffff;
+                      text-decoration:none;
+                      border-radius:10px;
+                      font-weight:bold;
+                      margin-top:25px;
+                      font-size:16px;
+                    "
+                  >
+                    Verifica account
+                  </a>
+
+                  <p style="
+                    color:#888;
+                    font-size:13px;
+                    margin-top:25px;
+                    line-height:1.6;
+                  ">
+                    Se il pulsante non funziona, copia e incolla questo link nel browser:
+                    <br><br>
+                    <a href="${verifyLink}" style="color:#ff3b3b;">
+                      ${verifyLink}
+                    </a>
+                  </p>
+
+                  ${footer}
+
+                </td>
+              </tr>
+
+            </table>
+
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+}

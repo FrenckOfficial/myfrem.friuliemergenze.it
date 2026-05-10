@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, "Lexend", sans-serif;
   background: linear-gradient(135deg, #0073e6, #00FFFF);
   display: flex;
   justify-content: center;
