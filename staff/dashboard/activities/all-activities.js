@@ -1,7 +1,21 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../configFirebase.js"
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+import { firebaseConfig } from "../../../configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 
 const app = initializeApp(firebaseConfig);
@@ -23,7 +37,13 @@ onAuthStateChanged(auth, async (user) => {
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  const allowedRoles = [
+    "simplestaff",
+    "modstaff",
+    "advstaff",
+    "advstaffplus",
+    "superadmin"
+  ];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
     alert("❌ Accesso negato: non sei staff!");
@@ -44,11 +64,29 @@ async function loadStats() {
 
     for (const docSnap of sorted) {
       const activity = docSnap.data();
-      const li = document.createElement("li");
-      const date = activity.timestamp.toDate().toLocaleString();
 
+      const li = document.createElement("li");
+      li.style.cursor = "pointer";
+
+      const date = activity.timestamp.toDate().toLocaleString();
       const text = await parseActivity(activity, date);
+
       li.innerHTML = text;
+
+      li.addEventListener("click", async () => {
+        const ok = confirm("Vuoi eliminare questa attività?");
+        if (!ok) return;
+
+        try {
+          await deleteDoc(doc(db, "activities", docSnap.id));
+
+          li.remove();
+          console.log("🗑️ Eliminata activity:", docSnap.id);
+
+        } catch (err) {
+          console.error("❌ Errore eliminazione:", err);
+        }
+      });
 
       recentActivityListEl.appendChild(li);
     }
@@ -57,20 +95,9 @@ async function loadStats() {
       const li = document.createElement("li");
       li.textContent = "Nessuna attività recente.";
       recentActivityListEl.appendChild(li);
-      li.onclick = deleteDoc();
     }
+
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
   }
 }
-
-async function deleteDoc() {
-  const activitiesSnap = await getDocs(collection(db, "activities"));
-  for (const docSnap of activitiesSnap.docs) {
-    if (confirm("Vuoi eliminare quest'attività dal database! Questa azione è irreversibile!")) {
-      await deleteDoc(doc(db, "activities", docSnap.id));
-      alert("Attività eliminata.");
-      window.location.reload();
-    }
-  }
-};
