@@ -129,7 +129,7 @@ sendBtn.addEventListener("click", async () => {
 
     for (const docSnap of snap.docs) {
       const user = docSnap.data();
-      const userEmail = 'francyvio012@icloud.com' //user.email || "";
+      const userEmail = user.email || "";
       const userName = user.name || "";
 
       const htmlContent = buildEmail({
@@ -212,7 +212,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
 
                   ${name ? `
                     <p style="font-size:20px;color:#333;margin-bottom:15px;margin-top:10px;">
-                      Ciao <b>${name}</b> 👋
+                      Ciao <b>${name}</b>,
                     </p>
                   ` : ""}
 
