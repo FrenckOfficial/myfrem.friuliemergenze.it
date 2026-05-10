@@ -77,68 +77,66 @@
             }
 
             try {
-            console.log("PROJECT:", firebase.app().options.projectId);
+                const doc = await db
+                    .collection("emailVerifications")
+                    .doc(token)
+                    .get();
 
-            db.collection("emailVerifications")
-            .limit(1)
-            .get()
-            .then(() => console.log("OK FIRESTORE"))
-            .catch(e => console.error("FIRESTORE FAIL", e));
-            const doc = await docRef.get();
+                if (!doc.exists) {
+                    statusBox.innerText = "❌ Token non valido o scaduto";
+                    statusBox.style.color = "red";
+                    return;
+                }
 
-            if (!doc.exists) {
-                statusBox.innerText = "❌ Token non valido o scaduto";
-                statusBox.style.color = "red";
-                return;
-            }   
+                const data = doc.data();
 
-            const data = doc.data();
+                if (data.used) {
+                    statusBox.innerText = "❌ Token già utilizzato";
+                    statusBox.style.color = "red";
+                    return;
+                }
 
-            if (data.used) {
-                statusBox.innerText = "❌ Token già utilizzato";
-                statusBox.style.color = "red";
-                return;
-            }
+                if (Date.now() > data.expiresAt) {
+                    statusBox.innerText = "❌ Token scaduto";
+                    statusBox.style.color = "red";
+                    return;
+                }
 
-            if (Date.now() > data.expiresAt) {
-                statusBox.innerText = "❌ Token scaduto";
-                statusBox.style.color = "red";
-                return;
-            }
+                const userSnap = await db
+                    .collection("users")
+                    .where("email", "==", data.email)
+                    .limit(1)
+                    .get();
 
-            const userSnap = await db
-                .collection("users")
-                .where("email", "==", data.email)
-                .limit(1)
-                .get();
+                if (userSnap.empty) {
+                    statusBox.innerText = "❌ Utente non trovato";
+                    statusBox.style.color = "red";
+                    return;
+                }
 
-            if (userSnap.empty) {
-                statusBox.innerText = "❌ Utente non trovato";
-                statusBox.style.color = "red";
-                return;
-            }
+                const userDoc = userSnap.docs[0];
 
-            const userDoc = userSnap.docs[0];
+                await userDoc.ref.update({
+                    emailVerified: true
+                });
 
-            await userDoc.ref.update({
-                emailVerified: true
-            });
+                await db
+                    .collection("emailVerifications")
+                    .doc(token)
+                    .update({
+                        used: true
+                    });
 
-            await docRef.update({
-                used: true
-            });
+                statusBox.innerText = "✅ Email verificata con successo!";
+                statusBox.style.color = "green";
 
-            statusBox.innerText = "✅ Email verificata con successo!";
-            statusBox.style.color = "green";
-
-            setTimeout(() => {
-                window.location.href = "/login/signin";
-            }, 2000);
-
+                setTimeout(() => {
+                    window.location.href = "/login/signin";
+                }, 2000);
             } catch (err) {
-            console.error(err);
-            statusBox.innerText = "❌ Errore server";
-            statusBox.style.color = "red";
+                console.error(err);
+                statusBox.innerText = "❌ Errore server";
+                statusBox.style.color = "red";
             }
         }
 
