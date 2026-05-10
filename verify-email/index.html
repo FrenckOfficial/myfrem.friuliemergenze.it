@@ -62,6 +62,7 @@
         firebase.initializeApp(firebaseConfig);
 
         const db = firebase.firestore();
+        console.log(firebase.apps.length);
 
         const statusBox = document.getElementById("statusBox");
 
@@ -83,7 +84,7 @@
                 statusBox.innerText = "❌ Token non valido o scaduto";
                 statusBox.style.color = "red";
                 return;
-            }
+            }   
 
             const data = doc.data();
 
