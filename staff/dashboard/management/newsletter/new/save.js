@@ -170,6 +170,8 @@ sendBtn.addEventListener("click", async () => {
     statusMsg.style.display = "block";
     statusMsg.textContent = "✅ Newsletter inviata con successo!";
 
+    document.getElementById("newsletterForm").reset();
+
     localStorage.removeItem("newsletter_draft_id");
     draftId = null;
 

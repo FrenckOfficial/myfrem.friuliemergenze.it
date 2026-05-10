@@ -25,7 +25,7 @@ html {
 }
 
 body {
-  font-family: "Inter", "Segoe UI", sans-serif;
+  font-family: -apple-system, "Lexend", sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
