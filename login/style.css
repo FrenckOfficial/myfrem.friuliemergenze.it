@@ -15,6 +15,10 @@ body {
   color: #333;
 }
 
+input, button {
+  font-family: inherit;
+}
+
 .container {
   background: white;
   padding: 2rem;
