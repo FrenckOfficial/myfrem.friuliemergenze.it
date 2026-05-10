@@ -33,6 +33,8 @@ const titleMap = {
   update: "⚙️ Aggiornamento importante:"
 };
 
+statusMsg.style.display = "none";
+
 let titleTouched = false;
 let draftId = localStorage.getItem("newsletter_draft_id");
 let saveTimeout;
@@ -48,7 +50,8 @@ function updatePreview() {
     content: content.value || "",
     link: link.value || "",
     image: photo.value || "",
-    email: "email"
+    email: "email",
+    name: "Mario"
   });
 
   preview.innerHTML = html;
@@ -66,6 +69,7 @@ async function autosave() {
   };
 
   try {
+    statusMsg.style.display = "block";
     statusMsg.textContent = "💾 Salvataggio bozza...";
 
     if (!draftId) {
@@ -80,8 +84,10 @@ async function autosave() {
       await setDoc(doc(db, "newsletterDrafts", draftId), data, { merge: true });
     }
 
+    statusMsg.style.display = "block";
     statusMsg.textContent = "🟢 Bozza salvata";
   } catch (err) {
+    statusMsg.style.display = "block";
     statusMsg.textContent = "❌ Errore salvataggio bozza";
   }
 }
@@ -108,20 +114,23 @@ type.addEventListener("change", () => {
 
 sendBtn.addEventListener("click", async () => {
   try {
+    statusMsg.style.display = "block";
     statusMsg.textContent = "📡 Caricamento utenti...";
 
     const snap = await getDocs(
       query(
         collection(db, "newsletterSubs"),
-        where("verified", "==", false)
+        where("subscribed", "==", true)
       )
     );
 
+    statusMsg.style.display = "block";
     statusMsg.textContent = `🚀 Invio a ${snap.size} utenti...`;
 
     for (const docSnap of snap.docs) {
       const user = docSnap.data();
-      const userEmail = user.email;
+      const userEmail = 'francyvio012@icloud.com' //user.email || "";
+      const userName = user.name || "";
 
       const htmlContent = buildEmail({
         type: type.value,
@@ -129,7 +138,8 @@ sendBtn.addEventListener("click", async () => {
         content: content.value,
         link: link.value,
         image: photo.value,
-        email: userEmail
+        email: userEmail,
+        name: userName
       });
 
       await fetch("https://myfrem.friuliemergenze.it/api/sendNewsletter", {
@@ -156,18 +166,20 @@ sendBtn.addEventListener("click", async () => {
       sentAt: new Date(),
       recipients: snap.size
     });
-
+    
+    statusMsg.style.display = "block";
     statusMsg.textContent = "✅ Newsletter inviata con successo!";
 
     localStorage.removeItem("newsletter_draft_id");
     draftId = null;
 
   } catch (err) {
+    statusMsg.style.display = "block";
     statusMsg.textContent = "❌ Errore invio newsletter";
   }
 });
 
-function buildEmail({ type, title, content, link, image, email }) {
+function buildEmail({ type, title, content, link, image, email, name }) {
 
   const parsedContent = content.replace(/\n/g, "<br>");
 
@@ -198,7 +210,13 @@ function buildEmail({ type, title, content, link, image, email }) {
                     ${title}
                   </h2>
 
-                  <p style="color:#555;line-height:1.7;margin-top:15px;">
+                  ${name ? `
+                    <p style="font-size:20px;color:#333;margin-bottom:15px;margin-top:10px;">
+                      Ciao <b>${name}</b> 👋
+                    </p>
+                  ` : ""}
+
+                  <p style="color:#555;line-height:1.7;margin-top:15px;font-size:18px;">
                     ${parsedContent}
                   </p>
 
@@ -211,6 +229,7 @@ function buildEmail({ type, title, content, link, image, email }) {
                       text-decoration:none;
                       border-radius:8px;
                       font-weight:bold;
+                      margin-top:20px;
                     ">
                       ${type === "photo" ? "Apri galleria" :
                         type === "photobook" ? "Visualizza photobook" :

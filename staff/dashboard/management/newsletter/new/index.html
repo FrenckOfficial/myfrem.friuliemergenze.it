@@ -13,7 +13,6 @@
 
 <body>
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
@@ -33,7 +32,6 @@
     <button id="logoutBtn" class="logout">🚪 Logout</button>
   </aside>
 
-  <!-- MAIN -->
   <main class="main-content">
 
     <div class="top-bar">
@@ -47,8 +45,8 @@
     <div class="activity-box">
 
       <form id="newsletterForm">
+        <div id="statusMsg"></div>
 
-        <!-- ROW 1 -->
         <div class="form-row">
 
           <div class="form-col">
@@ -74,19 +72,23 @@
           <input type="url" id="image" class="photo-link-input" placeholder="Inserire l'URL dell'immagine. L'upload non è consentito.">
         </div>
 
-        <!-- CONTENT -->
         <div class="form-group">
           <label for="content">✏️ Contenuto:</label>
           <textarea id="content" class="photo-link-input" placeholder="Scrivi il contenuto della newsletter..." style="height: 220px;" required></textarea>
         </div>
 
-        <!-- LINK -->
         <div class="form-group">
           <label for="link">🔗 Link:</label>
           <input type="url" id="link" class="photo-link-input" placeholder="https://..." required>
         </div>
 
-        <!-- ACTION BUTTONS -->
+        <div class="preview-box" style="margin-top:20px;">
+          <h3>👀 Preview email</h3>
+          <div id="emailPreview" style="padding:15px; border:1px solid #ddd; border-radius:10px;">
+            <!-- JS LIVE -->
+          </div>
+        </div>
+
         <div class="form-row">
 
           <button type="button" id="sendNewsletter" class="btn-primary">
@@ -96,16 +98,6 @@
         </div>
 
       </form>
-
-      <div class="preview-box" style="margin-top:20px;">
-        <h3>👀 Preview email</h3>
-        <div id="emailPreview" style="padding:15px; border:1px solid #ddd; border-radius:10px;">
-          <!-- JS LIVE -->
-        </div>
-      </div>
-
-      <!-- STATUS -->
-      <div id="statusMsg"></div>
 
     </div>
 
