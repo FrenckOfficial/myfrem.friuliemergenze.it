@@ -77,7 +77,13 @@
             }
 
             try {
-            const docRef = db.collection("emailVerifications").doc(token);
+            console.log("PROJECT:", firebase.app().options.projectId);
+
+            db.collection("emailVerifications")
+            .limit(1)
+            .get()
+            .then(() => console.log("OK FIRESTORE"))
+            .catch(e => console.error("FIRESTORE FAIL", e));
             const doc = await docRef.get();
 
             if (!doc.exists) {
