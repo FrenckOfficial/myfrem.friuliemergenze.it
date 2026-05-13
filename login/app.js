@@ -207,6 +207,8 @@ if (registerForm) {
       body: JSON.stringify({ userEmail: email, htmlContent })
     });
 
+    alert("📩 Email di verifica inviata! Controlla la tua casella di posta. Ci raccomandiamo di controllare anche la cartella spam!");
+
     await auth.signOut();
 
     alert("✅ Registrazione avvenuta!");
