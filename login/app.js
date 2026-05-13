@@ -197,6 +197,12 @@ if (registerForm) {
       used: false
     });
 
+    await db.collection("activities").add({
+      type: "user_creation",
+      userName: `${name} ${surname}`,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+    })
+
     const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
     const htmlContent = buildEmail({ verifyLink, name, email });

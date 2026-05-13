@@ -120,6 +120,11 @@ export async function parseActivity(activity, date) {
             return `[${date}] L'utente WhatsApp "${user}" ha cambiato ruolo in "${activity.newRole}".`;
         }
 
+        case "pdf_generated": {
+            const staff = await getNameById("users", activity.generatedBy);
+            return `[${date}] PDF "${activity.documentTitle}" generato da ${staff}.`;
+        }
+
 
         default:
             return `[${date}] Attività sconosciuta.`;
