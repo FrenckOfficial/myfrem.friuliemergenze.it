@@ -9,6 +9,7 @@ const clg = console.log;
 const crr = console.error;
 
 clg("✅ Firebase inizializzato");
+let isRegistering = false;
 
 const loginForm = document.getElementById("loginForm");
 
@@ -160,85 +161,62 @@ const registerForm = document.getElementById("registerForm");
 
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const name = document.getElementById("registerName").value;
-    const surname = document.getElementById("registerSurname").value;
-    const email = document.getElementById("registerEmail").value;
-    const username = document.getElementById("registerUsername").value;
-    const password = document.getElementById("registerPassword").value;
+  const name = document.getElementById("registerName").value;
+  const surname = document.getElementById("registerSurname").value;
+  const email = document.getElementById("registerEmail").value;
+  const username = document.getElementById("registerUsername").value;
+  const password = document.getElementById("registerPassword").value;
 
-    try {
-      const existing = await db
-        .collection("users")
-        .where("username", "==", username)
-        .limit(1)
-        .get();
+  isRegistering = true;
 
-      if (!existing.empty) {
-        alert("❌ Username già in uso");
-        return;
-      }
+  try {
+    console.log("👉 STEP 1: create user auth");
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const user = cred.user;
 
-      const cred = await auth.createUserWithEmailAndPassword(email, password);
-      const user = cred.user;
+    console.log("👉 STEP 2: write users doc");
+    await db.collection("users").doc(user.uid).set({
+      email,
+      name,
+      surname,
+      username,
+      role: "user",
+      status: "attivo",
+      emailVerified: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-      const token = crypto.randomUUID();
+    const token = crypto.randomUUID();
 
-      const expiresAt = Date.now() + 1000 * 60 * 60 * 24;
+    await db.collection("emailVerifications").doc(token).set({
+      email,
+      userId: user.uid,
+      expiresAt: Date.now() + 86400000,
+      used: false
+    });
 
-      await db.collection("emailVerifications").doc(token).set({
-        email,
-        userId: user.uid,
-        expiresAt,
-        used: false
-      });
+    const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
-      const verifyLink =
-        `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+    const htmlContent = buildEmail({ verifyLink, name, email });
 
-      const htmlContent = buildEmail({
-        verifyLink,
-        name,
-        email
-      });
+    await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userEmail: email, htmlContent })
+    });
 
-      await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userEmail: email,
-          htmlContent
-        })
-      });
+    await auth.signOut();
 
-      await db.collection("activities").add({
-        type: "user_creation",
-        userName: `${name} ${surname}`,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      await db.collection("users").doc(user.uid).set({
-        email,
-        name,
-        surname,
-        username,
-        role: "user",
-        status: "attivo",
-        emailVerified: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      await auth.signOut();
-
-      alert("✅ Registrazione avvenuta! Controlla la tua email per verificare il tuo account. Assicurati di controllare anche la cartella spam.");
-      window.location.href = "/login";
+    alert("✅ Registrazione avvenuta!");
+    window.location.href = "/login";
 
     } catch (err) {
-      crr("❌ Errore registrazione:", err);
-      alert("Errore registrazione: " + err.message);
+      crr(err);
+      alert(err.message);
+    } finally {
+      isRegistering = false;
     }
   });
 }
@@ -262,33 +240,31 @@ if (resetForm) {
 }
 
 auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    const token = await user.getIdToken();
+  if (!user) return;
 
-    localStorage.setItem("userToken", token);
+  if (isRegistering) return;
 
-    const userDoc = await db.collection("users").doc(user.uid).get();
+  const currentPath = window.location.pathname;
 
-    if (!userDoc.exists) return;
+  if (currentPath === "/staff" || currentPath === "/dashboard") return;
 
-    const userData = userDoc.data();
+  const userDoc = await db.collection("users").doc(user.uid).get();
+  if (!userDoc.exists) return;
 
-    const allowedRoles = [
-      "simplestaff",
-      "modstaff",
-      "advstaff",
-      "advstaffplus",
-      "superadmin"
-    ];
+  const userData = userDoc.data();
 
-    if (allowedRoles.includes(userData.role)) {
-      window.location.href = "/staff";
-    } else {
-      window.location.href = "/dashboard";
-    }
+  const allowedRoles = [
+    "simplestaff",
+    "modstaff",
+    "advstaff",
+    "advstaffplus",
+    "superadmin"
+  ];
 
+  if (allowedRoles.includes(userData.role)) {
+    window.location.href = "/staff";
   } else {
-    clg("⚠️ Nessun utente loggato");
+    window.location.href = "/dashboard";
   }
 });
 

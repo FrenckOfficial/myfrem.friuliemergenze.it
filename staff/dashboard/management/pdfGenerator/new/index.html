@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuovo - Documenti PDF | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" defer src="/staff/dashboard/management/pdfGenerator/new/pdfBuilder.js"></script>
+  <script type="module" defer src="/staff/dashboard/management/pdfGenerator/new/pdfFunctions.js"></script>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
+      <h2>MyFrEM Staff</h2>
+    </div>
+
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="top-bar">
+      <h1>Nuovo Documento PDF - 👥 Funzionalità</h1>
+    </div>
+
+    <p>
+      Crea documenti PDF ufficiali (verbali, report, attestati, liste).
+    </p>
+
+    <div class="activity-box">
+
+      <form id="pdfForm">
+
+        <div id="statusMsg"></div>
+
+        <div class="form-row">
+
+          <div class="form-col">
+            <label>Titolo documento:</label>
+            <input type="text" id="title" class="photo-link-input" placeholder="Es: Verbale Riunione Staff" required>
+          </div>
+
+          <div class="form-col">
+            <label>Data:</label>
+            <input type="date" id="date" class="photo-link-input" required>
+          </div>
+
+          <div class="form-col">
+            <label>Tipo documento:</label>
+            <select id="type" class="photo-link-input" required>
+              <option value="">-- Seleziona tipo --</option>
+              <option value="verbale">Verbale</option>
+              <option value="report">Report</option>
+              <option value="attestato">Attestato</option>
+              <option value="lista">Lista</option>
+              <option value="altro">Altro</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label>Contenuto documento:</label>
+          <textarea id="content" class="photo-link-input" style="height: 220px;"
+            placeholder="Scrivi il contenuto del documento..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Firma / autore:</label>
+          <input type="text" id="author" class="photo-link-input" placeholder="Es: Staff MyFrEM">
+        </div>
+
+        <div class="preview-box" style="margin-top:20px;cursor:not-allowed;">
+          <h3>Preview documento:</h3>
+
+          <div id="pdfPreview"
+            style="padding:15px; border:1px solid #ddd; border-radius:10px; background:white;">
+
+            <h2 id="prevTitle">Titolo documento</h2>
+            <p id="prevDate">Data</p>
+            <hr>
+            <p id="prevContent">Contenuto...</p>
+            <br>
+            <small id="prevAuthor">Autore</small>
+
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:20px;">
+
+          <button type="button" id="generatePdf" class="btn-primary">
+            Genera PDF
+          </button>
+
+          <button type="button" id="clearForm" class="btn-secondary">
+            Pulisci
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

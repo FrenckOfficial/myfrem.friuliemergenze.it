@@ -26,6 +26,11 @@ const statusMsg = document.getElementById("statusMsg");
 const preview = document.getElementById("emailPreview");
 const sendBtn = document.getElementById("sendNewsletter");
 
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  await signOut(auth);
+  window.location.href = "/login";
+});
+
 const titleMap = {
   photo: "📸 Nuova foto disponibile in galleria:",
   photobook: "📚 Nuovo photobook disponibile:",
@@ -171,6 +176,7 @@ sendBtn.addEventListener("click", async () => {
     statusMsg.textContent = "✅ Newsletter inviata con successo!";
 
     document.getElementById("newsletterForm").reset();
+    document.getElementById("emailPreview").innerHTML = "";
 
     localStorage.removeItem("newsletter_draft_id");
     draftId = null;
@@ -198,7 +204,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
   `;
 
   const card = (body) => `
-    <div style="font-family:Arial;background:#f5f5f5;padding:20px;">
+    <div style="font-family:"Lexend";background:#f5f5f5;padding:20px;">
       <table width="100%">
         <tr>
           <td align="center">

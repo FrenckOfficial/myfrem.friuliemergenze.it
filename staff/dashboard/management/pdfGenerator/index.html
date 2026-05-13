@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Documenti PDF | Dashboard Staff MyFrEM</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+  <script type="module" src="/staff/dashboard/management/pdfGenerator/load.js"></script>
+
+  <style>
+    .sidebar {
+      height: 97%;
+      width: 225px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: relative;
+        width: 94.5%;
+        height: auto;
+        padding: 15px 15px 10px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 15px;
+      background: #2563eb;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+  </style>
+
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+      <h2>MyFrEM Staff</h2>
+    </div>
+    <nav>
+      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+    </nav>
+    <button id="logoutBtn" class="logout">🚪 Logout</button>
+  </aside>
+
+  <main class="main-content">
+
+    <h1>Gestione Documenti PDF - 👥 Funzionalità</h1>
+
+    <div class="list">
+      <a href="/staff/dashboard/management/pdfGenerator/new" class="btn-primary">
+        ➕ Nuovo documento
+      </a>
+    </div>
+
+    <div class="gallery-search" style="margin-top: 10px;">
+      <input type="text" id="searchInput" placeholder="Cerca documento..." style="
+        width: 50%;
+        padding: 0.75rem;
+        margin: 1rem 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      ">
+    </div>
+
+    <table id="documentsTable">
+
+      <thead>
+        <tr>
+          <th>Titolo</th>
+          <th>Tipo</th>
+          <th>Data</th>
+          <th>Autore</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+
+      <tbody id="documentsTableBody">
+        <!-- JS LOAD -->
+      </tbody>
+
+    </table>
+
+    <p id="messageBox"></p>
+
+    <script>
+      const searchInput = document.getElementById("searchInput");
+      const tableBody = document.getElementById("usersTableBody");
+
+      searchInput.addEventListener("keyup", () => {
+        const filter = searchInput.value.toLowerCase();
+        const rows = tableBody.querySelectorAll("tr");
+
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(filter) ? "" : "none";
+        });
+      });
+    </script>
+
+  </main>
+
+</body>
+</html>

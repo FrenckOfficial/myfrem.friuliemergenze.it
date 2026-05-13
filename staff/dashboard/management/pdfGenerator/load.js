@@ -9,37 +9,34 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-const tableBody = document.getElementById("usersTableBody");
+const tableBody = document.getElementById("documentsTableBody");
 const messageBox = document.getElementById("messageBox");
 
-console.log("📡 Loading newsletter users...");
+console.log("📄 Loading generated documents...");
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-async function loadUsers() {
+async function loadDocuments() {
   try {
     tableBody.innerHTML = `<tr><td colspan="5">Caricamento...</td></tr>`;
 
     const q = query(
-      collection(db, "newsletterSubs"),
+      collection(db, "generatedDocuments"),
       orderBy("createdAt", "desc")
     );
 
     const snap = await getDocs(q);
 
     if (snap.empty) {
-      tableBody.innerHTML = `<tr><td colspan="5">Nessun utente trovato</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="5">Nessun documento trovato</td></tr>`;
       return;
     }
 
@@ -55,15 +52,17 @@ async function loadUsers() {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${data.name || "-"}</td>
-        <td>${data.email}</td>
+        <td>${data.title || "-"}</td>
+        <td>${data.type || "-"}</td>
         <td>${date}</td>
-        <td style="font-size:12px; word-break:break-all;">
-          ${data.token || "-"}
-        </td>
+        <td>${data.authorName || data.authorId || "-"}</td>
         <td>
+          <a href="${data.pdfUrl || '#'}" target="_blank">
+            📥 Download
+          </a>
+
           <button class="deleteBtn" data-id="${docSnap.id}">
-            ❌ Rimuovi
+            ❌ Elimina
           </button>
         </td>
       `;
@@ -71,26 +70,32 @@ async function loadUsers() {
       tableBody.appendChild(row);
     });
 
-    console.log("✅ Utenti caricati:", snap.size);
+    console.log("✅ Documenti caricati:", snap.size);
 
   } catch (err) {
-    console.error("❌ Errore caricamento utenti:", err);
-    messageBox.textContent = "Errore nel caricamento utenti";
+    console.error("❌ Errore caricamento documenti:", err);
+    messageBox.textContent = "Errore nel caricamento documenti";
   }
 }
 
 document.addEventListener("click", async (e) => {
   if (e.target.classList.contains("deleteBtn")) {
+
     const id = e.target.dataset.id;
 
-    if (!confirm("Vuoi eliminare questo utente?")) return;
+    if (!confirm("Vuoi eliminare questo documento?")) return;
 
-    await deleteDoc(doc(db, "newsletterSubs", id));
+    try {
+      await deleteDoc(doc(db, "generatedDocuments", id));
 
-    console.log("🗑️ Eliminato:", id);
+      console.log("🗑️ Documento eliminato:", id);
 
-    loadUsers();
+      loadDocuments();
+
+    } catch (err) {
+      console.error("❌ Errore eliminazione:", err);
+    }
   }
 });
 
-loadUsers();
+loadDocuments();
