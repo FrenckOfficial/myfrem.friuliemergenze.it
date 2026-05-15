@@ -1,80 +1,116 @@
 import { firebaseConfig } from "../configFirebase.js";
 
+console.log("🚀 SCRIPT AVVIATO - auth module loading...");
+
 firebase.initializeApp(firebaseConfig);
+console.log("🔥 Firebase inizializzato");
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+console.log("🔗 Auth & Firestore instance create");
+
 const clg = console.log;
 const crr = console.error;
 
-clg("✅ Firebase inizializzato");
+clg("✅ Sistema log attivo");
+
 let isRegistering = false;
 
 const loginForm = document.getElementById("loginForm");
+console.log("🔍 loginForm:", loginForm);
 
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("📨 LOGIN SUBMIT triggerato");
 
     const identifier = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
+    console.log("👤 Identifier:", identifier);
+    console.log("🔑 Password length:", password?.length);
+
     let emailToUse = identifier;
 
     try {
+      console.log("➡️ STEP LOGIN 1: check identifier type");
+
       if (!identifier.includes("@")) {
+        console.log("🔎 Username rilevato, query Firestore...");
         const snap = await db
           .collection("users")
           .where("username", "==", identifier)
           .limit(1)
           .get();
 
+        console.log("📦 Query snapshot empty?", snap.empty);
+
         if (snap.empty) {
+          console.warn("❌ Username non trovato");
           alert("❌ Username non trovato");
           return;
         }
 
         emailToUse = snap.docs[0].data().email;
+        console.log("📧 Email trovata da username:", emailToUse);
       }
 
+      console.log("🔐 STEP LOGIN 2: signInWithEmailAndPassword");
       const cred = await auth.signInWithEmailAndPassword(emailToUse, password);
+
+      console.log("✅ Login eseguito:", cred.user.uid);
+
       const user = cred.user;
 
+      console.log("🔄 Reload user...");
       await user.reload();
 
+      console.log("📄 STEP LOGIN 3: fetch user doc");
       const userDoc = await db.collection("users").doc(user.uid).get();
 
+      console.log("📦 userDoc exists:", userDoc.exists);
+
       if (!userDoc.exists) {
+        console.warn("❌ Profilo non trovato");
         alert("Profilo non trovato");
         return;
       }
 
       const userData = userDoc.data();
+      console.log("📊 userData:", userData);
 
       if (userData.emailVerified === false) {
+        console.warn("⚠️ Email non verificata");
         alert("❌ Verifica il tuo indirizzo email prima di accedere.");
         await auth.signOut();
         return;
       }
 
+      console.log("🧪 status check:", userData.status);
+
       if (userData.status === "sospeso") {
+        console.warn("⛔ Account sospeso");
         alert("❌ Il tuo account è sospeso. Contatta un amministratore.");
         await auth.signOut();
         return;
       }
 
       if (userData.status === "eliminato") {
+        console.warn("⛔ Account eliminato");
         alert("❌ Il tuo account è stato eliminato.");
         await auth.signOut();
         return;
       }
 
+      console.log("📝 Logging login event...");
       await db.collection("logins").add({
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      console.log("📍 Login salvato su Firestore");
 
       const allowedRoles = [
         "simplestaff",
@@ -84,57 +120,70 @@ if (loginForm) {
         "superadmin"
       ];
 
+      console.log("🧭 Role check:", userData.role);
+
       if (allowedRoles.includes(userData.role)) {
+        console.log("➡️ Redirect /staff");
         window.location.href = "/staff";
       } else {
+        console.log("➡️ Redirect /dashboard");
         window.location.href = "/dashboard";
       }
 
     } catch (err) {
-      crr("❌ Errore login:", err);
+      crr("❌ LOGIN ERROR:", err);
+      console.error("🔴 Stack/Details:", err?.stack);
       alert("Errore login: " + err.message);
     }
   });
 }
 
 const googleBtn = document.getElementById("googleLoginBtn");
+console.log("🔍 googleBtn:", googleBtn);
 
 if (googleBtn) {
   googleBtn.addEventListener("click", async () => {
+    console.log("🔵 GOOGLE LOGIN click");
+
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
+      console.log("🔐 Provider creato");
 
       const result = await auth.signInWithPopup(provider);
       const user = result.user;
 
+      console.log("✅ Google login user:", user.uid);
+
       const userRef = db.collection("users").doc(user.uid);
       const snap = await userRef.get();
 
+      console.log("📄 user doc exists:", snap.exists);
+
       if (!snap.exists) {
+        console.warn("⛔ Accesso negato: account non registrato");
         alert("Accesso negato: crea prima un account.");
         await auth.signOut();
         return;
       }
 
       const data = snap.data();
+      console.log("📊 Google user data:", data);
 
-      if (data.status === "sospeso") {
-        alert("❌ Il tuo account è sospeso.");
+      if (data.status === "sospeso" || data.status === "eliminato") {
+        console.warn("⛔ Account bloccato:", data.status);
+        alert("❌ Account non attivo");
         await auth.signOut();
         return;
       }
 
-      if (data.status === "eliminato") {
-        alert("❌ Il tuo account è stato eliminato.");
-        await auth.signOut();
-        return;
-      }
-
+      console.log("📝 logging google login...");
       await db.collection("logins").add({
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      console.log("🧭 role:", data.role);
 
       const allowedRoles = [
         "simplestaff",
@@ -145,85 +194,110 @@ if (googleBtn) {
       ];
 
       if (allowedRoles.includes(data.role)) {
+        console.log("➡️ redirect staff");
         window.location.href = "/staff";
       } else {
+        console.log("➡️ redirect dashboard");
         window.location.href = "/dashboard";
       }
 
     } catch (err) {
-      crr("❌ Errore Google:", err);
+      crr("❌ GOOGLE ERROR:", err);
+      console.error("🔴 Google stack:", err?.stack);
       alert("Errore Google: " + err.message);
     }
   });
 }
 
 const registerForm = document.getElementById("registerForm");
+console.log("🔍 registerForm:", registerForm);
 
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const name = document.getElementById("registerName").value;
-  const surname = document.getElementById("registerSurname").value;
-  const email = document.getElementById("registerEmail").value;
-  const username = document.getElementById("registerUsername").value;
-  const password = document.getElementById("registerPassword").value;
+    console.log("🟢 REGISTER submit");
 
-  isRegistering = true;
+    const name = document.getElementById("registerName").value;
+    const surname = document.getElementById("registerSurname").value;
+    const email = document.getElementById("registerEmail").value;
+    const username = document.getElementById("registerUsername").value;
+    const password = document.getElementById("registerPassword").value;
 
-  try {
-    console.log("👉 STEP 1: create user auth");
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    const user = cred.user;
+    console.log("👤 register data:", { name, surname, email, username });
 
-    console.log("👉 STEP 2: write users doc");
-    await db.collection("users").doc(user.uid).set({
-      email,
-      name,
-      surname,
-      username,
-      role: "user",
-      status: "attivo",
-      emailVerified: false,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    isRegistering = true;
 
-    const token = crypto.randomUUID();
+    try {
+      console.log("👉 STEP 1: create auth user");
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      const user = cred.user;
 
-    console.log("👉 STEP 3: write email verification");
-    await db.collection("emailVerifications").doc(token).set({
-      email,
-      userId: user.uid,
-      expiresAt: Date.now() + 86400000,
-      used: false
-    });
+      console.log("✅ user created:", user.uid);
 
-    console.log("👉 STEP 4: log activity");
-    await db.collection("activities").add({
-      type: "user_creation",
-      userName: `${name} ${surname}`,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-    });
+      console.log("👉 STEP 2: write Firestore user doc");
+      await db.collection("users").doc(user.uid).set({
+        email,
+        name,
+        surname,
+        username,
+        role: "user",
+        status: "attivo",
+        emailVerified: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-    const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+      console.log("📄 user doc scritto");
 
-    const htmlContent = buildEmail({ verifyLink, name, email });
+      const token = crypto.randomUUID();
+      console.log("🔑 verification token:", token);
 
-    await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userEmail: email, htmlContent })
-    });
+      console.log("👉 STEP 3: email verification doc");
+      await db.collection("emailVerifications").doc(token).set({
+        email,
+        userId: user.uid,
+        expiresAt: Date.now() + 86400000,
+        used: false
+      });
 
-    alert("📩 Email di verifica inviata! Controlla la tua casella di posta. Ci raccomandiamo di controllare anche la cartella spam!");
+      console.log("📨 verification saved");
 
-    await auth.signOut();
-    window.location.href = "/login";
+      console.log("👉 STEP 4: activity log");
+      await db.collection("activities").add({
+        type: "user_creation",
+        userName: `${name} ${surname}`,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      console.log("📊 activity logged");
+
+      const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+      console.log("🔗 verifyLink:", verifyLink);
+
+      const htmlContent = buildEmail({ verifyLink, name, email });
+
+      console.log("📧 sending email request...");
+      await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: email, htmlContent })
+      });
+
+      console.log("📨 email request sent");
+
+      alert("📩 Email di verifica inviata!");
+
+      await auth.signOut();
+      console.log("🚪 signed out after register");
+
+      window.location.href = "/login";
 
     } catch (err) {
-      crr(err);
+      crr("❌ REGISTER ERROR:", err);
+      console.error("🔴 register stack:", err?.stack);
       alert(err.message);
     } finally {
+      console.log("🔚 register finished");
       isRegistering = false;
     }
   });
@@ -235,31 +309,44 @@ if (resetForm) {
   resetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    console.log("🔁 RESET password submit");
+
     const email = e.target["resetEmail"].value;
+    console.log("📧 reset email:", email);
 
     try {
       await auth.sendPasswordResetEmail(email);
+      console.log("📨 reset email sent");
       alert("📩 Email di reset inviata!");
     } catch (err) {
-      crr("❌ Reset error:", err);
+      crr("❌ RESET ERROR:", err);
       alert("Errore reset: " + err.message);
     }
   });
 }
 
 auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
+  console.log("👀 auth state changed:", user?.uid || null);
 
-  if (isRegistering) return;
+  if (!user) return;
+  if (isRegistering) {
+    console.log("⏸ skipping redirect (registering)");
+    return;
+  }
 
   const currentPath = window.location.pathname;
+  console.log("📍 currentPath:", currentPath);
 
   if (currentPath === "/staff" || currentPath === "/dashboard") return;
 
   const userDoc = await db.collection("users").doc(user.uid).get();
+
+  console.log("📄 auth listener userDoc exists:", userDoc.exists);
+
   if (!userDoc.exists) return;
 
   const userData = userDoc.data();
+  console.log("📊 auth listener userData:", userData);
 
   const allowedRoles = [
     "simplestaff",
@@ -269,15 +356,18 @@ auth.onAuthStateChanged(async (user) => {
     "superadmin"
   ];
 
+  console.log("🧭 auth redirect role:", userData.role);
+
   if (allowedRoles.includes(userData.role)) {
+    console.log("➡️ auto redirect staff");
     window.location.href = "/staff";
   } else {
+    console.log("➡️ auto redirect dashboard");
     window.location.href = "/dashboard";
   }
 });
 
 function buildEmail({ verifyLink, email, name }) {
-
   const footer = `
     <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
       MyFrEM · Friuli Emergenze<br>
