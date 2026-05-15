@@ -16,6 +16,8 @@ const crr = console.error;
 clg("✅ Sistema log attivo");
 
 let isRegistering = false;
+let isLoggingIn = false;
+let isRouting = false;
 
 const loginForm = document.getElementById("loginForm");
 console.log("🔍 loginForm:", loginForm);
@@ -24,6 +26,9 @@ if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     console.log("📨 LOGIN SUBMIT triggerato");
+
+    isLoggingIn = true;
+    console.log("🔒 LOGIN LOCK ON");
 
     const identifier = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
@@ -110,8 +115,6 @@ if (loginForm) {
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      console.log("📍 Login salvato su Firestore");
-
       const allowedRoles = [
         "simplestaff",
         "modstaff",
@@ -122,6 +125,9 @@ if (loginForm) {
 
       console.log("🧭 Role check:", userData.role);
 
+      isLoggingIn = false;
+      console.log("🔓 LOGIN LOCK OFF");
+
       if (allowedRoles.includes(userData.role)) {
         console.log("➡️ Redirect /staff");
         window.location.href = "/staff";
@@ -131,6 +137,9 @@ if (loginForm) {
       }
 
     } catch (err) {
+      isLoggingIn = false;
+      console.log("🔓 LOGIN LOCK OFF (ERROR)");
+
       crr("❌ LOGIN ERROR:", err);
       console.error("🔴 Stack/Details:", err?.stack);
       alert("Errore login: " + err.message);
@@ -147,11 +156,9 @@ if (googleBtn) {
 
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      console.log("🔐 Provider creato");
-
       const result = await auth.signInWithPopup(provider);
-      const user = result.user;
 
+      const user = result.user;
       console.log("✅ Google login user:", user.uid);
 
       const userRef = db.collection("users").doc(user.uid);
@@ -176,14 +183,11 @@ if (googleBtn) {
         return;
       }
 
-      console.log("📝 logging google login...");
       await db.collection("logins").add({
         userId: user.uid,
         email: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
-
-      console.log("🧭 role:", data.role);
 
       const allowedRoles = [
         "simplestaff",
@@ -192,6 +196,8 @@ if (googleBtn) {
         "advstaffplus",
         "superadmin"
       ];
+
+      console.log("🧭 role:", data.role);
 
       if (allowedRoles.includes(data.role)) {
         console.log("➡️ redirect staff");
@@ -218,24 +224,18 @@ if (registerForm) {
 
     console.log("🟢 REGISTER submit");
 
+    isRegistering = true;
+
     const name = document.getElementById("registerName").value;
     const surname = document.getElementById("registerSurname").value;
     const email = document.getElementById("registerEmail").value;
     const username = document.getElementById("registerUsername").value;
     const password = document.getElementById("registerPassword").value;
 
-    console.log("👤 register data:", { name, surname, email, username });
-
-    isRegistering = true;
-
     try {
-      console.log("👉 STEP 1: create auth user");
       const cred = await auth.createUserWithEmailAndPassword(email, password);
       const user = cred.user;
 
-      console.log("✅ user created:", user.uid);
-
-      console.log("👉 STEP 2: write Firestore user doc");
       await db.collection("users").doc(user.uid).set({
         email,
         name,
@@ -247,12 +247,8 @@ if (registerForm) {
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      console.log("📄 user doc scritto");
-
       const token = crypto.randomUUID();
-      console.log("🔑 verification token:", token);
 
-      console.log("👉 STEP 3: email verification doc");
       await db.collection("emailVerifications").doc(token).set({
         email,
         userId: user.uid,
@@ -260,110 +256,90 @@ if (registerForm) {
         used: false
       });
 
-      console.log("📨 verification saved");
-
-      console.log("👉 STEP 4: activity log");
       await db.collection("activities").add({
         type: "user_creation",
         userName: `${name} ${surname}`,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      console.log("📊 activity logged");
-
       const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
-      console.log("🔗 verifyLink:", verifyLink);
 
       const htmlContent = buildEmail({ verifyLink, name, email });
 
-      console.log("📧 sending email request...");
       await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userEmail: email, htmlContent })
       });
 
-      console.log("📨 email request sent");
-
       alert("📩 Email di verifica inviata!");
 
       await auth.signOut();
-      console.log("🚪 signed out after register");
-
       window.location.href = "/login";
 
     } catch (err) {
       crr("❌ REGISTER ERROR:", err);
-      console.error("🔴 register stack:", err?.stack);
       alert(err.message);
     } finally {
-      console.log("🔚 register finished");
       isRegistering = false;
     }
   });
 }
-
-const resetForm = document.getElementById("resetForm");
-
-if (resetForm) {
-  resetForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    console.log("🔁 RESET password submit");
-
-    const email = e.target["resetEmail"].value;
-    console.log("📧 reset email:", email);
-
-    try {
-      await auth.sendPasswordResetEmail(email);
-      console.log("📨 reset email sent");
-      alert("📩 Email di reset inviata!");
-    } catch (err) {
-      crr("❌ RESET ERROR:", err);
-      alert("Errore reset: " + err.message);
-    }
-  });
-}
-
 auth.onAuthStateChanged(async (user) => {
   console.log("👀 auth state changed:", user?.uid || null);
 
   if (!user) return;
-  if (isRegistering) {
-    console.log("⏸ skipping redirect (registering)");
+  if (isRegistering) return;
+  if (isLoggingIn) {
+    console.log("⛔ skip auth listener: login in progress");
     return;
   }
 
   const currentPath = window.location.pathname;
   console.log("📍 currentPath:", currentPath);
 
-  if (currentPath === "/staff" || currentPath === "/dashboard") return;
+  if (currentPath.startsWith("/login")) {
+    console.log("⛔ skip redirect on login page");
+    return;
+  }
 
-  const userDoc = await db.collection("users").doc(user.uid).get();
+  if (isRouting) {
+    console.log("⛔ skip auth listener: routing active");
+    return;
+  }
 
-  console.log("📄 auth listener userDoc exists:", userDoc.exists);
+  try {
+    isRouting = true;
+    console.log("🚦 ROUTING LOCK ON");
 
-  if (!userDoc.exists) return;
+    const userDoc = await db.collection("users").doc(user.uid).get();
 
-  const userData = userDoc.data();
-  console.log("📊 auth listener userData:", userData);
+    console.log("📄 auth listener userDoc exists:", userDoc.exists);
 
-  const allowedRoles = [
-    "simplestaff",
-    "modstaff",
-    "advstaff",
-    "advstaffplus",
-    "superadmin"
-  ];
+    if (!userDoc.exists) return;
 
-  console.log("🧭 auth redirect role:", userData.role);
+    const userData = userDoc.data();
+    console.log("📊 auth listener userData:", userData);
 
-  if (allowedRoles.includes(userData.role)) {
-    console.log("➡️ auto redirect staff");
-    window.location.href = "/staff";
-  } else {
-    console.log("➡️ auto redirect dashboard");
-    window.location.href = "/dashboard";
+    const allowedRoles = [
+      "simplestaff",
+      "modstaff",
+      "advstaff",
+      "advstaffplus",
+      "superadmin"
+    ];
+
+    console.log("🧭 auth redirect role:", userData.role);
+
+    if (allowedRoles.includes(userData.role)) {
+      window.location.href = "/staff";
+    } else {
+      window.location.href = "/dashboard";
+    }
+
+  } finally {
+    isRouting = false;
+    console.log("🚦 ROUTING LOCK OFF");
   }
 });
 
