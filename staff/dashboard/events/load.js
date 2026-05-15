@@ -48,6 +48,7 @@ onAuthStateChanged(auth, async (user) => {
           <button class="btn-action btn-approve">Approva</button>
           <button class="btn-action btn-reject">Rifiuta</button>
           <button class="btn-action btn-view" onclick="window.open('/events/detail/?id=${docSnap.id}', '_blank')">Visualizza Evento</button>
+          <button class="btn-action btn-view1">Non mostrare in dashboard</button>
         </div>
       `;
 
@@ -55,6 +56,7 @@ onAuthStateChanged(auth, async (user) => {
         div.querySelector(".btn-organized").disabled = true;
         div.querySelector(".btn-approve").disabled = true;
         div.querySelector(".btn-reject").disabled = true;
+        div.querySelector(".btn-view1").disabled = false;
       }
 
       if (e.status === "Approvato") {
@@ -106,6 +108,11 @@ onAuthStateChanged(auth, async (user) => {
           div.querySelector(".status").textContent = "Rifiutato";
           div.querySelector(".status").className = "status rejected";
         };
+        div.querySelector(".btn-view1").onclick = async () => {
+          const userRef = doc(db, "events", docSnap.id);
+          await updateDoc(userRef, { showInDash: false });
+          div.style.display = "none";
+        }
 
         eventsList.appendChild(div);
       });

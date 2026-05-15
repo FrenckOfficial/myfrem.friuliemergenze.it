@@ -86,7 +86,7 @@ auth.onAuthStateChanged(async (user) => {
     
     eventsSnap.forEach(doc => {
       const event = doc.data();
-      if (event.status === "Organizzato") {
+      if (event.status === "Organizzato" && event.showInDash === true) {
         eventsListEl.innerHTML += `
           <div class="event-card">
             <h3>${event.title}</h3>
@@ -95,7 +95,9 @@ auth.onAuthStateChanged(async (user) => {
             <a href="/events/join/?event=${doc.id}" class="btn" target="_blank">Iscriviti</a>
           </div>
         `;
-      }
+      } else if (event.status === "Organizzato" && event.showInDash === false) {
+        eventsListEl.innerHTML += ""
+      };
     });
 
   } catch (err) {

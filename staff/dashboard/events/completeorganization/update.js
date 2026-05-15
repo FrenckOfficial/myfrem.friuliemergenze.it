@@ -68,6 +68,7 @@ async function confirmOrg() {
             startTime: startTimeEl,
             location: placeEl,
             status: "Organizzato",
+            showInDash: true
         });
 
         alert("Organizzazione confermata.");
