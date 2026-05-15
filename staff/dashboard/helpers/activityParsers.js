@@ -125,7 +125,6 @@ export async function parseActivity(activity, date) {
             return `[${date}] PDF "${activity.documentTitle}" generato da ${staff}.`;
         }
 
-
         default:
             return `[${date}] Attività sconosciuta.`;
     }

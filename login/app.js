@@ -190,6 +190,7 @@ if (registerForm) {
 
     const token = crypto.randomUUID();
 
+    console.log("👉 STEP 3: write email verification");
     await db.collection("emailVerifications").doc(token).set({
       email,
       userId: user.uid,
@@ -197,11 +198,12 @@ if (registerForm) {
       used: false
     });
 
+    console.log("👉 STEP 4: log activity");
     await db.collection("activities").add({
       type: "user_creation",
       userName: `${name} ${surname}`,
       timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-    })
+    });
 
     const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
@@ -216,8 +218,6 @@ if (registerForm) {
     alert("📩 Email di verifica inviata! Controlla la tua casella di posta. Ci raccomandiamo di controllare anche la cartella spam!");
 
     await auth.signOut();
-
-    alert("✅ Registrazione avvenuta!");
     window.location.href = "/login";
 
     } catch (err) {
