@@ -26,7 +26,7 @@ const statusMsg = document.getElementById("statusMsg");
 const preview = document.getElementById("emailPreview");
 const sendBtn = document.getElementById("sendNewsletter");
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });

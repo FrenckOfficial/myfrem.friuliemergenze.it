@@ -19,7 +19,7 @@ const messageBox = document.getElementById("messageBox");
 
 console.log("📄 Loading generated documents...");
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });

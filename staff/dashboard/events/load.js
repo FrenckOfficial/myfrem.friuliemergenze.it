@@ -111,7 +111,7 @@ onAuthStateChanged(auth, async (user) => {
         div.querySelector(".btn-view1").onclick = async () => {
           const userRef = doc(db, "events", docSnap.id);
           await updateDoc(userRef, { showInDash: false });
-          div.style.display = "none";
+          alert("Evento nascosto dalla dashboard user.");
         }
 
         eventsList.appendChild(div);
