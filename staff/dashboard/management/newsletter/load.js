@@ -48,6 +48,9 @@ async function loadUsers() {
     snap.forEach((docSnap) => {
       const data = docSnap.data();
 
+      const isVerified = data.verified ? "SI" : "NO";
+      const isEnabled = data.subscribed ? "SI" : "NO";
+
       const date = data.createdAt?.toDate
         ? data.createdAt.toDate().toLocaleString("it-IT")
         : "N/A";
@@ -61,6 +64,8 @@ async function loadUsers() {
         <td style="font-size:12px; word-break:break-all;">
           ${data.token || "-"}
         </td>
+        <td>${isVerified}</td>
+        <td>${isEnabled}</td>
         <td>
           <button class="deleteBtn" data-id="${docSnap.id}">
             ❌ Rimuovi
