@@ -87,7 +87,10 @@ async function loadUsers() {
   users.forEach(u => {
     const tr = document.createElement("tr");
 
+    const emailVerified = u.emailVerified ? "✅" : "❌"
+
     tr.innerHTML = `
+      <td>${emailVerified}</td>
       <td>${u.name || ""}</td>
       <td>${u.surname || ""}</td>
       <td>${u.email || ""}</td>
