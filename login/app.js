@@ -222,8 +222,6 @@ import {
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-import { firebaseConfig } from "/configFirebase.js";
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
