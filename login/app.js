@@ -213,7 +213,97 @@ if (googleBtn) {
       alert("Errore Google: " + err.message);
     }
   });
-}
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { firebaseConfig } from "/configFirebase.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const form = document.getElementById("resetForm");
+const emailInput = document.getElementById("resetEmail");
+const errorText = document.getElementById("error");
+const successText = document.getElementById("success");
+const button = document.getElementById("resetEmailButton");
+
+if (form) {
+
+  form.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    errorText.textContent = "";
+    successText.textContent = "";
+
+    const email = emailInput.value.trim();
+
+    if (!email) {
+
+      errorText.textContent =
+        "Inserisci un indirizzo email valido.";
+
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Invio in corso...";
+
+    try {
+
+      await sendPasswordResetEmail(auth, email);
+
+      successText.textContent =
+        "Email di reset inviata con successo. Controlla la tua casella di posta.";
+
+      form.reset();
+
+    } catch (error) {
+
+      console.error("RESET PASSWORD ERROR:", error);
+
+      switch (error.code) {
+
+        case "auth/user-not-found":
+
+          errorText.textContent =
+            "Nessun account trovato con questa email.";
+
+          break;
+
+        case "auth/invalid-email":
+
+          errorText.textContent =
+            "Email non valida.";
+
+          break;
+
+        case "auth/too-many-requests":
+
+          errorText.textContent =
+            "Troppi tentativi. Riprova più tardi.";
+
+          break;
+
+        default:
+
+          errorText.textContent =
+            "Errore durante l'invio dell'email di reset.";
+      }
+
+    } finally {
+
+      button.disabled = false;
+      button.textContent = "Invia link di reset";
+    }
+  });
+};
 
 const registerForm = document.getElementById("registerForm");
 console.log("🔍 registerForm:", registerForm);
