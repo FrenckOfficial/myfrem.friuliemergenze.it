@@ -141,13 +141,6 @@ if (loginForm) {
 
       await user.reload();
 
-      if (!user.emailVerified) {
-        await signOut(auth);
-        throw new Error(
-          "Verifica il tuo indirizzo email prima di accedere."
-        );
-      }
-
       const userSnap = await getUserDoc(user.uid);
 
       if (!userSnap.exists()) {
@@ -156,6 +149,13 @@ if (loginForm) {
       }
 
       const userData = userSnap.data();
+
+      if (userData.emailVerified === false) {
+        await signOut(auth);
+        throw new Error(
+          "Verifica il tuo indirizzo email prima di accedere."
+        );
+      }
 
       await validateAccount(userData);
 
