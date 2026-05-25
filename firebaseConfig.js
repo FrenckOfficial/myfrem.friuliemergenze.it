@@ -1,6 +1,6 @@
 const firebaseConfig = {
   apiKey: "AIzaSyBXD0zGs_kzfWYugVIj8rrZX91YlwBjOJU",
-  authDomain: "friuli-emergenze.firebaseapp.com",
+  authDomain: "link.myfrem.friuliemergenze.it",
   projectId: "friuli-emergenze",
   storageBucket: "friuli-emergenze.firebasestorage.app",
   messagingSenderId: "362899702838",
