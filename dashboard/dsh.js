@@ -144,7 +144,7 @@ auth.onAuthStateChanged(async (user) => {
 
     newsletterBtn.addEventListener("click", async () => {
       if(confirm("Sarai reindirizzato alla pagina di iscrizione alla newsletter. Saranno precompilati il tuo nome e la tua email, dovrai solo cliccare su 'Iscriviti' per completare l'iscrizione. Vuoi procedere?")) {
-        window.location.href = `http://localhost:5185/newsletter/?name=${encodeURIComponent(name)}&email=${encodeURIComponent(auth.currentUser.email)}&privacyChecked=true`;
+        window.location.href = `https://friuliemergenze.it/newsletter/?name=${encodeURIComponent(name)}&email=${encodeURIComponent(auth.currentUser.email)}&privacyChecked=true`;
       };
     })
 
