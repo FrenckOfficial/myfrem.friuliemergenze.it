@@ -1,472 +1,433 @@
 import { firebaseConfig } from "../configFirebase.js";
 
-console.log("🚀 SCRIPT AVVIATO - auth module loading...");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-firebase.initializeApp(firebaseConfig);
-console.log("🔥 Firebase inizializzato");
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  limit,
+  getDocs,
+  getDoc,
+  setDoc,
+  addDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-console.log("🔗 Auth & Firestore instance create");
+const app = initializeApp(firebaseConfig);
 
-const clg = console.log;
-const crr = console.error;
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-clg("✅ Sistema log attivo");
+const allowedRoles = [
+  "simplestaff",
+  "modstaff",
+  "advstaff",
+  "advstaffplus",
+  "superadmin"
+];
 
 let isRegistering = false;
 let isLoggingIn = false;
 let isRouting = false;
 
 const loginForm = document.getElementById("loginForm");
-console.log("🔍 loginForm:", loginForm);
+const registerForm = document.getElementById("registerForm");
+const googleBtn = document.getElementById("googleLoginBtn");
+
+const resetForm = document.getElementById("resetForm");
+const resetEmail = document.getElementById("resetEmail");
+const resetError = document.getElementById("error");
+const resetSuccess = document.getElementById("success");
+const resetButton = document.getElementById("resetEmailButton");
+
+function redirectByRole(role) {
+  if (allowedRoles.includes(role)) {
+    window.location.href = "/staff";
+  } else {
+    window.location.href = "/dashboard";
+  }
+}
+
+async function getUserByUsername(username) {
+  const q = query(
+    collection(db, "users"),
+    where("username", "==", username),
+    limit(1)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    return null;
+  }
+
+  return snap.docs[0].data();
+}
+
+async function getUserDoc(uid) {
+  return await getDoc(doc(db, "users", uid));
+}
+
+async function createLoginLog(user) {
+  await addDoc(collection(db, "logins"), {
+    userId: user.uid,
+    email: user.email,
+    timestamp: serverTimestamp()
+  });
+}
+
+async function validateAccount(userData) {
+  if (!userData) {
+    throw new Error("Profilo utente non trovato.");
+  }
+
+  if (userData.status === "sospeso") {
+    throw new Error("Il tuo account è sospeso.");
+  }
+
+  if (userData.status === "eliminato") {
+    throw new Error("Il tuo account è stato eliminato.");
+  }
+}
 
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("📨 LOGIN SUBMIT triggerato");
+
+    if (isLoggingIn) return;
 
     isLoggingIn = true;
-    console.log("🔒 LOGIN LOCK ON");
-
-    const identifier = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    console.log("👤 Identifier:", identifier);
-    console.log("🔑 Password length:", password?.length);
-
-    let emailToUse = identifier;
 
     try {
-      console.log("➡️ STEP LOGIN 1: check identifier type");
+      const identifier =
+        document.getElementById("loginEmail").value.trim();
+
+      const password =
+        document.getElementById("loginPassword").value;
+
+      let email = identifier;
 
       if (!identifier.includes("@")) {
-        console.log("🔎 Username rilevato, query Firestore...");
-        const snap = await db
-          .collection("users")
-          .where("username", "==", identifier)
-          .limit(1)
-          .get();
+        const userData = await getUserByUsername(identifier);
 
-        console.log("📦 Query snapshot empty?", snap.empty);
-
-        if (snap.empty) {
-          console.warn("❌ Username non trovato");
-          alert("❌ Username non trovato");
-          return;
+        if (!userData) {
+          throw new Error("Username non trovato.");
         }
 
-        emailToUse = snap.docs[0].data().email;
-        console.log("📧 Email trovata da username:", emailToUse);
+        email = userData.email;
       }
 
-      console.log("🔐 STEP LOGIN 2: signInWithEmailAndPassword");
-      const cred = await auth.signInWithEmailAndPassword(emailToUse, password);
-
-      console.log("✅ Login eseguito:", cred.user.uid);
+      const cred = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
       const user = cred.user;
 
-      console.log("🔄 Reload user...");
       await user.reload();
 
-      console.log("📄 STEP LOGIN 3: fetch user doc");
-      const userDoc = await db.collection("users").doc(user.uid).get();
-
-      console.log("📦 userDoc exists:", userDoc.exists);
-
-      if (!userDoc.exists) {
-        console.warn("❌ Profilo non trovato");
-        alert("Profilo non trovato");
-        return;
+      if (!user.emailVerified) {
+        await signOut(auth);
+        throw new Error(
+          "Verifica il tuo indirizzo email prima di accedere."
+        );
       }
 
-      const userData = userDoc.data();
-      console.log("📊 userData:", userData);
+      const userSnap = await getUserDoc(user.uid);
 
-      if (userData.emailVerified === false) {
-        console.warn("⚠️ Email non verificata");
-        alert("❌ Verifica il tuo indirizzo email prima di accedere.");
-        await auth.signOut();
-        return;
+      if (!userSnap.exists()) {
+        await signOut(auth);
+        throw new Error("Profilo non trovato.");
       }
 
-      console.log("🧪 status check:", userData.status);
+      const userData = userSnap.data();
 
-      if (userData.status === "sospeso") {
-        console.warn("⛔ Account sospeso");
-        alert("❌ Il tuo account è sospeso. Contatta un amministratore.");
-        await auth.signOut();
-        return;
-      }
+      await validateAccount(userData);
 
-      if (userData.status === "eliminato") {
-        console.warn("⛔ Account eliminato");
-        alert("❌ Il tuo account è stato eliminato.");
-        await auth.signOut();
-        return;
-      }
+      await createLoginLog(user);
 
-      console.log("📝 Logging login event...");
-      await db.collection("logins").add({
-        userId: user.uid,
-        email: user.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      const allowedRoles = [
-        "simplestaff",
-        "modstaff",
-        "advstaff",
-        "advstaffplus",
-        "superadmin"
-      ];
-
-      console.log("🧭 Role check:", userData.role);
-
-      isLoggingIn = false;
-      console.log("🔓 LOGIN LOCK OFF");
-
-      if (allowedRoles.includes(userData.role)) {
-        console.log("➡️ Redirect /staff");
-        window.location.href = "/staff";
-      } else {
-        console.log("➡️ Redirect /dashboard");
-        window.location.href = "/dashboard";
-      }
+      redirectByRole(userData.role);
 
     } catch (err) {
+      alert(err.message);
+      console.error(err);
+    } finally {
       isLoggingIn = false;
-      console.log("🔓 LOGIN LOCK OFF (ERROR)");
-
-      crr("❌ LOGIN ERROR:", err);
-      console.error("🔴 Stack/Details:", err?.stack);
-      alert("Errore login: " + err.message);
     }
   });
 }
 
-const googleBtn = document.getElementById("googleLoginBtn");
-console.log("🔍 googleBtn:", googleBtn);
-
 if (googleBtn) {
   googleBtn.addEventListener("click", async () => {
-    console.log("🔵 GOOGLE LOGIN click");
-
     try {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      const result = await auth.signInWithPopup(provider);
+      const provider = new GoogleAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
 
       const user = result.user;
-      console.log("✅ Google login user:", user.uid);
 
-      const userRef = db.collection("users").doc(user.uid);
-      const snap = await userRef.get();
+      const userSnap = await getUserDoc(user.uid);
 
-      console.log("📄 user doc exists:", snap.exists);
-
-      if (!snap.exists) {
-        console.warn("⛔ Accesso negato: account non registrato");
-        alert("Accesso negato: crea prima un account.");
-        await auth.signOut();
-        return;
+      if (!userSnap.exists()) {
+        await signOut(auth);
+        throw new Error(
+          "Accesso negato. Crea prima un account."
+        );
       }
 
-      const data = snap.data();
-      console.log("📊 Google user data:", data);
+      const userData = userSnap.data();
 
-      if (data.status === "sospeso" || data.status === "eliminato") {
-        console.warn("⛔ Account bloccato:", data.status);
-        alert("❌ Account non attivo");
-        await auth.signOut();
-        return;
-      }
+      await validateAccount(userData);
 
-      await db.collection("logins").add({
-        userId: user.uid,
-        email: user.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await createLoginLog(user);
 
-      const allowedRoles = [
-        "simplestaff",
-        "modstaff",
-        "advstaff",
-        "advstaffplus",
-        "superadmin"
-      ];
-
-      console.log("🧭 role:", data.role);
-
-      if (allowedRoles.includes(data.role)) {
-        console.log("➡️ redirect staff");
-        window.location.href = "/staff";
-      } else {
-        console.log("➡️ redirect dashboard");
-        window.location.href = "/dashboard";
-      }
+      redirectByRole(userData.role);
 
     } catch (err) {
-      crr("❌ GOOGLE ERROR:", err);
-      console.error("🔴 Google stack:", err?.stack);
-      alert("Errore Google: " + err.message);
+      alert(err.message);
+      console.error(err);
     }
   });
-};
+}
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-  getAuth,
-  sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-const form = document.getElementById("resetForm");
-const emailInput = document.getElementById("resetEmail");
-const errorText = document.getElementById("error");
-const successText = document.getElementById("success");
-const button = document.getElementById("resetEmailButton");
-
-if (form) {
-
-  form.addEventListener("submit", async (e) => {
-
+if (resetForm) {
+  resetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    errorText.textContent = "";
-    successText.textContent = "";
+    resetError.textContent = "";
+    resetSuccess.textContent = "";
 
-    const email = emailInput.value.trim();
+    const email = resetEmail.value.trim();
 
     if (!email) {
-
-      errorText.textContent =
+      resetError.textContent =
         "Inserisci un indirizzo email valido.";
 
       return;
     }
 
-    button.disabled = true;
-    button.textContent = "Invio in corso...";
-
     try {
+      resetButton.disabled = true;
+      resetButton.textContent = "Invio in corso...";
 
       await sendPasswordResetEmail(auth, email);
 
-      successText.textContent =
-        "Email di reset inviata con successo. Controlla la tua casella di posta.";
+      resetSuccess.textContent =
+        "Email di reset inviata con successo.";
 
-      form.reset();
+      resetForm.reset();
 
     } catch (error) {
-
-      console.error("RESET PASSWORD ERROR:", error);
-
       switch (error.code) {
-
         case "auth/user-not-found":
-
-          errorText.textContent =
+          resetError.textContent =
             "Nessun account trovato con questa email.";
-
           break;
 
         case "auth/invalid-email":
-
-          errorText.textContent =
+          resetError.textContent =
             "Email non valida.";
-
           break;
 
         case "auth/too-many-requests":
-
-          errorText.textContent =
+          resetError.textContent =
             "Troppi tentativi. Riprova più tardi.";
-
           break;
 
         default:
-
-          errorText.textContent =
-            "Errore durante l'invio dell'email di reset.";
+          resetError.textContent =
+            "Errore durante l'invio dell'email.";
       }
 
-    } finally {
+      console.error(error);
 
-      button.disabled = false;
-      button.textContent = "Invia link di reset";
+    } finally {
+      resetButton.disabled = false;
+      resetButton.textContent = "Invia link di reset";
     }
   });
-};
-
-const registerForm = document.getElementById("registerForm");
-console.log("🔍 registerForm:", registerForm);
+}
 
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    console.log("🟢 REGISTER submit");
+    if (isRegistering) return;
 
     isRegistering = true;
 
-    const name = document.getElementById("registerName").value;
-    const surname = document.getElementById("registerSurname").value;
-    const email = document.getElementById("registerEmail").value;
-    const username = document.getElementById("registerUsername").value;
-    const password = document.getElementById("registerPassword").value;
-
     try {
-      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      const name =
+        document.getElementById("registerName").value.trim();
+
+      const surname =
+        document.getElementById("registerSurname").value.trim();
+
+      const email =
+        document.getElementById("registerEmail").value.trim();
+
+      const username =
+        document.getElementById("registerUsername").value.trim();
+
+      const password =
+        document.getElementById("registerPassword").value;
+
+      const usernameQuery = query(
+        collection(db, "users"),
+        where("username", "==", username),
+        limit(1)
+      );
+
+      const usernameSnap = await getDocs(usernameQuery);
+
+      if (!usernameSnap.empty) {
+        throw new Error("Username già utilizzato.");
+      }
+
+      const cred = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
       const user = cred.user;
 
-      await db.collection("users").doc(user.uid).set({
+      await setDoc(doc(db, "users", user.uid), {
         email,
         name,
         surname,
         username,
         role: "user",
         status: "attivo",
-        emailVerified: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: serverTimestamp()
       });
 
-      const token = crypto.randomUUID();
+      const token = self.crypto.randomUUID();
 
-      await db.collection("emailVerifications").doc(token).set({
-        email,
-        userId: user.uid,
-        expiresAt: Date.now() + 86400000,
-        used: false
-      });
+      await setDoc(
+        doc(db, "emailVerifications", token),
+        {
+          email,
+          userId: user.uid,
+          expiresAt: Date.now() + 86400000,
+          used: false
+        }
+      );
 
-      await db.collection("activities").add({
+      await addDoc(collection(db, "activities"), {
         type: "user_creation",
         userName: `${name} ${surname}`,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: serverTimestamp()
       });
 
-      const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+      const verifyLink =
+        `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
-      const htmlContent = buildEmail({ verifyLink, name, email });
-
-      await fetch("https://myfrem.friuliemergenze.it/api/sendVerificationEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: email, htmlContent })
+      const htmlContent = buildEmail({
+        verifyLink,
+        email,
+        name
       });
 
-      alert("📩 Email di verifica inviata!");
+      const response = await fetch(
+        "https://myfrem.friuliemergenze.it/api/sendVerificationEmail",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userEmail: email,
+            htmlContent
+          })
+        }
+      );
 
-      await auth.signOut();
+      if (!response.ok) {
+        throw new Error(
+          "Errore invio email di verifica."
+        );
+      }
+
+      alert("Email di verifica inviata.");
+
+      await signOut(auth);
+
       window.location.href = "/login";
 
     } catch (err) {
-      crr("❌ REGISTER ERROR:", err);
       alert(err.message);
+      console.error(err);
+
     } finally {
       isRegistering = false;
     }
   });
 }
-auth.onAuthStateChanged(async (user) => {
-  console.log("👀 auth state changed:", user?.uid || null);
 
+onAuthStateChanged(auth, async (user) => {
   if (!user) return;
-  if (isRegistering) return;
-  if (isLoggingIn) {
-    console.log("⛔ skip auth listener: login in progress");
+
+  if (isRegistering || isLoggingIn || isRouting) {
     return;
   }
 
-  const currentPath = window.location.pathname;
-  console.log("📍 currentPath:", currentPath);
+  const path = window.location.pathname;
 
-  if (currentPath.startsWith("/login")) {
-    console.log("⛔ skip redirect on login page");
-    return;
-  }
+  const blockedPaths = [
+    "/login/signin/",
+    "/login/signup",
+    "/login/reset-your-password"
+  ];
 
-  if (isRouting) {
-    console.log("⛔ skip auth listener: routing active");
+  if (blockedPaths.some((p) => path.startsWith(p))) {
     return;
   }
 
   try {
     isRouting = true;
-    console.log("🚦 ROUTING LOCK ON");
 
-    const userDoc = await db.collection("users").doc(user.uid).get();
+    const userSnap = await getUserDoc(user.uid);
 
-    console.log("📄 auth listener userDoc exists:", userDoc.exists);
-
-    if (!userDoc.exists) return;
-
-    const userData = userDoc.data();
-    console.log("📊 auth listener userData:", userData);
-
-    const allowedRoles = [
-      "simplestaff",
-      "modstaff",
-      "advstaff",
-      "advstaffplus",
-      "superadmin"
-    ];
-
-    console.log("🧭 auth redirect role:", userData.role);
-
-    if (allowedRoles.includes(userData.role)) {
-      window.location.href = "/staff";
-    } else {
-      window.location.href = "/dashboard";
+    if (!userSnap.exists()) {
+      return;
     }
+
+    const userData = userSnap.data();
+
+    redirectByRole(userData.role);
+
+  } catch (err) {
+    console.error(err);
 
   } finally {
     isRouting = false;
-    console.log("🚦 ROUTING LOCK OFF");
   }
 });
 
 function buildEmail({ verifyLink, email, name }) {
-  const footer = `
-    <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
-      MyFrEM · Friuli Emergenze<br>
-      Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
-      Se non sei stato tu, puoi ignorare questa email.
-      <br><br>
-      <a href="https://friuliemergenze.it">
-        friuliemergenze.it
-      </a>
-      ·
-      <a href="mailto:soem@friuliemergenze.it">
-        soem@friuliemergenze.it
-      </a>
-    </p>
-  `;
-
   return `
-    <div style="
-      font-family:Arial,sans-serif;
-      background:#f5f5f5;
-      padding:20px;
-    ">
+    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td align="center">
 
-            <table style="
-              max-width:520px;
-              width:100%;
-              background:#ffffff;
-              border-radius:14px;
-              overflow:hidden;
-              box-shadow:0 2px 10px rgba(0,0,0,0.05);
-            ">
-
+            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
               <tr>
                 <td style="padding:35px;text-align:center;">
 
@@ -475,35 +436,18 @@ function buildEmail({ verifyLink, email, name }) {
                     style="width:80px;margin-bottom:20px;"
                   >
 
-                  <h1 style="
-                    color:#ff3b3b;
-                    margin:0;
-                    font-size:28px;
-                  ">
+                  <h1 style="color:#ff3b3b;margin:0;font-size:28px;">
                     Verifica il tuo account
                   </h1>
 
-                  ${name ? `
-                    <p style="
-                      font-size:18px;
-                      color:#333;
-                      margin-top:25px;
-                      margin-bottom:10px;
-                    ">
-                      Ciao <b>${name}</b>,
-                    </p>
-                  ` : ""}
+                  <p style="font-size:18px;color:#333;margin-top:25px;">
+                    Ciao <b>${name}</b>,
+                  </p>
 
-                  <p style="
-                    color:#555;
-                    line-height:1.7;
-                    font-size:17px;
-                    margin-top:20px;
-                  ">
-                    Benvenuto su <b>MyFrEM</b> 👋<br><br>
+                  <p style="color:#555;line-height:1.7;font-size:17px;margin-top:20px;">
+                    Benvenuto su <b>MyFrEM</b>.<br><br>
 
-                    Per completare la registrazione del tuo account
-                    e confermare il tuo indirizzo email
+                    Per completare la registrazione e verificare l'indirizzo email
                     <b>${email}</b>,
                     clicca sul pulsante qui sotto.
                   </p>
@@ -525,24 +469,37 @@ function buildEmail({ verifyLink, email, name }) {
                     Verifica account
                   </a>
 
-                  <p style="
-                    color:#888;
-                    font-size:13px;
-                    margin-top:25px;
-                    line-height:1.6;
-                  ">
-                    Se il pulsante non funziona, copia e incolla questo link nel browser:
+                  <p style="color:#888;font-size:13px;margin-top:25px;line-height:1.6;">
+                    Se il pulsante non funziona, copia questo link nel browser:
                     <br><br>
-                    <a href="${verifyLink}" style="color:#ff3b3b;">
+
+                    <a
+                      href="${verifyLink}"
+                      style="color:#ff3b3b;"
+                    >
                       ${verifyLink}
                     </a>
                   </p>
 
-                  ${footer}
+                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
+                    MyFrEM · Friuli Emergenze<br>
+                    Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
+                    Se non sei stato tu, puoi ignorare questa email.
+                    <br><br>
+
+                    <a href="https://friuliemergenze.it">
+                      friuliemergenze.it
+                    </a>
+
+                    ·
+
+                    <a href="mailto:soem@friuliemergenze.it">
+                      soem@friuliemergenze.it
+                    </a>
+                  </p>
 
                 </td>
               </tr>
-
             </table>
 
           </td>
