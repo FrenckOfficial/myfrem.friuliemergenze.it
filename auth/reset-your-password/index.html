@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reimposta la tua password MyFrEM</title>
+  <link rel="stylesheet" href="/auth/style.css" />
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+  <div class="container">
+    <h1>Reset Password</h1>
+    <p>Inserisci la tua email, ti invieremo un link per reimpostare la password.</p>
+
+    <form id="resetForm">
+      <h5>Email</h5>
+      <input type="email" id="resetEmail" required placeholder="nome@esempio.com"/>
+      <button type="submit" id="resetEmailButton">Invia link di reset</button>
+    </form>
+
+    <p id="pResetForm"><a href="/login/signin"> Torna al login</a></p>
+
+    <p id="error" class="error"></p>
+    <p id="success" class="success"></p>
+  </div>
+
+  <script type="module" src="/auth/app.js"></script>
+</body>
+</html>

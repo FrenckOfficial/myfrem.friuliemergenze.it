@@ -18,6 +18,8 @@ const approvedEventsEl = document.getElementById("approvedEvents");
 const pendingEventsEl = document.getElementById("pendingEvents");
 const rejectedEventsEl = document.getElementById("rejectedEvents");
 const organizedEventsEl = document.getElementById("organizedEvents");
+const newsBannerEl = document.getElementById("newsBanner");
+const newsletterBtn = document.getElementById("newsletterBtn")
 
 auth.onAuthStateChanged(async (user) => {
   console.log("👀 onAuthStateChanged triggered, user:", user);
@@ -42,6 +44,12 @@ auth.onAuthStateChanged(async (user) => {
       userNameEl.textContent = `${userData.name} (${userData.username})`;
     } else {
       userNameEl.textContent = "Utente";
+    }
+
+    if (userData.newsSubbed === false) {
+      newsBannerEl.style.display = "block"
+    } else {
+      newsBannerEl.style.display = "none"
     }
 
     const photosSnap = await db.collection("photos")
@@ -131,6 +139,14 @@ auth.onAuthStateChanged(async (user) => {
     pendingEventsEl.textContent = pendingE;
     rejectedEventsEl.textContent = rejectedE;
     organizedEventsEl.textContent = organizedE;
+
+    const name = userData.name
+
+    newsletterBtn.addEventListener("click", async () => {
+      if(confirm("Sarai reindirizzato alla pagina di iscrizione alla newsletter. Saranno precompilati il tuo nome e la tua email, dovrai solo cliccare su 'Iscriviti' per completare l'iscrizione. Vuoi procedere?")) {
+        window.location.href = `http://localhost:5185/newsletter/?name=${encodeURIComponent(name)}&email=${encodeURIComponent(auth.currentUser.email)}&privacyChecked=true`;
+      };
+    })
 
   } catch (err) {
     console.error("[EVENTI] ❌ Errore durante il recupero dati Firestore:", err);

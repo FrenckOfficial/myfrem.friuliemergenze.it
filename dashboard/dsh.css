@@ -95,6 +95,49 @@ input, textarea {
   color: #555;
 }
 
+.newsletter-banner{
+  margin-top:20px;
+  background:linear-gradient(135deg,#e53935,#ff6b6b);
+  border-radius:18px;
+  padding:24px;
+  color:white;
+  box-shadow:0 8px 25px rgba(229,57,53,.2);
+}
+
+.newsletter-content{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.newsletter-content h2{
+  margin:0 0 10px;
+  font-size:24px;
+}
+
+.newsletter-content p{
+  margin:0;
+  opacity:.95;
+  line-height:1.6;
+}
+
+#newsletterBtn{
+  border:none;
+  background:white;
+  color:#e53935;
+  padding:14px 22px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+#newsletterBtn:hover{
+  transform:translateY(-2px);
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -327,6 +370,13 @@ button {
   .main-content {
     width: 91%;
     padding: 1rem;
+  }
+
+  #newsletterBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 35%;
   }
 
   .cards {

@@ -340,7 +340,7 @@ button[type="submit"]:hover {
 }
 
 #pResetForm {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 @keyframes fadeIn {

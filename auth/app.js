@@ -314,6 +314,7 @@ if (registerForm) {
         username,
         role: "user",
         status: "attivo",
+        newsSubbed: false,
         createdAt: serverTimestamp()
       });
 

@@ -7,10 +7,6 @@
   <title>Dashboard MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon">
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
@@ -40,6 +36,23 @@
         <h1>Ciao, <span id="userName"></span> 👋</h1>
         <p>Benvenuto nella tua dashboard personale.</p>
       </header>
+
+      <section class="newsletter-banner" id="newsBanner" style="display:none;">
+        <div class="newsletter-content">
+          <div>
+            <h2>📬 Newsletter Friuli Emergenze</h2>
+
+            <p>
+              Ricevi aggiornamenti sugli eventi,
+              nuove funzionalità e attività di Friuli Emergenze.
+            </p>
+          </div>
+
+          <button id="newsletterBtn">
+            Iscriviti
+          </button>
+        </div>
+      </section>
 
       <section class="cards">
         <div class="card">
