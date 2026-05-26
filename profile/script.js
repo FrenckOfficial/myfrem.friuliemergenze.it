@@ -43,14 +43,7 @@ const adminRoles = [
     "simplestaff"
 ];
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = "/login";
-        return;
-    }
-
-    loadUserProfile(userId);
-});
+loadUserProfile(userId);
 
 async function loadUserProfile(uid) {
     try {
@@ -70,6 +63,7 @@ async function loadUserProfile(uid) {
         const role = user.role || "Utente";
         const status = user.status || "Offline";
         const avatar = user.photoURL || "/assets/profile/defpic.png";
+        const createdAt = user.createdAt;
 
         document.title = `Profilo di ${fullName} | MyFrEM`;
 
@@ -85,7 +79,7 @@ async function loadUserProfile(uid) {
             elements.avatar.src = "/assets/profile/defpic.png";
         };
 
-        renderBadges(role);
+        renderBadges(createdAt);
         renderStatus(status);
 
         const isStaff = adminRoles.includes(role.toLowerCase());
@@ -122,7 +116,7 @@ async function loadUserProfile(uid) {
                 formatDate(user.createdAt) || "2025";
 
             elements.userBadge.textContent =
-                getActivityBadge(photos);
+                getActivityBadge(user.createdAt);
         }
     } catch (err) {
         console.error("Errore caricamento profilo:", err);
@@ -142,64 +136,73 @@ function formatDate(timestamp) {
 }
 
 function roleData(role) {
-    const roles = {
-        superadmin: {
-            class: "admin",
-            text: "SUPER AMMINISTRATORE"
-        },
+  const safeRole = (typeof role === "string")
+    ? role.toLowerCase()
+    : "user";
 
-        advstaff: {
-            class: "staff",
-            text: "AMMINISTRATORE AVANZATO"
-        },
+  const roles = {
+    superadmin: {
+      class: "admin",
+      text: "SUPER AMMINISTRATORE"
+    },
+    advstaff: {
+      class: "staff",
+      text: "AMMINISTRATORE AVANZATO"
+    },
+    modstaff: {
+      class: "staff",
+      text: "MODERATORE"
+    },
+    simplestaff: {
+      class: "staff",
+      text: "NUOVO AMMINISTRATORE"
+    }
+  };
 
-        modstaff: {
-            class: "staff",
-            text: "MODERATORE"
-        },
-
-        simplestaff: {
-            class: "staff",
-            text: "NUOVO AMMINISTRATORE"
-        }
-    };
-
-    return roles[role.toLowerCase()] || {
-        class: "user",
-        text: "UTENTE"
-    };
+  return roles[safeRole] || {
+    class: "user",
+    text: "UTENTE"
+  };
 }
 
 function getPermissions(role) {
-    switch (role.toLowerCase()) {
-        case "superadmin":
-            return "ACCESSO COMPLETO";
+  const safeRole = typeof role === "string" ? role.toLowerCase() : "user";
 
-        case "advstaff":
-            return "GESTIONE AVANZATA";
-
-        case "modstaff":
-            return "MODERAZIONE";
-
-        case "simplestaff":
-            return "GESTIONE BASE";
-
-        default:
-            return "STANDARD";
-    }
+  switch (safeRole) {
+    case "superadmin":
+      return "ACCESSO COMPLETO";
+    case "advstaff":
+      return "GESTIONE AVANZATA";
+    case "modstaff":
+      return "MODERAZIONE";
+    case "simplestaff":
+      return "GESTIONE BASE";
+    default:
+      return "STANDARD";
+  }
 }
 
-function getActivityBadge(photos) {
-    if (photos >= 500)
-        return "LEGGENDA";
+function getActivityBadge(createdAt) {
+  if (!createdAt) return "NUOVO MEMBRO";
+  const now = new Date();
+  const createdDate = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
 
-    if (photos >= 100)
-        return "SUPER ATTIVO";
+  const diffTime = now - createdDate;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (photos >= 25)
-        return "ATTIVO";
+  if (diffDays >= 365) {
+    return "VETERANO DI MYFREM";
+  }
 
-    return "NUOVO MEMBRO";
+  if (diffDays >= 180) {
+    return "UTENTE ESPERTO";
+  }
+
+  if (diffDays >= 30) {
+    return "UTENTE ATTIVO";
+  }
+
+  return "NUOVO UTENTE";
 }
 
 function renderBadges(role) {

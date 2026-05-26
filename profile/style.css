@@ -304,6 +304,9 @@ body {
     justify-content: center;
   }
 
+  #statHiddenCard {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
