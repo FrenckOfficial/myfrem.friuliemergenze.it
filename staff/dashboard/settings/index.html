@@ -30,6 +30,27 @@
   <main class="main-content">
     <h1>⚙️ Impostazioni Staff</h1>
     <section class="settings-section">
+      <h2>📷 Foto Profilo</h2>
+
+      <div class="profile-upload">
+        <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+
+        <form id="profilePicForm" enctype="multipart/form-data">
+          <label>Carica nuova immagine</label>
+          <input type="file" id="profilePicInput" accept="image/*">
+
+          <button type="submit" class="btn" id="uploadProfilePicBtn">
+            📤 Carica foto
+          </button>
+
+          <button type="submit" class="btn" id="deleteProfilePicBtn" style="background-color:red;">
+            ❌ Elimina foto
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section class="settings-section">
       <h2>👤 Profilo Staff</h2>
 
       <div class="profile-box">

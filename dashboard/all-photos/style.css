@@ -16,7 +16,14 @@ body {
   color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 98vh;
+  overflow-y: auto;
+  z-index: 1000;
+  font-family: -apple-system, "Lexend", sans-serif;;
 }
 
 button {
@@ -78,13 +85,10 @@ input, textarea {
 }
 
 .main-content {
-  margin-left: 5%;
-  margin-right: 5%;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  padding: 30px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin-left: 300px;
 }
 
 .main-content h1 {

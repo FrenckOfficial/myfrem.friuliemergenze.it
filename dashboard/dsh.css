@@ -15,7 +15,14 @@ body {
   color: #fff;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 98vh;
+  overflow-y: auto;
+  z-index: 1000;
+  font-family: -apple-system, "Lexend", sans-serif;;
 }
 
 button {
@@ -77,7 +84,7 @@ input, textarea {
 }
 
 .main-content {
-  margin-left: 5%;
+  margin-left: 15%;
   margin-right: 5%;
   flex: 1;
   flex-direction: column;

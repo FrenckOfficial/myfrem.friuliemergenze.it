@@ -15,11 +15,20 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { supa } from "/configSupabase.js";
+
 import { firebaseConfig } from "../../configFirebase.js";
+
+const supabase = createClient(supa.url, supa.anonKey);
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+const profilePicInput = document.getElementById("profilePicInput");
+const profilePicForm = document.getElementById("profilePicForm");
+const profilePreview = document.getElementById("profilePreview");
 
 const nameInput = document.getElementById("nameInput");
 const surnameInput = document.getElementById("surnameInput");
@@ -68,7 +77,7 @@ async function loadUserData(uid) {
 
   const data = snap.data();
 
-  fullNameText.innerHTML = `<b>${data.name} ${data.surname}</b>` || "";
+  fullNameText.innerHTML = `<b>${data.name || ""} ${data.surname || ""}</b>`;
   userText.innerHTML = `<b>${data.username}</b>` || "";
   mailText.innerHTML = `<b>${data.email}</b>` || "";
   bioInput.value = data.bio || "";
@@ -124,30 +133,83 @@ savePasswordBtn.addEventListener("click", async () => {
   const currentPassword = currentPasswordInput.value;
   const newPassword = newPasswordInput.value;
   const confirmPassword = confirmPasswordInput.value;
-  
-  if (currentPassword !== auth.currentUser.password) {
-    return alert("Password attuale errata!");
-  }
-  if (currentPassword.length === 0) return alert("Inserisci la password attuale!");
-  if (newPassword.length < 6) return alert("La nuova password deve essere di almeno 6 caratteri!");
-  if (newPassword !== confirmPassword) return alert("Le nuove password non corrispondono!");
-  
-  const credential = auth.EmailAuthProvider.credential(
-    currentUser.email,
-    currentPassword
-  );
+
+  if (!currentPassword) return alert("Inserisci la password attuale!");
+  if (newPassword.length < 6) return alert("Minimo 6 caratteri!");
+  if (newPassword !== confirmPassword) return alert("Le password non coincidono!");
 
   try {
-    await currentUser.reauthenticateWithCredential(credential);
-    await currentUser.updatePassword(newPassword);
+    const user = auth.currentUser;
+
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      currentPassword
+    );
+
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+
     await updateDoc(doc(db, "users", currentUserId), {
       passwordUpdatedAt: new Date()
     });
+
     alert("Password aggiornata con successo!");
   } catch (error) {
-    alert("Errore durante l'aggiornamento della password: " + error.message);
+    alert("Errore password: " + error.message);
   }
 });
+
+profilePicForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const file = profilePicInput.files[0];
+  if (!file) return alert("Seleziona un'immagine!");
+
+  if (!file.type.startsWith("image/")) {
+    return alert("Solo immagini!");
+  }
+
+  const fileExt = file.name.split(".").pop();
+  const filePath = `${currentUserId}/avatar.${fileExt}`;
+
+  try {
+    const fileBuffer = await file.arrayBuffer();
+
+    const { error } = await supabase.storage
+      .from("profilePic")
+      .upload(filePath, fileBuffer, {
+        upsert: true,
+        contentType: file.type
+      });
+
+    if (error) throw error;
+
+    const { data } = supabase.storage
+      .from("profilePic")
+      .getPublicUrl(filePath);
+
+    const imageUrl = data.publicUrl;
+
+    await updateDoc(doc(db, "users", currentUserId), {
+      photoURL: imageUrl
+    });
+
+    profilePreview.src = imageUrl;
+
+    alert("Foto profilo aggiornata!");
+  } catch (err) {
+    console.error(err);
+    alert("Errore upload: " + err.message);
+  }
+});
+
+deleteProfPicBtn.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  await updateDoc(doc(db, "users", currentUserId), {
+    photoURL: "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
+  });
+})
 
 logoutBtn.addEventListener("click", () => {
   signOut(auth).then(() => {

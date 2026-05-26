@@ -111,10 +111,70 @@ async function verifyEmail() {
       window.location.href = "/login/signin";
     }, 2000);
 
+    sendPersonalLinkEmail();
+
   } catch (err) {
     console.error("💥 ERRORE GENERALE VERIFY:", err);
     statusBox.innerText = "❌ Errore server";
     statusBox.style.color = "red";
+  }
+}
+
+async function sendPersonalLinkEmail() {
+  try {
+    console.log("📨 Invio email link personale...");
+
+    const tokenRef = db.collection("emailVerifications").doc(token);
+    const tokenDoc = await tokenRef.get();
+
+    if (!tokenDoc.exists) {
+      console.warn("❌ Token non valido per email link");
+      return;
+    }
+
+    const data = tokenDoc.data();
+
+    const response = await fetch("https://myfrem.friuliemergenze.it/api/sendPersonalLinkEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userEmail: data.email,
+        title: "Il link personale per il tuo profilo MyFrEM",
+        htmlContent: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <h2>Ciao 👋</h2>
+            <p>Il tuo account MyFrEM è stato verificato con successo.</p>
+
+            <p>
+              Da ora puoi accedere al tuo <strong>link personale</strong> per visualizzare le informazioni del tuo profilo.
+            </p>
+
+            <a href="https://myfrem.friuliemergenze.it/profile?email=${encodeURIComponent(data.userId)}"
+               style="display:inline-block;padding:10px 20px;background:#00bcd4;color:#fff;border-radius:8px;text-decoration:none;">
+              Vai al tuo profilo
+            </a>
+
+            <p style="margin-top:20px;font-size:12px;color:#777;">
+              Friuli Emergenze - MyFrEM
+            </p>
+          </div>
+        `
+      })
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      console.error("❌ Errore invio email:", result);
+      return;
+    }
+
+    console.log("✅ Email link personale inviata");
+
+  } catch (err) {
+    console.error("💥 Errore sendPersonalLinkEmail:", err);
   }
 }
 
