@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { firebaseConfig } from "/configFirebase.js";
 
@@ -65,13 +65,25 @@ async function loadUserProfile(uid) {
         const avatar = user.photoURL || "/assets/profile/defpic.png";
         const createdAt = user.createdAt;
 
+        if (role === adminRoles) {
+            elements.role.textContent = "ADMIN"
+        } else if (role === "user") {
+            elements.role.textContent = "UTENTE"
+        }
+
+        if (status === "attivo") {
+            elements.status.textContent = "ACCOUNT ATTIVO"
+        } else if (status === "sospeso") {
+            elements.status.textContent = "ACCOUNT SOSPESO"
+        } else if (status === "eliminato") {
+            elements.status.textContent = "ACCOUNT ELIMINATO"
+        }
+
         document.title = `Profilo di ${fullName} | MyFrEM`;
 
         elements.name.textContent = fullName;
         elements.username.textContent = `@${username}`;
         elements.email.textContent = maskEmail(email);
-        elements.role.textContent = role;
-        elements.status.textContent = status;
 
         elements.avatar.src = avatar;
 
@@ -99,12 +111,15 @@ async function loadUserProfile(uid) {
         } else {
             elements.statsGrid.classList.remove("none");
             elements.staffGrid.classList.add("none");
+            const photosRef = collection(db, "photos");
+            const photosQuery = query(photosRef, where("userId", "==", uid));
+            const photosSnap = await getDocs(photosQuery);
+            const eventsRef = collection(db, "events");
+            const eventsQuery = query(photosRef, where("userId", "==", fullName));
+            const eventsSnap = await getDocs(eventsQuery)
 
-            const photos =
-                user.photos || 0;
-
-            const events =
-                user.events || 0;
+            const photos = photosSnap.size;
+            const events = eventsSnap.size;
 
             elements.userPhotos.textContent =
                 photos;
