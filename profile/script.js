@@ -163,6 +163,10 @@ function roleData(role) {
       class: "admin",
       text: "SUPER AMMINISTRATORE"
     },
+    advstaffplus: {
+      class: "staff",
+      text: "AMMINISTRATORE AVANZATO PLUS"
+    },
     advstaff: {
       class: "staff",
       text: "AMMINISTRATORE AVANZATO"
@@ -189,6 +193,8 @@ function getPermissions(role) {
   switch (safeRole) {
     case "superadmin":
       return "ACCESSO COMPLETO";
+    case "advstaffplus":
+      return "GESTIONE AVANZATA";
     case "advstaff":
       return "GESTIONE AVANZATA";
     case "modstaff":
