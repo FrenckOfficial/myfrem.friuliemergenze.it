@@ -346,7 +346,7 @@ if (registerForm) {
       });
 
       const response = await fetch(
-        "https://myfrem.api.friuliemergenze.it/sendVerificationEmail.js",
+        "https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail",
         {
           method: "POST",
           headers: {

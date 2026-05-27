@@ -147,7 +147,7 @@ sendBtn.addEventListener("click", async () => {
         name: userName
       });
 
-      await fetch("https://myfrem.friuliemergenze.it/api/sendNewsletter", {
+      await fetch("https://myfrem.api.friuliemergenze.it/api/sendNewsletter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

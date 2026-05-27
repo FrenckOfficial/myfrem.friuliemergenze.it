@@ -134,7 +134,7 @@ async function sendPersonalLinkEmail() {
 
     const data = tokenDoc.data();
 
-    const response = await fetch("https://myfrem.api.friuliemergenze.it/sendPersonalLinkEmail", {
+    const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendPersonalLinkEmail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
