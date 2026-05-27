@@ -39,6 +39,7 @@ const elements = {
 
 const adminRoles = [
     "superadmin",
+    "advstaffplus",
     "advstaff",
     "modstaff",
     "simplestaff"
