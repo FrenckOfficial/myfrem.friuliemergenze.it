@@ -1,19 +1,8 @@
-import { 
-  initializeApp 
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {  initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { supa } from "/configSupabase.js";
@@ -29,6 +18,7 @@ const auth = getAuth(app);
 const profilePicInput = document.getElementById("profilePicInput");
 const profilePicForm = document.getElementById("profilePicForm");
 const profilePreview = document.getElementById("profilePreview");
+const deleteProfPicBtn = document.getElementById("deleteProfPicBtn");
 
 const nameInput = document.getElementById("nameInput");
 const surnameInput = document.getElementById("surnameInput");

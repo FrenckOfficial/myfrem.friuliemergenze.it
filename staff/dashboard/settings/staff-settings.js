@@ -32,6 +32,7 @@ const saveBioBtn = document.getElementById("saveBioBtn");
 const profilePicInput = document.getElementById("profilePicInput");
 const profilePicForm = document.getElementById("profilePicForm");
 const profilePreview = document.getElementById("profilePreview");
+const deleteProfPicBtn = document.getElementById("deleteProfPicBtn");
 
 let currentUserId = null;
 let currentUser = null;
