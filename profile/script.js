@@ -11,8 +11,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get("userid");
 
 if (!userId) {
-    alert("ID utente mancante.");
-    window.location.href = "/login";
+  messageBox.classList.add("error");
+  messageBox.textContent = "ID utente mancante.";
 }
 
 const elements = {
@@ -33,7 +33,8 @@ const elements = {
     userBadge: document.getElementById("userBadge"),
     staffRole: document.getElementById("staffRole"),
     staffPerms: document.getElementById("staffPerms"),
-    staffSince: document.getElementById("staffSince")
+    staffSince: document.getElementById("staffSince"),
+    messageBox: document.getElementById("messageBox")
 };
 
 const adminRoles = [
@@ -51,8 +52,9 @@ async function loadUserProfile(uid) {
         const snap = await getDoc(docRef);
 
         if (!snap.exists()) {
-            alert("Profilo non trovato.");
-            return;
+          messageBox.classList.add("error");
+          messageBox.textContent = "Profilo non trovato.";
+          return;
         }
 
         const user = snap.data();
@@ -65,10 +67,10 @@ async function loadUserProfile(uid) {
         const avatar = user.photoURL || "/assets/profile/defpic.png";
         const createdAt = user.createdAt;
 
-        if (role === adminRoles) {
-            elements.role.textContent = "ADMIN"
-        } else if (role === "user") {
-            elements.role.textContent = "UTENTE"
+        if (adminRoles.includes(role.toLowerCase())) {
+          elements.role.textContent = "AMMINISTRATORE";
+        } else if (role.toLowerCase() === "user") {
+          elements.role.textContent = "UTENTE";
         }
 
         if (status === "attivo") {
@@ -79,7 +81,7 @@ async function loadUserProfile(uid) {
             elements.status.textContent = "ACCOUNT ELIMINATO"
         }
 
-        document.title = `Profilo di ${fullName} | MyFrEM`;
+        document.title = `Profilo di ${fullName} | MyFrEM - Piattaforma ufficiale di Friuli Emergenze`;
 
         elements.name.textContent = fullName;
         elements.username.textContent = `@${username}`;
@@ -91,7 +93,7 @@ async function loadUserProfile(uid) {
             elements.avatar.src = "/assets/profile/defpic.png";
         };
 
-        renderBadges(createdAt);
+        renderBadges(role);
         renderStatus(status);
 
         const isStaff = adminRoles.includes(role.toLowerCase());
