@@ -34,6 +34,7 @@ const mailText = document.getElementById("mailText");
 const saveMailBtn = document.getElementById("saveMailBtn");
 
 const bioInput = document.getElementById("bioInput");
+const bioText = document.getElementById("bioText");
 const saveBioBtn = document.getElementById("saveBioBtn");
 
 const currentPasswordInput = document.getElementById("currentPassword");
@@ -70,7 +71,12 @@ async function loadUserData(uid) {
   fullNameText.innerHTML = `<b>${data.name || ""} ${data.surname || ""}</b>`;
   userText.innerHTML = `<b>${data.username}</b>` || "";
   mailText.innerHTML = `<b>${data.email}</b>` || "";
-  bioInput.value = data.bio || "";
+  bioText.innerHTML = `<b>${data.bio}</b>` || "";
+  if (data.photoURL) {
+    profilePreview.src = data.photoURL;
+  } else {
+    profilePreview.src = "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
+  }
 }
 
 saveFullNameBtn.addEventListener("click", async () => {

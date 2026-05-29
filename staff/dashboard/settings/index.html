@@ -6,7 +6,10 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>Impostazioni Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/settings/style.css">
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/settings/staff-settings.js"></script>
 </head>
 <body>
@@ -29,42 +32,52 @@
 
   <main class="main-content">
     <h1>⚙️ Impostazioni Staff</h1>
-    <section class="settings-section">
-      <h2>📷 Foto Profilo</h2>
+    <div class="settings-row">
+      <section class="settings-section">
+        <h2>📷 Foto Profilo</h2>
 
-      <div class="profile-upload">
-        <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+        <div class="profile-upload">
+          <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
 
-        <form id="profilePicForm" enctype="multipart/form-data">
-          <label>Carica nuova immagine</label>
-          <input type="file" id="profilePicInput" accept="image/*">
+          <form id="profilePicForm" enctype="multipart/form-data">
+            <label>Carica nuova immagine</label>
+            <input type="file" id="profilePicInput" accept="image/*">
 
-          <button type="submit" class="btn" id="uploadProfilePicBtn">
-            📤 Carica foto
-          </button>
+            <div class="btns">
+              <button type="submit" class="btn" id="uploadProfilePicBtn">
+                📤 Carica foto
+              </button>
 
-          <button type="submit" class="btn" id="deleteProfPicBtn" style="background-color:red;">
-            ❌ Elimina foto
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <section class="settings-section">
-      <h2>👤 Profilo Staff</h2>
-
-      <div class="profile-box">
-        <div>
-          <p><strong>Nome utente:</strong> <span id="staffUsername"></span></p>
-          <p>-</p>
-          <p><strong>Nome staffer:</strong> <span id="staffName"></span></p>
-          <p>-</p>
-          <p><strong>Email:</strong> <span id="staffEmail"></span></p>
-          <p>-</p>
-          <p><strong>Ruolo:</strong> <span id="staffRole"></span></p>
+              <button class="btn" id="deleteProfPicBtn" style="background-color:red;">
+                ❌ Elimina foto
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section class="settings-section" style="height:359.71px;">
+        <h2>👤 Profilo Staff</h2>
+
+        <div class="profile-box">
+          <div>
+            <p><b>Nome utente:</b> <span id="staffUsername"></span></p>
+            <br>
+            <p><b>Nome staffer:</b> <span id="staffName"></span></p>
+            <br>
+            <p><b>Email:</b> <span id="staffEmail"></span></p>
+            <br>
+            <p><b>Ruolo:</b> <span id="staffRole"></span></p>
+            <br>
+            <p><b>Accesso:</b> <span id="staffAccess"></span></p>
+            <br>
+            <br>
+            <br>
+            <p><b><em>Per cambiare tali dati si prega di farne richiesta alla mail <a href="mailto:banca.dati@friuliemergenze.it">banca.dati@friuliemergenze.it</a> o al numero <a href="tel:+393894757472">389/4757472</a></em></b></p>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <section class="settings-section">
       <h2>🔐 Cambia Password</h2>
@@ -81,16 +94,6 @@
         <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
       </form>
       <p id="passwordStatusMsg"></p>
-    </section>
-
-    <section class="settings-section">
-      <h2>👤 Cambia Username</h2>
-      <p>Il tuo username attuale è: <b id="usernameText"></b></p>
-      <form id="changeUsernameForm" style="margin-top: 15px;">
-        <label>Nuovo username</label>
-        <input type="text" id="newUsername" required>
-
-        <button type="submit" class="btn" id="saveUsernameBtn">💾 Cambia username</button>
     </section>
 
     <section class="settings-section">

@@ -16,33 +16,35 @@ if (!userId) {
 }
 
 const elements = {
-    title: document.getElementById("profileTitle"),
-    name: document.getElementById("profileName"),
-    username: document.getElementById("profileUsername"),
-    email: document.getElementById("profileEmail"),
-    role: document.getElementById("profileRole"),
-    status: document.getElementById("profileStatus"),
-    avatar: document.getElementById("profileAvatar"),
-    badges: document.getElementById("profileBadges"),
-    statusDot: document.getElementById("statusDot"),
-    statsGrid: document.getElementById("statsGrid"),
-    staffGrid: document.getElementById("staffGrid"),
-    userPhotos: document.getElementById("userPhotos"),
-    userEvents: document.getElementById("userEvents"),
-    userSince: document.getElementById("userSince"),
-    userBadge: document.getElementById("userBadge"),
-    staffRole: document.getElementById("staffRole"),
-    staffPerms: document.getElementById("staffPerms"),
-    staffSince: document.getElementById("staffSince"),
-    messageBox: document.getElementById("messageBox")
+  title: document.getElementById("profileTitle"),
+  name: document.getElementById("profileName"),
+  username: document.getElementById("profileUsername"),
+  email: document.getElementById("profileEmail"),
+  role: document.getElementById("profileRole"),
+  status: document.getElementById("profileStatus"),
+  avatar: document.getElementById("profileAvatar"),
+  badges: document.getElementById("profileBadges"),
+  statusDot: document.getElementById("statusDot"),
+  statsGrid: document.getElementById("statsGrid"),
+  staffGrid: document.getElementById("staffGrid"),
+  userPhotos: document.getElementById("userPhotos"),
+  userEvents: document.getElementById("userEvents"),
+  userSince: document.getElementById("userSince"),
+  userBadge: document.getElementById("userBadge"),
+  staffRole: document.getElementById("staffRole"),
+  staffPerms: document.getElementById("staffPerms"),
+  staffSince: document.getElementById("staffSince"),
+  messageBox: document.getElementById("messageBox"),
+  staffPhotos: document.getElementById("staffPhotos"),
+  staffEvents: document.getElementById("staffEvents")
 };
 
 const adminRoles = [
-    "superadmin",
-    "advstaffplus",
-    "advstaff",
-    "modstaff",
-    "simplestaff"
+  "superadmin",
+  "advstaffplus",
+  "advstaff",
+  "modstaff",
+  "simplestaff"
 ];
 
 loadUserProfile(userId);
@@ -135,6 +137,14 @@ async function loadUserProfile(uid) {
 
             elements.userBadge.textContent =
                 getActivityBadge(user.createdAt);
+
+            elements.userPhotos.addEventListener("click", async () => {
+              loadUserPhotos(userId);
+            });
+
+            elements.userEvents.addEventListener("click", async () => {
+              loadUserEvents(userId)
+            })
         }
     } catch (err) {
         console.error("Errore caricamento profilo:", err);
@@ -258,4 +268,195 @@ function maskEmail(email) {
     const [name, domain] = email.split("@");
 
     return `${name.slice(0,3)}***@${domain}`;
+}
+
+async function loadUserPhotos(userId) {
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+
+  const popup = document.createElement("div");
+  popup.className = "popup";
+
+  popup.innerHTML = `
+    <div class="popup-header">
+      <h2>📸 Foto utente</h2>
+      <button class="close-popup">✖</button>
+    </div>
+
+    <div class="popup-content" id="userPhotosContainer">
+      <p>Caricamento foto...</p>
+    </div>
+  `;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  popup.querySelector(".close-popup").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    }
+  });
+
+  const container = document.getElementById("userPhotosContainer");
+
+  try {
+    const photosRef = collection(db, "photos");
+
+    const q = query(
+      photosRef,
+      where("userId", "==", userId)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    container.innerHTML = "";
+
+    if (querySnapshot.empty) {
+      container.innerHTML = `
+        <p>Nessuna foto trovata.</p>
+      `;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+
+      card.innerHTML = `
+        <img src="${data.url}" class="popup-photo">
+
+        <div class="photo-info">
+          <p><b>Titolo:</b> ${data.title}</p>
+          <p><b>ID:</b> ${docSnap.id}</p>
+          <p><b>Data:</b> ${
+            data.createdAt?.toDate
+              ? data.createdAt.toDate().toLocaleString()
+              : "Non disponibile"
+          }</p>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    container.innerHTML = `
+      <p style="color:red;">
+        Errore caricamento foto.
+      </p>
+    `;
+  }
+}
+
+async function loadUserEvents(userId) {
+  const overlay = document.createElement("div");
+  overlay.className = "popup-overlay";
+
+  const popup = document.createElement("div");
+  popup.className = "popup";
+
+  popup.innerHTML = `
+    <div class="popup-header">
+      <h2>🗂️ Eventi utente</h2>
+      <button class="close-popup">✖</button>
+    </div>
+
+    <div class="popup-content" id="userEventsContainer">
+      <p>Caricamento eventi...</p>
+    </div>
+  `;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  popup.querySelector(".close-popup").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    }
+  });
+
+  const container = document.getElementById("userEventsContainer");
+
+  try {
+    const userSnap = await getDoc(doc(db, "users", userId));
+
+    if (!userSnap.exists()) {
+      container.innerHTML = `
+        <p style="color:red;">
+          Utente non trovato.
+        </p>
+      `;
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    const fullName =
+      `${userData.name || ""} ${userData.surname || ""}`.trim();
+
+    const eventsRef = collection(db, "events");
+
+    const q = query(
+      eventsRef,
+      where("userId", "==", fullName)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    container.innerHTML = "";
+
+    if (querySnapshot.empty) {
+      container.innerHTML = `
+        <p>Nessun evento trovato.</p>
+      `;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+
+      card.innerHTML = `
+        <img src="${data.url || "/assets/default-event.png"}"
+             class="popup-photo">
+
+        <div class="photo-info">
+          <p><b>Titolo:</b> ${data.title || "Senza titolo"}</p>
+
+          <p><b>ID:</b> ${docSnap.id}</p>
+
+          <p><b>Data:</b> ${
+            data.createdAt?.toDate
+              ? data.createdAt.toDate().toLocaleString("it-IT")
+              : "Non disponibile"
+          }</p>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    container.innerHTML = `
+      <p style="color:red;">
+        Errore caricamento eventi.
+      </p>
+    `;
+  }
 }

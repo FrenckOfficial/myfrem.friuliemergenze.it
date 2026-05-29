@@ -88,13 +88,33 @@ body {
   font-size: 28px;
 }
 
+.settings-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.settings-row .settings-section {
+  flex: 1;
+  min-width: 320px;
+}
+
 .settings-section {
   background-color: #fff;
   padding: 22px;
   margin-bottom: 22px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ccc;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
 }
 
 .settings-section h2 {
@@ -166,9 +186,9 @@ body {
 }
 
 .profile-box {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
 }
 
 .profile-box img {
@@ -177,6 +197,15 @@ body {
   border-radius: 100px;
   object-fit: cover;
   border: 3px solid #ccc;
+}
+
+.profile-link {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.profile-link:hover {
+  text-decoration: underline;
 }
 
 .role {

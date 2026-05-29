@@ -17,13 +17,10 @@ const staffUsername = document.getElementById("staffUsername");
 const staffName = document.getElementById("staffName");
 const staffEmail = document.getElementById("staffEmail");
 const staffRole = document.getElementById("staffRole");
+const staffAccess = document.getElementById("staffAccess");
 
 const changePasswordForm = document.getElementById("changePasswordForm");
 const passwordStatusMsg = document.getElementById("passwordStatusMsg");
-
-const changeUsernameForm = document.getElementById("changeUsernameForm");
-const usernameText = document.getElementById("usernameText");
-const newUsernameInput = document.getElementById("newUsername");
 
 const bioInput = document.getElementById("bioInput");
 const bioText = document.getElementById("bioText");
@@ -53,13 +50,40 @@ auth.onAuthStateChanged(async (user) => {
   staffUsername.textContent = data.username || "Non disponibile.";
   staffName.textContent = `${data.name || ""} ${data.surname || ""}`.trim() || "Non disponibile.";
   staffEmail.innerHTML = data.email ? `<a href="mailto:${data.email}">${data.email}</a>` : "Non disponibile.";
-  staffRole.textContent = data.role || "Non disponibile.";
+  if (data.role === "superadmin") {
+    staffRole.textContent = "Super Amministratore";
+  } else if (data.role === "advstaffplus") {
+    staffRole.textContent = "Amministratore Avanzato Plus";
+  } else if (data.role === "advstaff") {
+    staffRole.textContent = "Amministratore Avanzato";
+  } else if (data.role === "modstaff") {
+    staffRole.textContent = "Amministratore";
+  } else if (data.role === "simplestaff") {
+    staffRole.textContent = "Amministratore in prova";
+  } else {
+    staffRole.textContent = "Dato non disponibile."
+  };
 
-  usernameText.textContent = data.username || "Non disponibile.";
+  if (data.role === "superadmin") {
+    staffAccess.textContent = "Accesso completo";
+  } else if (data.role === "advstaffplus") {
+    staffAccess.textContent = "Moderazione foto, richieste assistenza, rapporti espulsione e gestione utenze";
+  } else if (data.role === "advstaff") {
+    staffAccess.textContent = "Moderazione foto, richieste assistenza e rapporti espulsione";
+  } else if (data.role === "modstaff") {
+    staffAccess.textContent = "Moderazione foto e richieste di assistenza";
+  } else if (data.role === "simplestaff") {
+    staffAccess.textContent = "Sola moderazione foto";
+  } else {
+    staffAccess.textContent = "Dato non disponibile."
+  };
+
   bioText.textContent = data.bio || "Non disponibile.";
 
   if (data.photoURL) {
     profilePreview.src = data.photoURL;
+  } else {
+    profilePreview.src = "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
   }
 });
 
@@ -97,23 +121,6 @@ changePasswordForm.addEventListener("submit", async (e) => {
     passwordStatusMsg.textContent = "❌ Errore: " + err.message;
     passwordStatusMsg.className = "error";
   }
-});
-
-changeUsernameForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const newUsername = newUsernameInput.value.trim();
-  if (newUsername.length < 3) {
-    alert("Lo username deve essere di almeno 3 caratteri!");
-    return;
-  }
-
-  await updateDoc(doc(db, "users", currentUserId), {
-    username: newUsername
-  });
-
-  usernameText.textContent = newUsername;
-  alert("Username aggiornato!");
 });
 
 saveBioBtn.addEventListener("click", async () => {
@@ -171,7 +178,7 @@ profilePicForm.addEventListener("submit", async (e) => {
   }
 });
 
-deleteProfPicBtn.addEventListener("submit", async (e) => {
+deleteProfPicBtn.addEventListener("click", async (e) => {
   e.preventDefault();
 
   await updateDoc(doc(db, "users", currentUserId), {
