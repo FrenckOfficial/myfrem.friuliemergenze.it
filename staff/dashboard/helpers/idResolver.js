@@ -1,9 +1,7 @@
-// idResolver.js
 import { doc, getDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { firebaseConfig } from "/configFirebase.js";
 
-// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 

@@ -1,9 +1,8 @@
-/* ===== Reset base ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, "Lexend", sans-serif;
+  font-family: -apple-system, 'Lexend', sans-serif;
 }
 
 body {
@@ -13,7 +12,6 @@ body {
   padding: 20px;
 }
 
-/* Header */
 header {
   text-align: center;
   margin-bottom: 30px;
@@ -29,7 +27,6 @@ header p {
   color: #555;
 }
 
-/* Container eventi */
 .events-container {
   display: flex;
   flex-wrap: wrap;
@@ -37,7 +34,6 @@ header p {
   justify-content: center;
 }
 
-/* Card evento */
 .event-card {
   background-color: #fff;
   border-radius: 10px;
@@ -73,7 +69,6 @@ header p {
 .status.null { background-color: #95a5a6; color: #fff; }
 .status.rejected { background-color: #e74c3c; color: #fff; }
 
-/* Pulsante visualizza */
 .btn-view {
   text-decoration: none;
   text-align: center;
@@ -100,7 +95,6 @@ header p {
   transition: 0.2s;
 }
 
-/* Messaggi status */
 #statusMsg {
   text-align: center;
   font-weight: bold;
@@ -108,7 +102,6 @@ header p {
   color: #e74c3c;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .event-card {
     width: 90%;

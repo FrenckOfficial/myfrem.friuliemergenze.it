@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, "Lexend", sans-serif;;
+  font-family: -apple-system, 'Lexend', sans-serif;;
   min-height: 100vh;
 }
 
@@ -8,7 +8,6 @@ html, body {
   height: 100%;
 }
 
-/* Sidebar */
 .sidebar {
   width: 250px;
   background: #222;
@@ -81,7 +80,6 @@ input, textarea {
   background: #c0392b;
 }
 
-/* Main content */
 .main-content {
   padding: 30px;
   background-color: #f3f4f6;
@@ -261,9 +259,6 @@ input, textarea {
     margin-top: 15px;
 }
 
-/* ============================
-   TABLET — max-width: 1024px
-   ============================ */
 @media (max-width: 1024px) {
 
   .sidebar {
@@ -291,12 +286,7 @@ input, textarea {
 }
 
 
-/* ============================
-   MOBILE — max-width: 768px
-   ============================ */
 @media (max-width: 768px) {
-
-  /* Sidebar diventa in alto */
   .sidebar {
     position: relative;
     width: 94.5%;
@@ -320,7 +310,6 @@ input, textarea {
     margin-bottom: 6px;
   }
 
-  /* Il contenuto si sposta sotto */
   .main-content {
     margin-left: 0;
     padding: 20px;

@@ -55,6 +55,7 @@ form.addEventListener("submit", async (e) => {
       location,
       contact,
       userId: userDoc.data().name + " " + userDoc.data().surname,
+      uid: currentUser.uid,
       status: "In revisione...",
       createdAt: serverTimestamp()
     });

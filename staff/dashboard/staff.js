@@ -1,4 +1,3 @@
-// ✅ Import Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -9,7 +8,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ✅ Riferimenti DOM
 const userNameEl = document.getElementById("userName");
 const totalUsersEl = document.getElementById("totalUsers");
 const pendingPhotosEl = document.getElementById("pendingPhotos");

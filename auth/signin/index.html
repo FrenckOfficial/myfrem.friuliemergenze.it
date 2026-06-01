@@ -4,123 +4,102 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Accedi - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-
-  <link rel="stylesheet" href="/auth/style.css" />
+  <link rel="stylesheet" href="/auth/style.css  ">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
 
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-    crossorigin="anonymous" />
-
-  <script>
-    window.va = window.va || function () {
-      (window.vaq = window.vaq || []).push(arguments);
-    };
-  </script>
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
-
 <body>
 
-  <main class="auth-wrapper">
-
-    <section class="auth-card">
-
-      <header class="auth-header">
-        <h1 class="logo">MyFrEM</h1>
-        <p class="subtitle">Accedi al tuo account</p>
-      </header>
-
-      <button id="googleLoginBtn" class="google-btn" type="button">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
-        Continua con Google
-      </button>
-
-      <div class="divider">
-        <span>oppure</span>
-      </div>
-
-      <form id="loginForm" class="auth-form">
-
-        <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input
-            type="email"
-            id="loginEmail"
-            required
-            autocomplete="email"
-            placeholder="nome@esempio.com"
-          />
+  <main>
+    <div class="shell">
+      <div class="panel-left">
+        <div class="left-brand">
+          <p class="wordmark">My<span>FrEM</span></p>
+          <p class="tagline">Friuli Emergenze · Piattaforma foto ed eventi</p>
         </div>
 
-        <div class="form-group">
-          <label for="loginPassword">Password</label>
+        <div class="left-body">
+          <h2>Gestisci le<br><em>emergenze</em><br>con un clic.</h2>
+          <p>La piattaforma ufficiale del Friuli-Venezia Giulia per il caricamento e la gestione delle fotografie in situazioni di emergenza.</p>
+          <ul class="feature-list">
+            <li><span class="dot"></span>Caricamento rapido delle foto</li>
+            <li><span class="dot"></span>Accesso sicuro e verificato</li>
+            <li><span class="dot"></span>Sincronizzazione in tempo reale</li>
+          </ul>
+        </div>
 
-          <div class="password-wrapper">
-            <input
-              type="password"
-              id="loginPassword"
-              required
-              autocomplete="current-password"
-              placeholder="••••••••"
-            />
+        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 FriuliEmergenze · Tutti i diritti riservati</div>
+      </div>
 
-            <button
-              type="button"
-              class="toggle-password"
-              onclick="togglePassword('loginPassword', this)"
-              aria-label="Mostra o nascondi password"
-            >
-              <i class="far fa-eye"></i>
-            </button>
+      <div class="panel-right">
+        <p class="form-title">Bentornato</p>
+        <p class="form-sub">Accedi al tuo account MyFrEM</p>
+
+        <button id="googleLoginBtn" class="google-btn" type="button">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+          Continua con Google
+        </button>
+
+        <div class="divider"><span>oppure</span></div>
+
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required autocomplete="email" placeholder="nome@esempio.com" />
           </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="••••••••" />
+              <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)" aria-label="Mostra o nascondi password">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="forgot-link">
+            <a href="/login/reset-your-password/">Password dimenticata?</a>
+          </div>
+
+          <button type="submit" class="submit-btn">Accedi</button>
+        </form>
+
+        <div class="auth-footer">
+          Non hai un account? <a href="/login/signup/">Registrati</a>
         </div>
 
-        <button type="submit" class="primary-btn">Accedi</button>
+        <a class="back-home" href="/">← Torna alla homepage</a>
 
-        <div class="auth-links">
-          <a href="/login/reset-your-password/">Password dimenticata?</a>
-          <p>o</p>
-          <a href="/login/signup/">Crea un account</a>
+        <div class="messages">
+          <p id="error"></p>
+          <p id="success"></p>
+          <p id="messageBox"></p>
         </div>
-
-      </form>
-
-      <a class="back-home" href="/">
-        ← Torna alla homepage
-      </a>
-
-      <div class="messages">
-        <p id="error" class="error"></p>
-        <p id="success" class="success"></p>
-        <p id="messageBox"></p>
       </div>
 
-    </section>
-
+    </div>
   </main>
 
   <script type="module" src="/auth/app.js"></script>
-
   <script>
     function togglePassword(inputId, button) {
       const input = document.getElementById(inputId);
-      const icon = button.querySelector("i");
-
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
+      const icon = button.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
       } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
     }
   </script>
-
 </body>
 </html>

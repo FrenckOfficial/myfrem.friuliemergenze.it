@@ -1,11 +1,8 @@
-/* ================================
-   Reset e base
-================================ */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, "Lexend", sans-serif;;
+  font-family: -apple-system, 'Lexend', sans-serif;;
 }
 
 body {
@@ -15,9 +12,6 @@ body {
   color: #333;
 }
 
-/* ================================
-   Sidebar
-================================ */
 .sidebar {
   width: 650px;
   background: #222;
@@ -74,9 +68,6 @@ body {
   background: #c0392b;
 }
 
-/* ================================
-   Main Content
-================================ */
 .main-content {
   flex-grow: 1;
   padding: 30px;
@@ -127,9 +118,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* ================================
-   Report Box
-================================ */
 .activity-box {
   background: #fff;
   padding: 25px;
@@ -180,9 +168,6 @@ body {
   padding: 2rem;
 }
 
-/* ================================
-   Status messages
-================================ */
 .error {
   color: #b91c1c;
   font-weight: 600;
@@ -195,9 +180,6 @@ body {
   margin-top: 10px;
 }
 
-/* ================================
-   Table lista report (opzionale)
-================================ */
 .reports-table table {
   width: 100%;
   border-collapse: collapse;
@@ -220,9 +202,6 @@ body {
   background-color: #f0f4f8;
 }
 
-/* ================================
-   Responsive
-================================ */
 @media (max-width: 992px) {
   body {
     flex-direction: column;
@@ -281,9 +260,6 @@ body {
     margin-top: 10px;
   }
 
-  /* -------------------------
-     Main content
-  ------------------------- */
   .main-content h1 {
     font-size: 1.4rem;
   }

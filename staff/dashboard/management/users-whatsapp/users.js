@@ -53,7 +53,7 @@ async function loadUsers() {
     users.push({
       id: docSnap.id,
       ...u,
-      joinedAt: u.joinedAt ? new Date(u.joinedAt) : new Date(0)
+      joinedAt: u.date ? new Date(u.date) : new Date(0)
     });
   });
 
@@ -65,7 +65,7 @@ async function loadUsers() {
 
     if (roleA !== roleB) return roleA - roleB;
 
-    return a.joinedAt - b.joinedAt;
+    return b.joinedAt - a.joinedAt;
   });
 
   users.forEach(u => {

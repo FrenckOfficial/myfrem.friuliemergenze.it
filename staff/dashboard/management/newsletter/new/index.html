@@ -13,15 +13,12 @@
   <script type="module" src="/staff/dashboard/management/newsletter/new/save.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
-
 <body>
-
   <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
       <h2>MyFrEM Staff</h2>
     </div>
-
     <nav>
       <a href="/staff">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
@@ -31,22 +28,18 @@
       <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
       <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
     </nav>
-
     <button id="logoutBtn" class="logout">🚪 Logout</button>
   </aside>
 
   <main class="main-content">
-
     <div class="top-bar">
       <h1>📨 Nuova Newsletter</h1>
     </div>
-
     <p>
       Crea una nuova newsletter. Il sistema salverà automaticamente la bozza e mostrerà una preview in tempo reale.
     </p>
 
     <div class="activity-box">
-
       <form id="newsletterForm">
         <div id="statusMsg"></div>
 
@@ -93,18 +86,31 @@
         </div>
 
         <div class="form-row">
-
-          <button type="button" id="sendNewsletter" class="btn-primary">
-            🚀 Invia newsletter
-          </button>
-
+          <div class="send-grid">
+            <button type="button" id="sendSubscribers" class="send-btn btn-subscribers">
+              <span class="btn-icon">📧</span>
+              <span class="btn-label">Iscritti newsletter</span>
+              <span class="btn-desc">Utenti con subscribed = true</span>
+            </button>
+            <button type="button" id="sendStaffers" class="send-btn btn-staffers">
+              <span class="btn-icon">🛡️</span>
+              <span class="btn-label">Membri dello staff</span>
+              <span class="btn-desc">Collection staffers</span>
+            </button>
+            <button type="button" id="sendMyfremUsers" class="send-btn btn-myfrem">
+              <span class="btn-icon">👥</span>
+              <span class="btn-label">Utenti MyFrEM</span>
+              <span class="btn-desc">Esclusi ruoli staff</span>
+            </button>
+            <button type="button" id="sendOthers" class="send-btn btn-others">
+              <span class="btn-icon">✏️</span>
+              <span class="btn-label">Destinatari personalizzati</span>
+              <span class="btn-desc">Inserimento manuale email</span>
+            </button>
+          </div>
         </div>
-
       </form>
-
     </div>
-
   </main>
-
 </body>
 </html>

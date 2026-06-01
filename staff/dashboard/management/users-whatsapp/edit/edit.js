@@ -39,6 +39,7 @@ const userId = urlParams.get("id");
 const userDetails = document.getElementById("userDetails");
 const statusMsg = document.getElementById("statusMsg");
 let linkedMyFremUser = null;
+let currentData = null;
 
 document.getElementById("linkMyFremBtn").onclick = async () => {
   const id = document.getElementById("myfremIdInput").value.trim();
@@ -79,6 +80,8 @@ async function loadUser() {
 
     const data = snap.data();
 
+    currentData = data;
+
     userDetails.innerHTML = `
         <p><strong>ID Utente:</strong> ${userId}</p>
         <p><strong>Nome:</strong> ${data.name || "-"}</p>
@@ -116,7 +119,7 @@ document.querySelector(".editForm").addEventListener("submit", async (e) => {
         status: document.getElementById("status").value.trim(),
         notes: document.getElementById("notes").value.trim(),
         tags: tags || [],
-        linkedMyFremUser: linkedMyFremUser || data.linkedMyFremUser || null,
+        linkedMyFremUser: linkedMyFremUser || currentData?.linkedMyFremUser || null,
         lastEdit: serverTimestamp(),
         editedBy: auth.currentUser.uid
     };

@@ -142,12 +142,6 @@ if (loginForm) {
       await user.reload();
 
       const userSnap = await getUserDoc(user.uid);
-
-      if (!userSnap.exists()) {
-        await signOut(auth);
-        throw new Error("Profilo non trovato.");
-      }
-
       const userData = userSnap.data();
 
       if (userData.emailVerified === false) {
@@ -155,6 +149,11 @@ if (loginForm) {
         throw new Error(
           "Verifica il tuo indirizzo email prima di accedere."
         );
+      }
+
+      if (!userSnap.exists()) {
+        await signOut(auth);
+        throw new Error("Profilo non trovato.");
       }
 
       await validateAccount(userData);
@@ -315,6 +314,7 @@ if (registerForm) {
         role: "user",
         status: "attivo",
         newsSubbed: false,
+        emailVerified: false,
         createdAt: serverTimestamp()
       });
 

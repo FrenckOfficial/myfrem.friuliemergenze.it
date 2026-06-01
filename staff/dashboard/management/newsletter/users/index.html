@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Newsletter Inviate | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Gestione Utenti Newsletter | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script type="module" src="/staff/dashboard/management/newsletter/load.js"></script>
+  <script type="module" src="/staff/dashboard/management/newsletter/users/load.js"></script>
   <style>
     .sidebar {
       height: 97%;
@@ -51,15 +51,14 @@
   </aside>
 
   <main class="main-content">
-    <h1>Newsletter Inviate - 👥 Funzionalità</h1>
+    <h1>Gestione utenze Newsletter - 👥 Funzionalità</h1>
 
     <div class="list">
       <a href="/staff/dashboard/management/newsletter/new" class="btn-primary">➕ Invia nuova mail</a>
-      <a href="/staff/dashboard/management/newsletter/users/" class="btn-primary">👥 Visualizza Utenti</a>
     </div>
 
     <div class="gallery-search" style="margin-top: 10px;">
-      <input type="text" id="searchInput" placeholder="Cerca una newsletter..." style="
+      <input type="text" id="searchInput" placeholder="Cerca un iscrizione..." style="
         width: 50%;
         padding: 0.75rem;
         margin: 1rem 0;
@@ -72,12 +71,12 @@
     <table id="usersTable">
         <thead>
             <tr>
-              <th>Titolo</th>
-              <th>Tipo</th>
-              <th>Immagine</th>
-              <th>Link</th>
-              <th>Destinatari</th>
-              <th>Data invio</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Data iscrizione</th>
+              <th>Token di verifica</th>
+              <th>Verificato?</th>
+              <th>Abilitato a ricezione?</th>
               <th>Azioni</th>
             </tr>
         </thead>

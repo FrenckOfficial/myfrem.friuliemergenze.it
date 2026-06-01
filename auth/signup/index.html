@@ -4,126 +4,397 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registrati - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-
-  <link rel="stylesheet" href="/auth/style.css" />
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-    crossorigin="anonymous" />
-
-  <script>
-    window.va = window.va || function () {
-      (window.vaq = window.vaq || []).push(arguments);
-    };
-  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red: #e53935;
+      --red-dark: #b71c1c;
+      --red-dim: rgba(229,57,53,0.12);
+      --red-glow: rgba(229,57,53,0.22);
+      --surface: #ffffff;
+      --bg: #f5f4f2;
+      --border: rgba(0,0,0,0.09);
+      --border-focus: rgba(229,57,53,0.5);
+      --text: #111111;
+      --muted: #666666;
+      --faint: #999999;
+      --input-bg: #fafaf9;
+    }
+
+    body {
+      font-family: 'Lexend', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #444;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--text);
+      transition: border-color .18s, box-shadow .18s, background .18s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--border-focus);
+      background: #fff;
+      box-shadow: 0 0 0 3px var(--red-dim);
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    .password-wrapper { position: relative; }
+    .password-wrapper input { padding-right: 42px; }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--faint);
+      font-size: 0.9rem;
+      padding: 4px;
+      transition: color .15s;
+    }
+
+    .toggle-password:hover { color: var(--muted); }
+
+    .submit-btn {
+      margin-top: 4px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: var(--red);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background .18s, transform .12s, box-shadow .18s;
+    }
+
+    .submit-btn:hover {
+      background: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px var(--red-glow);
+    }
+
+    .submit-btn:active { transform: translateY(0); }
+
+    .auth-footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .auth-footer a { color: var(--red); text-decoration: none; font-weight: 500; }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--faint);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .back-home:hover { color: var(--red); }
+
+    .messages { margin-top: 10px; text-align: center; font-size: 0.82rem; }
+    #error { color: var(--red); }
+    #success { color: #2e7d32; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      width: min(900px, 100%);
+      min-height: 580px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+      animation: fadeUp .45s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    .panel-left {
+      background: var(--surface);
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-title { font-size: 1.45rem; font-weight: 600; color: var(--text); letter-spacing: -0.025em; }
+    .form-sub { margin-top: 4px; font-size: 0.85rem; color: var(--muted); }
+
+    .auth-form { margin-top: 24px; display: flex; flex-direction: column; gap: 13px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .panel-right {
+      background: linear-gradient(155deg, #1a0a0a 0%, #2d1010 50%, #1c0808 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 44px 48px;
+    }
+
+    .panel-right::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 20%, rgba(229,57,53,0.3) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 20% 85%, rgba(183,28,28,0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .panel-right::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -60px;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      border: 1px solid rgba(229,57,53,0.12);
+    }
+
+    .panel-brand { position: relative; z-index: 1; }
+    .panel-foot { position: relative; z-index: 1; font-size: 0.72rem; color: rgba(255,255,255,0.25); }
+
+    .brand-wordmark {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-wordmark span { color: var(--red); }
+
+    .brand-tagline {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .panel-headline { position: relative; z-index: 1; }
+
+    .panel-headline h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #fff;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-headline h2 em { font-style: normal; color: var(--red); }
+
+    .panel-headline p {
+      margin-top: 14px;
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
+      max-width: 280px;
+    }
+
+    .steps {
+      margin-top: 32px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .steps li { display: flex; align-items: flex-start; gap: 14px; }
+
+    .steps li .num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(229,57,53,0.25);
+      border: 1px solid rgba(229,57,53,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .steps li .step-text {
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+
+    .steps li .step-text strong {
+      display: block;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        grid-template-columns: 1fr;
+        border-radius: 18px;
+      }
+      .panel-left {
+        order: 2;
+        padding: 36px 28px;
+      }
+      .panel-right {
+        order: 1;
+        padding: 36px 28px;
+        min-height: auto;
+      }
+      .panel-right::after { display: none; }
+      .panel-headline h2 { font-size: 1.6rem; }
+      .panel-headline p { max-width: 100%; }
+      .steps { margin-top: 20px; gap: 12px; }
+    }
+  </style>
 </head>
-
 <body>
-
-  <main class="auth-wrapper">
-
-    <section class="auth-card">
-
-      <header class="auth-header">
-        <h1 class="logo">MyFrEM</h1>
-        <p class="subtitle">Crea il tuo account</p>
-      </header>
-
-      <form id="registerForm" class="auth-form">
-
-        <div class="grid-2">
-
+  <main>
+    <div class="shell">
+      <div class="panel-left">
+        <p class="form-title">Crea il tuo account</p>
+        <p class="form-sub">Unisciti alla piattaforma MyFrEM</p>
+        <form id="registerForm" class="auth-form">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="registerName">Nome</label>
+              <input type="text" id="registerName" required placeholder="Mario" autocomplete="given-name" />
+            </div>
+            <div class="form-group">
+              <label for="registerSurname">Cognome</label>
+              <input type="text" id="registerSurname" required placeholder="Rossi" autocomplete="family-name" />
+            </div>
+          </div>
           <div class="form-group">
-            <label for="registerName">Nome</label>
-            <input type="text" id="registerName" required placeholder="Mario" autocomplete="name"/>
+            <label for="registerUsername">Username</label>
+            <input type="text" id="registerUsername" required placeholder="mariorossi" autocomplete="username" />
           </div>
-
           <div class="form-group">
-            <label for="registerSurname">Cognome</label>
-            <input type="text" id="registerSurname" required placeholder="Rossi" autocomplete="name"/>
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" required placeholder="nome@esempio.com" autocomplete="email" />
           </div>
-
-        </div>
-
-        <div class="form-group">
-          <label for="registerUsername">Username</label>
-          <input type="text" id="registerUsername" required placeholder="mariorossi" autocomplete="username"/>
-        </div>
-
-        <div class="form-group">
-          <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" required placeholder="nome@esempio.com" autocomplete="email"/>
-        </div>
-
-        <div class="form-group">
-          <label for="registerPassword">Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password"/>
-            <button type="button" class="toggle-password"
-              onclick="togglePassword('registerPassword', this)"
-              aria-label="Mostra password">
-              <i class="far fa-eye"></i>
-            </button>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password" />
+              <button type="button" class="toggle-password" onclick="togglePassword('registerPassword', this)" aria-label="Mostra password">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label for="registerConfirmPassword">Conferma password</label>
-          <div class="password-wrapper">
-            <input type="password" id="registerConfirmPassword" required placeholder="••••••••"  autocomplete="new-password"/>
-            <button type="button" class="toggle-password"
-              onclick="togglePassword('registerConfirmPassword', this)"
-              aria-label="Mostra password">
-              <i class="far fa-eye"></i>
-            </button>
+          <div class="form-group">
+            <label for="registerConfirmPassword">Conferma password</label>
+            <div class="password-wrapper">
+              <input type="password" id="registerConfirmPassword" required placeholder="••••••••" autocomplete="new-password" />
+              <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword', this)" aria-label="Mostra password">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
           </div>
+          <button type="submit" class="submit-btn">Crea account</button>
+        </form>
+        <div class="auth-footer">
+          Hai già un account? <a href="/login/signin">Accedi</a>
         </div>
-
-        <button type="submit" class="primary-btn">Crea account</button>
-
-        <p class="auth-links">
-          Hai già un account?
-          <a href="/login/signin">Accedi</a>
-        </p>
-
-      </form>
-
-      <a class="back-home" href="/">
-        ← Torna alla homepage
-      </a>
-
-      <div class="messages">
-        <p id="error" class="error"></p>
-        <p id="messageBox"></p>
+        <a class="back-home" href="/">← Torna alla homepage</a>
+        <div class="messages">
+          <p id="error"></p>
+          <p id="messageBox"></p>
+        </div>
       </div>
-
-    </section>
-
+      <div class="panel-right">
+        <div class="panel-brand">
+          <p class="brand-wordmark">My<span>FrEM</span></p>
+          <p class="brand-tagline">Friuli Emergenze · Piattaforma foto</p>
+        </div>
+        <div class="panel-headline">
+          <h2>Inizia a<br>fare la tua<br><em>differenza.</em></h2>
+          <p>Registrandoti, entrerai a far parte della rete operativa del Friuli-Venezia Giulia per la gestione delle emergenze.</p>
+          <ol class="steps">
+            <li>
+              <span class="num">1</span>
+              <span class="step-text"><strong>Compila il modulo</strong>Inserisci i tuoi dati di accesso</span>
+            </li>
+            <li>
+              <span class="num">2</span>
+              <span class="step-text"><strong>Verifica l'email</strong>Controlla la tua casella di posta</span>
+            </li>
+            <li>
+              <span class="num">3</span>
+              <span class="step-text"><strong>Inizia ad operare</strong>Carica foto e gestisci le emergenze</span>
+            </li>
+          </ol>
+        </div>
+        <div class="panel-foot">© 2025 FriuliEmergenze · Tutti i diritti riservati</div>
+      </div>
+    </div>
   </main>
-
   <script type="module" src="/auth/app.js"></script>
-
   <script>
     function togglePassword(inputId, button) {
       const input = document.getElementById(inputId);
-      const icon = button.querySelector("i");
-
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
+      const icon = button.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
       } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
     }
   </script>
-
 </body>
 </html>

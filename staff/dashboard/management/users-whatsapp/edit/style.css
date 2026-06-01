@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, "Lexend", sans-serif;;
+  font-family: -apple-system, 'Lexend', sans-serif;;
   min-height: 100vh;
 }
 
@@ -88,41 +88,42 @@ input, textarea {
 }
 
 .user-box {
-    background: #f8f8f8;
-    padding: 1.4rem;
-    border-radius: 12px;
-    margin-top: 1rem;
+  background: #f8f8f8;
+  padding: 1.4rem;
+  border-radius: 12px;
+  margin-top: 1rem;
 }
 
 label {
-    display: block;
-    margin-top: 1rem;
-    margin-bottom: 0.3rem;
-    font-weight: 600;
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
 }
 
 input,
 textarea,
 select {
-    width: 100%;
-    padding: 0.9rem;
-    background: #fff;
-    border: 1px solid #333;
-    border-radius: 10px;
+  width: 100%;
+  padding: 0.9rem;
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 10px;
+  font-family: inherit;
 }
 
 textarea {
-    resize: none;
+  resize: none;
 }
 
 .btn-primary {
-    background: #0066ff;
-    border: none;
-    color: #fff;
-    padding: 0.9rem 1.4rem;
-    margin-top: 1.4rem;
-    border-radius: 10px;
-    cursor: pointer;
+  background: #0066ff;
+  border: none;
+  color: #fff;
+  padding: 0.9rem 1.4rem;
+  margin-top: 1.4rem;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .quick-btn {
@@ -139,4 +140,124 @@ textarea {
 .quick-btn:hover {
   background: #1d4ed8;
   transform: translateY(-1px);
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 200px;
+    padding: 18px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1.1rem;
+  }
+
+  .sidebar nav a {
+    padding: 9px;
+    font-size: 0.95rem;
+  }
+
+  .main-content {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: auto;
+    height: auto;
+    padding: 15px 15px 10px;
+    flex-direction: column;
+  }
+
+  .sidebar .logo {
+    margin-bottom: 15px;
+  }
+
+  .sidebar .logo img {
+    width: 50px;
+  }
+
+  .sidebar nav a {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: auto;
+    padding: 20px;
+  }
+
+  .main-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .user-box {
+    padding: 1rem;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 95%;
+  }
+
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .quick-btn {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    padding: 12px;
+  }
+
+  .sidebar .logo h2 {
+    font-size: 1rem;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .user-box {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .quick-btn {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
 }

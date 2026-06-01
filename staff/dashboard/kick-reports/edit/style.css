@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, "Lexend", sans-serif;;
+  font-family: -apple-system, 'Lexend', sans-serif;;
   min-height: 100vh;
 }
 
@@ -8,10 +8,8 @@ html, body {
   height: 100%;
 }
 
-/* ——— LAYOUT ——————————————— */
-
 .sidebar {
-  width: 210px;
+  width: 250px;
   background: #222;
   color: #fff;
   display: flex;
@@ -71,25 +69,20 @@ html, body {
   background: #c0392b;
 }
 
-/* ================================
-   Main Content
-================================ */
 .main-content {
   padding: 30px;
   background-color: #f3f4f6;
   min-height: 100vh;
-  margin-left: 250px;
+  margin-left: 270px;
 }
 
 .main-content h1 {
   margin-bottom: 20px;
 }
 
-/* ——— CONTENT BOXES —————————— */
-
 .page-header h2 {
-    margin-left: 25px;
-    font-size: 28px;
+  margin-left: 25px;
+  font-size: 28px;
 }
 
 .page-header p {
@@ -99,60 +92,58 @@ html, body {
 .report-box,
 .add-note-box,
 .notes-list {
-    background: #f1f1f1;
-    padding: 1.4rem;
-    border-radius: 12px;
-    margin-top: 1.5rem;
+  background: #f1f1f1;
+  padding: 1.4rem;
+  border-radius: 12px;
+  margin-top: 1.5rem;
 }
 
 textarea,
 input[type="url"] {
-    width: 100%;
-    background: #f0f0f0;
-    border: 1px solid #333;
-    padding: 0.9rem;
-    border-radius: 10px;
-    color: #fff;
-    margin-top: 0.6rem;
+  width: 100%;
+  background: #f0f0f0;
+  border: 1px solid #333;
+  padding: 0.9rem;
+  border-radius: 10px;
+  color: #fff;
+  margin-top: 0.6rem;
 }
 
 textarea {
-    height: 120px;
+  height: 120px;
 }
 
 .btn-primary {
-    background: #0066ff;
-    border: none;
-    color: #fff;
-    padding: 0.9rem 1.4rem;
-    margin-top: 1rem;
-    border-radius: 10px;
-    cursor: pointer;
+  background: #0066ff;
+  border: none;
+  color: #fff;
+  padding: 0.9rem 1.4rem;
+  margin-top: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-    background: #0051cc;
+  background: #0051cc;
 }
 
-/* ——— NOTES LIST —————————— */
-
 .notes-list ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .notes-list li {
-    background: #f1f1f1;
-    padding: 1rem;
-    border: 1px solid #222;
-    border-radius: 10px;
-    margin-bottom: 1rem;
+  background: #f1f1f1;
+  padding: 1rem;
+  border: 1px solid #222;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .notes-list .attachment {
-    display: block;
-    margin-top: 4px;
-    color: #4aa3ff;
+  display: block;
+  margin-top: 4px;
+  color: #4aa3ff;
 }
 
 @media (max-width: 768px) {
@@ -179,7 +170,6 @@ textarea {
     margin-bottom: 6px;
   }
 
-  /* Il contenuto si sposta sotto */
   .main-content {
     margin-left: 0;
     padding: 20px;
@@ -189,7 +179,6 @@ textarea {
     font-size: 1.6rem;
   }
 
-  /* Tabella scrollabile */
   table {
     display: block;
     overflow-x: auto;

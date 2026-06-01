@@ -20,26 +20,26 @@ const auth = getAuth(app);
 const tableBody = document.getElementById("usersTableBody");
 const messageBox = document.getElementById("messageBox");
 
-console.log("📡 Loading newsletter users...");
+console.log("📡 Loading sent newsletters...");
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
-async function loadUsers() {
+async function loadNewsletters() {
   try {
-    tableBody.innerHTML = `<tr><td colspan="5">Caricamento...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8">Caricamento...</td></tr>`;
 
     const q = query(
-      collection(db, "newsletterSubs"),
-      orderBy("createdAt", "desc")
+      collection(db, "newsletterSent"),
+      orderBy("sentAt", "desc")
     );
 
     const snap = await getDocs(q);
 
     if (snap.empty) {
-      tableBody.innerHTML = `<tr><td colspan="5">Nessun utente trovato</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="8">Nessuna newsletter trovata</td></tr>`;
       return;
     }
 
@@ -48,27 +48,37 @@ async function loadUsers() {
     snap.forEach((docSnap) => {
       const data = docSnap.data();
 
-      const isVerified = data.verified ? "SI" : "NO";
-      const isEnabled = data.subscribed ? "SI" : "NO";
-
-      const date = data.createdAt?.toDate
-        ? data.createdAt.toDate().toLocaleString("it-IT")
+      const sentAt = data.sentAt?.toDate
+        ? data.sentAt.toDate().toLocaleString("it-IT")
         : "N/A";
+
+      const hasImage = data.image && data.image.trim() !== "";
+      const hasLink = data.link && data.link.trim() !== "";
 
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${data.name || "-"}</td>
-        <td>${data.email}</td>
-        <td>${date}</td>
-        <td style="font-size:12px; word-break:break-all;">
-          ${data.token || "-"}
+        <td style="max-width:200px; word-break:break-word;">${data.title || "-"}</td>
+        <td>
+          <span class="badge-type">${data.type || "-"}</span>
         </td>
-        <td>${isVerified}</td>
-        <td>${isEnabled}</td>
+        <td>
+          ${hasImage
+            ? `<span class="has-image" title="${data.image}">✅ Sì</span>`
+            : `<span class="no-image">❌ No</span>`
+          }
+        </td>
+        <td class="link-cell">
+          ${hasLink
+            ? `<a href="${data.link}" target="_blank" rel="noopener">🔗 Apri</a>`
+            : `<span style="color:#aaa; font-size:13px;">—</span>`
+          }
+        </td>
+        <td class="recipients-count">${data.recipients ?? "-"}</td>
+        <td>${sentAt}</td>
         <td>
           <button class="deleteBtn" data-id="${docSnap.id}">
-            ❌ Rimuovi
+            ❌ Elimina
           </button>
         </td>
       `;
@@ -76,11 +86,11 @@ async function loadUsers() {
       tableBody.appendChild(row);
     });
 
-    console.log("✅ Utenti caricati:", snap.size);
+    console.log("✅ Newsletter caricate:", snap.size);
 
   } catch (err) {
-    console.error("❌ Errore caricamento utenti:", err);
-    messageBox.textContent = "Errore nel caricamento utenti";
+    console.error("❌ Errore caricamento newsletter:", err);
+    messageBox.textContent = "Errore nel caricamento delle newsletter";
   }
 }
 
@@ -88,14 +98,14 @@ document.addEventListener("click", async (e) => {
   if (e.target.classList.contains("deleteBtn")) {
     const id = e.target.dataset.id;
 
-    if (!confirm("Vuoi eliminare questo utente?")) return;
+    if (!confirm("Vuoi eliminare questa newsletter dallo storico?")) return;
 
-    await deleteDoc(doc(db, "newsletterSubs", id));
+    await deleteDoc(doc(db, "newsletterSent", id));
 
-    console.log("🗑️ Eliminato:", id);
+    console.log("🗑️ Eliminata:", id);
 
-    loadUsers();
+    loadNewsletters();
   }
 });
 
-loadUsers();
+loadNewsletters();

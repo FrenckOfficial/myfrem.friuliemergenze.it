@@ -62,7 +62,7 @@ async function loadUserProfile(uid) {
 
         const user = snap.data();
 
-        const fullName = `${user.name || ""} ${user.surname || ""}`.trim() || "Utente";
+        const fullName = `${user.name || ""} ${user.surname || ""}` || "Utente";
         const username = user.username || "username";
         const email = user.email || "N/D";
         const role = user.role || "Utente";
@@ -120,7 +120,7 @@ async function loadUserProfile(uid) {
             const photosQuery = query(photosRef, where("userId", "==", uid));
             const photosSnap = await getDocs(photosQuery);
             const eventsRef = collection(db, "events");
-            const eventsQuery = query(photosRef, where("userId", "==", fullName));
+            const eventsQuery = query(photosRef, where("uid", "==", uid));
             const eventsSnap = await getDocs(eventsQuery)
 
             const photos = photosSnap.size;
@@ -431,9 +431,6 @@ async function loadUserEvents(userId) {
       card.className = "photo-card";
 
       card.innerHTML = `
-        <img src="${data.url || "/assets/default-event.png"}"
-             class="popup-photo">
-
         <div class="photo-info">
           <p><b>Titolo:</b> ${data.title || "Senza titolo"}</p>
 

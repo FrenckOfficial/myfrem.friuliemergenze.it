@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, "Lexend", sans-serif;;
+  font-family: -apple-system, 'Lexend', sans-serif;;
 }
 
 body {
@@ -11,7 +11,6 @@ body {
   color: #333;
 }
 
-/* Sidebar */
 .sidebar {
   width: 250px;
   background: #222;
