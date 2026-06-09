@@ -734,6 +734,31 @@ textarea::placeholder {
   text-align: center
 }
 
+#viewAllPhotos {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.15s;
+  width: 13.4%;
+  margin-top: 15px;
+}
+
+#viewAllPhotos:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
 .photos-grid {
   display: flex;
   flex-wrap: wrap;
