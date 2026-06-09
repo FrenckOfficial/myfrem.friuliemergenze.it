@@ -1,17 +1,63 @@
-body {
-  margin: 0;
-  font-family: -apple-system, 'Lexend', sans-serif;;
-  min-height: 100vh;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --accent: #ff7b00;
+  --accent-dim: rgba(255, 123, 0, 0.12);
+  --signal-red: #ff4d6d;
+  --signal-amber: #ffb703;
+  --signal-green: #52b788;
+  --bg: #0d0b09;
+  --bg-panel: #15110d;
+  --bg-surface: #211a14;
+  --bg-hover: #2b2219;
+  --border: rgba(255, 123, 0, 0.15);
+  --border-hard: rgba(255, 123, 0, 0.3);
+  --border-panel: rgba(255, 255, 255, 0.05);
+  --text: #fff7f0;
+  --muted: #d4a373;
+  --faint: #6b4e2e;
+  --font-display: -apple-system, "Manrope", sans-serif;
+  --font-mono: -apple-system, "Roboto", sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
 }
 
-html, body {
-  height: 100%;
+a {
+  text-decoration: none;
+  color: var(--accent);
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-display);
+}
+
+body {
+  height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  background-image:
+    linear-gradient(rgba(0, 212, 232, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 232, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
 }
 
 .sidebar {
   width: 250px;
-  background: #222;
-  color: #fff;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  color: var(--text);
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -19,16 +65,8 @@ html, body {
   top: 0;
   left: 0;
   height: 100vh;
-  overflow-y: auto;
   z-index: 1000;
-}
-
-button {
-  font-family: inherit;
-}
-
-input, textarea {
-  font-family: inherit;
+  overflow-y: auto;
 }
 
 .sidebar .logo {
@@ -38,12 +76,17 @@ input, textarea {
 
 .sidebar .logo img {
   width: 60px;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .sidebar .logo h2 {
-  font-size: 1.2rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin-top: 10px;
+  color: var(--text);
 }
 
 .sidebar nav {
@@ -52,195 +95,268 @@ input, textarea {
 
 .sidebar nav a {
   display: block;
-  color: #bbb;
+  color: var(--muted);
   text-decoration: none;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  transition: 0.3s;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .sidebar nav a:hover,
 .sidebar nav a.active {
-  background: #444;
-  color: #fff;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--border);
 }
 
 .sidebar .logout {
-  background: #e74c3c;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
+  background: transparent;
+  color: var(--signal-red);
+  border: 1px solid var(--signal-red);
+  padding: 9px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: 0.3s;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .sidebar .logout:hover {
-  background: #c0392b;
+  background: var(--signal-red);
+  color: var(--bg);
 }
 
 .main-content {
+  flex-grow: 1;
   padding: 30px;
-  background-color: #f3f4f6;
-  min-height: 100vh;
   margin-left: 250px;
 }
 
 .main-content h1 {
   margin-bottom: 20px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
 
 .list {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 
 #totalUsers {
-  font-size: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
-  border-radius: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-th, td {
-  padding: 12px 15px;
+th,
+td {
+  padding: 0.85rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-panel);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
 }
 
 th {
-  background-color: #3b82f6;
-  color: white;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  border-bottom: 1px solid var(--border);
 }
 
-tr:hover {
-  background-color: #e0f2fe;
+td {
+  color: var(--text-primary);
+}
+
+tbody tr {
+  transition: background 0.15s;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: var(--bg-hover);
 }
 
 button {
-  padding: 5px 10px;
-  margin-right: 5px;
-  border: none;
-  border-radius: 5px;
+  padding: 0.35rem 0.75rem;
+  margin-right: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 button:hover {
-  opacity: 0.85;
-}
-
-a {
-  text-decoration: none;
-  color: #3b82f6;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-#messageBox {
-  margin-top: 15px;
-  font-weight: bold;
-  font-size: 1rem;
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+  opacity: 1;
 }
 
 .btn-primary {
-  display: inline-block;
-  background-color: #39be1e;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: #4fca7a;
+  border: 1px solid #4fca7a;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
 .btn-primary:hover {
-  background-color: #0e5e1f;
-  transform: translateY(-1px);
+  background: rgba(79, 202, 122, 0.15);
+  color: #4fca7a;
+  transform: none;
+  text-decoration: none;
 }
 
 .btn-secondary {
-  display: inline-block;
-  background-color: #40739e;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
 .btn-secondary:hover {
-  background-color: #0e5e1f;
-  transform: translateY(-1px);
+  background: var(--accent-dim);
+  color: var(--accent);
+  transform: none;
+  text-decoration: none;
+}
+
+#messageBox {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent);
 }
 
 @media (max-width: 1024px) {
-
   .sidebar {
     width: 200px;
-    padding: 18px;
+    padding: 1.25rem 0.85rem;
   }
 
   .main-content {
-    padding: 25px;
+    margin-left: 200px;
+    padding: 1.75rem 2rem;
   }
 
   .sidebar .logo img {
-    width: 50px;
+    width: 44px;
   }
 
   .sidebar .logo h2 {
-    font-size: 1.1rem;
-  }
-
-  .sidebar nav a {
-    padding: 9px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 768px) {
-
   .sidebar {
     position: relative;
     width: 100%;
     height: auto;
-    padding: 15px 15px 10px;
-    display: flex;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
     flex-direction: column;
   }
 
   .sidebar .logo {
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
   }
 
   .sidebar .logo img {
-    width: 50px;
+    width: 44px;
   }
 
   .sidebar nav a {
-    padding: 10px;
-    font-size: 1rem;
-    margin-bottom: 6px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .sidebar .logout {
+    margin-top: 0.75rem;
+    width: 100%;
+    text-align: center;
   }
 
   .main-content {
     margin-left: 0;
-    padding: 20px;
+    padding: 1.5rem;
   }
 
   .main-content h1 {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
   }
 
   table {
@@ -249,42 +365,43 @@ a:hover {
     white-space: nowrap;
   }
 
-  th, td {
-    padding: 10px;
-    font-size: 0.9rem;
+  th,
+  td {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.72rem;
   }
 
   button {
-    padding: 6px 10px;
-    font-size: 0.85rem;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
   }
 }
 
 @media (max-width: 480px) {
-
   .sidebar {
-    padding: 12px;
+    padding: 0.85rem;
   }
 
   .sidebar .logo h2 {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .main-content {
-    padding: 15px;
+    padding: 1rem;
   }
 
-  th, td {
-    font-size: 0.8rem;
-    padding: 8px;
+  th,
+  td {
+    font-size: 0.68rem;
+    padding: 0.6rem 0.75rem;
   }
 
   button {
-    font-size: 0.75rem;
-    padding: 5px 8px;
+    font-size: 0.62rem;
+    padding: 0.25rem 0.5rem;
   }
 
   #messageBox {
-    font-size: 0.9rem;
+    font-size: 0.72rem;
   }
 }

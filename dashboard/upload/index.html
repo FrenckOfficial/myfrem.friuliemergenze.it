@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <aside class="sidebar sidebar--fixed">
+  <aside class="sidebar">
       <div class="logo">
         <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
         <h2>MyFrEM</h2>
@@ -25,33 +25,70 @@
         <a href="/dashboard/create-event/">🗂️ Crea un evento</a>
         <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
         <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-        <p></p>
         <a href="/dashboard/contact/">📞 Contattaci</a>
       </nav>
       <button id="logoutBtn" class="logout">🚪 Logout</button>
   </aside>
 
-  <div class="main-content main-content--fixed">
-    <h1>📸 Carica una Foto</h1>
+  <div class="main-content">
+    <div class="content-box">
+      <h1>📸 Carica una Foto</h1>
+      <form id="uploadForm">
+        <div class="form-group">
+          <div class="mini-group">
+            <label>Modello del veicolo <b>*</b></label>
+            <input type="text" id="title" required>
+          </div>
 
-    <form id="uploadForm">
-      <label>Titolo</label>
-      <input type="text" id="title" required>
+          <div class="mini-group">
+            <label>Targa</label>
+            <input type="text" id="licensePlate">
+          </div>
+        </div>
 
-      <label>Descrizione (es. Targa Mezzo, Allestitore, Modello Completo)</label>
-      <textarea id="description" required></textarea>
+        <div class="form-group">
+          <div class="mini-group">
+            <label>Allestitore</label>
+            <input type="text" id="sponsor" style="margin-top: 25px;">
+          </div>
+          
+          <div class="mini-group">
+            <label>Sede di appartenenza <b>*</b></label>
+            <input type="text" id="location" required>
+          </div>
+        </div>
+        
 
-      <input type="file" id="inp-upl" multiple accept="image/*">
-      <label for="inp-upl">📤 Scegli foto</label>
-      <span id="file-name">Nessun file</span>
+        <label>Tipologia di servizio svolto <b>*</b></label>
+        <select id="serviceType" required>
+          <option value="none">Seleziona una tipologia</option>
+          <option value="emergenza-sanitaria">Emergenza Sanitaria Territoriale (ex 118)</option>
+          <option value="trasporti-secondari">Trasporti Sanitari Secondari</option>
+          <option value="soccorso-tecnico-urgente">Soccorso Tecnico Urgente (ex 115)</option>
+          <option value="ordine-pubblico">Ordine Pubblico (ex 112-113 e GdF)</option>
+          <option value="guardia-costiera">Guardia Costiera</option>
+          <option value="protezione-civile">Protezione Civile</option>
+          <option value="altro">Altro (specificare nel campo note)</option>
+        </select>
 
-      <progress id="progressBar" value="0" max="100" style="width:100%;display:none;"></progress>
-      <p id="progressText"></p>
+        <label>Note aggiuntive</label>
+        <input type="text" id="notes">
 
-      <button id="btn-upl">📤 Carica</button>
-    </form>
+        <div class="form-group">
+          <input type="file" id="inp-upl" multiple accept="image/*">
+          <label for="inp-upl">📤 Scegli foto</label>
+          <span id="file-name">Nessun file</span>
+        </div>
 
-    <p id="statusMsg"></p>
+        <progress id="progressBar" value="0" max="100" style="width:100%;display:none;"></progress>
+        <p id="progressText" style="display:none;"></p>
+
+        <button id="btn-upl">📤 Carica</button>
+      </form>
+      
+      <p id="disclaimer">Tutti i campi evidenziati con * sono richiesti</p>
+      <p id="statusMsg"></p>
+    </div>
   </div>
 
   <script type="module" src="/dashboard/upload/upload.js"></script>

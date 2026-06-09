@@ -14,8 +14,7 @@
   <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
 </head>
 <body>
-  <!-- SIDEBAR -->
-  <aside class="sidebar sidebar--fixed">
+  <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
       <h2>MyFrEM</h2>
@@ -27,19 +26,19 @@
       <a href="/dashboard/create-event/">🗂️ Crea un evento</a>
       <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
       <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-      <p></p>
       <a href="/dashboard/contact/">📞 Contattaci</a>
     </nav>
     <button id="logoutBtn" class="logout">🚪 Logout</button>
   </aside>
 
-  <!-- CONTENUTO -->
-  <div class="main-content main-content--fixed">
-    <h1>📸 Le mie Foto</h1>
-    <div id="photosContainer" class="photos-grid">
-      <!-- Qui verranno generate le foto con JS -->
+  <div class="main-content">
+    <div class="content-box" style="max-width:none;">
+      <h1>📸 Le mie Foto</h1>
+      <div id="photosContainer" class="photos-grid">
+        <!-- Qui verranno generate le foto con JS -->
+      </div>
+      <p id="statusMsg"></p>
     </div>
-    <p id="statusMsg"></p>
   </div>
 
   <script type="module" src="/dashboard/all-photos/insert-photos.js"></script>

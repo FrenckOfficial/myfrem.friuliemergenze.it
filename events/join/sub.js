@@ -79,7 +79,7 @@ async function loadPublicEvent() {
         nameJoiner: name,
         eventTitle: e.title,
         eventId: eventId,
-        timestamp: new Date()
+        timestamp: serverTimestamp()
       })
 
       await addDoc(collection(db, "eventRegistrations"), {

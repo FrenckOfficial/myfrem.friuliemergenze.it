@@ -47,7 +47,7 @@ form.addEventListener("submit", async (e) => {
       type: "new_ticket",
       title: subject,
       from: "Sistema di contatto MyFrEM",
-      timestamp: new Date()
+      timestamp: serverTimestamp()
     });
 
     result.innerText = "✅ Messaggio inviato! Ti risponderemo al più presto.";

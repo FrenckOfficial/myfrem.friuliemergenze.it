@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Bozze Veicoli - Dashboard Staff | MyFrEM</title>
+    <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="/staff/dashboard/management/vehicle-drafts/load.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+            <h2>MyFrEM Staff</h2>
+        </div>
+        <nav>
+            <a href="/staff/">📊 Dashboard</a>
+            <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+            <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+            <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+            <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+            <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+            <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+        </nav>
+        <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+
+    <div class="main-content">
+        <h1>🚗 Gestione Bozze Veicoli</h1>
+        
+        <div class="drafts-container">
+            <div class="drafts-header">
+                <h2>Bozze in attesa di completamento:</h2>
+                <span class="draft-count" id="draftCount"> 0</span>
+            </div>
+
+            <div id="draftsTableContainer">
+                <table class="drafts-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">📸</th>
+                            <th style="width: 25%;">Nome File</th>
+                            <th style="width: 15%;">Stato</th>
+                            <th style="width: 20%;">Data Creazione</th>
+                            <th style="width: 15%;">Creato da</th>
+                            <th style="width: 20%;">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="draftsList">
+                        <!-- Bozze caricate dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p style="font-size: 3rem; margin: 20px 0;">📭</p>
+                <p>Nessuna bozza veicolo in attesa</p>
+                <p style="color: var(--faint); font-size: 0.75rem;">Crea una nuova bozza dalla moderazione foto</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="editDraftModal" class="modal">
+        <div class="modal-content">
+            <p id="statusMsg"></p>
+            <div class="modal-header">
+                <h2>Completa Bozza Veicolo</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+
+            <div class="photo-preview" id="photoPreview">
+                <img id="previewImg" src="" alt="Foto veicolo" style="display: none;">
+                <p id="photoFileName"></p>
+            </div>
+
+            <form id="vehicleForm">
+                <div class="form-group">
+                    <label for="vehicleTitle">Titolo/Denominazione Veicolo</label>
+                    <input type="text" id="vehicleTitle" name="title" required placeholder="Es: Ambulanza 118 Tipo A">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vehicleBrand">Marca</label>
+                        <input type="text" id="vehicleBrand" name="brand" required placeholder="Es: Mercedes">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleModel">Modello</label>
+                        <input type="text" id="vehicleModel" name="model" required placeholder="Es: Sprinter">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="vehiclePlate">Targa</label>
+                    <input type="text" id="vehiclePlate" name="plate" required placeholder="Es: AA123BC" style="text-transform: uppercase;">
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicleBuilder">Allestitore</label>
+                    <input type="text" id="vehicleBuilder" name="builder" placeholder="Es: Medef, Orion">
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicleSlug">Slug (/gallery/scheda/*)</label>
+                    <input type="text" id="vehicleSlug" name="slug" required placeholder="Es: volvofl-vvfgorizia">
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicleService">Servizio Svolto</label>
+                    <select id="vehicleService" name="service" required>
+                        <option value="">-- Seleziona un servizio --</option>
+                        <option value="ambulanza">Ambulanza</option>
+                        <option value="pompieri">Vigili del Fuoco</option>
+                        <option value="protezione_civile">Protezione Civile</option>
+                        <option value="polizia_locale">Polizia Locale</option>
+                        <option value="polizia_di_stato">Polizia</option>
+                        <option value="carabinieri">Carabinieri</option>
+                        <option value="guardia_di_finanza">Guardia di Finanza</option>
+                        <option value="soccorso_alpino">Soccorso Alpino</option>
+                        <option value="guardia_costiera">Guardia Costiera</option>
+                        <option value="altro">Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicleHQ">Sede di Appartenenza</label>
+                    <input type="text" id="vehicleHQ" name="headquarters" required placeholder="Es: Stazione di Udine">
+                </div>
+
+                <div class="form-group">
+                    <label for="vehicleNotes">Note Aggiuntive</label>
+                    <textarea id="vehicleNotes" name="notes" placeholder="Informazioni aggiuntive sul veicolo..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">💾 Salva e Pubblica</button>
+                    <button type="button" class="btn-cancel">Annulla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

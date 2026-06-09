@@ -57,7 +57,7 @@ async function loadDocuments() {
         <td>${date}</td>
         <td>${data.authorName || data.authorId || "-"}</td>
         <td>
-          <a href="${data.pdfUrl || '#'}" target="_blank">
+          <a href="${data.pdfUrl || '#'}" class="btn-primary" target="_blank">
             📥 Download
           </a>
 

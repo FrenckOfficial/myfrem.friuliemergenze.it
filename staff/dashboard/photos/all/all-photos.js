@@ -9,10 +9,12 @@ import {
   doc,
   getDoc,
   updateDoc,
+  addDoc,
+  deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import { firebaseConfig } from "../../../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -62,10 +64,14 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loadUsersMap() {
-  const snap = await getDocs(collection(db, "users"));
-  snap.forEach(docSnap => {
-    usersMap[docSnap.id] = docSnap.data().username || "Sconosciuto";
-  });
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    snap.forEach(docSnap => {
+      usersMap[docSnap.id] = docSnap.data().username || "Sconosciuto";
+    });
+  } catch (err) {
+    console.error("Errore caricamento utenti:", err);
+  }
 }
 
 async function loadAllPhotos() {
@@ -93,51 +99,74 @@ async function loadAllPhotos() {
         photo.status?.includes("Approvata") ? "green" :
         photo.status?.includes("Rifiutata") ? "red" : "orange";
 
-      let linkBox = "-";
+      let linkBox = "Non disponibile in quanto foto in attesa o rifiutata";
+      let serviceType = "Non inserito";
 
       if (photo.status?.includes("Approvata")) {
-
-        const hasLink = photo.vehicleLink && photo.vehicleLink.length > 0;
+        const hasLink = photo.vehicleLink && photo.vehicleLink.trim().length > 0;
 
         linkBox = `
           <div class="photo-link-box" id="box-${id}">
-
-            <!-- Link cliccabile -->
             <a
               href="${hasLink ? photo.vehicleLink : "#"}"
               target="_blank"
               id="link-view-${id}"
-              style="text-decoration: underline; font-size: 1em;"
+              style="text-decoration: underline; font-size: 1em; word-break: break-all;"
               class="photo-link-static ${hasLink ? "" : "hidden"}"
             >
               ${hasLink ? photo.vehicleLink : ""}
             </a>
 
-            <!-- Input nascosto -->
-            <input
-              type="text"
-              id="link-input-${id}"
-              class="photo-link-input ${hasLink ? "hidden" : ""}"
-              placeholder="Inserisci link mezzo..."
-              value="${hasLink ? photo.vehicleLink : ""}"
-            />
+            <div id="link-input-wrapper-${id}" class="link-input-wrapper ${hasLink ? "hidden" : ""}">
+              <input
+                type="url"
+                id="link-input-${id}"
+                class="photo-link-input"
+                placeholder="https://friuliemergenze.it/gallery/scheda/(mezzo)"
+                value="${hasLink ? photo.vehicleLink : ""}"
+              />
+              <div class="link-input-buttons">
+                <button class="edit-link-btn save-btn" onclick="saveVehicleLink('${id}')" title="Salva">
+                  <img src="/assets/icons/floppy-disk-regular-full.svg" alt="Salva" />
+                </button>
+              </div>
+            </div>
 
-            <!-- Pulsanti -->
-            <button class="edit-link-btn" onclick="editLink('${id}')">✏️</button>
-            <button class="edit-link-btn ${hasLink ? "hidden" : ""}" id="save-${id}" onclick="saveVehicleLink('${id}')">💾</button>
-
+            <button class="edit-link-btn edit-btn ${hasLink ? "" : "hidden"}" onclick="editLink('${id}')" title="Modifica">
+              <img src="/assets/icons/pen-solid-full.svg" alt="Modifica" />
+            </button>
           </div>
         `;
       }
 
+      if (photo.serviceType === "ordine-pubblico") {
+        serviceType = "Ordine Pubblico";
+      } else if (photo.serviceType === "emergenza-sanitaria") {
+        serviceType = "Emergenza Sanitaria";
+      } else if (photo.serviceType === "trasporti-secondari") {
+        serviceType = "Automezzo adibito a trasporti secondari";
+      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
+        serviceType = "Vigili del Fuoco";
+      } else if (photo.serviceType === "guardia-costiera") {
+        serviceType = "Guardia Costiera";
+      } else if (photo.serviceType === "protezione-civile") {
+        serviceType = "Protezione Civile";
+      } else serviceType;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><img src="${photo.url}" class="preview"/></td>
-        <td>${photo.title || "-"}</td>
-        <td>${usersMap[photo.userId] || "Sconosciuto"}</td>
-        <td style="color:${statusColor}">${photo.status}</td>
-        <td>${photo.createdAt?.toDate().toLocaleString() || "-"}</td>
-        <td>${linkBox}</td>
+        <td><span class="status-indicator" style="background-color: ${statusColor};"></span> <b>${photo.status || "Sconosciuto"}</b></td>
+        <td><img src="${photo.url}" class="preview" alt="Preview della foto caricata tramite i sistemi Friuli Emergenze" /></td>
+        <td><b>${photo.vehicleModel || "Non inserito"}</b></td>
+        <td><b>${photo.sponsor || "Non inserito"}</b></td>
+        <td><b>${photo.licensePlate || "Non inserita"}</b></td>
+        <td><b>${serviceType}</b></td>
+        <td><b>${photo.location || "Non inserita"}</b></td>
+        <td><b>${usersMap[photo.userId] || "Sconosciuto"}</b></td>
+        <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
+        <td><b>${photo.notes || "Non inserite"}</b></td>
+        <td><b>${linkBox}</b></td>
+        <td><button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina"/></button></td>
       `;
 
       photosTableBody.appendChild(tr);
@@ -150,71 +179,103 @@ async function loadAllPhotos() {
   }
 }
 
-window.saveVehicleLink = async (photoId) => {
-  const input = document.getElementById(`link-${photoId}`);
-  const link = input.value.trim();
-
-  if (!link) {
-    alert("Inserisci un link valido");
-    return;
-  }
-
+function isValidUrl(string) {
   try {
-    await addDoc(doc(db, "activities"), {
-      type: "photo_edit",
-      editStaffer: auth.currentUser.email || "-",
-      photoTitle: photo.title || "-",
-      timestamp: serverTimestamp()
-    });
-    await updateDoc(doc(db, "photos", photoId), {
-      vehicleLink: link
-    });
-
-    alert("✅ Link salvato");
-  } catch (err) {
-    console.error("Errore salvataggio:", err);
-    alert("Errore salvataggio");
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
   }
-};
+}
 
 window.editLink = (photoId) => {
   const view = document.getElementById(`link-view-${photoId}`);
+  const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
   const input = document.getElementById(`link-input-${photoId}`);
-  const saveBtn = document.getElementById(`save-${photoId}`);
+  const editBtn = event.target.closest(".edit-btn");
 
-  view.classList.add("hidden");
-  input.classList.remove("hidden");
-  saveBtn.classList.remove("hidden");
+  if (view) view.classList.add("hidden");
+  if (inputWrapper) inputWrapper.classList.remove("hidden");
+  if (editBtn) editBtn.classList.add("hidden");
+  if (input) input.focus();
 };
 
 window.saveVehicleLink = async (photoId) => {
   const input = document.getElementById(`link-input-${photoId}`);
-  const link = input.value.trim();
+  const link = input?.value?.trim();
 
   if (!link) {
-    alert("Inserisci un link valido");
+    alert("❌ Inserisci un link valido");
+    return;
+  }
+
+  if (!isValidUrl(link)) {
+    alert("❌ Formato URL non valido. Usa: https://friuliemergenze.it");
     return;
   }
 
   try {
-    await updateDoc(doc(db, "photos", photoId), {
-      vehicleLink: link
+    const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
+    if (saveBtn) saveBtn.disabled = true;
+
+    const photoRef = doc(db, "photos", photoId);
+    const photoSnap = await getDoc(photoRef);
+    const photoData = photoSnap.data() || {};
+
+    await updateDoc(photoRef, {
+      vehicleLink: link,
+      updatedAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "activities"), {
+      type: "photo_edit",
+      editStaffer: auth.currentUser?.email || "-",
+      timestamp: serverTimestamp()
     });
 
     const view = document.getElementById(`link-view-${photoId}`);
-    const saveBtn = document.getElementById(`save-${photoId}`);
+    const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
+    const editBtn = document.querySelector(`#box-${photoId} .edit-btn`);
 
-    view.href = link;
-    view.textContent = link;
-    view.classList.remove("hidden");
+    if (view) {
+      view.href = link;
+      view.textContent = link;
+      view.classList.remove("hidden");
+    }
+    if (inputWrapper) inputWrapper.classList.add("hidden");
+    if (editBtn) editBtn.classList.remove("hidden");
+    if (input) input.setAttribute("value", link);
 
-    input.classList.add("hidden");
-    saveBtn.classList.add("hidden");
-
-    alert("✅ Link salvato");
+    setStatus("✅ Link salvato con successo", "success");
 
   } catch (err) {
-    console.error("Errore salvataggio:", err);
-    alert("Errore salvataggio");
+    console.error("Errore salvataggio link:", err);
+    setStatus("❌ Errore salvataggio link", "error");
+    alert("❌ Errore durante il salvataggio");
+  } finally {
+    const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
+    if (saveBtn) saveBtn.disabled = false;
   }
 };
+
+window.deletePhoto = async (photoId) => {
+  if (!confirm("Sei sicuro di voler eliminare questa foto? Questa azione è irreversibile.")) {
+    return;
+  } else {
+    try {
+      await deleteDoc(doc(db, "photos", photoId));
+
+      await addDoc(collection(db, "activities"), {
+        type: "photo_delete",
+        editStaffer: auth.currentUser?.email || "-",
+        timestamp: serverTimestamp()
+      });
+
+      setStatus("✅ Foto eliminata con successo", "success");
+      loadAllPhotos();
+    } catch (err) {
+      console.error("Errore eliminazione foto:", err);
+      setStatus("❌ Errore eliminazione foto", "error");
+    }
+  }
+}

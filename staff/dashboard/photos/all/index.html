@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <script src="https://kit.fontawesome.com/361d5e9388.js" crossorigin="anonymous"></script>
   <script type="module" src="./all-photos.js"></script>
 </head>
 <body>
@@ -20,7 +21,7 @@
     </div>
     <nav>
       <a href="/staff">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+      <a href="/staff/dashboard/photos/" class="active">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
       <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
@@ -35,18 +36,24 @@
     <table class="photos-table">
       <thead>
         <tr>
-          <th>Anteprima</th>
-          <th>Titolo</th>
-          <th>Utente</th>
           <th>Stato</th>
+          <th>Anteprima</th>
+          <th>Modello</th>
+          <th>Allestitore</th>
+          <th>Numero di targa</th>
+          <th>Servizio svolto</th>
+          <th>Sede di appartenenza</th>
+          <th>Utente</th>
           <th>Data</th>
-          <th>Link mezzo</th>
+          <th>Note</th>
+          <th>Link del mezzo in galleria</th>
+          <th>Azioni</th>
         </tr>
       </thead>
       <tbody id="photosTbody">
         <tr><td colspan="6">Caricamento...</td></tr>
       </tbody>
-      
+      <a id="backPhotoModeration" onclick="window.history.back()">Torna alla moderazione delle foto</a>
       <p id="messageBox"></p>
     </table>
   </div>

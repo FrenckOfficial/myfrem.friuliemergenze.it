@@ -35,15 +35,20 @@
     <h1>🖼️ Moderazione foto</h1>
     <p>Qui puoi approvare o rifiutare le foto caricate dagli utenti.</p>
 
+    <div id="viewAllPhotos">Visualizza tutte le foto</div>
+
     <table class="photos-table">
       <thead>
         <tr>
           <th>Anteprima</th>
-          <th>Nome file</th>
-          <th>Titolo</th>
-          <th>Descrizione</th>
+          <th>Modello</th>
+          <th>Allestitore</th>
+          <th>Numero di targa</th>
+          <th>Servizio svolto</th>
+          <th>Sede di appartenenza</th>
           <th>Utente</th>
           <th>Data</th>
+          <th>Note</th>
           <th>Azioni</th>
         </tr>
       </thead>
@@ -52,9 +57,29 @@
       </tbody>
     </table>
 
-    <p id="statusMsg"></p>
+    <div id="draftModal" class="draft-modal">
+      <div class="draft-modal-content">
+        <div class="draft-modal-header">
+          <h2>Crea Bozza Veicolo</h2>
+          <button id="draft-modal-close">&times;</button>
+        </div>
+        
+        <div class="draft-modal-body">
+          <p>Vuoi creare una bozza di veicolo per questa foto?</p>
+          <div id="photoPreviewInModal">
+            <img id="draftPhotoPreview" src="" alt="Foto" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+            <p id="draftFileName" style="margin-top: 10px; color: #666;"></p>
+          </div>
+        </div>
+        
+        <div class="draft-modal-actions">
+          <button id="draft-btn-create">✅ Crea Bozza</button>
+          <button id="draft-btn-skip">⏭️ Salta</button>
+        </div>
+      </div>
+    </div>
 
-    <h3>Visualizza tutte le foto <a href="/staff/dashboard/photos/all/">qui</a></h3>
+    <p id="statusMsg"></p>
   </main>
 </body>
 </html>

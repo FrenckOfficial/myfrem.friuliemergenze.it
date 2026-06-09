@@ -78,7 +78,7 @@ async function loadContactRequests() {
                     type: "ticket_close",
                     title: request.title,
                     closedBy: auth.currentUser.email,
-                    timestamp: new Date()
+                    timestamp: serverTimestamp()
                 });
             });
         });

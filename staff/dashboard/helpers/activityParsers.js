@@ -3,129 +3,132 @@ import { getNameById } from "https://myfrem.friuliemergenze.it/staff/dashboard/h
 export async function parseActivity(activity, date) {
 
     switch (activity.type) {
-
         case "photo_submission": {
-            const user = await getNameById("users", activity.userName);
-            const photo = await getNameById("photos", activity.photoId);
-            return `[${date}] Nuova foto inviata da ${user}: "${photo}"`;
+            const user = activity.userId ? await getNameById("users", activity.userId) : "Utente sconosciuto";
+            return `[${date}] Nuova foto inviata da ${user}.`;
         }
 
         case "photo_approval": {
-            const photo = await getNameById("photos", activity.photoId);
-            const staff = await getNameById("users", activity.approvalStaffer);
-            return `[${date}] Foto "${photo}" approvata da: "${staff}"`;
+            const staff = activity.approvalStaffer || "Staff sconosciuto";
+
+            if (activity.photoId) {
+                const photo = await getNameById("photos", activity.photoId);
+                return `[${date}] Foto "${photo}" approvata da ${staff}.`;
+            }
+
+            return `[${date}] Una foto è stata approvata da ${staff}.`;
         }
 
         case "photo_rejection": {
-            const photo = await getNameById("photos", activity.photoId);
-            const staff = await getNameById("users", activity.rejectionStaffer);
-            return `[${date}] Foto "${photo}" rifiutata da: "${staff}"`;
+            const staff = activity.rejectionStaffer || "Staff sconosciuto";
+
+            if (activity.photoId) {
+                const photo = await getNameById("photos", activity.photoId);
+                return `[${date}] Foto "${photo}" rifiutata da ${staff}.`;
+            }
+
+            return `[${date}] Una foto è stata rifiutata da ${staff}.`;
         }
 
         case "photo_edit": {
-            const photo = await getNameById("photos", activity.photoId);
-            const staff = await getNameById("users", activity.editStaffer);
-            return `[${date}] Foto "${photo}" modificata da: "${staff}"`;
+            const staff = activity.editStaffer || "Staff sconosciuto";
+
+            if (activity.photoId) {
+                const photo = await getNameById("photos", activity.photoId);
+                return `[${date}] Foto "${photo}" modificata da ${staff}.`;
+            }
+
+            return `[${date}] Una foto è stata modificata da ${staff}.`;
         }
 
+        case "photo_delete": {
+            const staff = activity.editStaffer || "Staff sconosciuto";
+
+            if (activity.photoId) {
+                const photo = await getNameById("photos", activity.photoId);
+                return `[${date}] Foto "${photo}" eliminata da ${staff}.`;
+            }
+
+            return `[${date}] Una foto è stata eliminata da ${staff}.`;
+        }
 
         case "event_creation": {
-            const staff = await getNameById("users", activity.userName);
-            const event = await getNameById("events", activity.eventId);
-            return `[${date}] Nuovo evento creato da ${staff}: "${event}"`;
+            return `[${date}] Nuovo evento creato da ${activity.userName}: "${activity.eventTitle}".`;
         }
 
         case "event_approval": {
-            const event = await getNameById("events", activity.eventId);
-            const staff = await getNameById("users", activity.approvalStaffer);
-            return `[${date}] Evento "${event}" approvato da: "${staff}"`;
+            return `[${date}] Evento "${activity.eventTitle}" approvato da ${activity.approvalStaffer}.`;
         }
 
         case "event_rejection": {
-            const event = await getNameById("events", activity.eventId);
-            const staff = await getNameById("users", activity.rejectionStaffer);
-            return `[${date}] Evento "${event}" rifiutato da: "${staff}"`;
+            return `[${date}] Evento "${activity.eventTitle}" rifiutato da ${activity.rejectionStaffer}.`;
         }
 
         case "event_organized": {
-            const event = await getNameById("events", activity.eventId);
-            const staff = await getNameById("users", activity.organizationStaffer);
-            return `[${date}] Evento "${event}" organizzato da: "${staff}"`;
+            return `[${date}] Evento "${activity.eventTitle}" organizzato da ${activity.organizationStaffer}.`;
         }
 
         case "eventRegistration": {
-            const user = await getNameById("eventRegistrations", activity.mail);
-            const event = await getNameById("eventRegistrations", activity.eventId);
-            return `[${date}] ${user} si è iscritto all'evento "${event}".`;
-        }
-
-
-        case "user_role_change": {
-            const user = await getNameById("users", activity.userName);
-            const staff = await getNameById("users", activity.changeStaffer);
-            return `[${date}] Ruolo utente "${user}" cambiato in "${activity.newRole}" da: "${staff}"`;
-        }
-
-        case "user_deletion": {
-            const user = await getNameById("users", activity.userName);
-            return `[${date}] L'account dell'utente "${user}" è stato contrassegnato come eliminato.`;
+            return `[${date}] ${activity.nameJoiner} si è iscritto all'evento "${activity.eventTitle}".`;
         }
 
         case "user_creation": {
-            const user = await getNameById("users", activity.userName);
-            return `[${date}] Nuovo utente registrato: "${user}"`;
+            return `[${date}] Nuovo utente registrato: "${activity.userName}".`;
         }
 
-
-        case "kick_add": {
-            const staff = await getNameById("users", activity.addStaffer);
-            const kicked = await getNameById("users", activity.kickedMember);
-            return `[${date}] Nuovo report di espulsione aggiunto da "${staff}": "${kicked}"`;
+        case "user_role_change": {
+            return `[${date}] Ruolo dell'utente "${activity.userName}" modificato in "${activity.newRole}" da ${activity.changeStaffer}.`;
         }
 
-
-        case "new_ticket": {
-            const from = await getNameById("users", activity.fromId);
-            return `[${date}] Da ${from}: Nuovo ticket creato con oggetto "${activity.title}".`;
+        case "user_deletion": {
+            return `[${date}] L'utente "${activity.userName}" è stato eliminato.`;
         }
-
-        case "ticket_close": {
-            const staff = await getNameById("users", activity.closedById);
-            return `[${date}] Ticket "${activity.title}" chiuso da ${staff}.`;
-        }
-
 
         case "user_creation_whatsapp": {
-            const user = await getNameById("users_whatsapp", activity.userName);
-            return `[${date}] Nuovo utente WhatsApp registrato: "${user}"`;
+            return `[${date}] Nuovo utente WhatsApp registrato: "${activity.userName}".`;
         }
 
         case "user_edit_whatsapp": {
             const user = await getNameById("users_whatsapp", activity.userId);
-            return `[${date}] L'anagrafica dell'utente WhatsApp "${user}" è stata modificata.`;
-        }
-
-        case "user_deletion_whatsapp": {
-            const user = await getNameById("users_whatsapp", activity.userName);
-            return `[${date}] L'utente WhatsApp "${user}" è stato segnalato come espulso."`;
-        }
-
-        case "user_permanent_deletion_whatsapp": {
-            const user = await getNameById("users_whatsapp", activity.userName);
-            return `[${date}] L'utente WhatsApp "${user}" è stato eliminato definitivamente dal database."`;
+            return `[${date}] L'anagrafica dell'utente WhatsApp "${user}" è stata modificata da ${activity.editedBy}.`;
         }
 
         case "user_role_change_whatsapp": {
-            const user = await getNameById("users_whatsapp", activity.userName);
-            return `[${date}] L'utente WhatsApp "${user}" ha cambiato ruolo in "${activity.newRole}".`;
+            return `[${date}] L'utente WhatsApp "${activity.userName}" ha cambiato ruolo in "${activity.newRole}".`;
+        }
+
+        case "user_deletion_whatsapp": {
+            return `[${date}] L'utente WhatsApp "${activity.userName}" è stato segnalato come espulso.`;
+        }
+
+        case "user_permanent_deletion_whatsapp": {
+            return `[${date}] L'utente WhatsApp "${activity.userName}" è stato eliminato definitivamente dal database.`;
+        }
+
+
+        case "new_ticket": {
+            return `[${date}] Da ${activity.from}: nuovo ticket creato con oggetto "${activity.title}".`;
+        }
+
+        case "ticket_close": {
+            return `[${date}] Ticket "${activity.title}" chiuso da ${activity.closedBy}.`;
+        }
+
+        case "kick_add": {
+            return `[${date}] Nuovo report di espulsione aggiunto da "${activity.addStaffer}" per "${activity.kickedMember}".`;
         }
 
         case "pdf_generated": {
-            const staff = await getNameById("users", activity.generatedBy);
+            const staff = activity.generatedBy ? await getNameById("users", activity.generatedBy) : "Utente sconosciuto";
             return `[${date}] PDF "${activity.documentTitle}" generato da ${staff}.`;
         }
 
+        case "vehicle_draft_created": {
+            return `[${date}] Nuovo bozza veicolo (${activity.photoId}) creato da ${activity.staffMember}. ID ${activity.draftId}.`;
+        }
+
         default:
-            return `[${date}] Attività sconosciuta.`;
+            console.warn("Tipo attività sconosciuto:", activity);
+            return `[${date}] Attività sconosciuta (${activity.type || "Tipo non definito"}).`;
     }
 }

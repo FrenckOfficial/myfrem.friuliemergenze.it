@@ -69,13 +69,29 @@ async function loadUsers() {
   });
 
   users.forEach(u => {
+    let role = "Ruolo non disponibile";
+    let status = "N/A";
     const tr = document.createElement("tr");
+
+    if (u.role === "admin") {
+      role = "Amministratore";
+    } else if (u.role === "user") {
+      role = "Utente";
+    } else role;
+
+    if (u.status === "active") {
+      status = "Attivo";
+    } else if (u.status === "suspended") {
+      status = "Sospeso";
+    } else if (u.status === "espulso") {
+      status = "Espulso";
+    } else status;
 
     tr.innerHTML = `
       <td>${u.name || ""}</td>
       <td>${u.phone || ""}</td>
-      <td>${u.role || "Ruolo non disponibile"}</td>
-      <td>${u.status || "N/A"}</td>
+      <td>${role}</td>
+      <td>${status}</td>
       <td>
         <button class="promote">Promuovi</button>
         <button class="delete">Espulsione</button>
@@ -110,7 +126,7 @@ async function updateRole(userId, currentRole) {
     type: "user_role_change_whatsapp",
     userName: userId,
     newRole,
-    timestamp: new Date()
+    timestamp: serverTimestamp()
   });
   loadUsers();
 }
@@ -120,7 +136,7 @@ async function deleteUser(userId) {
     await addDoc(collection(db, "activities"), {
       type: "user_deletion_whatsapp",
       userName: userId,
-      timestamp: new Date()
+      timestamp: serverTimestamp()
     });
     await updateDoc(doc(db, "users_whatsapp", userId), { status: "espulso" });
     loadUsers();
@@ -144,7 +160,7 @@ async function deleteFromDatabase(userId) {
     await addDoc(collection(db, "activities"), {
       type: "user_permanent_deletion_whatsapp",
       userName: userId,
-      timestamp: new Date()
+      timestamp: serverTimestamp()
     });
     await deleteDoc(doc(db, "users_whatsapp", userId));
     loadUsers();

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 import {
   getFirestore,
@@ -47,6 +47,7 @@ const prevTitle = document.getElementById("prevTitle");
 const prevDate = document.getElementById("prevDate");
 const prevContent = document.getElementById("prevContent");
 const prevAuthor = document.getElementById("prevAuthor");
+const prevType = document.getElementById("prevType");
 
 console.log({
   titleInput,
@@ -57,9 +58,9 @@ console.log({
   prevTitle,
   prevDate,
   prevContent,
-  prevAuthor
+  prevAuthor,
+  prevType
 });
-
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -80,25 +81,52 @@ function setStatus(msg) {
   statusMsg.textContent = msg;
 }
 
-titleInput.addEventListener("input", () => {
-  prevTitle.textContent =
-    titleInput.value || "Titolo documento";
-});
+function updatePreview() {
+  const title = titleInput.value || "Titolo documento";
+  const date = dateInput.value || "Data";
+  const type = typeInput.value || "Tipo";
+  const author = authorInput.value || "Autore";
+  const content = contentInput.value || "Contenuto...";
 
-dateInput.addEventListener("input", () => {
-  prevDate.textContent =
-    dateInput.value || "Data";
-});
+  prevTitle.textContent = title;
 
-contentInput.addEventListener("input", () => {
-  prevContent.textContent =
-    contentInput.value || "Contenuto...";
-});
+  prevDate.textContent = date;
+  prevAuthor.textContent = author;
+  if (prevType) {
+    prevType.textContent = type;
+  }
 
-authorInput.addEventListener("input", () => {
-  prevAuthor.textContent =
-    authorInput.value || "Autore";
-});
+  prevContent.innerHTML = content
+    .split('\n')
+    .map(line => {
+      if (line.trim()) {
+        if (line.includes("=>")) {
+          return `<span style="display: block; margin-left: 10px; margin-bottom: 4px;">▸ ${escapeHtml(line)}</span>`;
+        }
+        return escapeHtml(line);
+      } else {
+        return '<span style="display: block; height: 8px;"></span>';
+      }
+    })
+    .join('<br>');
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+titleInput.addEventListener("input", updatePreview);
+dateInput.addEventListener("input", updatePreview);
+typeInput.addEventListener("input", updatePreview);
+contentInput.addEventListener("input", updatePreview);
+authorInput.addEventListener("input", updatePreview);
 
 generateBtn.addEventListener("click", async () => {
 
@@ -223,28 +251,15 @@ generateBtn.addEventListener("click", async () => {
 });
 
 clearBtn.addEventListener("click", () => {
-
   form.reset();
 
-  prevTitle.textContent =
-    "Titolo documento";
-
-  prevDate.textContent =
-    "Data";
-
-  prevContent.textContent =
-    "Contenuto...";
-
-  prevAuthor.textContent =
-    "Autore";
+  prevTitle.textContent = "Titolo documento";
+  prevDate.textContent = "Data";
+  prevContent.innerHTML = "Contenuto...";
+  prevAuthor.textContent = "Autore";
+  if (prevType) {
+    prevType.textContent = "Tipo";
+  }
 
   setStatus("🧹 Form pulito");
-});
-document
-  .getElementById("logoutBtn")
-  .addEventListener("click", async () => {
-
-    await auth.signOut();
-
-    window.location.href = "/login/";
 });

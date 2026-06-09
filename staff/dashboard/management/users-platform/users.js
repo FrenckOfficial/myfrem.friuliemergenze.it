@@ -123,7 +123,7 @@ async function updateRole(userId, currentRole) {
     userName: auth.currentUser.name,
     newRole: newRole,
     changeStaffer: auth.currentUser.email,
-    timestamp: new Date()
+    timestamp: serverTimestamp()
   })
   await updateDoc(doc(db, "users", userId), { role: newRole });
   loadUsers();
@@ -140,7 +140,7 @@ async function deleteUser(userId) {
     await addDoc(collection(db, "activities"), {
       type: "user_deletion",
       userName: userId,
-      timestamp: new Date()
+      timestamp: serverTimestamp()
     });
     await updateDoc(doc(db, "users", userId), { status: "eliminato" });
     loadUsers();
