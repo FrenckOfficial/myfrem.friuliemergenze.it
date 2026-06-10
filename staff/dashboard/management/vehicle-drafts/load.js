@@ -43,6 +43,7 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
+    const userData = await userSnap.data();
 
     const allowedRoles = ["advstaffplus", "superadmin"];
 
@@ -51,9 +52,7 @@ onAuthStateChanged(auth, async (user) => {
       window.location.href = "/login/";
       return;
     }
-
-    await loadUsersMap();
-    loadPendingPhotos();
+    
   } catch (err) {
     console.error("Errore verifica staff:", err);
     setStatus("Errore verifica permessi", "error");
