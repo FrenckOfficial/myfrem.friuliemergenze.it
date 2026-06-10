@@ -27,6 +27,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install firebase-admin @octokit/rest
+      
+      - name: Test GitHub Token
+        run: |
+          echo "Token length: ${#GITHUB_TOKEN}"
+          curl -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/user \
+            -w "\nStatus: %{http_code}\n"
 
       - name: Push Vehicle Data to GitHub
         env:
