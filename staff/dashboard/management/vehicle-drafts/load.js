@@ -22,14 +22,14 @@ const modalClose = document.querySelector('.modal-close');
 const btnCancel = document.querySelector('.btn-cancel');
 const statusMsg = document.getElementById('statusMsg');
 
-modalClose.addEventListener('click', () => {
+modalClose?.addEventListener('click', () => {
     closeDraftModal();
 })
-btnCancel.addEventListener('click', () => {
+btnCancel?.addEventListener('click', () => {
     closeDraftModal();
 })
 
-logoutBtn.addEventListener('click', async () => {
+logoutBtn?.addEventListener('click', async () => {
     await signOut(auth);
     window.location.href = '/login';
 });
@@ -43,12 +43,19 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
-    const userData = await userSnap.data();
+    const userData = userSnap.data();
+
+    if (!userData) {
+      await signOut(auth);
+      window.location.href = "/login";
+      return;
+    }
 
     const allowedRoles = ["advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
       alert("Accesso negato: solo staff autorizzato.");
+      await signOut(auth);
       window.location.href = "/login/";
       return;
     }
@@ -181,18 +188,12 @@ class VehicleDraftsManager {
         let statusText = '⏳ In attesa';
 
         if (draft.status === "pending") {
-            statusClass;
+            statusClass = 'status-pending';
         } else if (draft.status === "in_progress") {
             statusClass = 'status-in-progress';
-        } else if (draft.status === "published") {
-            statusClass = 'status-published';
-        }
-
-        if (draft.status === "pending") {
-            statusText;
-        } else if (draft.status === "in_progress") {
             statusText = '📝 In lavorazione';
         } else if (draft.status === "published") {
+            statusClass = 'status-published';
             statusText = '✅ Pubblicata';
         }
 
@@ -290,12 +291,12 @@ class VehicleDraftsManager {
         const photoFileName = document.getElementById('photoFileName');
 
         if (previewImg) {
-            previewImg.src = draft.photoUrl;
-            previewImg.style.display = 'block';
+            previewImg.src = draft.photoUrl || '';
+            previewImg.style.display = draft.photoUrl ? 'block' : 'none';
         }
 
         if (photoFileName) {
-            photoFileName.textContent = this.escapeHtml(draft.fileName);
+            photoFileName.textContent = this.escapeHtml(draft.fileName || '');
         }
     }
 
@@ -317,7 +318,7 @@ class VehicleDraftsManager {
         event.preventDefault();
 
         if (this.isSaving) {
-            console.warn('Salvataggio già in corso.');
+            console.warn('⚠️ Salvataggio già in corso.');
             return;
         }
 
@@ -339,12 +340,14 @@ class VehicleDraftsManager {
             console.error('❌ Cercavo ID:', this.currentDraftId);
             console.error('❌ IDs disponibili:', this.drafts.map(d => d.id));
             this.showError('Bozza non trovata');
+            this.isSaving = false;
             return;
         }
 
         if (!this.validateForm()) {
             console.warn('⚠️ Validazione form fallita');
             this.showError('Completa tutti i campi obbligatori');
+            this.isSaving = false;
             return;
         }
 
@@ -363,29 +366,33 @@ class VehicleDraftsManager {
             console.log('💾 → Esecuzione updateDoc...');
             
             await updateDoc(draftRef, {
-                status: 'published',
+                status: 'in_progress',
                 data: vehicleData,
                 slug: vehicleData.slug,
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser || 'Staff User'
             });
 
+            console.log('✅ updateDoc completato!');
+
             await this.triggerGithubWorkflow(this.currentDraftId);
 
-            console.log('✅ updateDoc completato!');
+            await updateDoc(draftRef, {
+                status: 'published'
+            });
 
             draft.data = vehicleData;
             draft.status = 'published';
-            draft.slug = 
+            draft.slug = vehicleData.slug;
             draft.updatedAt = new Date().toISOString();
 
             console.log('✅ Stato locale aggiornato');
             console.log('═════════════════════════════════════════════');
-            this.showSuccess('✅ Bozza salvata!\nIl sistema sta pubblicando su GitHub...');
+            this.showSuccess('✅ Bozza salvata e pubblicata su GitHub!');
             console.log('═════════════════════════════════════════════\n');
 
             this.closeDraftModal();
-            this.loadDrafts();
+            setTimeout(() => this.loadDrafts(), 1000);
 
         } catch (error) {
             console.error('❌ ERRORE NEL SALVATAGGIO:', error);
@@ -400,33 +407,45 @@ class VehicleDraftsManager {
     async triggerGithubWorkflow(draftId) {
         console.log("🚀 Trigger workflow GitHub");
         console.log("🚀 Draft ID:", draftId);
+        console.log("🚀 Body che verrà inviato:", JSON.stringify({ draftId }));
 
-        const response = await fetch(
-            "/api/triggerWorkflow",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    draftId
-                })
-            }
-        );
-
-        console.log("🚀 Status:", response.status);
-
-        const text = await response.text();
-
-        console.log("🚀 Response body:", text);
-
-        if (!response.ok) {
-            throw new Error(
-                `Workflow error (${response.status}): ${text}`
+        try {
+            const response = await fetch(
+                "/api/triggerWorkflow",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        draftId: String(draftId)
+                    })
+                }
             );
-        }
 
-        console.log("✅ Workflow avviato correttamente");
+            console.log("🚀 Status risposta:", response.status);
+            console.log("🚀 OK:", response.ok);
+
+            const text = await response.text();
+            console.log("🚀 Response body:", text);
+
+            if (!response.ok) {
+                console.error("❌ Errore GitHub workflow:", response.status);
+                console.error("❌ Response:", text);
+                
+                try {
+                    const errorJson = JSON.parse(text);
+                    throw new Error(`GitHub workflow error (${response.status}): ${errorJson.error || text}`);
+                } catch {
+                    throw new Error(`Workflow error (${response.status}): ${text}`);
+                }
+            }
+
+            console.log("✅ Workflow avviato correttamente");
+        } catch (error) {
+            console.error("❌ triggerGithubWorkflow - Errore:", error);
+            throw error;
+        }
     }
 
     validateForm() {
@@ -503,11 +522,12 @@ class VehicleDraftsManager {
                 minute: '2-digit'
             });
         } catch {
-            return dateString;
+            return dateString || 'Data non disponibile';
         }
     }
 
     escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -515,17 +535,19 @@ class VehicleDraftsManager {
 
     showError(message) {
         console.error('❌', message);
-        alert('❌ ' + message);
         if (window.showNotification) {
             window.showNotification(message, 'error');
+        } else {
+            alert('❌ ' + message);
         }
     }
 
     showSuccess(message) {
         console.log('✅', message);
-        alert(message);
         if (window.showNotification) {
             window.showNotification(message, 'success');
+        } else {
+            alert(message);
         }
     }
 
