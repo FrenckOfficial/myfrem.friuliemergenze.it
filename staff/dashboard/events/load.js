@@ -16,6 +16,14 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
     return;
+
+    const allowedRoles = ["advstaffplus", "superadmin"];
+
+    if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
+    }
   }
 
   try {

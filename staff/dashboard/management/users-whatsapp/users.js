@@ -28,13 +28,13 @@ onAuthStateChanged(auth, async user => {
   const userDocSnap = await getDoc(userDocRef);
   const userData = userDocSnap.data();
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  const allowedRoles = ["advstaffplus", "superadmin"];
 
-  if (!userData || !allowedRoles.includes(userData.role)) {
-    alert("Accesso negato: solo staff");
-    window.location.href = "/login/";
-    return;
-  }
+  if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
+    }
 
   loadUsers();
 });

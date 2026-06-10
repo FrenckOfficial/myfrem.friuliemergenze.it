@@ -25,12 +25,12 @@ onAuthStateChanged(auth, async (user) => {
         query(collection(db, "users"), where("__name__", "==", user.uid))
     );
 
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+    const allowedRoles = ["modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-    if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
-        alert("❌ Accesso negato: non sei staff!");
-        window.location.href = "/dashboard";
-        return;
+    if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
     }
 
     loadContactRequests();

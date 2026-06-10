@@ -15,6 +15,15 @@ onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "/login";
   }
+
+  const allowedRoles = ["advstaff", "advstaffplus", "superadmin"];
+
+  if (!user || !allowedRoles.includes(user.role)) {
+    alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
+    window.location.href = "/staff/dashboard/";
+    auth.keptSignIn = true;
+    return;
+  }
 });
 
 logoutBtn.addEventListener("click", async () => {

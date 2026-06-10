@@ -430,6 +430,17 @@ input:focus {
 #error   { color: var(--signal-red); }
 #success { color: var(--accent); }
 
+#nameGroup {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+#nameSurname {
+  flex: 1;
+}
+
 @media (max-width: 860px) {
   .shell {
     grid-template-columns: 1fr;

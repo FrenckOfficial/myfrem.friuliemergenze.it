@@ -63,11 +63,13 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
 
     const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-    if (!userSnap.exists() || !allowedRoles.includes(userSnap.data().role)) {
-      window.location.href = "/dashboard";
+    if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
       return;
     }
 

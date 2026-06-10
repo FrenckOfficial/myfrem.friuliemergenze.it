@@ -1,6 +1,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  doc, 
+  updateDoc, 
+  deleteDoc, 
+  getDoc, 
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -12,36 +22,37 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
-  await auth.signOut();
+  await signOut(auth);
   console.log("✅ Logout completato, redirect...");
   window.location.href = "/login/";
 });
 
 onAuthStateChanged(auth, async user => {
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
-  const userData = userDocSnap.data();
-  const allowedPageRoles = ["advstaffplus", "superadmin"];
-  if (!userData || !allowedPageRoles.includes(userData.role)) {
-    alert("Accesso negato: non disponi delle autorizzazioni necessarie.");
-    window.location.href = "/staff/dashboard/management";
-    auth.keptSignIn = true;
-    return;
-  }
-
-
   if (!user) {
     window.location.href = "/login/";
     return;
   }
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  const userID = user.uid;
 
-  if (!userData || !allowedRoles.includes(userData.role)) {
-    alert("Accesso negato: solo staff");
+  const userDocRef = doc(db, "users", user.uid);
+  const userDocSnap = await getDoc(userDocRef);
+  
+  if (!userDocSnap.exists()) {
+    alert("Profilo utente non trovato.");
+    await signOut(auth);
     window.location.href = "/login/";
     return;
   }
+
+  const userData = userDocSnap.data();
+  const allowedRoles = ["advstaffplus", "superadmin"];
+
+  if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
+    }
 
   loadUsers();
 });
@@ -86,7 +97,6 @@ async function loadUsers() {
 
   users.forEach(u => {
     const tr = document.createElement("tr");
-
     const emailVerified = u.emailVerified ? "Sì" : "No"
 
     tr.innerHTML = `
@@ -101,7 +111,7 @@ async function loadUsers() {
         <button class="promote">Promuovi</button>
         <button class="suspend">Sospendi/Riattiva</button>
         <button class="delete">Elimina</button>
-        <button class="view"><a href="/profile/?userid=${u.id}" target="_blank" id="viewProfileBtn">Visualizza profilo</a></button>
+        <button class="view" onclick="window.open('/profile/?userid=${u.id}', '_blank')">Visualizza profilo</button>
       </td>
     `;
 
@@ -114,43 +124,76 @@ async function loadUsers() {
 }
 
 async function updateRole(userId, currentRole) {
-  const roleHierarchy = ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
-  const currentIndex = roleHierarchy.indexOf(currentRole);
-  const newIndex = (currentIndex + 1) % roleHierarchy.length;
-  const newRole = roleHierarchy[newIndex];
-  await addDoc(collection(db, "activities"), {
-    type: "user_role_change",
-    userName: auth.currentUser.name,
-    newRole: newRole,
-    changeStaffer: auth.currentUser.email,
-    timestamp: serverTimestamp()
-  })
-  await updateDoc(doc(db, "users", userId), { role: newRole });
-  loadUsers();
+  try {
+    const roleHierarchy = ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+    const currentIndex = roleHierarchy.indexOf(currentRole);
+    const newIndex = (currentIndex + 1) % roleHierarchy.length;
+    const newRole = roleHierarchy[newIndex];
+
+    const currentUserEmail = auth.currentUser.email;
+    const currentUserName = auth.currentUser.displayName || "Staff";
+
+    await addDoc(collection(db, "activities"), {
+      type: "user_role_change",
+      userName: currentUserName,
+      userId: userId,
+      newRole: newRole,
+      changeStaffer: currentUserEmail,
+      timestamp: serverTimestamp()
+    });
+
+    await updateDoc(doc(db, "users", userId), { role: newRole });
+    loadUsers();
+  } catch (error) {
+    console.error("Errore nel cambio ruolo:", error);
+    alert("Errore nel cambio ruolo.");
+  }
 }
 
 async function updateStatus(userId, currentStatus) {
-  const newStatus = currentStatus === "attivo" ? "sospeso" : "attivo";
-  await updateDoc(doc(db, "users", userId), { status: newStatus });
-  loadUsers();
+  try {
+    const newStatus = currentStatus === "attivo" ? "sospeso" : "attivo";
+    await updateDoc(doc(db, "users", userId), { status: newStatus });
+    loadUsers();
+  } catch (error) {
+    console.error("Errore nell'aggiornamento status:", error);
+    alert("Errore nell'aggiornamento dello status.");
+  }
 }
 
 async function deleteUser(userId) {
-  if (confirm("Sei sicuro di voler eliminare questo utente?")) {
-    await addDoc(collection(db, "activities"), {
-      type: "user_deletion",
-      userName: userId,
-      timestamp: serverTimestamp()
-    });
-    await updateDoc(doc(db, "users", userId), { status: "eliminato" });
-    loadUsers();
-    setTimeout(async () => {
-      const userDocRef = doc(db, "users", userId);
-      const userDocSnap = await getDoc(userDocRef);
-      const userData = userDocSnap.data();
-      if (userData && userData.status === "eliminato") {
-        await deleteDoc(collection(db, "users", userId));
-      } 
-    }, 60 * 24 * 60 * 60 * 1000);
+  if (confirm("Sei sicuro di voler eliminare questo utente? L'account sarà permanentemente eliminato dopo 30 giorni.")) {
+    try {
+      await addDoc(collection(db, "activities"), {
+        type: "user_deletion",
+        userId: userId,
+        deletedBy: auth.currentUser.email,
+        timestamp: serverTimestamp()
+      });
+
+      await updateDoc(doc(db, "users", userId), { status: "eliminato" });
+      loadUsers();
+
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      
+      setTimeout(async () => {
+        try {
+          const userDocRef = doc(db, "users", userId);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          if (userDocSnap.exists() && userDocSnap.data().status === "eliminato") {
+            // ✅ CORRETTO: usa doc() non collection()
+            await deleteDoc(userDocRef);
+            console.log(`✅ Utente ${userId} eliminato permanentemente.`);
+          }
+        } catch (error) {
+          console.error("Errore nella cancellazione permanente:", error);
+        }
+      }, thirtyDaysMs);
+
+    } catch (error) {
+      console.error("Errore nell'eliminazione:", error);
+      alert("Errore nell'eliminazione dell'utente.");
+    }
   }
 }

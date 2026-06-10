@@ -17,6 +17,14 @@ const eventIdPage = document.getElementById("eventId");
 
 onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "/login";
+
+    const allowedRoles = ["advstaffplus", "superadmin"];
+
+    if (!allowedRoles.includes(userData.role)) {
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
+    }
 });
 
 async function loadEventPage() {

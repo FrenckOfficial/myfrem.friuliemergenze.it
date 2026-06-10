@@ -45,14 +45,14 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     const userData = userSnap.data();
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+    const allowedRoles = ["advstaffplus", "superadmin"];
 
     console.log("User role:", userData.role);
 
     if (!allowedRoles.includes(userData.role)) {
-        console.warn("Unauthorized role:", userData.role);
-        window.location.href = "/login";
-        return;
+      alert("Accesso negato: solo staff autorizzato.");
+      window.location.href = "/login/";
+      return;
     }
 
     loadSurveys();
