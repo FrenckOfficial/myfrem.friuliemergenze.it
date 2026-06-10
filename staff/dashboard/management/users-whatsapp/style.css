@@ -401,7 +401,7 @@ button:nth-child(3):hover {
   border-collapse: collapse;
   background: var(--bg-panel);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid var(--border);
 }
 
