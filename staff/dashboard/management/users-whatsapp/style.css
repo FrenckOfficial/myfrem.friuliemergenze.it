@@ -771,7 +771,9 @@ button:nth-child(3):hover {
 
   .modal-content {
     padding: 20px;
-    max-width: 95%;
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .form-row {

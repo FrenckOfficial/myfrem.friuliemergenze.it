@@ -28,7 +28,7 @@ export default async (request, response) => {
     }
 
     let draftId;
-    const token = process.env.GITHUB_PAT;
+    const token = process.env.GT_TOKEN;
 
     console.log("TOKEN ESISTE:", !!token);
     console.log("TOKEN LENGTH:", token?.length);
