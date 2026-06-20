@@ -1,0 +1,26 @@
+User-agent: *
+
+Allow: /
+Allow: /events/
+Allow: /dashboard/
+Allow: /auth/
+Allow: /profile/
+Allow: /staff/
+
+Disallow: /login/
+Disallow: /riunione-staff/
+Disallow: /verify-email/
+Disallow: /kick-reports/
+Disallow: /api/
+Disallow: /.github/
+Disallow: /.netlify/
+Disallow: /netlify/
+Disallow: /node_modules/
+Disallow: /README.md
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /configFirebase.js
+Disallow: /configSupabase.js
+Disallow: /humans.txt
+
+Sitemap: https://myfrem.friuliemergenze.it/sitemap.xml

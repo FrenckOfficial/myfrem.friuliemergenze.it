@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
 </head>
 <body>
     <aside class="sidebar">
@@ -143,5 +144,24 @@
             </a>
         </div>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const logoutBtn = document.getElementById("logoutBtn");
+        logoutBtn.addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "/login/";
+            } catch (error) {
+                console.error("Errore durante il logout:", error);
+            }
+        });
+    </script>
 </body>
 </html>

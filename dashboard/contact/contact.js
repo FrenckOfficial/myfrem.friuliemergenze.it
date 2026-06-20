@@ -4,7 +4,9 @@ import {
   getFirestore,
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
 
@@ -16,13 +18,44 @@ const form = document.getElementById("contactForm");
 const result = document.getElementById("result");
 
 let currentUser = null;
+let isReadOnlyMode = false;
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async (user) => {
   currentUser = user || null;
+  
+  if (user) {
+    // 🔒 Controlla il ruolo
+    const userDocSnap = await getDoc(doc(db, "users", user.uid));
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      if (userData.role === "testacc") {
+        isReadOnlyMode = true;
+        document.body.classList.add("read-only-mode");
+        
+        // Disabilita il form
+        form.style.opacity = "0.5";
+        form.style.pointerEvents = "none";
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.title = "Non disponibile in modalità sola lettura";
+        }
+        
+        result.textContent = "📖 Modalità sola lettura: non puoi inviare messaggi";
+        result.className = "warning";
+      }
+    }
+  }
 });
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  if (isReadOnlyMode) {
+    result.innerText = "❌ Non puoi inviare messaggi in modalità sola lettura";
+    return;
+  }
 
   const subject = document.getElementById("subject").value.trim();
   const message = document.getElementById("message").value.trim();

@@ -24,6 +24,7 @@ const db = getFirestore(app);
 
 const recentActivityListEl = document.getElementById("activitiesList");
 const logoutBtn = document.getElementById("logoutBtn");
+const statusMsg = document.getElementById("statusMsg");
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
@@ -46,7 +47,7 @@ onAuthStateChanged(auth, async (user) => {
   ];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
-    alert("❌ Accesso negato: non sei staff!");
+    setStatus("Accesso negato: non sei staff!", "error");
     return (window.location.href = "/dashboard");
   }
 
@@ -81,6 +82,7 @@ async function loadStats() {
           await deleteDoc(doc(db, "activities", docSnap.id));
 
           li.remove();
+          setStatus("Attività eliminata!", "success");
           console.log("🗑️ Eliminata activity:", docSnap.id);
 
         } catch (err) {
@@ -100,4 +102,9 @@ async function loadStats() {
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
   }
+}
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
 }

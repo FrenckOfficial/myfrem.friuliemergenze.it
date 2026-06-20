@@ -37,6 +37,7 @@
         <h2>📷 Foto Profilo</h2>
 
         <div class="profile-upload">
+          <p id="pfpStatus" class="statusBox" style="display:none;"></p>
           <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
 
           <form id="profilePicForm" enctype="multipart/form-data">
@@ -80,6 +81,7 @@
 
     <section class="settings-section">
       <h2>🔐 Cambia Password</h2>
+      <p id="passwordStatusMsg" class="statusBox" style="display:none;"></p>
       <form id="changePasswordForm" autocomplete="off">
         <label>Password attuale</label>
         <input type="password" id="currentPassword" required autocomplete="on">
@@ -92,11 +94,11 @@
 
         <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
       </form>
-      <p id="passwordStatusMsg"></p>
     </section>
 
     <section class="settings-section">
       <h2>Biografia</h2>
+      <p id="bioStatus" class="statusBox" style="display:none;"></p>
       <p>La tua biografia attuale è: <b id="bioText"></b></p>
       <textarea id="bioInput" class="textarea"></textarea>
       <button id="saveBioBtn" class="btn" type="submit">💾 Salva bio</button>

@@ -19,6 +19,7 @@ const db = getFirestore(app);
 
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
+const statusMsg = document.getElementById("statusMsg");
 
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
@@ -39,7 +40,7 @@ onAuthStateChanged(auth, async user => {
   const userDocSnap = await getDoc(userDocRef);
   
   if (!userDocSnap.exists()) {
-    alert("Profilo utente non trovato.");
+    setStatus("Profilo utente non trovato.", "error");
     await signOut(auth);
     window.location.href = "/login/";
     return;
@@ -49,7 +50,7 @@ onAuthStateChanged(auth, async user => {
   const allowedRoles = ["advstaffplus", "superadmin"];
 
   if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
@@ -146,7 +147,7 @@ async function updateRole(userId, currentRole) {
     loadUsers();
   } catch (error) {
     console.error("Errore nel cambio ruolo:", error);
-    alert("Errore nel cambio ruolo.");
+    setStatus("Errore nel cambio ruolo.", "error");
   }
 }
 
@@ -157,7 +158,7 @@ async function updateStatus(userId, currentStatus) {
     loadUsers();
   } catch (error) {
     console.error("Errore nell'aggiornamento status:", error);
-    alert("Errore nell'aggiornamento dello status.");
+    setStatus("Errore nell'aggiornamento dello status.", "success");
   }
 }
 
@@ -182,7 +183,6 @@ async function deleteUser(userId) {
           const userDocSnap = await getDoc(userDocRef);
           
           if (userDocSnap.exists() && userDocSnap.data().status === "eliminato") {
-            // ✅ CORRETTO: usa doc() non collection()
             await deleteDoc(userDocRef);
             console.log(`✅ Utente ${userId} eliminato permanentemente.`);
           }
@@ -193,7 +193,13 @@ async function deleteUser(userId) {
 
     } catch (error) {
       console.error("Errore nell'eliminazione:", error);
-      alert("Errore nell'eliminazione dell'utente.");
+      setStatus("Errore nell'eliminazione dell'utente.", "error");
     }
   }
+}
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
 }

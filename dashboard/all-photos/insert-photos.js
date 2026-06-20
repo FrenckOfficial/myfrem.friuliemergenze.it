@@ -10,6 +10,8 @@ import {
   where,
   orderBy,
   getDocs,
+  getDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
 
@@ -24,9 +26,29 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login/";
   } else {
+    await checkUserRole(user.uid);
     loadAllPhotos(user.uid);
   }
 });
+
+async function checkUserRole(uid) {
+  try {
+    const userDocSnap = await getDoc(doc(db, "users", uid));
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      if (userData.role === "testacc") {
+        document.body.classList.add("read-only-mode");
+        // Opzionale: mostra un banner
+        const banner = document.createElement("div");
+        banner.style.cssText = "background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;";
+        banner.textContent = "📖 Modalità sola lettura";
+        photosContainer.parentElement.insertBefore(banner, photosContainer);
+      }
+    }
+  } catch (err) {
+    console.error("Errore verifica ruolo:", err);
+  }
+}
 
 async function loadAllPhotos(userId) {
   try {

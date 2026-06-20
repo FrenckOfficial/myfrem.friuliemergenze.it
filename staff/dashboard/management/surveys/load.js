@@ -50,7 +50,7 @@ onAuthStateChanged(auth, async (user) => {
     console.log("User role:", userData.role);
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+     setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }

@@ -47,6 +47,7 @@ let isRouting = false;
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const googleBtn = document.getElementById("googleLoginBtn");
+const statusMsg = document.getElementById("statusMsg");
 
 const resetForm = document.getElementById("resetForm");
 const resetEmail = document.getElementById("resetEmail");
@@ -163,7 +164,20 @@ if (loginForm) {
       redirectByRole(userData.role);
 
     } catch (err) {
-      alert(err.message);
+      switch (err.code) {
+        case "auth/user-not-found":
+          setStatus("Username non trovato.", "error");
+          break;
+        case "auth/wrong-password":
+          setStatus("Password errata.", "error");
+          break;
+        case "auth/invalid-credential":
+          setStatus("Username o password errati.", "error");
+          break;
+        default:
+          setStatus(err.message, "error");
+          break;
+      }
       console.error(err);
     } finally {
       isLoggingIn = false;
@@ -198,7 +212,7 @@ if (googleBtn) {
       redirectByRole(userData.role);
 
     } catch (err) {
-      alert(err.message);
+      setStatus(err.message, "error");
       console.error(err);
     }
   });
@@ -365,20 +379,26 @@ if (registerForm) {
         );
       }
 
-      alert("Email di verifica inviata.");
+      setStatus("Email di verifica inviata.", "success");
 
       await signOut(auth);
 
       window.location.href = "/login";
 
     } catch (err) {
-      alert(err.message);
+      setStatus(err.message, "error");
       console.error(err);
 
     } finally {
       isRegistering = false;
     }
   });
+};
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
 }
 
 onAuthStateChanged(auth, async (user) => {

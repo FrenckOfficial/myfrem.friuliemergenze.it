@@ -34,20 +34,25 @@
         
         <div class="drafts-container">
             <div class="drafts-header">
+                <h2>Bozze totali:</h2>
+                <span class="draft-count" id="totalDraftsCount"> 0</span>
                 <h2>Bozze in attesa di completamento:</h2>
                 <span class="draft-count" id="draftCount"> 0</span>
+                <h2>Bozze pubblicate:</h2>
+                <span class="draft-count" id="publishedDraftsCount"> 0</span>
             </div>
+            <button id="newDraftBtn" class="btn-new-draft">➕ Nuova Bozza</button>
 
             <div id="draftsTableContainer">
                 <table class="drafts-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">📸</th>
                             <th style="width: 25%;">Nome File</th>
                             <th style="width: 15%;">Stato</th>
+                            <th style="width: 25%;">Veicolo</th>
                             <th style="width: 20%;">Data Creazione</th>
-                            <th style="width: 15%;">Creato da</th>
-                            <th style="width: 20%;">Azioni</th>
+                            <th style="width: 20%;">Creato da</th>
+                            <th style="width: 15%;">Azioni</th>
                         </tr>
                     </thead>
                     <tbody id="draftsList">
@@ -61,6 +66,110 @@
                 <p>Nessuna bozza veicolo in attesa</p>
                 <p style="color: var(--faint); font-size: 0.75rem;">Crea una nuova bozza dalla moderazione foto</p>
             </div>
+        </div>
+    </div>
+
+    <div id="createDraftModal" class="modal">
+        <div class="modal-content">
+            <p id="statusMsgCreate"></p>
+            <div class="modal-header">
+                <h2>Crea Nuova Bozza Veicolo</h2>
+                <button class="modal-close" onclick="window.vehicleDraftsManager.closeCreateModal()">&times;</button>
+            </div>
+ 
+            <form id="createVehicleForm">
+                <div class="form-group">
+                    <label for="vehiclePhotoInput">📸 Foto Veicolo *</label>
+                    <div class="photo-upload-area">
+                        <input 
+                            type="file" 
+                            id="vehiclePhotoInput" 
+                            name="photo" 
+                            accept="image/*" 
+                            required
+                            style="display: none;">
+                        
+                        <div id="photoDropZone" class="photo-drop-zone">
+                            <p style="font-size: 2rem; margin: 10px 0;">📷</p>
+                            <p><strong>Trascina la foto qui</strong></p>
+                            <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
+                            <button type="button" class="btn-browse" id="photoBrowseBtn">Sfoglia file</button>
+                            <p style="color: var(--faint); font-size: 0.85rem; margin-top: 10px;">Formati: JPG, PNG, WebP | Max 5MB</p>
+                        </div>
+ 
+                        <div id="photoPreviewCreate" class="photo-preview" style="display: none; margin-top: 15px;">
+                            <img id="previewImgCreate" src="" alt="Anteprima foto" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
+                            <p id="photoFileNameCreate" style="text-align: center; margin-top: 10px; color: var(--faint); font-size: 0.9rem;"></p>
+                            <button type="button" class="btn-remove-photo" id="removePhotoBtn">❌ Rimuovi foto</button>
+                        </div>
+                    </div>
+                </div>
+ 
+                <hr style="margin: 20px 0; opacity: 0.2;">
+ 
+                <div class="form-group">
+                    <label for="createVehicleTitle">Titolo/Denominazione Veicolo *</label>
+                    <input type="text" id="createVehicleTitle" name="title" required placeholder="Modello - Sede di appartenenza (ES: Fiat Ducato X290 - Sistema 118 Trieste)">
+                </div>
+ 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="createVehicleBrand">Marca *</label>
+                        <input type="text" id="createVehicleBrand" name="brand" required placeholder="Es: Mercedes">
+                    </div>
+                    <div class="form-group">
+                        <label for="createVehicleModel">Modello *</label>
+                        <input type="text" id="createVehicleModel" name="model" required placeholder="Es: Sprinter">
+                    </div>
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehiclePlate">Targa *</label>
+                    <input type="text" id="createVehiclePlate" name="plate" required placeholder="Es: AA123BC" style="text-transform: uppercase;">
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehicleBuilder">Allestitore</label>
+                    <input type="text" id="createVehicleBuilder" name="builder" placeholder="Es: Medef, Orion">
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehicleSlug">Slug (/gallery/scheda/*) *</label>
+                    <input type="text" id="createVehicleSlug" name="slug" required placeholder="Es: volvofl-vvfgorizia">
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehicleService">Servizio Svolto *</label>
+                    <select id="createVehicleService" name="service" required>
+                        <option value="">-- Seleziona un servizio --</option>
+                        <option value="ambulanza">Ambulanza</option>
+                        <option value="pompieri">Vigili del Fuoco</option>
+                        <option value="protezione_civile">Protezione Civile</option>
+                        <option value="polizia_locale">Polizia Locale</option>
+                        <option value="polizia_di_stato">Polizia</option>
+                        <option value="carabinieri">Carabinieri</option>
+                        <option value="guardia_di_finanza">Guardia di Finanza</option>
+                        <option value="soccorso_alpino">Soccorso Alpino</option>
+                        <option value="guardia_costiera">Guardia Costiera</option>
+                        <option value="altro">Altro</option>
+                    </select>
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehicleHQ">Sede di Appartenenza *</label>
+                    <input type="text" id="createVehicleHQ" name="headquarters" required placeholder="Es: Stazione di Udine">
+                </div>
+ 
+                <div class="form-group">
+                    <label for="createVehicleNotes">Note Aggiuntive</label>
+                    <textarea id="createVehicleNotes" name="notes" placeholder="Informazioni aggiuntive sul veicolo..."></textarea>
+                </div>
+ 
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">💾 Crea Bozza</button>
+                    <button type="button" class="btn-cancel" onclick="window.vehicleDraftsManager.closeCreateModal()">Annulla</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -141,6 +250,72 @@
                     <button type="button" class="btn-cancel">Annulla</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="viewDraftModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👁️ Visualizza Bozza Veicolo</h2>
+                <button class="modal-close" onclick="window.vehicleDraftsManager.closeViewerModal()">&times;</button>
+            </div>
+
+            <div class="photo-preview" id="viewerPhotoPreview">
+                <img id="viewerPhotoImg" src="" alt="Foto veicolo" style="display: none; max-width: 300px; margin: 20px auto;">
+                <p id="viewerPhotoFileName" style="text-align: center; color: var(--faint);"></p>
+            </div>
+
+            <div class="viewer-content">
+                <div class="form-group">
+                    <label>Titolo/Denominazione Veicolo</label>
+                    <p id="viewerTitle" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <p id="viewerBrand" class="viewer-field">-</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Modello</label>
+                        <p id="viewerModel" class="viewer-field">-</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Targa</label>
+                    <p id="viewerPlate" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Allestitore</label>
+                    <p id="viewerBuilder" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Slug (/gallery/scheda/*)</label>
+                    <p id="viewerSlug" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Servizio Svolto</label>
+                    <p id="viewerService" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Sede di Appartenenza</label>
+                    <p id="viewerHQ" class="viewer-field">-</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Note Aggiuntive</label>
+                    <p id="viewerNotes" class="viewer-field">-</p>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary" onclick="window.vehicleDraftsManager.closeViewerModal()">Chiudi</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

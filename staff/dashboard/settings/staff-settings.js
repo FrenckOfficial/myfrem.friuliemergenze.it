@@ -131,17 +131,17 @@ saveBioBtn.addEventListener("click", async () => {
   });
 
   bioText.textContent = newBio;
-  alert("Biografia aggiornata!");
+  setStatus("bioStatus", "Biografia aggiornata!", "success");
 });
 
 profilePicForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const file = profilePicInput.files[0];
-  if (!file) return alert("Seleziona un'immagine!");
+  if (!file) return setStatus("Seleziona un'immagine!");
 
   if (!file.type.startsWith("image/")) {
-    return alert("Solo immagini!");
+    return setStatus("Solo immagini!");
   }
 
   const fileExt = file.name.split(".").pop();
@@ -171,10 +171,10 @@ profilePicForm.addEventListener("submit", async (e) => {
 
     profilePreview.src = imageUrl;
 
-    alert("Foto profilo aggiornata!");
+    setStatus("pfpStatus", "Foto profilo aggiornata!", "success");
   } catch (err) {
     console.error(err);
-    alert("Errore upload: " + err.message);
+    setStatus("pfpStatus", `${"Errore upload: " + err.message}`, "error");
   }
 });
 
@@ -184,4 +184,11 @@ deleteProfPicBtn.addEventListener("click", async (e) => {
   await updateDoc(doc(db, "users", currentUserId), {
     photoURL: "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
   });
-})
+});
+
+function setStatus(statusMsg, message, type = "info") {
+  if (!statusMsg) return;
+  document.getElementById(`${statusMsg}`).textContent = message;
+  document.getElementById(`${statusMsg}`).className = `${"statusBox" + " " + type}`;
+  document.getElementById(`${statusMsg}`).style.display = "block";
+}

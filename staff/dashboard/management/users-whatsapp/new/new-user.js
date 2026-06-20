@@ -22,7 +22,7 @@ let linkedMyFremUser = null;
 
 document.getElementById("linkMyFremBtn").onclick = async () => {
   const id = document.getElementById("myfremIdInput").value.trim();
-  if (!id) return alert("Inserisci un ID!");
+  if (!id) return setStatus("Inserisci un ID!");
 
   try {
     const userDoc = await getDoc(doc(db, "users", id));
@@ -44,7 +44,7 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
 
   } catch (err) {
     console.error(err);
-    alert("Errore durante la ricerca dell'utente MyFrEM.");
+    setStatus("Errore durante la ricerca dell'utente MyFrEM.", "error");
   }
 };
 
@@ -98,3 +98,9 @@ form.addEventListener("submit", async (e) => {
     statusMsg.className = "error";
   }
 });
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
+}

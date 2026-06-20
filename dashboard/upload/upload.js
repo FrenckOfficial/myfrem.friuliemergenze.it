@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "/configFirebase.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { supa } from "/configSupabase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -28,10 +28,26 @@ const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 
 let currentUser = null;
+let isReadOnlyMode = false;
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   currentUser = user;
-  if (!user) setStatus("⚠️ Devi essere loggato");
+  if (!user) return setStatus("⚠️ Devi essere loggato");
+
+  const userDocSnap = await getDoc(doc(db, "users", user.uid));
+  if (userDocSnap.exists()) {
+    const userData = userDocSnap.data();
+    if (userData.role === "testacc") {
+      isReadOnlyMode = true;
+      document.body.classList.add("read-only-mode");
+      uploadBtn.disabled = true;
+      uploadBtn.style.opacity = "0.5";
+      uploadBtn.style.cursor = "not-allowed";
+      uploadBtn.title = "Non disponibile in modalità sola lettura";
+      setStatus("📖 Modalità sola lettura: puoi solo visualizzare i contenuti");
+      fileInput.disabled = true;
+    }
+  }
 });
 
 function setStatus(msg) {
@@ -50,6 +66,10 @@ fileInput.addEventListener("change", () => {
 uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
   
+  if (isReadOnlyMode) {
+    return setStatus("❌ Non puoi caricare foto in modalità sola lettura");
+  }
+
   if (!currentUser) return setStatus("❌ Devi essere loggato");
   if (!titleInput.value.trim()) {
     return setStatus("❌ Il modello del veicolo è obbligatorio");
@@ -128,7 +148,7 @@ uploadBtn.addEventListener("click", async (e) => {
     progressText.textContent = `${percent}% (${uploadedCount}/${files.length})`;
   }
 
-  setStatus(`✅ Caricate ${uploadedCount}/${files.length} foto con watermark!`);
+  setStatus(`✅ Caricate ${uploadedCount}/${files.length} foto!`);
   fileInput.value = "";
   fileNameSpan.textContent = "Nessun file";
   uploadForm.reset();

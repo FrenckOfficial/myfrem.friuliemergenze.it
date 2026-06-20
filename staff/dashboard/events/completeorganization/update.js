@@ -21,7 +21,7 @@ onAuthStateChanged(auth, (user) => {
     const allowedRoles = ["advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
@@ -79,7 +79,7 @@ async function confirmOrg() {
             showInDash: true
         });
 
-        alert("Organizzazione confermata.");
+        setStatus("Organizzazione confermata.", "success");
         window.history.back();
     }
 }

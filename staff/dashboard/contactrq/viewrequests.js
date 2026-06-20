@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, where, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
@@ -9,6 +9,7 @@ const db = getFirestore(app);
 
 const requestsContainer = document.getElementById("contactRequestsTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
+const statusMsg = document.getElementById("statusMsg");
 
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
@@ -25,10 +26,12 @@ onAuthStateChanged(auth, async (user) => {
         query(collection(db, "users"), where("__name__", "==", user.uid))
     );
 
+    const userData = userDoc.docs[0].data();
+
     const allowedRoles = ["modstaff", "advstaff", "advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
@@ -39,7 +42,8 @@ onAuthStateChanged(auth, async (user) => {
 async function loadContactRequests() {
     try {
         const userSnap = await getDocs(collection(db, "users"));
-        const requestsSnap = await getDocs(collection(db, "messages"));
+        const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+        const requestsSnap = await getDocs(q);
         requestsContainer.innerHTML = "";
         requestsSnap.forEach((doc) => {
             const request = doc.data();
@@ -67,11 +71,11 @@ async function loadContactRequests() {
             btn.addEventListener("click", async (e) => {
                 const request = requestsSnap.docs.find(r => r.id === e.target.getAttribute("data-id")).data();
                 if (request.status === "Chiusa") {
-                    alert("❌ Non puoi chiudere una richiesta già chiusa.");
+                    setStatus("Non puoi chiudere una richiesta già chiusa.", "error");
                 }
                 const requestId = e.target.getAttribute("data-id");
                 await updateRequestStatus(requestId, "Chiusa");
-                alert(`La richiesta di assistenza selezionata è stata chiusa.`)
+                setStatus(`La richiesta di assistenza selezionata è stata chiusa.`, "success");
                 loadContactRequests();
 
                 await addDoc(collection(db, "activities"), {
@@ -86,17 +90,17 @@ async function loadContactRequests() {
             btn.addEventListener("click", async (e) => {
                 const request = requestsSnap.docs.find(r => r.id === e.target.getAttribute("data-id")).data();
                 if (request.status === "Aperta") {
-                    alert("❌ Non puoi riaprire una richiesta già aperta.");
+                    setStatus("Non puoi riaprire una richiesta già aperta.", "error");
                 }
                 const requestId = e.target.getAttribute("data-id");
                 await updateRequestStatus(requestId, "Aperta");
-                alert(`La richiesta di assistenza selezionata è stata riaperta`)
+                setStatus(`La richiesta di assistenza selezionata è stata riaperta`, "success");
                 loadContactRequests();
             });
         });
     } catch (error) {
         console.error("Errore nel caricamento delle richieste di contatto:", error);
-        alert("❌ Si è verificato un errore nel caricamento delle richieste di contatto.");
+        setStatus("Si è verificato un errore nel caricamento delle richieste di contatto.", "error");
     }
 };
 
@@ -110,6 +114,12 @@ async function updateRequestStatus(requestId, newStatus) {
     console.log(`✅ Richiesta ${requestId} aggiornata a "${newStatus}"`);
   } catch (error) {
     console.error("Errore nell'aggiornamento dello status:", error);
-    alert("❌ Si è verificato un errore durante l'aggiornamento dello status.");
+    setStatus("Si è verificato un errore durante l'aggiornamento dello status.", "error");
   }
+}
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
 }

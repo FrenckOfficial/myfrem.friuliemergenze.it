@@ -1,10 +1,15 @@
 {
   "name": "Piattaforma MyFrEM",
   "short_name": "MyFrEM",
-  "description": "La piattaforma MyFrEM è stata creata per consentire a tutti di caricare mezzi di emergenza delle regioni Friuli-Venezia Giulia e Veneto Orientale per contribuire all'espansione della galleria di Friuli Emergenze.",
+  "description": "La piattaforma MyFrEM consente agli utenti di caricare e condividere fotografie dei mezzi di emergenza del Friuli Venezia Giulia e del Veneto Orientale, contribuendo all'espansione della galleria di Friuli Emergenze.",
   "start_url": "/?source=pwa",
+  "id": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
   "orientation": "portrait-primary",
   "background_color": "#111",
   "theme_color": "#e53935",

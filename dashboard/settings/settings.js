@@ -1,12 +1,8 @@
-import {  initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-
+import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { supa } from "/configSupabase.js";
-
 import { firebaseConfig } from "../../configFirebase.js";
 
 const supabase = createClient(supa.url, supa.anonKey);
@@ -47,6 +43,7 @@ const logoutBtnSettings = document.getElementById("logoutBtnSettings");
 
 let currentUserId = null;
 let currentUser = null;
+let isReadOnlyMode = false;
 
 onAuthStateChanged(auth, async user => {
   if (!user) {
@@ -68,10 +65,18 @@ async function loadUserData(uid) {
 
   const data = snap.data();
 
+  // 🔒 Controlla il ruolo
+  if (data.role === "testacc") {
+    isReadOnlyMode = true;
+    document.body.classList.add("read-only-mode");
+    disableAllButtons();
+    setStatus("readOnlyStatus", "📖 Modalità sola lettura: non puoi modificare i dati", "warning");
+  }
+
   fullNameText.innerHTML = `<b>${data.name || ""} ${data.surname || ""}</b>`;
   userText.innerHTML = `<b>${data.username}</b>` || "";
   mailText.innerHTML = `<b>${data.email}</b>` || "";
-  bioText.innerHTML = `<b>${data.bio}</b>` || "";
+  bioText.innerHTML = `<b>${data.bio ? data.bio : ""}</b>` || "";
   if (data.photoURL) {
     profilePreview.src = data.photoURL;
   } else {
@@ -79,60 +84,94 @@ async function loadUserData(uid) {
   }
 }
 
+function disableAllButtons() {
+  const buttons = [
+    saveFullNameBtn,
+    saveUsernameBtn,
+    saveMailBtn,
+    saveBioBtn,
+    savePasswordBtn
+  ];
+
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
+    btn.style.cursor = "not-allowed";
+    btn.title = "Non disponibile in modalità sola lettura";
+  });
+
+  profilePicForm.style.opacity = "0.5";
+  profilePicForm.style.pointerEvents = "none";
+  profilePicInput.disabled = true;
+  deleteProfPicBtn.disabled = true;
+}
+
 saveFullNameBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("fullNameStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
   const newName = nameInput.value.trim();
   const newSurname = surnameInput.value.trim();
-  if (newName.length < 3) return alert("Minimo 3 caratteri!");
-  if (newSurname.length < 3) return alert("Minimo 3 caratteri!");
+  if (newName.length < 3) return setStatus("fullNameStatus", "Minimo 3 caratteri!", "error");
+  if (newSurname.length < 3) return setStatus("fullNameStatus", "Minimo 3 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     name: newName,
     surname: newSurname,
   });
 
-  alert("Nome e cognome aggiornati!");
+  setStatus("fullNameStatus", "Nome e cognome aggiornati!", "success");
 });
 
 saveUsernameBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("usernameStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
   const newUsername = usernameInput.value.trim();
-  if (newUsername.length < 3) return alert("Minimo 3 caratteri!");
+  if (newUsername.length < 3) return setStatus("usernameStatus", "Minimo 3 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     username: newUsername
   });
 
-  alert("Username aggiornato!");
+  setStatus("usernameStatus", "Username aggiornato!", "success");
 });
 
 saveMailBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("mailStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
   const newMail = mailInput.value.trim();
-  if (newMail.length < 5 || !newMail.includes("@")) return alert("Inserisci una mail valida!");
+  if (newMail.length < 5 || !newMail.includes("@")) return setStatus("mailStatus", "Inserisci una mail valida!", "error");
+
+  await updateEmail(currentUser, newMail)
 
   await updateDoc(doc(db, "users", currentUserId), {
     email: newMail
   });
 
-  alert("E-Mail aggiornato!");
+  setStatus("mailStatus", "E-Mail aggiornato!", "success");
 });
 
 saveBioBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("bioStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
   const newBio = bioInput.value.trim();
 
   await updateDoc(doc(db, "users", currentUserId), {
     bio: newBio
   });
 
-  alert("Biografia aggiornata!");
+  setStatus("bioStatus", "Biografia aggiornata!", "success");
 });
 
 savePasswordBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("pswStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
   const currentPassword = currentPasswordInput.value;
   const newPassword = newPasswordInput.value;
   const confirmPassword = confirmPasswordInput.value;
 
-  if (!currentPassword) return alert("Inserisci la password attuale!");
-  if (newPassword.length < 6) return alert("Minimo 6 caratteri!");
-  if (newPassword !== confirmPassword) return alert("Le password non coincidono!");
+  if (!currentPassword) return setStatus("pswStatus", "Inserisci la password attuale!", "error");
+  if (newPassword.length < 6) return setStatus("pswStatus", "Minimo 6 caratteri!", "error");
+  if (newPassword !== confirmPassword) return setStatus("pswStatus", "Le password non coincidono!", "error");
 
   try {
     const user = auth.currentUser;
@@ -149,20 +188,25 @@ savePasswordBtn.addEventListener("click", async () => {
       passwordUpdatedAt: new Date()
     });
 
-    alert("Password aggiornata con successo!");
+    setStatus("pswStatus", "Password aggiornata con successo!", "success");
   } catch (error) {
-    alert("Errore password: " + error.message);
+    setStatus("pswStatus", `${"Errore password: " + error.message}`, "error");
   }
 });
 
 profilePicForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  if (isReadOnlyMode) {
+    setStatus("pfpStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+    return;
+  }
+
   const file = profilePicInput.files[0];
-  if (!file) return alert("Seleziona un'immagine!");
+  if (!file) return setStatus("pfpStatus", "Seleziona un'immagine!", "error");
 
   if (!file.type.startsWith("image/")) {
-    return alert("Solo immagini!");
+    return setStatus("pfpStatus", "Solo immagini!", "error");
   }
 
   const fileExt = file.name.split(".").pop();
@@ -192,16 +236,23 @@ profilePicForm.addEventListener("submit", async (e) => {
 
     profilePreview.src = imageUrl;
 
-    alert("Foto profilo aggiornata!");
+    setStatus("pfpStatus", "Foto profilo aggiornata!", "success");
   } catch (err) {
     console.error(err);
-    alert("Errore upload: " + err.message);
+    setStatus("pfpStatus", `${"Errore upload: " + err.message}`, "error");
   }
 });
 
-deleteProfPicBtn.addEventListener("submit", async (e) => {
-  e.preventDefault();
+function setStatus(statusId, message, type = "info") {
+  const element = document.getElementById(statusId);
+  if (!element) return;
+  element.textContent = message;
+  element.className = `${"statusBox" + " " + type}`;
+}
 
+deleteProfPicBtn.addEventListener("click", async (e) => {
+  if (isReadOnlyMode) return;
+  
   await updateDoc(doc(db, "users", currentUserId), {
     photoURL: "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
   });

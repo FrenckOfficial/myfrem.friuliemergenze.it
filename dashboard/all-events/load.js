@@ -34,9 +34,18 @@ onAuthStateChanged(auth, async (user) => {
       statusMsg.className = "error";
       return;
     }
+
+    // 🔒 Controlla il ruolo
+    const userData = userDoc.data();
+    if (userData.role === "testacc") {
+      document.body.classList.add("read-only-mode");
+      statusMsg.textContent = "📖 Modalità sola lettura";
+      statusMsg.className = "warning";
+    }
+
     const q = query(
       collection(db, "events"),
-      where("userId", "==", userDoc.data().name + " " + userDoc.data().surname),
+      where("userId", "==", userData.name + " " + userData.surname),
     );
 
     const snap = await getDocs(q);

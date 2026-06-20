@@ -70,7 +70,7 @@ async function loadPublicEvent() {
       const mail = document.getElementById("textMail").value.trim();
 
       if (!name || !phone || !mail) {
-        alert("❌ Per favore, compila tutti i campi richiesti.");
+        setStatus("Per favore, compila tutti i campi richiesti.");
         return;
       }
 
@@ -90,9 +90,7 @@ async function loadPublicEvent() {
         registeredAt: new Date()
       });
 
-      alert(
-        `✅ Iscrizione avvenuta con successo!\n\nNome: ${name}\nTelefono: ${phone}\nEmail: ${mail}`
-      );
+      setStatus(`✅ Iscrizione avvenuta con successo!\n\nNome: ${name}\nTelefono: ${phone}\nEmail: ${mail}`, "success");
 
       window.location.href = "/dashboard/";
     });
@@ -101,6 +99,11 @@ async function loadPublicEvent() {
     eventsList.innerHTML = "<p class='error'>❌ Errore durante il caricamento dell'evento.</p>";
     console.error(err);
   }
+}
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.classList.add(type);
 }
 
 loadPublicEvent();

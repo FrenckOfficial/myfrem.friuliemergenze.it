@@ -58,6 +58,8 @@
       <a href="/staff/dashboard/management/newsletter/users/" class="btn-primary">👥 Visualizza Utenti</a>
     </div>
 
+    <p id="statusMsg" class="statusBox" style="display:none;"></p>
+
     <div class="gallery-search" style="margin-top: 10px;">
       <input type="text" id="searchInput" placeholder="Cerca una newsletter..." style="
         width: 50%;
@@ -86,7 +88,6 @@
         </tbody>
     </table>
 
-    <p id="messageBox"></p>
     <script>
       const searchInput = document.getElementById("searchInput");
       const tableBody = document.getElementById("usersTableBody");

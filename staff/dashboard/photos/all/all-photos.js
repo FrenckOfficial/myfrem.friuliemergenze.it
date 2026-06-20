@@ -33,9 +33,9 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 function setStatus(message, type = "info") {
-  if (!statusMsg) return;
   statusMsg.textContent = message;
-  statusMsg.className = type;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -52,7 +52,7 @@ onAuthStateChanged(auth, async (user) => {
     const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
@@ -207,12 +207,12 @@ window.saveVehicleLink = async (photoId) => {
   const link = input?.value?.trim();
 
   if (!link) {
-    alert("❌ Inserisci un link valido");
+    setStatus("Inserisci un link valido", "error");
     return;
   }
 
   if (!isValidUrl(link)) {
-    alert("❌ Formato URL non valido. Usa: https://friuliemergenze.it");
+    setStatus("Formato URL non valido. Usa: https://friuliemergenze.it", "error");
     return;
   }
 
@@ -253,7 +253,6 @@ window.saveVehicleLink = async (photoId) => {
   } catch (err) {
     console.error("Errore salvataggio link:", err);
     setStatus("❌ Errore salvataggio link", "error");
-    alert("❌ Errore durante il salvataggio");
   } finally {
     const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
     if (saveBtn) saveBtn.disabled = false;

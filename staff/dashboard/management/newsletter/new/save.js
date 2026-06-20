@@ -267,7 +267,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
     <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
       Friuli Emergenze<br>
       Ricevi questa comunicazione perché sei iscritto al nostro servizio di notifica!<br>
-      Disiscriviti <a href="https://friuliemergenze.it/unsubscribe/?email=${email}">qui</a>
+      Disiscriviti <a href="https://friuliemergenze.it/newsletter/unsubscribe/?email=${email}">qui</a>
       <br><br>
       <a href="https://friuliemergenze.it">friuliemergenze.it</a>
       ·

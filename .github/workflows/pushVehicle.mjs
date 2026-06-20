@@ -233,10 +233,16 @@ function getServiceLabel(service) {
       return "Guardia Costiera";
 
     case "polizia_di_stato":
+      return "Polizia di Stato";
+
     case "carabinieri":
+      return "Carabinieri";
+
     case "guardia_di_finanza":
+      return "Guardia di Finanza";
+      
     case "polizia_locale":
-      return "Ordine Pubblico";
+      return "Polizia Locale";
 
     default:
       return service || "N/A";

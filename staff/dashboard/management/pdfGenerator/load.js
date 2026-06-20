@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const tableBody = document.getElementById("documentsTableBody");
-const messageBox = document.getElementById("messageBox");
+const messageBox = document.getElementById("statusMsg");
 
 console.log("📄 Loading generated documents...");
 

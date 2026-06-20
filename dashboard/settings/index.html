@@ -35,6 +35,7 @@
           <h2>📷 Foto Profilo</h2>
 
           <div class="profile-upload">
+            <p id="pfpStatus" class="statusBox" style="display:none;"></p>
             <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
 
             <form id="profilePicForm" enctype="multipart/form-data">
@@ -53,6 +54,7 @@
         </section>
 
         <section class="settings-card">
+          <p id="fullNameStatus" class="statusBox" style="display:none;"></p>
           <h2>Nome e cognome</h2>
           <p id="fullName">Il tuo attuale nome e cognome è
             <span id="fullNameText"></span>
@@ -66,6 +68,7 @@
         </section>
 
         <section class="settings-card">
+          <p id="usernameStatus" class="statusBox" style="display:none;"></p>
           <h2>Username</h2>
           <p id="username">Il tuo username è
               <span id="userText"></span>
@@ -75,6 +78,7 @@
         </section>
 
         <section class="settings-card">
+          <p id="mailStatus" class="statusBox" style="display:none;"></p>
           <h2>E-Mail</h2>
           <p id="mail">La tua mail di accesso è
               <span id="mailText"></span>
@@ -84,6 +88,7 @@
         </section>
 
         <section class="settings-card">
+          <p id="bioStatus" class="statusBox" style="display:none;"></p>
           <h2>Biografia</h2>
           <p id="bio">La tua biografia è:
               <span id="bioText"></span>
@@ -93,6 +98,7 @@
         </section>
 
         <section class="settings-card" id="passwordCard">
+          <p id="pswStatus" class="statusBox" style="display:none;"></p>
           <h2>Cambia password</h2>
           <h3>Password attuale</h3>
           <input type="password" id="currentPassword" class="input">

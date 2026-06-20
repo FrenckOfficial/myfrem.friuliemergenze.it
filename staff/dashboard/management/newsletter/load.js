@@ -18,7 +18,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const tableBody = document.getElementById("usersTableBody");
-const messageBox = document.getElementById("messageBox");
+const messageBox = document.getElementById("statusMsg");
 
 console.log("📡 Loading sent newsletters...");
 

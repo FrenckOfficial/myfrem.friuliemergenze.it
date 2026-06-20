@@ -20,7 +20,7 @@ onAuthStateChanged(auth, async (user) => {
     const allowedRoles = ["advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
@@ -123,7 +123,7 @@ onAuthStateChanged(auth, async (user) => {
         div.querySelector(".btn-view1").onclick = async () => {
           const userRef = doc(db, "events", docSnap.id);
           await updateDoc(userRef, { showInDash: false });
-          alert("Evento nascosto dalla dashboard user.");
+          setStatus("Evento nascosto dalla dashboard user.", "success");
         }
 
         eventsList.appendChild(div);
@@ -133,3 +133,8 @@ onAuthStateChanged(auth, async (user) => {
     statusMsg.textContent = "❌ Errore nel caricamento degli eventi.";
   }
 });
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+}

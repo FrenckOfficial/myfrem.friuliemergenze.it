@@ -49,9 +49,9 @@ viewAllPhotos.addEventListener("click", () => {
 });
 
 function setStatus(message, type = "info") {
-  if (!statusMsg) return;
   statusMsg.textContent = message;
-  statusMsg.className = type;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
     const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      alert("Accesso negato: solo staff autorizzato.");
+      setStatus("Accesso negato: solo staff autorizzato.", "error");
       window.location.href = "/login/";
       return;
     }
