@@ -212,7 +212,6 @@ textarea {
 }
 
 .btn-tertiary {
-  margin-top: 25px;
   display: inline-block;
   background: transparent;
   color: var(--accent);

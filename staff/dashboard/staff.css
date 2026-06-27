@@ -885,8 +885,8 @@ button.reject:active {
 .btn-small {
   display: inline-block;
   background: transparent;
-  color: var(--signal-blue);
-  border: 1px solid var(--signal-blue);
+  background-color: var(--signal-blue);
+  border: 1px solid var(--accent);
   padding: 5px 12px;
   font-family: var(--font-mono);
   font-size: 0.65rem;
@@ -901,6 +901,7 @@ button.reject:active {
     background 0.2s,
     color 0.2s,
     transform 0.15s;
+  
 }
 
 .btn-small:hover {

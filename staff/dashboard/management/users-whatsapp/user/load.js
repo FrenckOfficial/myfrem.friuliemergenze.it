@@ -27,15 +27,37 @@ async function loadUser() {
 
   const data = snap.data();
 
+  let role = "Ruolo non disponibile";
+  let status = "N/A";
+  let date = "Data non disponibile";
+
+  if (data.role === "admin") {
+    role = "Amministratore";
+  } else if (data.role === "user") {
+    role = "Utente";
+  } else role;
+
+  if (data.status === "active") {
+    status = "Attivo";
+  } else if (data.status === "suspended") {
+    status = "Sospeso";
+  } else if (data.status === "espulso") {
+    status = "Espulso";
+  } else status;
+
+  if (data.date) {
+    date = new Date(data.date).toLocaleDateString("it-IT");
+  }
+
   userDataDiv.innerHTML = `
     <div class="user-card">
       <p><strong>Nome:</strong> ${data.name}</p>
       <p><strong>Numero:</strong> ${data.phone ?? "N/D"}</p>
-      <p><strong>Data entrata:</strong> ${data.date}</p>
-      <p><strong>Ruolo:</strong> ${data.role}</p>
-      <p><strong>Status:</strong> ${data.status}</p>
-      <p><strong>Note:</strong> ${data.notes ?? "Nessuna nota fornita"}</p>
-      <p><strong>Tag:</strong> ${data.tags ?? "Nessun tag fornito"}</p>
+      <p><strong>Data entrata:</strong> ${date}</p>
+      <p><strong>Ruolo:</strong> ${role}</p>
+      <p><strong>Status:</strong> ${status}</p>
+      <p><strong>Note:</strong> ${data.notes ? data.notes : "Nessuna nota fornita"}</p>
+      <p><strong>Tag:</strong> ${data.tags ? data.tags.join(", ") : "Nessun tag fornito"}</p>
       <p><strong>Linked MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.name : "Nessun account fornito"}</p>
       <p><strong>Linked MyFrEM Account ID:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.id : "Nessun ID account disponibile in quanto account non fornito"}</p>
       <button id="backBtn" class="user-btn btn-back">🔙 Torna alla lista</button>

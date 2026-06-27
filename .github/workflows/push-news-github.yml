@@ -1,0 +1,61 @@
+name: Push News to GitHub
+
+on:
+  workflow_dispatch:
+    inputs:
+      newsId:
+        description: "ID della notizia da pubblicare"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  push-to-github:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install firebase-admin @octokit/rest
+      
+      - name: Test GitHub Token
+        run: |
+          echo "Token length: ${#GITHUB_TOKEN}"
+          curl -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/user \
+            -w "\nStatus: %{http_code}\n"
+
+      - name: Push Vehicle Data to GitHub
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          GITHUB_TOKEN: ${{ secrets.GT_TOKEN }}
+          DRAFT_ID: ${{ github.event.inputs.newsId }}
+        run: node .github/workflows/pushNews.mjs
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "feat: Add vehicle from news ${{ github.event.inputs.newsId }}" || echo "No changes to commit"
+          git push
+
+      - name: Notify on Success
+        if: success()
+        run: echo "✅ Vehicle published successfully!"
+
+      - name: Notify on Failure
+        if: failure()
+        run: echo "❌ Failed to publish vehicle"

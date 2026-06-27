@@ -27,10 +27,10 @@ const btnCancel = document.querySelector('.btn-cancel');
 const statusMsg = document.getElementById('statusMsg');
 
 modalClose?.addEventListener('click', () => {
-    closeDraftModal();
+    closeCreateModal();
 })
 btnCancel?.addEventListener('click', () => {
-    closeDraftModal();
+    closeCreateModal();
 })
 
 logoutBtn?.addEventListener('click', async () => {
@@ -58,7 +58,7 @@ onAuthStateChanged(auth, async (user) => {
     const allowedRoles = ["advstaffplus", "superadmin"];
 
     if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
+      this.setStatus("Accesso negato: solo staff autorizzato.", "error");
       await signOut(auth);
       window.location.href = "/login/";
       return;
@@ -66,56 +66,48 @@ onAuthStateChanged(auth, async (user) => {
     
   } catch (err) {
     console.error("Errore verifica staff:", err);
-    setStatus("Errore verifica permessi", "error");
+    this.setStatus("Errore verifica permessi", "error");
   }
 });
 
 console.log('✅ Firebase inizializzato');
 
-class VehicleDraftsManager {
+class NewsManager {
     constructor() {
-        this.currentDraftId = null;
-        this.drafts = [];
+        this.currentNewsId = null;
+        this.newsList = [];
         this.isSaving = false;
-        this.selectedPhoto = null;
-        this.selectedPhotoBase64 = null;
-        console.log('🔧 VehicleDraftsManager - Costruttore inizializzato');
+        this.selectedImage = null;
+        this.selectedImageBase64 = null;
+        console.log('🔧 NewsManager - Costruttore inizializzato');
         this.init();
     }
 
     init() {
-        console.log('🔧 VehicleDraftsManager - init() avviato');
+        console.log('🔧 NewsManager - init() avviato');
         this.setupEventListeners();
-        this.setupCreateDraftListeners();
-        this.loadDrafts();
+        this.setupCreateNewsListeners();
+        this.loadNews();
     }
 
     setupEventListeners() {
         console.log('🔧 setupEventListeners - Configurazione event listener');
-        const modal = document.getElementById('editDraftModal');
+        const modal = document.getElementById('editNewsModal');
         if (modal) {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) this.closeDraftModal();
+                if (e.target === modal) this.closeNewsModal();
             });
         }
 
-        const form = document.getElementById('vehicleForm');
+        const form = document.getElementById('newsForm');
         if (form) {
-            form.addEventListener('submit', (e) => this.saveDraft(e));
-        }
-
-        const plateInput = document.getElementById('vehiclePlate');
-        if (plateInput) {
-            plateInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.toUpperCase();
-            });
+            form.addEventListener('submit', (e) => this.saveNews(e));
         }
     }
 
-    setupCreateDraftListeners() {
-        console.log('🔧 setupCreateDraftListeners - Configurazione modal creazione');
+    setupCreateNewsListeners() {
+        console.log('🔧 setupCreateNewsListeners - Configurazione modal creazione');
         
-        // Bottone apertura modal creazione
         const newDraftBtn = document.getElementById('newDraftBtn');
         if (newDraftBtn) {
             newDraftBtn.addEventListener('click', () => {
@@ -124,7 +116,7 @@ class VehicleDraftsManager {
         }
 
         // Modal click per chiudere
-        const createModal = document.getElementById('createDraftModal');
+        const createModal = document.getElementById('createNewsModal');
         if (createModal) {
             createModal.addEventListener('click', (e) => {
                 if (e.target === createModal) this.closeCreateModal();
@@ -132,30 +124,59 @@ class VehicleDraftsManager {
         }
 
         // Form creazione
-        const createForm = document.getElementById('createVehicleForm');
+        const createForm = document.getElementById('createNewsForm');
         if (createForm) {
-            createForm.addEventListener('submit', (e) => this.createDraft(e));
+            createForm.addEventListener('submit', (e) => this.createNews(e));
         }
 
-        // Upload foto - file input click
-        const photoBrowseBtn = document.getElementById('photoBrowseBtn');
-        const photoInput = document.getElementById('vehiclePhotoInput');
-        if (photoBrowseBtn && photoInput) {
-            photoBrowseBtn.addEventListener('click', (e) => {
+        // Upload immagine - file input click
+        const imageBrowseBtn = document.getElementById('imageBrowseBtn');
+        const imageInput = document.getElementById('newsImageInput');
+        if (imageBrowseBtn && imageInput) {
+            imageBrowseBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                photoInput.click();
+                imageInput.click();
             });
         }
 
-        // Upload foto - file change
-        if (photoInput) {
-            photoInput.addEventListener('change', (e) => {
-                this.handlePhotoSelect(e.target.files[0]);
+        const imageLinkBtn = document.getElementById('imageLinkBtn');
+        const imageLinkZone = document.getElementById('imageLinkZone');
+        if (imageLinkBtn) {
+            imageLinkBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                imageLinkZone.style.display = 'flex';
+            });
+        }
+
+        const imageLinkConfirmBtn = document.getElementById('imageLinkConfirmBtn');
+        if (imageLinkConfirmBtn) {
+            imageLinkConfirmBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                const link = document
+                    .getElementById('imageLinkInput')
+                    .value
+                    .trim();
+
+                if (!link) {
+                    this.showError("Inserisci un link.");
+                    return;
+                }
+
+                this.handleImageLink(link);
+            });
+        }
+
+        // Upload immagine - file change
+        if (imageInput) {
+            imageInput.addEventListener('change', (e) => {
+                this.handleImageSelect(e.target.files[0]);
             });
         }
 
         // Drag & drop area
-        const dropZone = document.getElementById('photoDropZone');
+        const dropZone = document.getElementById('imageDropZone');
         if (dropZone) {
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropZone.addEventListener(eventName, (e) => {
@@ -179,39 +200,30 @@ class VehicleDraftsManager {
             dropZone.addEventListener('drop', (e) => {
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
-                    this.handlePhotoSelect(files[0]);
+                    this.handleImageSelect(files[0]);
                 }
             });
         }
 
-        // Bottone rimozione foto
-        const removePhotoBtn = document.getElementById('removePhotoBtn');
-        if (removePhotoBtn) {
-            removePhotoBtn.addEventListener('click', (e) => {
+        // Bottone rimozione immagine
+        const removeImageBtn = document.getElementById('removeImageBtn');
+        if (removeImageBtn) {
+            removeImageBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.removeSelectedPhoto();
-            });
-        }
-
-        // Input plate uppercase
-        const createPlateInput = document.getElementById('createVehiclePlate');
-        if (createPlateInput) {
-            createPlateInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.toUpperCase();
+                this.removeSelectedImage();
             });
         }
     }
 
-    handlePhotoSelect(file) {
-        console.log('📷 handlePhotoSelect - File selezionato:', file?.name);
+    handleImageSelect(file) {
+        console.log('📷 handleImageSelect - File selezionato:', file?.name);
 
         if (!file) {
             console.warn('⚠️ Nessun file selezionato');
             return;
         }
 
-        // Validazione file
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
         if (!allowedTypes.includes(file.type)) {
@@ -225,11 +237,15 @@ class VehicleDraftsManager {
         }
 
         const reader = new FileReader();
+
         reader.onload = (e) => {
-            this.selectedPhoto = file;
-            this.selectedPhotoBase64 = e.target.result;
-            this.showPhotoPreviewCreate(file.name);
-            console.log('✅ Foto caricata in memoria');
+
+            this.selectedImage = file;
+            this.selectedImageBase64 = e.target.result;
+
+            this.showImagePreviewCreate(file.name);
+
+            console.log('✅ Immagine caricata');
         };
 
         reader.onerror = () => {
@@ -239,63 +255,90 @@ class VehicleDraftsManager {
         reader.readAsDataURL(file);
     }
 
-    showPhotoPreviewCreate(fileName) {
-        const dropZone = document.getElementById('photoDropZone');
-        const preview = document.getElementById('photoPreviewCreate');
+    handleImageLink(url) {
+        try {
+            new URL(url);
+        } catch {
+            this.showError("URL non valido");
+            return;
+        }
+
+        this.selectedImage = null;
+        this.selectedImageBase64 = url;
+
+        const dropZone = document.getElementById('imageDropZone');
+        const preview = document.getElementById('imagePreviewCreate');
         const previewImg = document.getElementById('previewImgCreate');
-        const photoFileName = document.getElementById('photoFileNameCreate');
+        const imageFileName = document.getElementById('imageFileNameCreate');
 
-        if (dropZone) dropZone.style.display = 'none';
-        if (preview) preview.style.display = 'block';
-        if (previewImg) previewImg.src = this.selectedPhotoBase64;
-        if (photoFileName) photoFileName.textContent = this.escapeHtml(fileName);
+        dropZone.style.display = "none";
+        preview.style.display = "block";
 
-        console.log('🖼️ Anteprima foto mostrata');
+        const urlName = url ? url.split(`https://www.ilgoriziano.it/public/uploads`).pop() : '';
+
+        previewImg.src = url;
+        previewImg.style.display = 'flex';
+        previewImg.style.justifyContent = 'center';
+        imageFileName.textContent = url;
     }
 
-    removeSelectedPhoto() {
-        console.log('❌ removeSelectedPhoto');
-        this.selectedPhoto = null;
-        this.selectedPhotoBase64 = null;
+    showImagePreviewCreate(fileName) {
+        const dropZone = document.getElementById('imageDropZone');
+        const preview = document.getElementById('imagePreviewCreate');
+        const previewImg = document.getElementById('previewImgCreate');
+        const imageFileName = document.getElementById('imageFileNameCreate');
 
-        const photoInput = document.getElementById('vehiclePhotoInput');
-        if (photoInput) photoInput.value = '';
+        dropZone.style.display = 'none';
+        preview.style.display = 'block';
+        previewImg.src = this.selectedImageBase64;
+        imageFileName.textContent = fileName;
 
-        const dropZone = document.getElementById('photoDropZone');
-        const preview = document.getElementById('photoPreviewCreate');
+        console.log('🖼️ Anteprima immagine mostrata');
+    }
+
+    removeSelectedImage() {
+        console.log('❌ removeSelectedImage');
+        this.selectedImage = null;
+        this.selectedImageBase64 = null;
+
+        const imageInput = document.getElementById('newsImageInput');
+        if (imageInput) imageInput.value = '';
+
+        const dropZone = document.getElementById('imageDropZone');
+        const preview = document.getElementById('imagePreviewCreate');
         if (dropZone) dropZone.style.display = 'block';
         if (preview) preview.style.display = 'none';
     }
 
     openCreateModal() {
         console.log('🆕 openCreateModal');
-        const modal = document.getElementById('createDraftModal');
+        const modal = document.getElementById('createNewsModal');
         if (modal) {
             modal.classList.add('active');
-            this.removeSelectedPhoto(); // Reset foto
-            document.getElementById('createVehicleForm')?.reset();
+            this.removeSelectedImage(); // Reset immagine
+            document.getElementById('createNewsForm')?.reset();
         }
     }
 
     closeCreateModal() {
         console.log('🔒 closeCreateModal');
-        const modal = document.getElementById('createDraftModal');
+        const modal = document.getElementById('createNewsModal');
         if (modal) {
             modal.classList.remove('active');
         }
-        this.removeSelectedPhoto();
-        const form = document.getElementById('createVehicleForm');
+        this.removeSelectedImage();
+        const form = document.getElementById('createNewsForm');
         if (form) {
             form.reset();
         }
     }
 
-    async uploadPhotoToStorage(photoBase64, fileName) {
-        console.log('☁️ uploadPhotoToStorage - Upload foto su Supabase');
+    async uploadImageToStorage(imageBase64, fileName) {
+        console.log('☁️ uploadImageToStorage - Upload immagine su Supabase');
         console.log('☁️ File:', fileName);
         
         try {
-            const base64Data = photoBase64.split(',')[1];
+            const base64Data = imageBase64.split(',')[1];
             const byteCharacters = atob(base64Data);
             const byteNumbers = new Array(byteCharacters.length);
             
@@ -308,12 +351,12 @@ class VehicleDraftsManager {
  
             const timestamp = Date.now();
             const fileExt = fileName.split('.').pop().toLowerCase();
-            const filePath = `vehicles/${timestamp}-${fileName.replace(/\.[^/.]+$/, "")}.${fileExt}`;
+            const filePath = `news/${timestamp}-${fileName.replace(/\.[^/.]+$/, "")}.${fileExt}`;
  
             console.log('☁️ Upload file a:', filePath);
  
             const { data, error } = await supabase.storage
-                .from('vehicles')
+                .from('news')
                 .upload(filePath, blob, {
                     cacheControl: '3600',
                     upsert: false
@@ -327,23 +370,23 @@ class VehicleDraftsManager {
             console.log('✅ File caricato:', data);
  
             const { data: publicUrlData } = supabase.storage
-                .from('vehicles')
+                .from('news')
                 .getPublicUrl(filePath);
  
-            const photoUrl = publicUrlData.publicUrl;
-            console.log('✅ Foto caricata su Supabase:', photoUrl);
+            const imageUrl = publicUrlData.publicUrl;
+            console.log('✅ Immagine caricata su Supabase:', imageUrl);
             
-            return photoUrl;
+            return imageUrl;
  
         } catch (error) {
-            console.error('❌ uploadPhotoToStorage - Errore:', error);
+            console.error('❌ uploadImageToStorage - Errore:', error);
             console.error('❌ Messaggio:', error.message);
-            this.showError(`Errore upload foto: ${error.message}`);
+            this.showError(`Errore upload immagine: ${error.message}`);
             throw error;
         }
     }
 
-    async createDraft(event) {
+    async createNews(event) {
         event.preventDefault();
 
         if (this.isSaving) {
@@ -354,16 +397,10 @@ class VehicleDraftsManager {
         this.isSaving = true;
 
         console.log('\n═════════════════════════════════════════════');
-        console.log('✨ CREATE DRAFT - INIZIO CREAZIONE');
+        console.log('✨ CREATE NEWS - INIZIO CREAZIONE');
         console.log('═════════════════════════════════════════════');
 
         try {
-            if (!this.selectedPhoto) {
-                this.showError('Seleziona una foto del veicolo');
-                this.isSaving = false;
-                return;
-            }
-
             if (!this.validateCreateForm()) {
                 console.warn('⚠️ Validazione form fallita');
                 this.showError('Completa tutti i campi obbligatori');
@@ -371,40 +408,41 @@ class VehicleDraftsManager {
                 return;
             }
 
-            this.showLoading('Caricamento foto in corso...');
+            let imageUrl = null;
 
-            // Upload foto
-            const photoUrl = await this.uploadPhotoToStorage(
-                this.selectedPhotoBase64,
-                this.selectedPhoto.name
-            );
+            if (this.selectedImage) {
+                this.showLoading('Caricamento immagine...');
+                imageUrl = await this.uploadImageToStorage(
+                    this.selectedImageBase64,
+                    this.selectedImage.name
+                );
+            } else if (this.selectedImageBase64) {
+                imageUrl = this.selectedImageBase64;
+            }
 
-            console.log('✅ Foto caricata');
+            this.showLoading('Creazione notizia in corso...');
 
-            this.showLoading('Creazione bozza in corso...');
-
-            const vehicleData = this.collectCreateFormData();
+            const newsData = this.collectCreateFormData();
             const currentUser = this.getCurrentUser();
 
-            const newDraftRef = await addDoc(collection(db, 'vehiclesDraft'), {
-                fileName: this.selectedPhoto.name,
-                photoUrl: photoUrl,
-                data: vehicleData,
-                slug: vehicleData.slug,
-                status: 'pending',
+            const newNewsRef = await addDoc(collection(db, 'newsDrafts'), {
+                title: newsData.title,
+                imageUrl: imageUrl,
+                data: newsData,
+                status: newsData.status || 'bozza',
                 createdAt: Timestamp.now(),
                 createdBy: currentUser,
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser
             });
 
-            console.log('✅ Bozza creata con ID:', newDraftRef.id);
+            console.log('✅ Notizia creata con ID:', newNewsRef.id);
             console.log('═════════════════════════════════════════════');
 
-            this.showSuccess('✅ Bozza creata con successo!');
+            this.showSuccess('✅ Notizia creata con successo!');
             this.closeCreateModal();
             
-            setTimeout(() => this.loadDrafts(), 1000);
+            setTimeout(() => this.loadNews(), 1000);
 
         } catch (error) {
             console.error('❌ ERRORE NELLA CREAZIONE:', error);
@@ -418,13 +456,8 @@ class VehicleDraftsManager {
     validateCreateForm() {
         console.log('✔️ validateCreateForm');
         const requiredFields = [
-            'createVehicleTitle',
-            'createVehicleBrand',
-            'createVehicleModel',
-            'createVehiclePlate',
-            'createVehicleService',
-            'createVehicleSlug',
-            'createVehicleHQ'
+            'createNewsTitle',
+            'createNewsLink'
         ];
         
         for (const fieldId of requiredFields) {
@@ -439,141 +472,132 @@ class VehicleDraftsManager {
 
     collectCreateFormData() {
         return {
-            title: document.getElementById('createVehicleTitle')?.value || '',
-            brand: document.getElementById('createVehicleBrand')?.value || '',
-            model: document.getElementById('createVehicleModel')?.value || '',
-            plate: document.getElementById('createVehiclePlate')?.value.toUpperCase() || '',
-            builder: document.getElementById('createVehicleBuilder')?.value || '',
-            service: document.getElementById('createVehicleService')?.value || '',
-            slug: document.getElementById('createVehicleSlug')?.value || '',
-            headquarters: document.getElementById('createVehicleHQ')?.value || '',
-            notes: document.getElementById('createVehicleNotes')?.value || ''
+            title: document.getElementById('createNewsTitle')?.value || '',
+            link: document.getElementById('createNewsLink')?.value || '',
+            date: Timestamp.now(),
+            tags: document.getElementById('createNewsTags')?.value || ''
         };
     }
 
-    async loadDrafts() {
+    async loadNews() {
         try {
-            console.log('📥 loadDrafts - Caricamento bozze da Firestore...');
+            console.log('📥 loadNews - Caricamento notizie da Firestore...');
             
             const q = query(
-                collection(db, 'vehiclesDraft'),
+                collection(db, 'newsDrafts'),
                 orderBy('createdAt', 'desc')
             );
 
             const querySnapshot = await getDocs(q);
-            console.log('📥 loadDrafts - Numero bozze caricate:', querySnapshot.size);
+            console.log('📥 loadNews - Numero notizie caricate:', querySnapshot.size);
 
-            this.drafts = querySnapshot.docs.map(docSnap => {
+            this.newsList = querySnapshot.docs.map(docSnap => {
                 const data = {
                     id: docSnap.id,
                     ...docSnap.data()
                 };
-                console.log('📥 Bozza trovata - ID:', docSnap.id, 'FileName:', docSnap.data().fileName, 'Status:', docSnap.data().status);
+                console.log('📥 Notizia trovata - ID:', docSnap.id, 'Titolo:', docSnap.data().title, 'Status:', docSnap.data().status);
                 return data;
             });
 
-            console.log('📥 loadDrafts - Array drafts aggiornato, lunghezza:', this.drafts.length);
-            console.log('📥 Drafts disponibili:', this.drafts.map(d => ({ id: d.id, fileName: d.fileName })));
-            this.renderDrafts();
+            console.log('📥 loadNews - Array newsList aggiornato, lunghezza:', this.newsList.length);
+            this.renderNews();
 
         } catch (error) {
-            console.error('❌ loadDrafts - Errore:', error);
-            this.showError('Errore nel caricamento delle bozze');
+            console.error('❌ loadNews - Errore:', error);
+            this.showError('Errore nel caricamento delle notizie');
             this.renderEmptyState();
         }
     }
 
-    renderDrafts() {
-        console.log('🎨 renderDrafts - Rendering lista bozze, numero bozze:', this.drafts.length);
-        const draftsList = document.getElementById('draftsList');
+    renderNews() {
+        console.log('🎨 renderNews - Rendering lista notizie, numero notizie:', this.newsList.length);
+        const newsList = document.getElementById('newsList');
         const emptyState = document.getElementById('emptyState');
         const draftCount = document.getElementById('draftCount');
-        const totalDraftCount = document.getElementById('totalDraftsCount');
-        const publishedDraftCount = document.getElementById('publishedDraftsCount');
+        const totalNewsCount = document.getElementById('totalDraftsCount');
+        const publishedNewsCount = document.getElementById('publishedDraftsCount');
 
-        if (!draftsList) {
-            console.error('❌ renderDrafts - Elemento draftsList non trovato');
+        if (!newsList) {
+            console.error('❌ renderNews - Elemento newsList non trovato');
             return;
         }
 
-        if (this.drafts.length === 0) {
-            console.log('🎨 renderDrafts - Nessuna bozza, mostra empty state');
+        if (this.newsList.length === 0) {
+            console.log('🎨 renderNews - Nessuna notizia, mostra empty state');
             this.renderEmptyState();
             return;
         }
 
         emptyState.style.display = 'none';
-        draftCount.textContent = this.drafts.filter(
-            d => d.status !== "published"
+        draftCount.textContent = this.newsList.filter(
+            n => n.status === "bozza"
         ).length;
-        totalDraftCount.textContent = this.drafts.length;
-        publishedDraftCount.textContent = this.drafts.filter(
-            d => d.status === "published"
+        totalNewsCount.textContent = this.newsList.length;
+        publishedNewsCount.textContent = this.newsList.filter(
+            n => n.status === "pubblicata"
         ).length;
 
-        draftsList.innerHTML = this.drafts.map(draft => this.renderDraftRow(draft)).join('');
+        newsList.innerHTML = this.newsList.map(news => this.renderNewsRow(news)).join('');
 
-        console.log('🎨 renderDrafts - Aggiunta event listener ai pulsanti (btn-open e btn-delete)');
+        console.log('🎨 renderNews - Aggiunta event listener ai pulsanti');
         
         document.querySelectorAll('.btn-open').forEach((btn, idx) => {
-            const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante open #${idx} - data-draft-id="${draftId}"`);
+            const newsId = btn.dataset.newsId;
+            console.log(`🎨 renderNews - Pulsante open #${idx} - data-news-id="${newsId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante open cliccato! draftId:', draftId);
-                this.openDraftModal(draftId);
+                console.log('🎨 EVENT: Pulsante open cliccato! newsId:', newsId);
+                this.openNewsModal(newsId);
             });
         });
 
         document.querySelectorAll('.btn-delete').forEach((btn, idx) => {
-            const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante delete #${idx} - data-draft-id="${draftId}"`);
+            const newsId = btn.dataset.newsId;
+            console.log(`🎨 renderNews - Pulsante delete #${idx} - data-news-id="${newsId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante delete cliccato! draftId:', draftId);
-                this.deleteDraft(draftId);
+                console.log('🎨 EVENT: Pulsante delete cliccato! newsId:', newsId);
+                this.deleteNews(newsId);
             });
         });
 
         document.querySelectorAll('.btn-view').forEach((btn, idx) => {
-            const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante view #${idx} - data-draft-id="${draftId}"`);
+            const newsId = btn.dataset.newsId;
+            console.log(`🎨 renderNews - Pulsante view #${idx} - data-news-id="${newsId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante view cliccato! draftId:', draftId);
-                this.openDraftViewer(draftId);
+                console.log('🎨 EVENT: Pulsante view cliccato! newsId:', newsId);
+                this.openNewsViewer(newsId);
             })
         })
     }
 
-    renderDraftRow(draft) {
-        let statusClass = 'status-pending'
-        const createdAtFormatted = this.formatDate(draft.createdAt);
-        let statusText = '⏳ In attesa';
+    renderNewsRow(news) {
+        let statusClass = 'status-draft'
+        const createdAtFormatted = this.formatDate(news.createdAt);
+        let statusText = '📝 Bozza';
 
-        if (draft.status === "pending") {
-            statusClass = 'status-pending';
-        } else if (draft.status === "in_progress") {
-            statusClass = 'status-in-progress';
-            statusText = '📝 In lavorazione';
-        } else if (draft.status === "published") {
+        if (news.status === "bozza") {
+            statusClass = 'status-draft';
+            statusText = '📝 Bozza';
+        } else if (news.status === "pubblicata") {
             statusClass = 'status-published';
             statusText = '✅ Pubblicata';
         }
 
         return `
             <tr>
-                <td>${this.escapeHtml(draft.fileName)}</td>
+                <td>${this.escapeHtml(news.title)}</td>
                 <td>
                     <span class="draft-status ${statusClass}">
                         ${statusText}
                     </span>
                 </td>
-                <td>${this.escapeHtml(draft.data?.title)}</td>
                 <td>${createdAtFormatted}</td>
-                <td>${this.escapeHtml(draft.createdBy)}</td>
+                <td>${this.escapeHtml(news.createdBy)}</td>
                 <td>
                     <div class="draft-actions">
-                        <button class="btn-open" data-draft-id="${draft.id}">Modifica</button>
-                        <button class="btn-view" data-draft-id="${draft.id}">Visualizza</button>
-                        <button class="btn-delete" data-draft-id="${draft.id}">Elimina</button>
+                        <button class="btn-open" data-news-id="${news.id}">Modifica</button>
+                        <button class="btn-view" data-news-id="${news.id}">Visualizza</button>
+                        <button class="btn-delete" data-news-id="${news.id}">Elimina</button>
                     </div>
                 </td>
             </tr>
@@ -582,101 +606,116 @@ class VehicleDraftsManager {
 
     renderEmptyState() {
         console.log('🎨 renderEmptyState - Mostra stato vuoto');
-        const draftsList = document.getElementById('draftsList');
+        const newsList = document.getElementById('newsList');
         const emptyState = document.getElementById('emptyState');
         const draftCount = document.getElementById('draftCount');
 
-        if (draftsList) draftsList.innerHTML = '';
+        if (newsList) newsList.innerHTML = '';
         if (emptyState) emptyState.style.display = 'block';
         if (draftCount) draftCount.textContent = '0';
     }
 
-    openDraftModal(draftId) {
-        console.log('🔓 openDraftModal - INIZIO');
-        console.log('🔓 draftId ricevuto:', draftId, '| Tipo:', typeof draftId);
-        console.log('🔓 this.drafts.length:', this.drafts.length);
-        console.log('🔓 Drafts IDs disponibili:', this.drafts.map(d => d.id));
+    async openNewsModal(newsId) {
+        console.log('🔓 openNewsModal - INIZIO');
+        console.log('🔓 newsId ricevuto:', newsId, '| Tipo:', typeof newsId);
+        console.log('🔓 this.newsList.length:', this.newsList.length);
+        console.log('🔓 News IDs disponibili:', this.newsList.map(n => n.id));
         
-        const draft = this.drafts.find(d => {
-            const match = d.id === draftId;
-            console.log(`🔓 Confronto: "${d.id}" === "${draftId}"? ${match}`);
+        const news = this.newsList.find(n => {
+            const match = n.id === newsId;
+            console.log(`🔓 Confronto: "${n.id}" === "${newsId}"? ${match}`);
             return match;
         });
         
-        if (!draft) {
-            console.error('❌ openDraftModal - Draft NON trovato!');
-            console.error('❌ Cercavo ID:', draftId);
-            console.error('❌ IDs disponibili:', this.drafts.map(d => d.id));
-            this.showError('Bozza non trovata');
+        if (!news) {
+            console.error('❌ openNewsModal - Notizia NON trovata!');
+            console.error('❌ Cercavo ID:', newsId);
+            console.error('❌ IDs disponibili:', this.newsList.map(n => n.id));
+            this.showError('Notizia non trovata');
             return;
         }
 
-        console.log('✅ openDraftModal - Draft TROVATO:', draft.fileName);
+        console.log('✅ openNewsModal - Notizia TROVATA:', news.title);
+
+        const newsSnap = await getDoc(doc(db, 'newsDrafts', newsId));
+        const newsData = newsSnap.data();
         
-        this.currentDraftId = draftId;
-        console.log('🔓 currentDraftId = ' + this.currentDraftId);
+        this.currentNewsId = newsId;
+        console.log('🔓 currentNewsId = ' + this.currentNewsId);
 
-        this.populateForm(draft);
-        this.showPhotoPreview(draft);
+        this.populateForm(newsData);
+        this.showImagePreview(newsData);
 
-        const modal = document.getElementById('editDraftModal');
+        const modal = document.getElementById('editNewsModal');
+        const editNewsTitle = document.getElementById('editNewsTitle');
+        const editNewsLink = document.getElementById('editNewsLink');
         if (modal) {
             modal.classList.add('active');
-            console.log('✅ openDraftModal - Modal aperto');
+            editNewsTitle.textContent = newsData.title || newsData.data?.title || '';
+            editNewsLink.textContent = newsData.data?.link || '';
+            console.log('✅ openNewsModal - Modal aperto');
         }
     }
 
-    populateForm(draft) {
-        console.log('📝 populateForm - Compilazione form');
-        const formFields = {
-            vehicleTitle: 'title',
-            vehicleBrand: 'brand',
-            vehicleModel: 'model',
-            vehiclePlate: 'plate',
-            vehicleBuilder: 'builder',
-            vehicleSlug: 'slug',
-            vehicleService: 'service',
-            vehicleHQ: 'headquarters',
-            vehicleNotes: 'notes'
-        };
-
-        for (const [elementId, fieldName] of Object.entries(formFields)) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.value = draft.data?.[fieldName] || '';
-            }
-        }
-    }
-
-    showPhotoPreview(draft) {
-        const previewImg = document.getElementById('previewImg');
-        const photoFileName = document.getElementById('photoFileName');
-
-        if (previewImg) {
-            previewImg.src = draft.photoUrl || '';
-            previewImg.style.display = draft.photoUrl ? 'block' : 'none';
-        }
-
-        if (photoFileName) {
-            photoFileName.textContent = this.escapeHtml(draft.fileName || '');
-        }
-    }
-
-    closeDraftModal() {
-        console.log('🔒 closeDraftModal');
-        const modal = document.getElementById('editDraftModal');
+    closeNewsModal() {
+        console.log('🔒 closeNewsModal');
+        const modal = document.getElementById('editNewsModal');
         if (modal) {
             modal.classList.remove('active');
         }
-
-        this.currentDraftId = null;
-        const form = document.getElementById('vehicleForm');
+        this.removeSelectedImage();
+        const form = document.getElementById('editNewsModal');
         if (form) {
             form.reset();
         }
     }
 
-    async saveDraft(event) {
+    populateForm(news) {
+        console.log('📝 populateForm - Compilazione form');
+        const formFields = {
+            newsTitle: 'title',
+            newsLink: 'link',
+            newsDate: 'date',
+            newsTags: 'tags'
+        };
+
+        for (const [elementId, fieldName] of Object.entries(formFields)) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.value = news.data?.[fieldName] || news[fieldName] || '';
+            }
+        }
+    }
+
+    showImagePreview(news) {
+        const previewImg = document.getElementById('previewImg');
+        const imageFileName = document.getElementById('imageFileName');
+
+        if (previewImg) {
+            previewImg.src = news.imageUrl || '';
+            previewImg.style.display = news.imageUrl ? 'block' : 'none';
+        }
+
+        if (imageFileName) {
+            imageFileName.textContent = this.escapeHtml(news.title || '');
+        }
+    }
+
+    closeNewsModal() {
+        console.log('🔒 closeNewsModal');
+        const modal = document.getElementById('editNewsModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+
+        this.currentNewsId = null;
+        const form = document.getElementById('newsForm');
+        if (form) {
+            form.reset();
+        }
+    }
+
+    async saveNews(event) {
         event.preventDefault();
 
         if (this.isSaving) {
@@ -687,21 +726,21 @@ class VehicleDraftsManager {
         this.isSaving = true;
         
         console.log('\n═════════════════════════════════════════════');
-        console.log('💾 SAVE DRAFT - INIZIO SALVATAGGIO');
+        console.log('💾 SAVE NEWS - INIZIO SALVATAGGIO');
         console.log('═════════════════════════════════════════════');
-        console.log('💾 this.currentDraftId:', this.currentDraftId);
-        console.log('💾 typeof this.currentDraftId:', typeof this.currentDraftId);
-        console.log('💾 this.drafts.length:', this.drafts.length);
+        console.log('💾 this.currentNewsId:', this.currentNewsId);
+        console.log('💾 typeof this.currentNewsId:', typeof this.currentNewsId);
+        console.log('💾 this.newsList.length:', this.newsList.length);
 
-        const draft = this.drafts.find(d => d.id === this.currentDraftId);
+        const news = this.newsList.find(n => n.id === this.currentNewsId);
         
-        console.log('💾 Draft trovato nel array?', draft ? 'SÌ' : 'NO');
+        console.log('💾 Notizia trovata nel array?', news ? 'SÌ' : 'NO');
         
-        if (!draft) {
-            console.error('❌ ERRORE: Draft non trovato!');
-            console.error('❌ Cercavo ID:', this.currentDraftId);
-            console.error('❌ IDs disponibili:', this.drafts.map(d => d.id));
-            this.showError('Bozza non trovata');
+        if (!news) {
+            console.error('❌ ERRORE: Notizia non trovata!');
+            console.error('❌ Cercavo ID:', this.currentNewsId);
+            console.error('❌ IDs disponibili:', this.newsList.map(n => n.id));
+            this.showError('Notizia non trovata');
             this.isSaving = false;
             return;
         }
@@ -713,48 +752,43 @@ class VehicleDraftsManager {
             return;
         }
 
-        const vehicleData = this.collectFormData();
-        console.log('💾 Vehicle data raccolto:', vehicleData);
+        const newsData = this.collectFormData();
+        console.log('💾 News data raccolto:', newsData);
 
         try {
             this.showLoading('Salvataggio in corso...');
 
-            const draftRef = doc(db, 'vehiclesDraft', this.currentDraftId);
-            console.log('💾 Doc reference creato per ID:', this.currentDraftId);
+            const newsRef = doc(db, 'newsDrafts', this.currentNewsId);
+            console.log('💾 Doc reference creato per ID:', this.currentNewsId);
 
             const currentUser = this.getCurrentUser();
             console.log('💾 Utente corrente:', currentUser);
 
             console.log('💾 → Esecuzione updateDoc...');
             
-            await updateDoc(draftRef, {
-                status: 'in_progress',
-                data: vehicleData,
-                slug: vehicleData.slug,
+            await updateDoc(newsRef, {
+                title: newsData.title,
+                link: newsData.link,
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser || 'Staff User'
             });
 
             console.log('✅ updateDoc completato!');
 
-            await this.triggerGithubWorkflow(this.currentDraftId);
+            this.triggerGithubWorkflow(this.currentNewsId);
 
-            await updateDoc(draftRef, {
-                status: 'published'
-            });
-
-            draft.data = vehicleData;
-            draft.status = 'published';
-            draft.slug = vehicleData.slug;
-            draft.updatedAt = new Date().toISOString();
+            news.data = newsData;
+            news.status = newsData.status;
+            news.title = newsData.title;
+            news.updatedAt = new Date().toISOString();
 
             console.log('✅ Stato locale aggiornato');
             console.log('═════════════════════════════════════════════');
-            this.showSuccess('✅ Bozza in pubblicazione!');
+            this.showSuccess('✅ Notizia salvata con successo!');
             console.log('═════════════════════════════════════════════\n');
 
-            this.closeDraftModal();
-            setTimeout(() => this.loadDrafts(), 1000);
+            this.closeNewsModal();
+            setTimeout(() => this.loadNews(), 1000);
 
         } catch (error) {
             console.error('❌ ERRORE NEL SALVATAGGIO:', error);
@@ -773,7 +807,7 @@ class VehicleDraftsManager {
 
         try {
             const response = await fetch(
-                "/api/triggerVehicleWorkflow",
+                "/api/triggerNewsWorkflow",
                 {
                     method: "POST",
                     headers: {
@@ -812,7 +846,7 @@ class VehicleDraftsManager {
 
     validateForm() {
         console.log('✔️ validateForm');
-        const requiredFields = ['vehicleTitle', 'vehicleBrand', 'vehicleModel', 'vehiclePlate', 'vehicleService', 'vehicleSlug', 'vehicleHQ'];
+        const requiredFields = ['editNewsTitle', 'editNewsLink'];
         
         for (const fieldId of requiredFields) {
             const element = document.getElementById(fieldId);
@@ -824,35 +858,31 @@ class VehicleDraftsManager {
         return true;
     }
 
-    collectFormData() {
+    collectFormData(mode = 'create') {
+        const suffix = mode === 'create' ? 'Create' : 'Edit';
         return {
-            title: document.getElementById('vehicleTitle')?.value || '',
-            brand: document.getElementById('vehicleBrand')?.value || '',
-            model: document.getElementById('vehicleModel')?.value || '',
-            plate: document.getElementById('vehiclePlate')?.value.toUpperCase() || '',
-            builder: document.getElementById('vehicleBuilder')?.value || '',
-            service: document.getElementById('vehicleService')?.value || '',
-            slug: document.getElementById('vehicleSlug')?.value || '',
-            headquarters: document.getElementById('vehicleHQ')?.value || '',
-            notes: document.getElementById('vehicleNotes')?.value || ''
+            title: document.getElementById(`news${suffix}Title`)?.value || '',
+            link: document.getElementById(`news${suffix}Link`)?.value || '',
+            date: Timestamp.now(),
+            tags: document.getElementById('newsTags')?.value || ''
         };
     }
 
-    async deleteDraft(draftId) {
-        console.log('🗑️ deleteDraft:', draftId);
+    async deleteNews(newsId) {
+        console.log('🗑️ deleteNews:', newsId);
         
-        if (confirm('Sei sicuro di voler eliminare questo veicolo dal sistema?')) {
+        if (confirm('Sei sicuro di voler eliminare questa notizia dal sistema?')) {
             try {
                 this.showLoading('Eliminazione in corso...');
-                const draftRef = doc(db, 'vehiclesDraft', draftId);
-                await deleteDoc(draftRef);
+                const newsRef = doc(db, 'newsDrafts', newsId);
+                await deleteDoc(newsRef);
     
-                this.drafts = this.drafts.filter(d => d.id !== draftId);
-                this.renderDrafts();
-                this.showSuccess('✅ Bozza eliminata');
+                this.newsList = this.newsList.filter(n => n.id !== newsId);
+                this.renderNews();
+                this.showSuccess('✅ Notizia eliminata');
     
             } catch (error) {
-                console.error('❌ deleteDraft - Errore:', error);
+                console.error('❌ deleteNews - Errore:', error);
                 this.showError(`Errore: ${error.message}`);
             }
         } else {
@@ -888,6 +918,13 @@ class VehicleDraftsManager {
         }
     }
 
+    setStatus(message, className) {
+        if (!statusMsg) return;
+        statusMsg.textContent = message;
+        statusMsg.className = `${"statusBox" + " " + className}`;
+        statusMsg.style.display = "block";
+    }
+
     escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -900,7 +937,7 @@ class VehicleDraftsManager {
         if (window.showNotification) {
             window.showNotification(message, 'error');
         } else {
-            setStatus(message, "error");
+            this.setStatus(message, "error");
         }
     }
 
@@ -909,7 +946,7 @@ class VehicleDraftsManager {
         if (window.showNotification) {
             window.showNotification(message, 'success');
         } else {
-            setStatus(message, "success");
+            this.setStatus(message, "success");
         }
     }
 
@@ -920,62 +957,60 @@ class VehicleDraftsManager {
         }
     }
 
-    setStatus(message, type) {
-        if (!statusMsg) return;
-        statusMsg.textContent = message;
-        statusMsg.className = `${"statusBox" + " " + type}`;
-    }
-
-    openDraftViewer(draftId) {
-        console.log('👁️ openDraftViewer - Visualizzazione bozza');
+    openNewsViewer(newsId) {
+        console.log('👁️ openNewsViewer - Visualizzazione notizia');
         
-        const draft = this.drafts.find(d => d.id === draftId);
+        const news = this.newsList.find(n => n.id === newsId);
         
-        if (!draft) {
-            this.showError('Bozza non trovata');
+        if (!news) {
+            this.showError('Notizia non trovata');
             return;
         }
 
-        this.populateViewerForm(draft);
-        this.showPhotoPreview(draft);
+        this.populateViewerForm(news);
+        this.showImagePreviewViewer(news);
 
-        const viewerModal = document.getElementById('viewDraftModal');
+        const viewerModal = document.getElementById('viewNewsModal');
         if (viewerModal) {
             viewerModal.classList.add('active');
         }
     }
 
-    populateViewerForm(draft) {
+    populateViewerForm(news) {
         console.log('📖 populateViewerForm - Compilazione form lettura');
         const photoImg = document.getElementById('viewerPhotoImg');
-        if (photoImg && draft.photoUrl) {
-            photoImg.src = draft.photoUrl;
+        if (photoImg && news.imageUrl) {
+            photoImg.src = news.imageUrl;
             photoImg.style.display = 'block';
         } else if (photoImg) {
             photoImg.style.display = 'none';
         }
+
         const viewerFields = {
             viewerTitle: 'title',
-            viewerBrand: 'brand',
-            viewerModel: 'model',
-            viewerPlate: 'plate',
-            viewerBuilder: 'builder',
-            viewerSlug: 'slug',
-            viewerService: 'service',
-            viewerHQ: 'headquarters',
-            viewerNotes: 'notes'
+            viewerLink: 'link',
+            viewerDate: 'date',
+            viewerTags: 'tags'
         };
 
         for (const [elementId, fieldName] of Object.entries(viewerFields)) {
             const element = document.getElementById(elementId);
             if (element) {
-                element.textContent = draft.data?.[fieldName] || '-';
+                const value = news.data?.[fieldName] || news[fieldName] || '-';
+                element.textContent = value;
             }
         }
     }
 
+    showImagePreviewViewer(news) {
+        const imageFileName = document.getElementById('viewerPhotoFileName');
+        if (imageFileName) {
+            imageFileName.textContent = this.escapeHtml(news.title || '');
+        }
+    }
+
     closeViewerModal() {
-        const viewerModal = document.getElementById('viewDraftModal');
+        const viewerModal = document.getElementById('viewNewsModal');
         if (viewerModal) {
             viewerModal.classList.remove('active');
         }
@@ -984,12 +1019,12 @@ class VehicleDraftsManager {
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎯 DOMContentLoaded - Inizializzazione manager');
-    window.vehicleDraftsManager = new VehicleDraftsManager();
+    window.newsManager = new NewsManager();
 
-    window.openDraftModal = (draftId) => window.vehicleDraftsManager.openDraftModal(draftId);
-    window.closeDraftModal = () => window.vehicleDraftsManager.closeDraftModal();
-    window.saveDraft = (event) => window.vehicleDraftsManager.saveDraft(event);
-    window.deleteDraft = (draftId) => window.vehicleDraftsManager.deleteDraft(draftId);
+    window.openNewsModal = (newsId) => window.newsManager.openNewsModal(newsId);
+    window.closeNewsModal = () => window.newsManager.closeNewsModal();
+    window.saveNews = (event) => window.newsManager.saveNews(event);
+    window.deleteNews = (newsId) => window.newsManager.deleteNews(newsId);
 });
 
-console.log('✅ Script vehiclesDraft caricato - DEBUG ABILITATO');
+console.log('✅ Script News Manager caricato - DEBUG ABILITATO');

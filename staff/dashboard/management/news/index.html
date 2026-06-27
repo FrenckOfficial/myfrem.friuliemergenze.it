@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Notizie - Dashboard Staff | MyFrEM</title>
+    <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="/staff/dashboard/management/news/load.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+            <h2>MyFrEM Staff</h2>
+        </div>
+        <nav>
+            <a href="/staff/">📊 Dashboard</a>
+            <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+            <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+            <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+            <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+            <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+            <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+        </nav>
+        <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+
+    <div class="main-content">
+        <h1>📰 Gestione Notizie</h1>
+
+        <div class="login">
+            <p>Effettua il login per visualizzare le notizie.</p>
+            <div class="loginstate">
+                <input type="password" name="password" id="psw" placeholder="Inserisci la password che ti è stata fornita.">
+                <button id="loginBtn">Login</button>
+            </div>
+        </div>
+        
+        <div class="drafts-container" style="display:none;">
+            <div class="drafts-header">
+                <h2>Notizie totali:</h2>
+                <span class="news-count" id="totalDraftsCount"> 0</span>
+                <h2>In bozza:</h2>
+                <span class="news-count" id="draftCount"> 0</span>
+                <h2>Pubblicate:</h2>
+                <span class="news-count" id="publishedDraftsCount"> 0</span>
+            </div>
+            <p class="statusBox" style="display:none;" id="statusMsgNormal"></p>
+            <button id="newDraftBtn" class="btn-new-draft">Nuova Notizia</button>
+
+            <div id="draftsTableContainer">
+                <table class="drafts-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Titolo</th>
+                            <th style="width: 15%;">Stato</th>
+                            <th style="width: 20%;">Data Creazione</th>
+                            <th style="width: 15%;">Autore</th>
+                            <th style="width: 15%;">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newsList">
+                        <!-- Notizie caricate dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p style="font-size: 3rem; margin: 20px 0;">📭</p>
+                <p>Nessuna notizia in bozza</p>
+                <p style="color: var(--faint); font-size: 0.75rem;">Crea una nuova notizia per iniziare</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="createNewsModal" class="modal">
+        <div class="modal-content">
+            <p id="statusMsgCreate"></p>
+            <div class="modal-header">
+                <h2>Crea Nuova Notizia</h2>
+                <button class="modal-close" onclick="window.newsManager.closeCreateModal()">&times;</button>
+            </div>
+ 
+            <form id="createNewsForm">
+                <div class="form-group">
+                    <p class="statusBox" style="display:none;" id="statusMsg"></p>
+                    <label for="newsImageInput">📸 Immagine in Evidenza</label>
+                    <div class="photo-upload-area">
+                        <input 
+                            type="file" 
+                            id="newsImageInput" 
+                            name="image" 
+                            accept="image/*"
+                            style="display: none;">
+                        
+                        <div id="imageDropZone" class="photo-drop-zone">
+                            <p style="font-size: 2rem; margin: 10px 0;">📷</p>
+                            <p><strong>Trascina l'immagine qui</strong></p>
+                            <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
+                            <button type="button" class="btn-browse" id="imageBrowseBtn">Sfoglia file</button>
+                            <p style="color: var(--faint); font-size: 0.85rem; margin-top: 10px;">Formati: JPG, PNG, WebP | Max 5MB</p>
+                            <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
+                            <button type="button" class="btn-browse" id="imageLinkBtn">Inserisci link</button>
+                            <div id="imageLinkZone" style="display:none;margin-top:15px;flex-direction:row;border:1px solid var(--faint);border-radius:8px;">
+                                <input type="text" name="imageLink" id="imageLinkInput">
+                                <button type="button" class="btn-browse" id="imageLinkConfirmBtn">Conferma</button>
+                            </div>
+                        </div>
+ 
+                        <div id="imagePreviewCreate" class="photo-preview" style="display: none; margin-top: 15px;">
+                            <img id="previewImgCreate" src="" alt="Anteprima immagine" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
+                            <p id="imageFileNameCreate" style="text-align: center; margin-top: 10px; color: var(--faint); font-size: 0.9rem;"></p>
+                            <button type="button" class="btn-remove-photo" id="removeImageBtn">Rimuovi immagine</button>
+                        </div>
+                    </div>
+                </div>
+ 
+                <hr style="margin: 20px 0; opacity: 0.2;">
+ 
+                <div class="form-group">
+                    <label for="createNewsTitle">Titolo *</label>
+                    <input type="text" id="createNewsTitle" name="title" required placeholder="Es: Nuovo protocollo di intervento approvato">
+                </div>
+
+                <div class="form-group">
+                    <label for="createNewsLink"> Link *</label>
+                    <input type="text" id="createNewsLink" name="link" required placeholder="https://ilgoriziano.it/notizie/nuovo-protocollo-di-intervento-approvato">
+                </div>
+ 
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">Crea Notizia</button>
+                    <button type="button" class="btn-cancel" onclick="window.newsManager.closeCreateModal()">Annulla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editNewsModal" class="modal">
+        <div class="modal-content">
+            <p id="statusMsg"></p>
+            <div class="modal-header">
+                <h2>Modifica Notizia</h2>
+                <button class="modal-close" onclick="window.newsManager.closeNewsModal()">&times;</button>
+            </div>
+
+            <div class="photo-preview" id="photoPreview">
+                <img id="previewImg" src="" alt="Immagine notizia" style="display: none;">
+            </div>
+
+            <form id="newsForm">
+                <p class="statusBox" style="display:none;" id="statusMsgEdit"></p>
+                <div class="form-group">
+                    <label for="editNewsTitle">Titolo *</label>
+                    <input type="text" id="editNewsTitle" name="title" required placeholder="Es: Nuovo protocollo di intervento approvato">
+                </div>
+
+                <div class="form-group">
+                    <label for="editNewsLink"> Link *</label>
+                    <input type="text" id="editNewsLink" name="link" required placeholder="https://ilgoriziano.it/notizie/nuovo-protocollo-di-intervento-approvato">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-save">Salva</button>
+                    <button type="button" class="btn-cancel" onclick="window.newsManager.closeNewsModal()">Annulla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewNewsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👁️ Visualizza Notizia</h2>
+                <button class="modal-close" onclick="window.newsManager.closeViewerModal()">&times;</button>
+            </div>
+
+            <div class="photo-preview" id="viewerPhotoPreview">
+                <img id="viewerPhotoImg" src="" alt="Immagine notizia" style="display: none; max-width: 300px; margin: 20px auto;">
+                <p id="viewerPhotoFileName" style="text-align: center; color: var(--faint);"></p>
+            </div>
+
+            <div class="viewer-content">
+                <p class="statusBox" style="display:none;" id="statusMsgView"></p>
+                <div class="form-group">
+                    <label for="viewNewsTitle">Titolo *</label>
+                    <input type="text" id="viewNewsTitle" name="title" required placeholder="Es: Nuovo protocollo di intervento approvato">
+                </div>
+
+                <div class="form-group">
+                    <label for="viewNewsLink">Link *</label>
+                    <input type="text" id="viewNewsLink" name="link" required placeholder="https://ilgoriziano.it/notizie/nuovo-protocollo-di-intervento-approvato">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary" onclick="window.newsManager.closeViewerModal()">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("loginBtn").addEventListener("click", async () => {
+            const password = document.getElementById("psw").value;
+            if (password === "ilgoriziano") {
+                document.querySelector(".drafts-container").style.display = "block";
+                document.querySelector(".login").style.display = "none";
+            };
+        });
+    </script>
+</body>
+</html>

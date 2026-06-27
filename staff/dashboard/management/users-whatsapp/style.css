@@ -369,6 +369,30 @@ button:nth-child(3):hover {
   color: var(--faint);
 }
 
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.login input {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+  width: 50%
+}
+.loginstate {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--signal-green);
+  gap: 20px;
+  display: flex;
+  flex-direction: row;
+}
+
 .drafts-container {
   display: flex;
   flex-direction: column;
@@ -428,6 +452,10 @@ button:nth-child(3):hover {
 
 .drafts-table tr:hover td {
   background: var(--bg-hover);
+}
+
+#draftsTableContainer {
+  margin-top: 20px;
 }
 
 .photo-thumb {

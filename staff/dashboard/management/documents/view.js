@@ -61,7 +61,6 @@ async function loadUsersMap() {
 
 async function loadAllFiles() {
   try {
-    setStatus("⏳ Caricamento di tutti i file...");
 
     const q = query(
       collection(db, "staffDocUploads"),
@@ -92,8 +91,6 @@ async function loadAllFiles() {
 
       docsTableBody.appendChild(tr);
     });
-
-    setStatus(`📸 Totale file: ${snapshot.size}`);
   } catch (err) {
     console.error("Errore caricamento:", err);
     setStatus("Errore caricamento files", "error");

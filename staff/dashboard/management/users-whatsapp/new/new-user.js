@@ -27,6 +27,8 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
   try {
     const userDoc = await getDoc(doc(db, "users", id));
 
+    document.getElementById("myfremResult").style.display = "block";
+
     if (!userDoc.exists()) {
       document.getElementById("myfremResult").innerHTML = "❌ Nessun utente trovato.";
       linkedMyFremUser = null;
@@ -34,6 +36,8 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
     }
 
     linkedMyFremUser = { id, ...userDoc.data() };
+
+    document.getElementById("myfremResult").style.display = "block";
 
     document.getElementById("myfremResult").innerHTML = `
       <b>Utente trovato</b><br>
