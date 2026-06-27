@@ -17,22 +17,237 @@
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://myfrem.friuliemergenze.it/login/signin</loc>
-  <lastmod>2026-06-19T18:36:38+00:00</lastmod>
-  <priority>0.80</priority>
+  <loc>https://myfrem.friuliemergenze.it/auth</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://myfrem.friuliemergenze.it/login/signup</loc>
-  <lastmod>2026-06-19T18:36:38+00:00</lastmod>
-  <priority>0.80</priority>
+  <loc>https://myfrem.friuliemergenze.it/dashboard</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>1.00</priority>
 </url>
 <url>
   <loc>https://myfrem.friuliemergenze.it/auth/signin</loc>
   <lastmod>2026-06-19T18:36:38+00:00</lastmod>
-  <priority>0.64</priority>
+  <priority>0.80</priority>
 </url>
 <url>
   <loc>https://myfrem.friuliemergenze.it/auth/signup</loc>
+  <lastmod>2026-06-19T18:36:38+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/auth/reset-your-password</loc>
+  <lastmod>2026-06-19T18:36:39+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/verify-email</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/all-events</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/all-photos</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/contact</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/create-event</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/settings</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/dashboard/upload</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/activities</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/contactrq</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/events</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/events/completeorganization</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/kick-reports</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/logins</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/documents</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/news</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/newsletter</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/newsletter/new</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/newsletter/users</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/pdfGenerator</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/pdfGenerator/new</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/permissions</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/permissions/new</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/surveys</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/upload-documents</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/users-platform</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/users-whatsapp</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/users-whatsapp/edit</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/users-whatsapp/new</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/users-whatsapp/user</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/vehicle-drafts</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/photos</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/rapporto-riunioni-staff</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/settings</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/users</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/staff/dashboard/management/riunioni</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/profile</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/events</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/api</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://myfrem.friuliemergenze.it/login/signup</loc>
   <lastmod>2026-06-19T18:36:38+00:00</lastmod>
   <priority>0.64</priority>
 </url>
@@ -42,14 +257,14 @@
   <priority>0.51</priority>
 </url>
 <url>
-  <loc>https://myfrem.friuliemergenze.it/login/signup/</loc>
-  <lastmod>2026-06-19T18:36:38+00:00</lastmod>
+  <loc>https://myfrem.friuliemergenze.it/riunione-staff</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
   <priority>0.51</priority>
 </url>
 <url>
-  <loc>https://myfrem.friuliemergenze.it/auth/reset-your-password</loc>
-  <lastmod>2026-06-19T18:36:39+00:00</lastmod>
-  <priority>0.41</priority>
+  <loc>https://myfrem.friuliemergenze.it/kick-reports</loc>
+  <lastmod>2026-06-27T10:26:45+00:00</lastmod>
+  <priority>0.51</priority>
 </url>
 
 </urlset>

@@ -475,7 +475,6 @@ class NewsManager {
             title: document.getElementById('createNewsTitle')?.value || '',
             link: document.getElementById('createNewsLink')?.value || '',
             date: Timestamp.now(),
-            tags: document.getElementById('createNewsTags')?.value || ''
         };
     }
 
@@ -573,14 +572,14 @@ class NewsManager {
     renderNewsRow(news) {
         let statusClass = 'status-draft'
         const createdAtFormatted = this.formatDate(news.createdAt);
-        let statusText = '📝 Bozza';
+        let statusText = 'Bozza';
 
         if (news.status === "bozza") {
             statusClass = 'status-draft';
-            statusText = '📝 Bozza';
+            statusText = 'Bozza';
         } else if (news.status === "pubblicata") {
             statusClass = 'status-published';
-            statusText = '✅ Pubblicata';
+            statusText = 'Pubblicata';
         }
 
         return `
@@ -651,8 +650,8 @@ class NewsManager {
         const editNewsLink = document.getElementById('editNewsLink');
         if (modal) {
             modal.classList.add('active');
-            editNewsTitle.textContent = newsData.title || newsData.data?.title || '';
-            editNewsLink.textContent = newsData.data?.link || '';
+            editNewsTitle.value = newsData.title || newsData.data?.title || '';
+            editNewsLink.value = newsData.data?.link || '';
             console.log('✅ openNewsModal - Modal aperto');
         }
     }
@@ -752,7 +751,7 @@ class NewsManager {
             return;
         }
 
-        const newsData = this.collectFormData();
+        const newsData = this.collectEditFormData();
         console.log('💾 News data raccolto:', newsData);
 
         try {
@@ -769,6 +768,11 @@ class NewsManager {
             await updateDoc(newsRef, {
                 title: newsData.title,
                 link: newsData.link,
+                data: {
+                    title: newsData.title,
+                    link: newsData.link,
+                    date: newsData.date,
+                },
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser || 'Staff User'
             });
@@ -858,14 +862,12 @@ class NewsManager {
         return true;
     }
 
-    collectFormData(mode = 'create') {
-        const suffix = mode === 'create' ? 'Create' : 'Edit';
+    collectEditFormData() {
         return {
-            title: document.getElementById(`news${suffix}Title`)?.value || '',
-            link: document.getElementById(`news${suffix}Link`)?.value || '',
-            date: Timestamp.now(),
-            tags: document.getElementById('newsTags')?.value || ''
-        };
+            title: document.getElementById('editNewsTitle').value,
+            link: document.getElementById('editNewsLink').value,
+            date: Timestamp.now()
+        }
     }
 
     async deleteNews(newsId) {

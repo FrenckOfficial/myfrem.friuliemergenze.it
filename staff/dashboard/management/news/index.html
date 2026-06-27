@@ -38,6 +38,7 @@
                 <input type="password" name="password" id="psw" placeholder="Inserisci la password che ti è stata fornita.">
                 <button id="loginBtn">Login</button>
             </div>
+            <p id="statusMsgLogin" style="display:none;"></p>
         </div>
         
         <div class="drafts-container" style="display:none;">
@@ -208,7 +209,26 @@
             if (password === "ilgoriziano") {
                 document.querySelector(".drafts-container").style.display = "block";
                 document.querySelector(".login").style.display = "none";
+            } else {
+                document.querySelector(".drafts-container").style.display = "none";
+                document.querySelector(".login").style.display = "block";
+                document.getElementById("statusMsgLogin").style.display = "block";
+                document.getElementById("statusMsgLogin").innerHTML = "Password errata";
             };
+        });
+        document.getElementById("psw").addEventListener("keyup", async (event) => {
+            if (event.key === "Enter") {
+                const password = document.getElementById("psw").value;
+                if (password === "ilgoriziano") {
+                    document.querySelector(".drafts-container").style.display = "block";
+                    document.querySelector(".login").style.display = "none";
+                } else {
+                    document.querySelector(".drafts-container").style.display = "none";
+                    document.querySelector(".login").style.display = "block";
+                    document.getElementById("statusMsgLogin").style.display = "block";
+                    document.getElementById("statusMsgLogin").innerHTML = "Password errata";
+                };
+            }
         });
     </script>
 </body>

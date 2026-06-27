@@ -63,12 +63,12 @@ async function pushNewsToGithub() {
     .get();
 
   if (!draftSnapshot.exists) {
-    throw new Error(`Bozza ${draftId} non trovata`);
+    throw new Error(`Notizia ${draftId} non trovata`);
   }
 
   const draft = draftSnapshot.data();
 
-  console.log("✅ Bozza caricata:", draft.fileName);
+  console.log("✅ Notizia caricata:", draft.title);
 
   const title = draft.title || {};
   const date = draft.createdAt || {};
@@ -175,7 +175,7 @@ pushNewsToGithub()
         await db.collection("newsDrafts")
           .doc(draftId)
           .update({
-            status: "error",
+            properStatus: "error",
             errorMessage: error.message,
             errorAt:
               admin.firestore.Timestamp.now(),
