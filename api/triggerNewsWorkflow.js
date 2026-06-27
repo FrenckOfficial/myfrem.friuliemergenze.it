@@ -27,7 +27,7 @@ export default async (request, response) => {
       return response.status(400).json({ error: "Body vuoto" });
     }
 
-    let draftId;
+    let newsId;
     const token = process.env.GT_TOKEN;
 
     console.log("TOKEN ESISTE:", !!token);
@@ -35,18 +35,18 @@ export default async (request, response) => {
 
     try {
       const parsed = JSON.parse(rawBody);
-      draftId = parsed.draftId;
+      newsId = parsed.newsId;
     } catch (err) {
       console.error("JSON non valido:", err);
       return response.status(400).json({ error: "JSON non valido" });
     }
 
-    if (!draftId) {
-      console.error("❌ draftId mancante");
-      return response.status(400).json({ error: "draftId mancante" });
+    if (!newsId) {
+      console.error("❌ newsId mancante");
+      return response.status(400).json({ error: "newsId mancante" });
     }
 
-    console.log("📦 Draft ID:", draftId);
+    console.log("📦 Draft ID:", newsId);
 
     if (!token) {
       console.error("❌ GITHUB_PAT non configurato");
@@ -65,7 +65,7 @@ export default async (request, response) => {
         body: JSON.stringify({
           ref: "main",
           inputs: {
-            draftId: String(draftId)
+            newsId: String(newsId)
           }
         })
       }
