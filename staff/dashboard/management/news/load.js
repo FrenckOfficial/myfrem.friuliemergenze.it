@@ -814,7 +814,7 @@ class NewsManager {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        draftId: String(draftId)
+                        newsId: String(draftId)
                     })
                 }
             );
