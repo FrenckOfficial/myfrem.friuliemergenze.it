@@ -162,7 +162,7 @@ if (loginForm) {
       await validateAccount(userData);
 
       try {
-        await fetch("/api/sendLoginNotification", {
+        await fetch("/api/sendLoginMail", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
