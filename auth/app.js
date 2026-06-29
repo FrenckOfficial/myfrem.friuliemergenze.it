@@ -229,7 +229,7 @@ if (googleBtn) {
       redirectByRole(userData.role);
 
       try {
-        await fetch("/api/sendLoginNotification", {
+        await fetch("/api/sendLoginMail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

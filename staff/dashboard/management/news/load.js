@@ -439,6 +439,7 @@ class NewsManager {
 
             await addDoc(collection(db, "activities"), {
                 type: "news_create",
+                title: newsData.title,
                 editStaffer: auth.currentUser?.email || "-",
                 timestamp: Timestamp.now()
             });
@@ -447,6 +448,12 @@ class NewsManager {
 
             document.querySelector(".btn-publish").addEventListener("click", () => {
                 this.triggerGithubWorkflow(this.currentNewsId);
+                await addDoc(collection(db, "activities"), {
+                    type: "news_published",
+                    title: newsData.title,
+                    editStaffer: auth.currentUser?.email || "-",
+                    timestamp: Timestamp.now()
+                })
             });
 
             console.log('✅ Notizia creata con ID:', newNewsRef.id);
@@ -793,6 +800,7 @@ class NewsManager {
 
             await addDoc(collection(db, 'activities'), {
                 type: 'news_update',
+                title: newsData.title,
                 editStaffer: currentUser.email || '-',
                 timestamp: Timestamp.now()
             });

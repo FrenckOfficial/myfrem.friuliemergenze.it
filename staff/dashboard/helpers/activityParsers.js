@@ -132,11 +132,11 @@ export async function parseActivity(activity, date) {
         }
 
         case "news_update": {
-            return `[${date}] Notizia "${activity.title}" modificata da ${activity.staffMember}.`;
+            return `[${date}] Notizia "${activity.title}" modificata da ${activity.editStaffer}.`;
         }
 
         case "news_published": {
-            return `[${date}] Notizia "${activity.title}" pubblicata da ${activity.staffMember}.`;
+            return `[${date}] Notizia "${activity.title}" pubblicata da ${activity.editStaffer}.`;
         }
 
         default:
