@@ -386,7 +386,7 @@ class NewsManager {
         }
     }
 
-    async createNews(event) {
+    async createNews(event, newsId) {
         event.preventDefault();
 
         if (this.isSaving) {
@@ -395,6 +395,7 @@ class NewsManager {
         }
 
         this.isSaving = true;
+        this.currentNewsId = newsId;
 
         console.log('\n═════════════════════════════════════════════');
         console.log('✨ CREATE NEWS - INIZIO CREAZIONE');
@@ -434,6 +435,18 @@ class NewsManager {
                 createdBy: currentUser,
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser
+            });
+
+            await addDoc(collection(db, "activities"), {
+                type: "news_create",
+                editStaffer: auth.currentUser?.email || "-",
+                timestamp: Timestamp.now()
+            });
+
+            this.currentNewsId = newNewsRef.id;
+
+            document.querySelector(".btn-publish").addEventListener("click", () => {
+                this.triggerGithubWorkflow(this.currentNewsId);
             });
 
             console.log('✅ Notizia creata con ID:', newNewsRef.id);
@@ -775,6 +788,12 @@ class NewsManager {
                 },
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser || 'Staff User'
+            });
+
+            await addDoc(collection(db, 'activities'), {
+                type: 'news_update',
+                editStaffer: currentUser.email || '-',
+                timestamp: Timestamp.now()
             });
 
             console.log('✅ updateDoc completato!');

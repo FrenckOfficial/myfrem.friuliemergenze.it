@@ -1,4 +1,4 @@
-import { getNameById } from "https://myfrem.friuliemergenze.it/staff/dashboard/helpers/idResolver.js";
+import { getNameById } from "/staff/dashboard/helpers/idResolver.js";
 
 export async function parseActivity(activity, date) {
 
@@ -125,6 +125,18 @@ export async function parseActivity(activity, date) {
 
         case "vehicle_draft_created": {
             return `[${date}] Nuovo bozza veicolo (${activity.photoId}) creato da ${activity.staffMember}. ID ${activity.draftId}.`;
+        }
+
+        case "news_create": {
+            return `[${date}] Nuova notizia creata: "${activity.title}".`;
+        }
+
+        case "news_update": {
+            return `[${date}] Notizia "${activity.title}" modificata da ${activity.staffMember}.`;
+        }
+
+        case "news_published": {
+            return `[${date}] Notizia "${activity.title}" pubblicata da ${activity.staffMember}.`;
         }
 
         default:

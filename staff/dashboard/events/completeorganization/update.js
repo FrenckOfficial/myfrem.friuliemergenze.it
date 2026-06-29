@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -39,7 +39,7 @@ async function loadEventPage() {
     const event = snap.data();
 
     eventIdPage.textContent = `📅 Evento: ${event.title}`;
-    titleEvent.textContent = `Completa organizzazione evento ${event.title} - Registro Eventi | MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`;
+    titleEvent.textContent = `Completa organizzazione evento ${event.title} - Registro Eventi | Intranet Friuli Emergenze`;
 
     const div = document.createElement("div");
     div.className = "event-card";

@@ -694,6 +694,7 @@ button:nth-child(3):hover {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
+  width: 20%;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: all 0.2s;

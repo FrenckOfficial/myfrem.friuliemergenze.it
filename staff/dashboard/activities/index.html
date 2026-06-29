@@ -4,34 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tutte le attività - Dashboard Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-    <link rel="stylesheet" href="/staff/dashboard/staff.css">
+    <link rel="stylesheet" href="/staff.css">
     <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <script type="module" src="/staff/dashboard/activities/all-activities.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="/activities/load.js"></script>
 </head>
 <body>
     <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>MyFrEM Staff</h2>
+      <h2>Intranet</h2>
     </div>
     <nav>
       <a href="/staff" class="active">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-      <a href="/staff/dashboard/users/">👥 Funzionalità</a>
-      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      <a href="/photos/">🖼️ Moderazione foto</a>
+      <a href="/users/">👥 Funzionalità</a>
+      <a href="/events/">🗂️ Moderazione eventi</a>
+      <a href="/kick-reports/">🗂️ Rapporti di espulsione</a>
+      <a href="/contactrq/">📞 Richieste di assistenza</a>
+      <a href="/settings/">⚙️ Impostazioni</a>
     </nav>
     <button id="logoutBtn" class="logout">🚪 Logout</button>
   </aside>
 
     <div class="main-content">
         <h1>📋 Tutte le attività</h1>
-        <a href="/staff/dashboard/activities/export/" class="btn-primary mb-3">📥 Esporta CSV</a>
         <div class="activity" id="activitiesList">
             <!-- JS Loading -->
         </div>

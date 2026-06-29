@@ -1,7 +1,7 @@
 {
   "name": "Piattaforma MyFrEM",
   "short_name": "MyFrEM",
-  "description": "La piattaforma MyFrEM consente agli utenti di caricare e condividere fotografie dei mezzi di emergenza del Friuli Venezia Giulia e del Veneto Orientale, contribuendo all'espansione della galleria di Friuli Emergenze.",
+  "description": "Carica e condividi foto dei mezzi di emergenza del Friuli-Venezia Giulia. Contribuisci alla galleria di Friuli Emergenze su MyFrEM.",
   "start_url": "/?source=pwa",
   "id": "/",
   "scope": "/",

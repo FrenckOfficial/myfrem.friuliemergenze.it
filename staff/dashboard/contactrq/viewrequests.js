@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, query, orderBy, where, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

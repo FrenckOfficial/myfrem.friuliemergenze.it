@@ -83,12 +83,29 @@ async function getUserDoc(uid) {
   return await getDoc(doc(db, "users", uid));
 }
 
+async function getIpAddress() {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error("Errore nel recupero IP:", error);
+    return "Non disponibile";
+  }
+}
+
 async function createLoginLog(user) {
   await addDoc(collection(db, "logins"), {
     userId: user.uid,
     email: user.email,
+    userAgent: navigator.userAgent,
+    ipAddress: await getIpAddress(),
     timestamp: serverTimestamp()
   });
+
+  console.table(
+    (await getDocs(collection(db, "logins"))).docs.map((doc) => doc.data())
+  );
 }
 
 async function validateAccount(userData) {
@@ -110,34 +127,21 @@ if (loginForm) {
     e.preventDefault();
 
     if (isLoggingIn) return;
-
     isLoggingIn = true;
 
     try {
-      const identifier =
-        document.getElementById("loginEmail").value.trim();
-
-      const password =
-        document.getElementById("loginPassword").value;
+      const identifier = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
 
       let email = identifier;
 
       if (!identifier.includes("@")) {
         const userData = await getUserByUsername(identifier);
-
-        if (!userData) {
-          throw new Error("Username non trovato.");
-        }
-
+        if (!userData) throw new Error("Username non trovato.");
         email = userData.email;
       }
 
-      const cred = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
+      const cred = await signInWithEmailAndPassword(auth, email, password);
       const user = cred.user;
 
       await user.reload();
@@ -147,9 +151,7 @@ if (loginForm) {
 
       if (userData.emailVerified === false) {
         await signOut(auth);
-        throw new Error(
-          "Verifica il tuo indirizzo email prima di accedere."
-        );
+        throw new Error("Verifica il tuo indirizzo email prima di accedere.");
       }
 
       if (!userSnap.exists()) {
@@ -158,6 +160,21 @@ if (loginForm) {
       }
 
       await validateAccount(userData);
+
+      try {
+        await fetch("/api/sendLoginNotification", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: user.email,
+            name: userData.nome || "Utente",
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          })
+        });
+      } catch (error) {
+        console.error("Errore notifica:", error);
+      }
 
       await createLoginLog(user);
 
@@ -211,6 +228,22 @@ if (googleBtn) {
 
       redirectByRole(userData.role);
 
+      try {
+        await fetch("/api/sendLoginNotification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email: user.email,
+            name: userData.nome || "Utente",
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          })
+        });
+      } catch (error) {
+        console.error("Errore nell'invio della notifica di login:", error);
+      }
     } catch (err) {
       setStatus(err.message, "error");
       console.error(err);

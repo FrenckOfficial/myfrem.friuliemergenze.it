@@ -142,7 +142,7 @@ async function loadStats() {
       const date = activity.timestamp.toDate().toLocaleString();
       const email = activity.email;
 
-      li.innerHTML = `Accesso di <a mailto:${email}>${email}</a> in data ${date}`;
+      li.innerHTML = `Accesso di <a mailto:${email}>${email}</a> in data ${date} (${activity.ipAddress ?? "IP sconosciuto"} - ${activity.userAgent ?? "Browser sconosciuto"})`;
 
       recentLoginsListEl.appendChild(li);
     }
