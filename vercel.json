@@ -9,6 +9,10 @@
     {
       "source": "/api/triggerNewsWorkflow",
       "destination": "/api/triggerNewsWorkflow.js"
+    },
+    {
+      "source": "/api/triggerVehicleWorkflow",
+      "destination": "/api/triggerVehicleWorkflow.js"
     }
   ],
   "headers": [

@@ -172,7 +172,7 @@ if (loginForm) {
           },
           body: JSON.stringify({
             email: user.email,
-            name: userData.nome || "Utente",
+            name: userData.name + " " + userData.surname || "Utente",
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent
           })
