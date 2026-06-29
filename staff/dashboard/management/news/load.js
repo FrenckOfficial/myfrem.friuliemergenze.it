@@ -446,7 +446,7 @@ class NewsManager {
 
             this.currentNewsId = newNewsRef.id;
 
-            document.querySelector(".btn-publish").addEventListener("click", () => {
+            document.querySelector(".btn-publish").addEventListener("click", async () => {
                 this.triggerGithubWorkflow(this.currentNewsId);
                 await addDoc(collection(db, "activities"), {
                     type: "news_published",
