@@ -1012,15 +1012,17 @@ class NewsManager {
         const viewerFields = {
             viewerTitle: 'title',
             viewerLink: 'link',
-            viewerDate: 'date',
-            viewerTags: 'tags'
+            viewerDate: 'date'
         };
 
         for (const [elementId, fieldName] of Object.entries(viewerFields)) {
             const element = document.getElementById(elementId);
             if (element) {
                 const value = news.data?.[fieldName] || news[fieldName] || '-';
-                element.textContent = value;
+                element.value = value;
+                element.disabled = true;
+                element.readOnly = true;
+                element.style.cursor = 'not-allowed';
             }
         }
     }
