@@ -430,7 +430,7 @@ class NewsManager {
                 title: newsData.title,
                 imageUrl: imageUrl,
                 data: newsData,
-                status: newsData.status || 'bozza',
+                status: 'draft',
                 createdAt: Timestamp.now(),
                 createdBy: currentUser,
                 updatedAt: Timestamp.now(),
@@ -587,10 +587,10 @@ class NewsManager {
         const createdAtFormatted = this.formatDate(news.createdAt);
         let statusText = 'Bozza';
 
-        if (news.status === "bozza") {
+        if (news.status === "draft") {
             statusClass = 'status-draft';
             statusText = 'Bozza';
-        } else if (news.status === "pubblicata") {
+        } else if (news.status === "published") {
             statusClass = 'status-published';
             statusText = 'Pubblicata';
         }

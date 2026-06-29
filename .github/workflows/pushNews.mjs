@@ -122,7 +122,7 @@ async function updateNewsJson(
 
   const newsData = {
     title: escapeHtml(title),
-    date: escapeHtml(date),
+    date: date.toDate().toISOString(),
     link: escapeHtml(link),
   };
 
