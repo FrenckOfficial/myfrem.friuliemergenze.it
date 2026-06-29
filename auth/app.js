@@ -166,7 +166,10 @@ if (loginForm) {
 
         await fetch("/api/sendLoginMail", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json", 
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify({
             email: user.email,
             name: userData.nome || "Utente",
@@ -231,10 +234,13 @@ if (googleBtn) {
       redirectByRole(userData.role);
 
       try {
-        await fetch("/api/sendLoginMail", {
+        const token = await auth.currentUser.getIdToken();
+
+        await fetch("/api/sendLoginMail",  {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
             email: user.email,
