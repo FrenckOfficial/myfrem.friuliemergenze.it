@@ -543,11 +543,11 @@ class NewsManager {
 
         emptyState.style.display = 'none';
         draftCount.textContent = this.newsList.filter(
-            n => n.status === "bozza"
+            n => n.status === "draft"
         ).length;
         totalNewsCount.textContent = this.newsList.length;
         publishedNewsCount.textContent = this.newsList.filter(
-            n => n.status === "pubblicata"
+            n => n.status === "published"
         ).length;
 
         newsList.innerHTML = this.newsList.map(news => this.renderNewsRow(news)).join('');
