@@ -133,6 +133,8 @@ async function updateNewsJson(
     link: newsData.link || "",
   };
 
+  content.unshift(news);
+
   console.log("💾 Salvataggio news.json");
   console.log(JSON.stringify(content, null, 2));
 
