@@ -193,12 +193,10 @@ document.getElementById("sendStaffers").addEventListener("click", async () => {
   statusMsg.style.display = "block";
   statusMsg.textContent = "📡 Caricamento membri staff...";
 
-  const snap = await getDocs(collection(db, "staffers"));
-
-  const recipients = snap.docs.map(d => ({
-    email: d.data().email || "",
-    name:  d.data().displayName || d.data().name || ""
-  }));
+  const recipients = {
+    email: "GruppoMembriStaff@gruppi.friuliemergenze.it",
+    name: "GruppoMembriStaff@gruppi.friuliemergenze.it"
+  }
 
   await console.log(recipients)
 
@@ -232,10 +230,12 @@ document.getElementById("sendOthers").addEventListener("click", async () => {
 
   if (!emailInput || !emailInput.trim()) return;
 
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const emails = emailInput
     .split(",")
     .map(e => e.trim())
-    .filter(e => e.includes("@"));
+    .filter(isValidEmail);
 
   if (emails.length === 0) {
     statusMsg.style.display = "block";
@@ -256,7 +256,7 @@ document.getElementById("sendOthers").addEventListener("click", async () => {
     name: names[i] || ""
   }));
 
-  await console.log(recipients)
+  console.log(recipients)
 
   await sendTo(recipients, "Destinatari personalizzati");
 });
