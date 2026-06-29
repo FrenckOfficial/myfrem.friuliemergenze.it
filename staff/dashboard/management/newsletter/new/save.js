@@ -137,6 +137,7 @@ async function sendTo(recipients, label) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userName: user.name,
           userEmail: user.email,
           htmlContent,
           title: title.value
