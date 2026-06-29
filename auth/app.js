@@ -162,6 +162,8 @@ if (loginForm) {
       await validateAccount(userData);
 
       try {
+        const token = await auth.currentUser.getIdToken();
+
         await fetch("/api/sendLoginMail", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
