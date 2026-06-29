@@ -1010,9 +1010,9 @@ class NewsManager {
         }
 
         const viewerFields = {
-            viewerTitle: 'title',
-            viewerLink: 'link',
-            viewerDate: 'date'
+            viewNewsTitle: 'title',
+            viewNewsLink: 'link',
+            viewNewsDate: 'date'
         };
 
         for (const [elementId, fieldName] of Object.entries(viewerFields)) {
