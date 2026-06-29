@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
-import { parseActivity } from "/helpers/activityParsers.js";
+import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
