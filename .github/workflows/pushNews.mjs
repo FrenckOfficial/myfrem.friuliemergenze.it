@@ -120,6 +120,12 @@ async function updateNewsJson(
     throw new Error("news.json non è un array");
   }
 
+  const newsData = {
+    title: escapeHtml(title),
+    date: escapeHtml(date),
+    link: escapeHtml(link),
+  };
+
   const news = {
     title: newsData.title || "",
     image: photoUrl || "",

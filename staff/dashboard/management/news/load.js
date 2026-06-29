@@ -786,6 +786,7 @@ class NewsManager {
                     link: newsData.link,
                     date: newsData.date,
                 },
+                status: newsData.status,
                 updatedAt: Timestamp.now(),
                 updatedBy: currentUser || 'Staff User'
             });
@@ -885,7 +886,8 @@ class NewsManager {
         return {
             title: document.getElementById('editNewsTitle').value,
             link: document.getElementById('editNewsLink').value,
-            date: Timestamp.now()
+            date: Timestamp.now(),
+            status: 'published'
         }
     }
 
