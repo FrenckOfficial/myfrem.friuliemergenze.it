@@ -683,6 +683,24 @@ button:nth-child(3):hover {
   border-top: 1px solid var(--border);
 }
 
+.btn-publish {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--signal-green);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 28%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  width: 30%;
+}
+
 .btn-save {
   flex: 1;
   background: transparent;
@@ -694,7 +712,7 @@ button:nth-child(3):hover {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
-  width: 20%;
+  width: 28%;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: all 0.2s;
@@ -739,25 +757,25 @@ button:nth-child(3):hover {
 }
 
 .btn-new-draft {
-  background: transparent;
-  color: var(--signal-green);
-  border: 1px solid var(--signal-green);
-  padding: 7px 16px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  width: 15%;
+  background: transparent !important;
+  color: var(--signal-green) !important;
+  border: 1px solid var(--signal-green) !important;
+  padding: 7px 16px !important;
+  border-radius: var(--radius-sm) !important;
+  cursor: pointer !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s !important;
+  width: 15% !important;
 }
 
 .btn-new-draft:hover {
-  background: var(--signal-green);
-  color: var(--bg);
-  transform: translateY(-1px);
+  background: var(--signal-green) !important;
+  color: var(--bg) !important;
+  transform: translateY(-1px) !important;
 }
 
 .btn-new-draft:active {
@@ -1111,6 +1129,7 @@ hr {
   line-height: 1.5;
   border-left: 4px solid;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   animation: slideIn 0.3s ease-out;
@@ -1157,6 +1176,26 @@ hr {
   font-size: 18px;
   color: #0891b2;
   flex-shrink: 0;
+}
+
+#closeSMsg {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {

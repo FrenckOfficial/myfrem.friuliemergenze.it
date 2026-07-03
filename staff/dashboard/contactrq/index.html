@@ -18,10 +18,10 @@
   <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>Intranet</h2>
+      <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff/dashboard/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -33,7 +33,10 @@
   </aside>
   <div class="main-content">
     <h1>📞 Richieste di Assistenza</h1>
-    <p id="statusMsg" class="statusBox" style="display:none;"></p>
+    <p class="statusBox" style="display:none;">
+      <span id="statusMsg"></span>
+      <button id="closeSMsg">&times;</button>
+    </p>
     <table>
       <thead>
         <tr>

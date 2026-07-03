@@ -20,7 +20,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -36,6 +36,10 @@
     </div>
 
     <p>Compila il modulo qui sotto per segnalare l'espulsione di un membro.</p>
+    <p class="statusBox" style="display:none;">
+      <span id="statusMsg"></span>
+      <button id="closeSMsg">&times;</button>
+    </p>
 
     <div class="activity-box">
         <form id="expulsionReportForm">
@@ -67,7 +71,6 @@
                 <a href="/staff/dashboard/kick-reports/" class="quick-btn" style="margin-top: 20px; width: 11.7%;">🔙 Torna alla pagina precedente</a>
             </div>
         </form>
-        <div id="statusMsg"></div>
     </div>
   </main>
 </body>

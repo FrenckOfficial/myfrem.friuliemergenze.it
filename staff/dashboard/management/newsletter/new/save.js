@@ -39,7 +39,6 @@ const titleMap = {
   update: "⚙️ Aggiornamento:"
 };
 
-statusMsg.style.display = "none";
 let titleTouched = false;
 let draftId = localStorage.getItem("newsletter_draft_id");
 let saveTimeout;
@@ -70,8 +69,7 @@ async function autosave() {
   };
 
   try {
-    statusMsg.style.display = "block";
-    statusMsg.textContent = "💾 Salvataggio bozza...";
+    setStatus("Salvataggio bozza...", "info");
 
     if (!draftId) {
       const ref = await addDoc(collection(db, "newsletterDrafts"), {
@@ -84,9 +82,9 @@ async function autosave() {
       await setDoc(doc(db, "newsletterDrafts", draftId), data, { merge: true });
     }
 
-    statusMsg.textContent = "🟢 Bozza salvata";
+    setStatus("Bozza salvata", "success");
   } catch (err) {
-    statusMsg.textContent = "❌ Errore salvataggio bozza";
+    setStatus("Errore durante il salvataggio della bozza", "error");
   }
 }
 
@@ -113,14 +111,12 @@ type.addEventListener("change", () => {
  */
 async function sendTo(recipients, label) {
   if (!title.value.trim() || !type.value || !content.value.trim() || !link.value.trim()) {
-    statusMsg.style.display = "block";
-    statusMsg.textContent = "⚠️ Compila tutti i campi obbligatori prima di inviare.";
+    setStatus("Compila tutti i campi obbligatori prima di inviare la newsletter.", "error");
     return;
   }
 
   try {
-    statusMsg.style.display = "block";
-    statusMsg.textContent = `🚀 Invio a ${recipients.length} ${label}...`;
+    setStatus(`Invio a ${recipients.length} ${label}...`, "info");
 
     for (const user of recipients) {
       const htmlContent = buildEmail({
@@ -157,7 +153,7 @@ async function sendTo(recipients, label) {
       recipients: recipients.length
     });
 
-    statusMsg.textContent = `✅ Newsletter inviata con successo a ${recipients.length} ${label}!`;
+    setStatus(`Newsletter inviata con successo a ${recipients.length} ${label}!`, "success");
 
     document.getElementById("newsletterForm").reset();
     preview.innerHTML = "";
@@ -167,13 +163,12 @@ async function sendTo(recipients, label) {
 
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "❌ Errore durante l'invio della newsletter";
+    setStatus("Errore durante l'invio della newsletter.", "error");
   }
 }
 
 document.getElementById("sendSubscribers").addEventListener("click", async () => {
-  statusMsg.style.display = "block";
-  statusMsg.textContent = "📡 Caricamento iscritti newsletter...";
+  setStatus("Caricamento iscritti newsletter...", "info");
 
   const snap = await getDocs(
     query(collection(db, "newsletterSubs"), where("subscribed", "==", true))
@@ -190,8 +185,7 @@ document.getElementById("sendSubscribers").addEventListener("click", async () =>
 });
 
 document.getElementById("sendStaffers").addEventListener("click", async () => {
-  statusMsg.style.display = "block";
-  statusMsg.textContent = "📡 Caricamento membri staff...";
+  setStatus("Caricamento membri dello staff...", "info");
 
   const recipients = {
     email: "GruppoMembriStaff@gruppi.friuliemergenze.it",
@@ -204,8 +198,7 @@ document.getElementById("sendStaffers").addEventListener("click", async () => {
 });
 
 document.getElementById("sendMyfremUsers").addEventListener("click", async () => {
-  statusMsg.style.display = "block";
-  statusMsg.textContent = "📡 Caricamento utenti MyFrEM...";
+  setStatus("Caricamento utenze MyFrEM...", "info");
 
   const staffRoles = ["simplestaff", "advstaff", "advstaffplus", "superadmin"];
 
@@ -238,8 +231,7 @@ document.getElementById("sendOthers").addEventListener("click", async () => {
     .filter(isValidEmail);
 
   if (emails.length === 0) {
-    statusMsg.style.display = "block";
-    statusMsg.textContent = "⚠️ Nessun indirizzo email valido inserito.";
+    setStatus("Nessun indirizzo email valido inserito.", "error");
     return;
   }
 
@@ -326,6 +318,17 @@ function buildEmail({ type, title, content, link, image, email, name }) {
   `;
 
   return card;
-}
+};
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
+};
 
 updatePreview();

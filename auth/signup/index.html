@@ -30,11 +30,14 @@
           </ul>
         </div>
 
-        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 FriuliEmergenze · Tutti i diritti riservati</div>
+        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 Friuli Emergenze · Tutti i diritti riservati</div>
       </div>
 
       <div class="panel-right">
-        <p id="statusMsg" class="statusBox" style="display:none;"></p>
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
         <p class="form-title">Crea il tuo account</p>
         <p class="form-sub">Unisciti alla piattaforma MyFrEM</p>
 
@@ -82,7 +85,10 @@
             </div>
           </div>
 
-          <button type="submit" class="submit-btn">Crea account</button>
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span id="btnText">Crea un account</span>
+            <span id="btnLoader" class="loader" style="display:none;"></span>
+          </button>
         </form>
 
         <div class="auth-footer">

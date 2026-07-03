@@ -9,6 +9,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const logoutBtn = document.getElementById("logoutBtn");
+const statusMsg = document.getElementById("statusMsg");
 const supabase = createClient(supa.url, supa.anonKey);
 
 onAuthStateChanged(auth, (user) => {
@@ -45,8 +46,7 @@ expulsionForm.addEventListener("submit", async (e) => {
   const notes = document.getElementById("notes").value.trim();
 
   if (!userName || !reason || !expulsionDate) {
-    statusMsg.textContent = "❌ Compila tutti i campi obbligatori!";
-    statusMsg.className = "error";
+    setStatus("Compila tutti i campi obbligatori", "error");
     return;
   }
 
@@ -69,8 +69,7 @@ expulsionForm.addEventListener("submit", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    statusMsg.textContent = "✅ Report inviato con successo!";
-    statusMsg.className = "success";
+    setStatus("Report inviato con successo!", "success");
     expulsionForm.reset();
 
     const staffDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
@@ -87,8 +86,7 @@ expulsionForm.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error("Errore invio report:", err);
-    statusMsg.textContent = "❌ Errore nell'invio del report. Riprovare.";
-    statusMsg.className = "error";
+    setStatus("Errore durante l'invio del report. Riprova.", "error");
   }
 });
 
@@ -176,5 +174,16 @@ async function saveOnSupabase(pdfBlob, filePath) {
   } catch (err) {
     console.error("❌ Errore imprevisto Supabase:", err);
     return null;
+  }
+}
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
   }
 }

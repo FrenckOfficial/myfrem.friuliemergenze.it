@@ -48,6 +48,9 @@ const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const googleBtn = document.getElementById("googleLoginBtn");
 const statusMsg = document.getElementById("statusMsg");
+const submitBtn = document.getElementById("submitBtn");
+const btnText = document.getElementById('btnText');
+const btnLoader = document.getElementById('btnLoader');
 
 const resetForm = document.getElementById("resetForm");
 const resetEmail = document.getElementById("resetEmail");
@@ -123,7 +126,16 @@ async function validateAccount(userData) {
 }
 
 if (loginForm) {
+  document.getElementById("loginEmail")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") loginForm.dispatchEvent(new Event("submit"));
+  });
+  document.getElementById("loginPassword")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") loginForm.dispatchEvent(new Event("submit"));
+  });
   loginForm.addEventListener("submit", async (e) => {
+    submitBtn.disabled = true;
+    btnText.textContent = "Accesso in corso..."
+    btnLoader.style.display = 'inline-block';
     e.preventDefault();
 
     if (isLoggingIn) return;
@@ -185,7 +197,11 @@ if (loginForm) {
 
       redirectByRole(userData.role);
 
+      btnText.style.display = 'inline-block';
+      btnLoader.style.display = 'none';
+
     } catch (err) {
+      btnText.textContent = "Accedi";
       switch (err.code) {
         case "auth/user-not-found":
           setStatus("Username non trovato.", "error");
@@ -202,6 +218,9 @@ if (loginForm) {
       }
       console.error(err);
     } finally {
+      submitBtn.disabled = false;
+      btnText.style.opacity = '1';
+      btnLoader.style.display = 'none';
       isLoggingIn = false;
     }
   });
@@ -260,7 +279,13 @@ if (googleBtn) {
 }
 
 if (resetForm) {
+  document.getElementById("resetEmail")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") resetForm.dispatchEvent(new Event("submit"));
+  });
   resetForm.addEventListener("submit", async (e) => {
+    submitBtn.disabled = true;
+    btnText.textContent = "Invio in corso..."
+    btnLoader.style.display = 'inline-block';
     e.preventDefault();
 
     resetError.textContent = "";
@@ -269,8 +294,7 @@ if (resetForm) {
     const email = resetEmail.value.trim();
 
     if (!email) {
-      resetError.textContent =
-        "Inserisci un indirizzo email valido.";
+      setStatus("Inserisci un indirizzo email valido.", "error");
 
       return;
     }
@@ -281,44 +305,63 @@ if (resetForm) {
 
       await sendPasswordResetEmail(auth, email);
 
-      resetSuccess.textContent =
-        "Email di reset inviata con successo.";
+      setStatus("Email di reset inviata. Controlla la tua casella di posta.", "success");
 
       resetForm.reset();
 
+      btnText.style.display = 'inline-block';
+      btnLoader.style.display = 'none';
+
     } catch (error) {
+      btnText.textContent = "Invia link di reset";
       switch (error.code) {
         case "auth/user-not-found":
-          resetError.textContent =
-            "Nessun account trovato con questa email.";
+          setStatus("Nessun account trovato con questo indirizzo email.", "error");
           break;
 
         case "auth/invalid-email":
-          resetError.textContent =
-            "Email non valida.";
+          setStatus("Indirizzo email non valido.", "error");
           break;
 
         case "auth/too-many-requests":
-          resetError.textContent =
-            "Troppi tentativi. Riprova più tardi.";
+          setStatus("Troppi tentativi. Riprova più tardi.", "error");
           break;
 
         default:
-          resetError.textContent =
-            "Errore durante l'invio dell'email.";
+          setStatus("Si è verificato un errore. Riprova.", "error");
+          break;
       }
 
       console.error(error);
 
     } finally {
-      resetButton.disabled = false;
-      resetButton.textContent = "Invia link di reset";
+      submitBtn.disabled = false;
+      btnText.style.opacity = '1';
+      btnLoader.style.display = 'none';
     }
   });
 }
 
 if (registerForm) {
+  document.getElementById("registerName")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
+  });
+  document.getElementById("registerSurname")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
+  });
+  document.getElementById("registerEmail")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
+  });
+  document.getElementById("registerUsername")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
+  });
+  document.getElementById("registerPassword")?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
+  });
   registerForm.addEventListener("submit", async (e) => {
+    submitBtn.disabled = true;
+    btnText.textContent = "Registrazione in corso..."
+    btnLoader.style.display = 'inline-block';
     e.preventDefault();
 
     if (isRegistering) return;
@@ -426,20 +469,32 @@ if (registerForm) {
 
       window.location.href = "/login";
 
+      btnText.style.display = 'inline-block';
+      btnLoader.style.display = 'none';
+
     } catch (err) {
+      btnText.textContent = "Crea un account";
       setStatus(err.message, "error");
       console.error(err);
 
     } finally {
       isRegistering = false;
+      submitBtn.disabled = false;
+      btnText.style.opacity = '1';
+      btnLoader.style.display = 'none';
     }
   });
 };
 
 function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
   statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
-  statusMsg.style.display = "block";
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
 }
 
 onAuthStateChanged(auth, async (user) => {

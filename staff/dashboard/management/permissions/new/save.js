@@ -83,8 +83,7 @@ form.addEventListener("submit", async (e) => {
       createdAt: new Date()
     });
 
-    statusMsg.textContent = "✅ Permesso salvato con successo!";
-    statusMsg.style.color = "green";
+    setStatus("Permesso salvato con successo!", "success");
 
     window.location.href = "/staff/dashboard/management/permissions";
     userNumber.value = "";
@@ -97,9 +96,18 @@ form.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "❌ Errore durante il salvataggio";
-    statusMsg.style.color = "red";
+    setStatus("Errore durante il salvataggio", "error");
   }
 });
+
+function setStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    statusMsg.style.display = "none";
+  }
+}
 
 loadUsers();

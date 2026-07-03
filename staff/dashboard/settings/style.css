@@ -350,7 +350,7 @@ body {
   color: var(--muted);
 }
 
-#statusMsg,
+.statusBox,
 #passwordStatusMsg,
 #preferencesStatusMsg {
   margin-top: 10px;
@@ -461,6 +461,7 @@ body {
   line-height: 1.5;
   border-left: 4px solid;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   animation: slideIn 0.3s ease-out;
@@ -507,6 +508,26 @@ body {
   font-size: 18px;
   color: #0891b2;
   flex-shrink: 0;
+}
+
+#closeSMsg {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {

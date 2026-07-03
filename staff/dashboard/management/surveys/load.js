@@ -19,6 +19,7 @@ const db = getFirestore(app);
 
 const surveyList = document.getElementById("surveyTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
+const statusMsg = document.getElementById("statusMsg");
 
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
@@ -95,5 +96,15 @@ async function loadSurveys() {
         console.log("Surveys loaded.");
     } catch (error) {
         console.error("Error loading surveys:", error);
+    }
+}
+
+function setStatus(message, type = "info") {
+    statusMsg.textContent = message;
+    statusMsg.className = `${"statusBox" + " " + type}`;
+    statusMsg.style.display = "block";
+    const closeBtn = document.getElementById("closeSMsg");
+    closeBtn.onclick = () => {
+        statusMsg.style.display = "none";
     }
 }

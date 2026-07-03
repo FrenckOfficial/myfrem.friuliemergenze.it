@@ -18,7 +18,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -37,7 +37,10 @@
       <p id="totalUsers"><b>Utenti totali: <span id="totalUsersCount">0</span></b></p>
     </div>
 
-    <p id="statusMsg" class="statusBox" style="display:none;"></p>
+    <p class="statusBox" style="display:none;">
+      <span id="statusMsg"></span>
+      <button id="closeSMsg">&times;</button>
+    </p>
 
     <div class="gallery-search" style="margin-top: 10px;">
       <input type="text" id="searchInput" placeholder="Cerca un utente..." style="

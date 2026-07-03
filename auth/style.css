@@ -1,33 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap");
 
 :root {
-  --accent:        #00d4e8;
-  --accent-dark:   #00b4c8;
-  --accent-dim:    rgba(0, 212, 232, 0.12);
-  --accent-glow:   rgba(0, 212, 232, 0.18);
-  --signal-red:    #e84855;
-  --signal-amber:  #f5a623;
-  --bg:            #090c0f;
-  --bg-panel:      #0f1419;
-  --bg-surface:    #161d25;
-  --bg-hover:      #1c2530;
-  --surface:       #0f1419;
-  --input-bg:      #161d25;
-  --border:        rgba(0, 212, 232, 0.14);
-  --border-hard:   rgba(0, 212, 232, 0.28);
-  --border-focus:  rgba(0, 212, 232, 0.55);
-  --border-panel:  rgba(255, 255, 255, 0.05);
-  --text:          #e8edf2;
-  --muted:         #7a8fa6;
-  --faint:         #3d5068;
-  --font-display:  -apple-system, "Inter", sans-serif;
-  --font-mono:     -apple-system, "Manrope", monospace;
-  --radius-sm:     4px;
-  --radius-md:     8px;
-  --radius-lg:     14px;
+  --accent: #00d4e8;
+  --accent-dark: #00b4c8;
+  --accent-dim: rgba(0, 212, 232, 0.12);
+  --accent-glow: rgba(0, 212, 232, 0.18);
+  --signal-red: #e84855;
+  --signal-amber: #f5a623;
+  --bg: #090c0f;
+  --bg-panel: #0f1419;
+  --bg-surface: #161d25;
+  --bg-hover: #1c2530;
+  --surface: #0f1419;
+  --input-bg: #161d25;
+  --border: rgba(0, 212, 232, 0.14);
+  --border-hard: rgba(0, 212, 232, 0.28);
+  --border-focus: rgba(0, 212, 232, 0.55);
+  --border-panel: rgba(255, 255, 255, 0.05);
+  --text: #e8edf2;
+  --muted: #7a8fa6;
+  --faint: #3d5068;
+  --font-display: -apple-system, "Inter", sans-serif;
+  --font-mono: -apple-system, "Manrope", monospace;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -54,7 +56,7 @@ body {
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
-  animation: fadeUp .45s cubic-bezier(.22,.68,0,1.2) both;
+  animation: fadeUp 0.45s cubic-bezier(0.22, 0.68, 0, 1.2) both;
 }
 
 .panel-left {
@@ -69,17 +71,25 @@ body {
 }
 
 .panel-left::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 55% at 20% 30%, rgba(0, 212, 232, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(0, 180, 200, 0.05) 0%, transparent 65%);
+    radial-gradient(
+      ellipse 60% 55% at 20% 30%,
+      rgba(0, 212, 232, 0.07) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 40% at 80% 80%,
+      rgba(0, 180, 200, 0.05) 0%,
+      transparent 65%
+    );
   pointer-events: none;
 }
 
 .panel-left::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -80px;
   right: -80px;
@@ -224,7 +234,10 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
-  transition: border-color .18s, color .18s, background .18s;
+  transition:
+    border-color 0.18s,
+    color 0.18s,
+    background 0.18s;
 }
 
 .google-btn:hover {
@@ -252,7 +265,7 @@ body {
 
 .divider::before,
 .divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: var(--border);
@@ -291,7 +304,10 @@ input[type="password"] {
   font-size: 0.82rem;
   color: var(--text);
   outline: none;
-  transition: border-color .18s, background .18s, box-shadow .18s;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    box-shadow 0.18s;
 }
 
 input::placeholder {
@@ -324,7 +340,7 @@ input:focus {
   color: var(--faint);
   font-size: 0.9rem;
   padding: 4px;
-  transition: color .15s;
+  transition: color 0.15s;
 }
 
 .toggle-password:hover {
@@ -344,7 +360,7 @@ input:focus {
   color: var(--accent);
   text-decoration: none;
   font-weight: 700;
-  transition: color .15s;
+  transition: color 0.15s;
 }
 
 .forgot-link a:hover {
@@ -365,7 +381,11 @@ input:focus {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background .18s, color .18s, transform .12s, box-shadow .18s;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    transform 0.12s,
+    box-shadow 0.18s;
 }
 
 .submit-btn:hover {
@@ -395,7 +415,7 @@ input:focus {
   color: var(--accent);
   text-decoration: none;
   font-weight: 700;
-  transition: color .15s;
+  transition: color 0.15s;
 }
 
 .auth-footer a:hover {
@@ -412,7 +432,7 @@ input:focus {
   text-transform: uppercase;
   color: var(--faint);
   text-decoration: none;
-  transition: color .15s;
+  transition: color 0.15s;
 }
 
 .back-home:hover {
@@ -427,8 +447,12 @@ input:focus {
   letter-spacing: 0.06em;
 }
 
-#error   { color: var(--signal-red); }
-#success { color: var(--accent); }
+#error {
+  color: var(--signal-red);
+}
+#success {
+  color: var(--accent);
+}
 
 #nameGroup {
   margin-top: 12px;
@@ -441,6 +465,23 @@ input:focus {
   flex: 1;
 }
 
+.loader {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .statusBox {
   padding: 12px 16px;
   border-radius: 6px;
@@ -449,6 +490,7 @@ input:focus {
   line-height: 1.5;
   border-left: 4px solid;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   animation: slideIn 0.3s ease-out;
@@ -495,6 +537,181 @@ input:focus {
   font-size: 18px;
   color: #0891b2;
   flex-shrink: 0;
+}
+
+#closeSMsg {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.card {
+  position: relative;
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 44px 40px;
+  animation: fadeUp 0.45s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+  overflow: hidden;
+}
+
+.card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.card-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.icon-wrap {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: var(--accent-dim);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrap svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card-body .wordmark {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.card-body .wordmark span {
+  color: var(--accent);
+}
+
+.card-body h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.card-body .description {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+#resetForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+#resetEmailButton {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    transform 0.12s,
+    box-shadow 0.18s;
+}
+
+#resetEmailButton:hover {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+#resetEmailButton:active {
+  transform: translateY(0);
+}
+
+#resetEmailButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card .divider {
+  margin: 20px 0;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.card-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+
+.card-footer a:hover {
+  color: #fff;
 }
 
 @keyframes slideIn {
@@ -549,9 +766,23 @@ input:focus {
   .panel-right {
     padding: 36px 28px;
   }
+
+  .card {
+    padding: 32px 24px;
+  }
+
+  .card-body h1 {
+    font-size: 1.3rem;
+  }
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

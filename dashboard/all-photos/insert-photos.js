@@ -52,7 +52,7 @@ async function checkUserRole(uid) {
 
 async function loadAllPhotos(userId) {
   try {
-    statusMsg.textContent = "⏳ Caricamento foto...";
+    setStatus("⏳ Caricamento foto...", "info");
     photosContainer.innerHTML = "";
 
     const photosQuery = query(
@@ -65,7 +65,7 @@ async function loadAllPhotos(userId) {
 
     if (snapshot.empty) {
       photosContainer.innerHTML = "<p>Nessuna foto caricata.</p>";
-      statusMsg.textContent = "";
+      setStatus("", "");
       return;
     }
 
@@ -73,6 +73,10 @@ async function loadAllPhotos(userId) {
       const data = doc.data();
       const card = document.createElement("div");
       card.className = "photo-card";
+
+      const status = data.status === "Approvata ✅" ? "approved" :
+                     data.status === "Rifiutata ❌" ? "rejected" :
+                     "pending";
 
       const service = getServiceLabel(data.serviceType);
 
@@ -87,7 +91,7 @@ async function loadAllPhotos(userId) {
 
           <p>
             <strong>Stato:</strong>
-            <span class="status ${data.status}">
+            <span class="status ${status}">
               ${data.status || "In attesa"}
             </span>
           </p>
@@ -127,10 +131,10 @@ async function loadAllPhotos(userId) {
       photosContainer.appendChild(card);
     });
 
-    statusMsg.textContent = "";
+    setStatus(`📸 Caricate ${snapshot.size} foto`, "success");
   } catch (err) {
     console.error("❌ Errore caricamento foto:", err);
-    statusMsg.textContent = "Errore durante il caricamento delle foto.";
+    setStatus("Errore caricamento foto", "error");
   }
 }
 
@@ -166,5 +170,16 @@ function getServiceLabel(service) {
 
     default:
       return service || "N/A";
+  }
+}
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
   }
 }

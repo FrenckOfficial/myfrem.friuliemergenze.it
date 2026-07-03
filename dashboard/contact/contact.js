@@ -15,7 +15,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const form = document.getElementById("contactForm");
-const result = document.getElementById("result");
+const statusMsg = document.getElementById("statusMsg");
 
 let currentUser = null;
 let isReadOnlyMode = false;
@@ -24,15 +24,13 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user || null;
   
   if (user) {
-    // 🔒 Controlla il ruolo
     const userDocSnap = await getDoc(doc(db, "users", user.uid));
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
       if (userData.role === "testacc") {
         isReadOnlyMode = true;
         document.body.classList.add("read-only-mode");
-        
-        // Disabilita il form
+      
         form.style.opacity = "0.5";
         form.style.pointerEvents = "none";
         
@@ -42,8 +40,7 @@ onAuthStateChanged(auth, async (user) => {
           submitBtn.title = "Non disponibile in modalità sola lettura";
         }
         
-        result.textContent = "📖 Modalità sola lettura: non puoi inviare messaggi";
-        result.className = "warning";
+        setStatus("Modalità sola lettura: non puoi inviare messaggi", "info");
       }
     }
   }
@@ -53,7 +50,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (isReadOnlyMode) {
-    result.innerText = "❌ Non puoi inviare messaggi in modalità sola lettura";
+    setStatus("Non puoi inviare messaggi in modalità sola lettura.", "error");
     return;
   }
 
@@ -61,7 +58,7 @@ form.addEventListener("submit", async (e) => {
   const message = document.getElementById("message").value.trim();
 
   if (!subject || !message) {
-    result.innerText = "❌ Compila tutti i campi.";
+    setStatus("Oggetto e messaggio sono obbligatori.", "error");
     return;
   }
 
@@ -83,12 +80,12 @@ form.addEventListener("submit", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    result.innerText = "✅ Messaggio inviato! Ti risponderemo al più presto.";
+    setStatus("Messaggio inviato con successo.", "success");
     form.reset();
 
   } catch (err) {
     console.error(err);
-    result.innerText = "❌ Errore durante l'invio.";
+    setStatus("Errore durante l'invio del messaggio.", "error");
   }
 });
 

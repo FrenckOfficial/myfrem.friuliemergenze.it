@@ -190,7 +190,7 @@ header p {
   background: rgba(245, 166, 35, 0.12);
 }
 
-#statusMsg {
+.statusBox {
   text-align: center;
   font-family: var(--font-mono);
   font-size: 0.72rem;

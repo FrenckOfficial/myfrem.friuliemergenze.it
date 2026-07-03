@@ -19,7 +19,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff/dashboard/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/" class="active">🗂️ Moderazione eventi</a>
@@ -36,7 +36,10 @@
     <p>Qui puoi vedere tutte le richieste di eventi e gestirne lo stato.</p>
   </div>
 
-  <div id="statusMsg"></div>
+  <p class="statusBox" style="display:none;">
+    <span id="statusMsg"></span>
+    <button id="closeSMsg">&times;</button>
+  </p>
 
   <div class="events-container" id="eventsList" style="max-width: 780px;">
     <!-- Eventi caricati dinamicamente con JS -->

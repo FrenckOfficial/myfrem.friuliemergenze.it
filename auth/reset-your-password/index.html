@@ -8,218 +8,62 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --red: #e53935;
-      --red-dark: #b71c1c;
-      --red-dim: rgba(229,57,53,0.12);
-      --red-glow: rgba(229,57,53,0.22);
-      --surface: #ffffff;
-      --bg: #f5f4f2;
-      --border: rgba(0,0,0,0.09);
-      --border-focus: rgba(229,57,53,0.5);
-      --text: #111111;
-      --muted: #666666;
-      --faint: #999999;
-      --input-bg: #fafaf9;
-    }
-
-    body {
-      font-family: 'Lexend', sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-
-    label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #444;
-    }
-
-    input[type="email"] {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--input-bg);
-      font-family: inherit;
-      font-size: 0.88rem;
-      color: var(--text);
-      transition: border-color .18s, box-shadow .18s, background .18s;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: var(--border-focus);
-      background: #fff;
-      box-shadow: 0 0 0 3px var(--red-dim);
-    }
-
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-
-    .messages { margin-top: 16px; text-align: center; font-size: 0.82rem; }
-    #error { color: var(--red); }
-    #success { color: #2e7d32; }
-
-    .card {
-      width: min(420px, 100%);
-      background: var(--surface);
-      border-radius: 24px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-      overflow: hidden;
-      animation: fadeUp .45s cubic-bezier(.22,.68,0,1.2) both;
-    }
-
-    .card-accent {
-      height: 4px;
-      background: linear-gradient(90deg, var(--red-dark), var(--red), #ff6b6b);
-    }
-
-    .card-body { padding: 40px 40px 36px; }
-
-    .icon-wrap {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      background: var(--red-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .icon-wrap svg {
-      width: 24px; height: 24px;
-      stroke: var(--red);
-      stroke-width: 1.8;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .wordmark {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--faint);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    .wordmark span { color: var(--red); }
-
-    h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: -0.025em;
-    }
-
-    .description {
-      margin-top: 8px;
-      font-size: 0.85rem;
-      font-weight: 300;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    #resetForm {
-      margin-top: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    #resetEmailButton {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      background: var(--red);
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.01em;
-      transition: background .18s, transform .12s, box-shadow .18s;
-    }
-
-    #resetEmailButton:hover {
-      background: var(--red-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px var(--red-glow);
-    }
-
-    #resetEmailButton:active { transform: translateY(0); }
-
-    #resetEmailButton:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .divider { height: 1px; background: var(--border); margin: 24px 0 20px; }
-
-    .card-footer {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .card-footer a { color: var(--red); text-decoration: none; font-weight: 500; }
-    .card-footer a:hover { text-decoration: underline; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 480px) {
-      .card-body { padding: 32px 28px 28px; }
-    }
-  </style>
+  <link rel="stylesheet" href="/auth/style.css" />
 </head>
 <body>
   <main>
-    <div class="card">
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="icon-wrap" aria-hidden="true">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="11" width="14" height="10" rx="2"/>
-            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-            <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/>
-          </svg>
+    <div class="shell">
+      <div class="panel-left">
+        <div class="left-brand">
+          <p class="wordmark">My<span>FrEM</span></p>
+          <p class="tagline">Friuli Emergenze · Piattaforma foto ed eventi</p>
         </div>
-        <p class="wordmark">My<span>FrEM</span></p>
-        <h1>Reimposta la password</h1>
-        <p class="description">Inserisci l'indirizzo email associato al tuo account. Ti invieremo un link per reimpostare la password.</p>
-        <form id="resetForm">
+
+        <div class="left-body">
+          <h2>Reimposta la<br><em>password</em><br>in pochi passi.</h2>
+          <p>Hai dimenticato la password? Non preoccuparti. Ti invieremo un link sicuro per reimpostarla rapidamente e tornare online.</p>
+          <ul class="feature-list">
+            <li><span class="dot"></span>Reset facile e veloce</li>
+            <li><span class="dot"></span>Link sicuro via email</li>
+            <li><span class="dot"></span>Torna subito online</li>
+          </ul>
+        </div>
+
+        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 Friuli Emergenze · Tutti i diritti riservati</div>
+      </div>
+
+      <div class="panel-right">
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
+        <p class="form-title">Reimposta password</p>
+        <p class="form-sub">Accedi di nuovo al tuo account</p>
+
+        <form id="resetForm" class="auth-form" style="margin-top: 20px;">
           <div class="form-group">
             <label for="resetEmail">Indirizzo email</label>
-            <input type="email" id="resetEmail" required placeholder="nome@esempio.com" autocomplete="email" />
+            <input type="email" id="resetEmail" required autocomplete="email" placeholder="nome@esempio.com" />
           </div>
-          <button type="submit" id="resetEmailButton">Invia link di reset</button>
+
+          <button type="submit" class="submit-btn" id="resetEmailButton">
+            <span id="btnText">Invia link di reset</span>
+            <span id="btnLoader" class="loader" style="display:none;"></span>
+          </button>
         </form>
-        <div class="divider"></div>
-        <div class="card-footer">
-          <span>Ricordi la password?</span>
-          <a href="/login/signin">Torna al login</a>
+
+        <div class="auth-footer">
+          Ricordi la password? <a href="/login/signin">Torna al login</a>
         </div>
+
+        <a class="back-home" href="/">← Torna alla homepage</a>
+
         <div class="messages">
           <p id="error"></p>
           <p id="success"></p>
         </div>
       </div>
+
     </div>
   </main>
   <script type="module" src="/auth/app.js"></script>

@@ -20,7 +20,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -39,7 +39,10 @@
 
     <div class="activity-box">
         <form id="expulsionReportForm" style="min-height: 78vh;">
-
+            <p class="statusBox" style="display:none;">
+              <span id="statusMsg"></span>
+              <button id="closeSMsg">&times;</button>
+            </p>
             <div class="form-row">
                 <div class="form-col">
                     <label for="userSelect">👤 Nome utente:</label>
@@ -73,8 +76,6 @@
             <button type="submit" class="btn-primary">Salva permesso</button>
 
         </form>
-
-        <div id="statusMsg"></div>
     </div>
   </main>
 </body>

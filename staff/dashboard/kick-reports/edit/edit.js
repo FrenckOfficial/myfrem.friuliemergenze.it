@@ -103,17 +103,25 @@ document.getElementById("addNoteForm").addEventListener("submit", async (e) => {
             notesHistory: arrayUnion(noteEntry)
         });
 
-        statusMsg.textContent = "✅ Nota aggiunta!";
-        statusMsg.style.color = "#4aff4a";
+        setStatus("Nota aggiunta con successo!", "success");
 
         document.getElementById("addNoteForm").reset();
 
         loadReport();
     } catch (err) {
         console.error(err);
-        statusMsg.textContent = "❌ Errore nel salvataggio.";
-        statusMsg.style.color = "#ff3b3b";
+        setStatus("Errore durante l'aggiunta della nota. Riprova.", "error");
     }
 });
+
+function setStatus(msg, type = "info") {
+    statusMsg.textContent = msg;
+    statusMsg.className = `${"statusBox" + " " + type}`;
+    statusMsg.style.display = "block";
+    const closeBtn = document.getElementById("closeSMsg");
+    closeBtn.onclick = () => {
+        statusMsg.style.display = "none";
+    };
+}
 
 loadReport();

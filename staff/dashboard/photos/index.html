@@ -19,7 +19,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/" class="active">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -38,7 +38,10 @@
     <div id="viewAllPhotos">Visualizza tutte le foto</div>
 
     <table class="photos-table">
-      <p id="statusMsg" class="statusBox" style="display:none;"></p>
+      <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
       <thead>
         <tr>
           <th>Anteprima</th>

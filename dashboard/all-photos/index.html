@@ -33,12 +33,14 @@
 
   <div class="main-content">
     <div class="content-box" style="max-width:none;">
-      <div id="viewAllPhotos">Visualizza tutte le foto</div>
       <h1>📸 Le mie Foto</h1>
       <div id="photosContainer" class="photos-grid">
         <!-- Qui verranno generate le foto con JS -->
       </div>
-      <p id="statusMsg"></p>
+      <p class="statusBox" style="display:none;">
+        <span id="statusMsg"></span>
+        <button id="closeSMsg">&times;</button>
+      </p>
     </div>
   </div>
 

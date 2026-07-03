@@ -133,8 +133,8 @@
                 </div>
  
                 <div class="modal-actions">
-                    <button type="submit" class="btn-publish">Crea e pubblica</button>
-                    <button type="button" class="btn-save">Salva</button>
+                    <button type="submit" class="btn-publish">Pubblica</button>
+                    <button type="submit" class="btn-save">Salva</button>
                     <button type="button" class="btn-cancel" onclick="window.newsManager.closeCreateModal()">Annulla</button>
                 </div>
             </form>
@@ -188,18 +188,18 @@
             <div class="viewer-content">
                 <p class="statusBox" style="display:none;" id="statusMsgView"></p>
                 <div class="form-group">
-                    <label for="viewNewsTitle">Titolo *</label>
-                    <input type="text" id="viewNewsTitle" name="title" required placeholder="Es: Nuovo protocollo di intervento approvato">
+                    <label>Titolo</label>
+                    <p id="viewNewsTitle" class="viewer-field">-</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="viewNewsLink">Link *</label>
-                    <input type="text" id="viewNewsLink" name="link" required placeholder="https://ilgoriziano.it/notizie/nuovo-protocollo-di-intervento-approvato">
+                    <label>Link</label>
+                    <p id="viewNewsLink" class="viewer-field">-</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="viewNewsDate">Data</label>
-                    <input type="text" id="viewNewsDate" name="date" placeholder="Inserisci il contenuto della notizia"></input>
+                    <label>Data</label>
+                    <p id="viewNewsDate" class="viewer-field">-</p>
                 </div>
 
                 <div class="modal-actions">

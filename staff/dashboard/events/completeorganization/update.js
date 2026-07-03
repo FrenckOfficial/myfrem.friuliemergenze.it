@@ -10,7 +10,7 @@ const db = getFirestore(app);
 
 const urlParams = new URLSearchParams(window.location.search);
 const eventId = urlParams.get("event_id");
-
+const statusMsg = document.getElementById("statusMsg");
 const titleEvent = document.getElementById("titleEvent");
 const eventsList = document.getElementById("eventsList");
 const eventIdPage = document.getElementById("eventId");
@@ -39,7 +39,7 @@ async function loadEventPage() {
     const event = snap.data();
 
     eventIdPage.textContent = `📅 Evento: ${event.title}`;
-    titleEvent.textContent = `Completa organizzazione evento ${event.title} - Registro Eventi | Intranet Friuli Emergenze`;
+    titleEvent.textContent = `Completa organizzazione evento ${event.title} - Registro Eventi | MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`;
 
     const div = document.createElement("div");
     div.className = "event-card";
@@ -82,6 +82,17 @@ async function confirmOrg() {
         setStatus("Organizzazione confermata.", "success");
         window.history.back();
     }
+}
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
 }
 
 loadEventPage();

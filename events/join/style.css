@@ -271,7 +271,7 @@ input::placeholder {
   color: var(--faint);
 }
 
-#statusMsg {
+.statusBox {
   text-align: center;
   font-family: var(--font-mono);
   font-size: 0.72rem;

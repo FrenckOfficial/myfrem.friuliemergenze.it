@@ -135,6 +135,12 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
   statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
 }

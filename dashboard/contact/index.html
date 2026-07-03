@@ -31,17 +31,19 @@
   </aside>
 
   <div class="main-content">
-    <div class="content-box">
+    <div class="content-box" style="max-width:410px;">
       <h2>📩 Contattaci</h2>
       <p>Hai trovato un bug? Hai bisogno di assistenza? Inviaci un messaggio.</p>
 
+      <p class="statusBox" style="display:none;">
+        <span id="statusMsg"></span>
+        <button id="closeSMsg">&times;</button>
+      </p>
       <form id="contactForm">
         <input type="text" id="subject" placeholder="Oggetto del messaggio" required>
         <textarea id="message" rows="6" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
         <button type="submit">Invia messaggio</button>
       </form>
-
-      <p id="result" style="margin-top:10px;"></p>
     </div>
   </div>
 </body>

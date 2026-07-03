@@ -924,6 +924,11 @@ class VehicleDraftsManager {
         if (!statusMsg) return;
         statusMsg.textContent = message;
         statusMsg.className = `${"statusBox" + " " + type}`;
+        statusMsg.style.display = "block";
+        const closeBtn = document.getElementById("closeSMsg");
+        closeBtn.onclick = () => {
+            statusMsg.style.display = "none";
+        }
     }
 
     openDraftViewer(draftId) {

@@ -100,8 +100,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
   const confirm = document.getElementById("confirmPassword").value;
 
   if (newP !== confirm) {
-    passwordStatusMsg.textContent = "❌ Le nuove password non coincidono!";
-    passwordStatusMsg.className = "error";
+    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", "Le nuove password non corrispondono.", "error");
     return;
   }
 
@@ -113,13 +112,11 @@ changePasswordForm.addEventListener("submit", async (e) => {
 
     await updatePassword(user, newP);
 
-    passwordStatusMsg.textContent = "✅ Password cambiata con successo!";
-    passwordStatusMsg.className = "success";
+    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", "Password aggiornata con successo!", "success");
 
     changePasswordForm.reset();
   } catch (err) {
-    passwordStatusMsg.textContent = "❌ Errore: " + err.message;
-    passwordStatusMsg.className = "error";
+    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", `Errore aggiornamento password: ${err.message}`, "error");
   }
 });
 
@@ -131,7 +128,7 @@ saveBioBtn.addEventListener("click", async () => {
   });
 
   bioText.textContent = newBio;
-  setStatus("bioStatus", "Biografia aggiornata!", "success");
+  setStatus("closeBioMsg", "bioStatusBox", "bioStatus", "Biografia aggiornata!", "success");
 });
 
 profilePicForm.addEventListener("submit", async (e) => {
@@ -171,7 +168,7 @@ profilePicForm.addEventListener("submit", async (e) => {
 
     profilePreview.src = imageUrl;
 
-    setStatus("pfpStatus", "Foto profilo aggiornata!", "success");
+    setStatus("closePfpMsg", "pfpStatusBox", "pfpStatus", "Foto profilo aggiornata!", "success");
   } catch (err) {
     console.error(err);
     setStatus("pfpStatus", `${"Errore upload: " + err.message}`, "error");
@@ -186,9 +183,14 @@ deleteProfPicBtn.addEventListener("click", async (e) => {
   });
 });
 
-function setStatus(statusMsg, message, type = "info") {
+function setStatus(closeBox,statusBox, statusMsg, message, type = "info") {
+  const classNameBox = document.querySelector(`${"." + statusBox}`);
   if (!statusMsg) return;
   document.getElementById(`${statusMsg}`).textContent = message;
-  document.getElementById(`${statusMsg}`).className = `${"statusBox" + " " + type}`;
-  document.getElementById(`${statusMsg}`).style.display = "block";
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById(closeBox);
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  };
 }

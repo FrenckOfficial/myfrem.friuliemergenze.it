@@ -100,3 +100,14 @@ async function deleteFromDatabase(userId) {
     loadPermissions();
   }
 };
+
+function setStatus(message, type = "info") {
+  const statusMsg = document.getElementById("statusMsg");
+  statusMsg.textContent = message;
+  statusMsg.className = `${"statusBox" + " " + type}`;
+  statusMsg.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    statusMsg.style.display = "none";
+  };
+};

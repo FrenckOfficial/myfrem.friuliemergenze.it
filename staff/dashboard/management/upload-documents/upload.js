@@ -31,6 +31,11 @@ onAuthStateChanged(auth, (user) => {
 function setStatus(msg) {
   console.log("STATUS:", msg);
   statusMsg.textContent = msg;
+  statusMsg.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    statusMsg.style.display = "none";
+  };
 }
 
 fileInput.addEventListener("change", () => {

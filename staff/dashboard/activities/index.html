@@ -15,7 +15,7 @@
     <aside class="sidebar">
     <div class="logo">
       <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>Intranet</h2>
+      <h2>MyFrEM Staff</h2>
     </div>
     <nav>
       <a href="/staff/dashboard/staff" class="active">📊 Dashboard</a>
@@ -31,6 +31,10 @@
 
     <div class="main-content">
         <h1>📋 Tutte le attività</h1>
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
         <div class="activity" id="activitiesList">
             <!-- JS Loading -->
         </div>

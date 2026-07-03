@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const tableBody = document.getElementById("documentsTableBody");
-const messageBox = document.getElementById("statusMsg");
+const statusMsg = document.getElementById("statusMsg");
 
 console.log("📄 Loading generated documents...");
 
@@ -71,10 +71,11 @@ async function loadDocuments() {
     });
 
     console.log("✅ Documenti caricati:", snap.size);
+    setStatus("Documenti caricati", "success");
 
   } catch (err) {
     console.error("❌ Errore caricamento documenti:", err);
-    messageBox.textContent = "Errore nel caricamento documenti";
+    setStatus("Errore nel caricamento documenti", "error");
   }
 }
 
@@ -97,5 +98,16 @@ document.addEventListener("click", async (e) => {
     }
   }
 });
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
+}
 
 loadDocuments();

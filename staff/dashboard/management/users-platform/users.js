@@ -88,9 +88,9 @@ async function loadUsers() {
     if (roleA !== roleB) return roleA - roleB;
 
     if (a.role === "user" && b.role === "user") {
-      const nameA = getAlphabetKey(a);
-      const nameB = getAlphabetKey(b);
-      return nameA.localeCompare(nameB);
+      const timeA = a.createdAt?.toMillis?.() || 0;
+      const timeB = b.createdAt?.toMillis?.() || 0;
+      return timeB - timeA;
     }
 
     return 0;
@@ -202,4 +202,8 @@ function setStatus(message, type = "info") {
   statusMsg.textContent = message;
   statusMsg.className = `${"statusBox" + " " + type}`;
   statusMsg.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    statusMsg.style.display = "none";
+  }
 }

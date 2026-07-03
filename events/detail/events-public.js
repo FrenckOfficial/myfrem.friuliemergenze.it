@@ -68,7 +68,18 @@ async function loadPublicEvent() {
 
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "❌ Errore nel caricamento dell'evento.";
+    setStatus("Si è verificato un errore nel caricamento dell'evento.", "error");
+  }
+}
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
   }
 }
 

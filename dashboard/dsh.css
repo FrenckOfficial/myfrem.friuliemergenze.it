@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap');
 
 :root {
   --accent: #00d4e8;
@@ -18,8 +18,8 @@
   --text: #e8edf2;
   --muted: #7a8fa6;
   --faint: #3d5068;
-  --font-display: -apple-system, "Syne", sans-serif;
-  --font-mono: -apple-system, "Space Mono", monospace;
+  --font-display: -apple-system, "Inter", sans-serif;
+  --font-mono: -apple-system, "Manrope", monospace;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 14px;
@@ -169,7 +169,7 @@ h1 {
   letter-spacing: 0.06em;
 }
 
-#statusMsg {
+.statusBox {
   margin: 15px 0;
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -180,13 +180,13 @@ h1 {
   color: var(--accent);
 }
 
-#statusMsg.info {
+.statusBox.info {
   color: var(--accent);
 }
-#statusMsg.success {
+.statusBox.success {
   color: var(--signal-green);
 }
-#statusMsg.error {
+.statusBox.error {
   color: var(--signal-red);
 }
 
@@ -321,7 +321,7 @@ h1 {
 }
 
 .settings-container {
-  max-width: 700px;
+  max-width: 500px;
   margin: 40px auto;
   padding: 20px;
 }
@@ -337,14 +337,27 @@ h1 {
   color: var(--accent);
 }
 
+.settings-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.settings-row .settings-card {
+  flex: 1;
+  min-width: 320px;
+}
+
+
 .settings-card {
   background: var(--bg-panel);
   padding: 25px;
   width: 100%;
   border-radius: var(--radius-lg);
-  margin-bottom: 30px;
   border: 1px solid var(--border);
-  box-sizing: border-box;
   transition: border-color 0.2s;
 }
 
@@ -360,7 +373,7 @@ h1 {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-top: 0;
+  margin-top: 15px;
 }
 
 input,
@@ -371,7 +384,7 @@ select {
   font-size: 0.88rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
-  margin-top: 10px;
+  margin-top: 2px;
   background: var(--bg-surface);
   color: var(--text);
   font-family: var(--font-mono);
@@ -566,7 +579,7 @@ form input[type="file"] {
 .form-group {
   margin-bottom: 1.3rem;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -734,31 +747,6 @@ textarea::placeholder {
   text-align: center
 }
 
-#viewAllPhotos {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  padding: 9px 16px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.15s;
-  width: 13.4%;
-  margin-top: 15px;
-}
-
-#viewAllPhotos:hover {
-  background: var(--accent);
-  color: var(--bg);
-}
-
 .photos-grid {
   display: flex;
   flex-wrap: wrap;
@@ -839,6 +827,18 @@ textarea::placeholder {
   text-transform: uppercase;
 }
 
+.gallery-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+
 .status.pending {
   background: rgba(245, 166, 35, 0.12);
   color: var(--signal-amber);
@@ -904,6 +904,7 @@ textarea::placeholder {
   line-height: 1.5;
   border-left: 4px solid;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   animation: slideIn 0.3s ease-out;
@@ -952,6 +953,26 @@ textarea::placeholder {
   flex-shrink: 0;
 }
 
+#closeSMsg {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -972,6 +993,8 @@ textarea::placeholder {
 @media (max-width: 768px) {
   body {
     flex-direction: column;
+    padding: 0;
+    margin: 0;
   }
 
   .sidebar,

@@ -19,7 +19,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -37,7 +37,10 @@
         <h2>📷 Foto Profilo</h2>
 
         <div class="profile-upload">
-          <p id="pfpStatus" class="statusBox" style="display:none;"></p>
+          <p class="pfpStatusBox" style="display:none;">
+            <span id="pfpStatus"></span>
+            <button id="closePfpMsg">&times;</button>
+          </p>
           <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
 
           <form id="profilePicForm" enctype="multipart/form-data">
@@ -81,7 +84,10 @@
 
     <section class="settings-section">
       <h2>🔐 Cambia Password</h2>
-      <p id="passwordStatusMsg" class="statusBox" style="display:none;"></p>
+      <p class="passwordStatusBox" style="display:none;">
+        <span id="passwordStatusMsg"></span>
+        <button id="closePswMsg">&times;</button>
+      </p>
       <form id="changePasswordForm" autocomplete="off">
         <label>Password attuale</label>
         <input type="password" id="currentPassword" required autocomplete="on">
@@ -98,7 +104,10 @@
 
     <section class="settings-section">
       <h2>Biografia</h2>
-      <p id="bioStatus" class="statusBox" style="display:none;"></p>
+      <p class="bioStatusBox" style="display:none;">
+        <span id="bioStatus"></span>
+        <button id="closeBioMsg">&times;</button>
+      </p>
       <p>La tua biografia attuale è: <b id="bioText"></b></p>
       <textarea id="bioInput" class="textarea"></textarea>
       <button id="saveBioBtn" class="btn" type="submit">💾 Salva bio</button>

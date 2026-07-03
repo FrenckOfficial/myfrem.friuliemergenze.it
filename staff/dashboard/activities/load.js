@@ -63,6 +63,12 @@ async function loadStats() {
       (a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis()
     );
 
+    const pStatusMsg = document.createElement("p");
+    pStatusMsg.id = "statusMsg";
+    pStatusMsg.className = "statusBox info";
+    pStatusMsg.style.display = "none";
+    recentActivityListEl.appendChild(pStatusMsg);
+
     for (const docSnap of sorted) {
       const activity = docSnap.data();
 
@@ -105,6 +111,12 @@ async function loadStats() {
 }
 
 function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
   statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
 }

@@ -471,7 +471,7 @@ textarea {
   flex-shrink: 0;
 }
 
-#statusMsg {
+.statusBox {
   margin-top: 15px;
   padding: 10px 15px;
   border-radius: var(--radius-sm);
@@ -483,13 +483,13 @@ textarea {
   color: var(--muted);
 }
 
-#statusMsg.success {
+.statusBox.success {
   background: rgba(79, 202, 122, 0.1);
   color: var(--signal-green);
   border: 1px solid rgba(79, 202, 122, 0.3);
 }
 
-#statusMsg.error {
+.statusBox.error {
   background: rgba(232, 72, 85, 0.1);
   color: var(--signal-red);
   border: 1px solid rgba(232, 72, 85, 0.3);

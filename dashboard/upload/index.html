@@ -49,7 +49,7 @@
         <div class="form-group">
           <div class="mini-group">
             <label>Allestitore</label>
-            <input type="text" id="sponsor" style="margin-top: 25px;">
+            <input type="text" id="sponsor">
           </div>
           
           <div class="mini-group">
@@ -60,7 +60,7 @@
         
 
         <label>Tipologia di servizio svolto <b>*</b></label>
-        <select id="serviceType" required>
+        <select id="serviceType" required style="margin-top:0;">
           <option value="none">Seleziona una tipologia</option>
           <option value="emergenza-sanitaria">Ambulanza Territoriale (ex 118)</option>
           <option value="trasporti-secondari">Trasporti Sanitari Secondari</option>
@@ -71,8 +71,8 @@
           <option value="altro">Altro (specificare nel campo note)</option>
         </select>
 
-        <label>Note aggiuntive</label>
-        <input type="text" id="notes">
+        <label style="margin-top:20px;">Note aggiuntive</label>
+        <input type="text" id="notes" style="margin-top:0;">
 
         <div class="form-group">
           <input type="file" id="inp-upl" multiple accept="image/*">

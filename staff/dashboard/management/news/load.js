@@ -27,10 +27,10 @@ const btnCancel = document.querySelector('.btn-cancel');
 const statusMsg = document.getElementById('statusMsg');
 
 modalClose?.addEventListener('click', () => {
-    closeCreateModal();
+    this.closeCreateModal();
 })
 btnCancel?.addEventListener('click', () => {
-    closeCreateModal();
+    this.closeCreateModal();
 })
 
 logoutBtn?.addEventListener('click', async () => {
@@ -211,6 +211,39 @@ class NewsManager {
             removeImageBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.removeSelectedImage();
+            });
+        }
+
+        const btnPublish = document.querySelector(".btn-publish");
+        if (btnPublish) {
+            btnPublish.addEventListener("click", async () => {
+                if (!this.currentNewsId) {
+                    this.showError("Nessuna notizia selezionata");
+                    return;
+                }
+
+                console.log('btn-publish clicked');
+                await this.triggerGithubWorkflow(this.currentNewsId);
+                console.log('github workflow triggered');
+                
+                const currentUser = this.getCurrentUser();
+                await updateDoc(doc(db, "newsDrafts", this.currentNewsId), {
+                    status: "published",
+                    updatedAt: Timestamp.now(),
+                    updatedBy: currentUser
+                });
+                console.log('updateDoc for the news doc called successfully');
+                
+                await addDoc(collection(db, "activities"), {
+                    type: "news_published",
+                    editStaffer: auth.currentUser?.email || "-",
+                    timestamp: Timestamp.now()
+                });
+                console.log('addDoc for the activity doc called successfully');
+                
+                this.showSuccess('✅ Notizia pubblicata con successo!');
+                this.closeCreateModal();
+                setTimeout(() => this.loadNews(), 1000);
             });
         }
     }
@@ -395,7 +428,6 @@ class NewsManager {
         }
 
         this.isSaving = true;
-        this.currentNewsId = newsId;
 
         console.log('\n═════════════════════════════════════════════');
         console.log('✨ CREATE NEWS - INIZIO CREAZIONE');
@@ -437,6 +469,8 @@ class NewsManager {
                 updatedBy: currentUser
             });
 
+            this.currentNewsId = newNewsRef.id;
+
             await addDoc(collection(db, "activities"), {
                 type: "news_create",
                 title: newsData.title,
@@ -444,24 +478,36 @@ class NewsManager {
                 timestamp: Timestamp.now()
             });
 
-            this.currentNewsId = newNewsRef.id;
+            console.log('✅ Notizia creata con ID:', newNewsRef.id);
 
-            document.querySelector(".btn-publish").addEventListener("click", async () => {
-                this.triggerGithubWorkflow(this.currentNewsId);
+            const isPublishBtn = event.submitter?.classList.contains('btn-publish');
+            
+            if (isPublishBtn) {
+                console.log('🚀 Pubblicazione automatica...');
+                this.showLoading('Pubblicazione in corso...');
+                
+                await this.triggerGithubWorkflow(this.currentNewsId);
+                
+                await updateDoc(doc(db, "newsDrafts", this.currentNewsId), {
+                    status: "published",
+                    updatedAt: Timestamp.now(),
+                    updatedBy: currentUser
+                });
+
                 await addDoc(collection(db, "activities"), {
                     type: "news_published",
                     title: newsData.title,
                     editStaffer: auth.currentUser?.email || "-",
                     timestamp: Timestamp.now()
-                })
-            });
+                });
 
-            console.log('✅ Notizia creata con ID:', newNewsRef.id);
+                this.showSuccess('✅ Notizia creata e pubblicata!');
+            } else {
+                this.showSuccess('✅ Notizia salvata come bozza!');
+            }
+
             console.log('═════════════════════════════════════════════');
-
-            this.showSuccess('✅ Notizia creata con successo!');
             this.closeCreateModal();
-            
             setTimeout(() => this.loadNews(), 1000);
 
         } catch (error) {
@@ -801,7 +847,7 @@ class NewsManager {
             await addDoc(collection(db, 'activities'), {
                 type: 'news_update',
                 title: newsData.title,
-                editStaffer: currentUser.email || '-',
+                editStaffer: auth.currentUser?.email || "-",
                 timestamp: Timestamp.now()
             });
 

@@ -20,7 +20,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -39,7 +39,10 @@
       Crea una nuova newsletter. Il sistema salverà automaticamente la bozza e mostrerà una preview in tempo reale.
     </p>
 
-    <p id="statusMsg" class="statusBox" style="display:none;"></p>
+    <p class="statusBox" style="display:none;">
+      <span id="statusMsg"></span>
+      <button id="closeSMsg">&times;</button>
+    </p>
 
     <div class="activity-box">
       <form id="newsletterForm">

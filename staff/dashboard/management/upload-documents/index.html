@@ -18,7 +18,7 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff">📊 Dashboard</a>
+      <a href="/staff/dashboard/">📊 Dashboard</a>
       <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
       <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
       <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
@@ -30,7 +30,10 @@
   </aside>
 
   <div class="main-content">
-    <p id="statusMsg" class="statusBox" style="display:none;"></p>
+    <p class="statusBox" style="display:none;">
+      <span id="statusMsg"></span>
+      <button id="closeSMsg">&times;</button>
+    </p>
     <div class="content-box">
       <h1>🗂️ Carica un documento</h1>
       <form id="uploadForm">

@@ -7,6 +7,13 @@
   <title>Impostazioni utente | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
   <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png">
+  <style>
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 0
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -31,90 +38,81 @@
     <div class="settings-container">
         <h1 class="title">Impostazioni account</h1>
 
-        <section class="settings-card">
-          <h2>📷 Foto Profilo</h2>
+        <div class="settings-row">
+          <section class="settings-card">
+            <h2>📷 Foto Profilo</h2>
+            <div class="profile-upload">
+              <p id="pfpStatus" class="statusBox" style="display:none;"></p>
+              <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+  
+              <form id="profilePicForm" enctype="multipart/form-data">
+                <label>Carica nuova immagine</label>
+                <input type="file" id="profilePicInput" accept="image/*">
+                <button type="submit" class="btn" id="uploadProfilePicBtn">Carica foto</button>
+                <button type="button" class="btn" id="deleteProfPicBtn" style="background-color:red;">Elimina foto</button>
+              </form>
+            </div>
+          </section>
+  
+          <section class="settings-card">
+            <p id="fullNameStatus" class="statusBox" style="display:none;"></p>
+            <h2>Nome e cognome</h2>
+            <p id="fullName">Il tuo attuale nome e cognome è
+              <span id="fullNameText"></span>
+            </p>
+            <h3>Nome</h3>
+            <input type="text" id="nameInput" class="input" placeholder="Nome">
+            <h3 style="margin-top:5px;">Cognome</h3>
+            <input type="text" id="surnameInput" class="input" placeholder="Cognome">
+            <button id="saveFullNameBtn" class="btn">Salva nome e cognome</button>
+          </section>
+        </div>
 
-          <div class="profile-upload">
-            <p id="pfpStatus" class="statusBox" style="display:none;"></p>
-            <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+        <div class="settings-row">
+          <section class="settings-card">
+            <p id="usernameStatus" class="statusBox" style="display:none;"></p>
+            <h2>Username</h2>
+            <p id="username">Il tuo username è
+                <span id="userText"></span>
+            </p>
+            <input type="text" id="usernameInput" class="input">
+            <button id="saveUsernameBtn" class="btn">Salva username</button>
+          </section>
+  
+          <section class="settings-card">
+            <p id="mailStatus" class="statusBox" style="display:none;"></p>
+            <h2>E-Mail</h2>
+            <p id="mail">La tua mail di accesso è
+                <span id="mailText"></span>
+            </p>
+            <input type="text" id="mailInput" class="input">
+            <button id="saveMailBtn" class="btn">Salva e-mail di accesso</button>
+          </section>
+        </div>
 
-            <form id="profilePicForm" enctype="multipart/form-data">
-              <label>Carica nuova immagine</label>
-              <input type="file" id="profilePicInput" accept="image/*">
-
-              <button type="submit" class="btn" id="uploadProfilePicBtn">
-                Carica foto
-              </button>
-
-              <button type="submit" class="btn" id="deleteProfPicBtn" style="background-color:red;">
-                Elimina foto
-              </button>
-            </form>
-          </div>
-        </section>
-
-        <section class="settings-card">
-          <p id="fullNameStatus" class="statusBox" style="display:none;"></p>
-          <h2>Nome e cognome</h2>
-          <p id="fullName">Il tuo attuale nome e cognome è
-            <span id="fullNameText"></span>
-          </p>
-          <p></p>
-          <h3>Nome</h3>
-          <input type="text" id="nameInput" class="input" placeholder="Nome">
-          <h3>Cognome</h3>
-          <input type="text" id="surnameInput" class="input" placeholder="Cognome">
-          <button id="saveFullNameBtn" class="btn">Salva nome e cognome</button>
-        </section>
-
-        <section class="settings-card">
-          <p id="usernameStatus" class="statusBox" style="display:none;"></p>
-          <h2>Username</h2>
-          <p id="username">Il tuo username è
-              <span id="userText"></span>
-          </p>
-          <input type="text" id="usernameInput" class="input">
-          <button id="saveUsernameBtn" class="btn">Salva username</button>
-        </section>
-
-        <section class="settings-card">
-          <p id="mailStatus" class="statusBox" style="display:none;"></p>
-          <h2>E-Mail</h2>
-          <p id="mail">La tua mail di accesso è
-              <span id="mailText"></span>
-          </p>
-          <input type="text" id="mailInput" class="input">
-          <button id="saveMailBtn" class="btn">Salva e-mail di accesso</button>
-        </section>
-
-        <section class="settings-card">
-          <p id="bioStatus" class="statusBox" style="display:none;"></p>
-          <h2>Biografia</h2>
-          <p id="bio">La tua biografia è:
-              <span id="bioText"></span>
-          </p>
-          <textarea id="bioInput" class="textarea"></textarea>
-          <button id="saveBioBtn" class="btn">Salva bio</button>
-        </section>
-
-        <section class="settings-card" id="passwordCard">
-          <p id="pswStatus" class="statusBox" style="display:none;"></p>
-          <h2>Cambia password</h2>
-          <h3>Password attuale</h3>
-          <input type="password" id="currentPassword" class="input">
-          <h3>Nuova password</h3>
-          <input type="password" id="newPassword" class="input">
-          <h3>Conferma nuova password</h3>
-          <input type="password" id="confirmPassword" class="input">
-          <button id="savePasswordBtn" class="btn">Aggiorna password</button>
-        </section>
-
-        <section class="settings-card">
-          <h2>Disconnessione</h2>
-          <h3>Effettua il logout dal tuo account MyFrEM.</h3>
-          <button id="logoutBtnSettings" class="btn danger">Esci</button>
-        </section>
-
+        <div class="settings-row">
+          <section class="settings-card">
+            <p id="bioStatus" class="statusBox" style="display:none;"></p>
+            <h2>Biografia</h2>
+            <p id="bio">La tua biografia è:
+                <span id="bioText"></span>
+            </p>
+            <textarea id="bioInput" class="textarea"></textarea>
+            <button id="saveBioBtn" class="btn">Salva bio</button>
+          </section>
+  
+          <section class="settings-card" id="passwordCard">
+            <p id="pswStatus" class="statusBox" style="display:none;"></p>
+            <h2>Cambia password</h2>
+            <h3>Password attuale</h3>
+            <input type="password" id="currentPassword" class="input">
+            <h3>Nuova password</h3>
+            <input type="password" id="newPassword" class="input">
+            <h3>Conferma nuova password</h3>
+            <input type="password" id="confirmPassword" class="input">
+            <button id="savePasswordBtn" class="btn">Aggiorna password</button>
+          </section>
+        </div>
     </div>
   </div>
 

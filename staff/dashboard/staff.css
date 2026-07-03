@@ -335,7 +335,7 @@ button.reject:active {
   transform: scale(0.96);
 }
 
-#statusMsg {
+.statusBox {
   margin-top: 15px;
   padding: 10px 15px;
   border-radius: var(--radius-sm);
@@ -347,13 +347,13 @@ button.reject:active {
   color: var(--muted);
 }
 
-#statusMsg.success {
+.statusBox.success {
   background: rgba(79, 202, 122, 0.1);
   color: var(--signal-green);
   border: 1px solid rgba(79, 202, 122, 0.3);
 }
 
-#statusMsg.error {
+.statusBox.error {
   background: rgba(232, 72, 85, 0.1);
   color: var(--signal-red);
   border: 1px solid rgba(232, 72, 85, 0.3);
@@ -611,6 +611,7 @@ button.reject:active {
   line-height: 1.5;
   border-left: 4px solid;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
   animation: slideIn 0.3s ease-out;
@@ -657,6 +658,26 @@ button.reject:active {
   font-size: 18px;
   color: #0891b2;
   flex-shrink: 0;
+}
+
+#closeSMsg {
+  position: absolute;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: inherit;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {
@@ -1256,7 +1277,7 @@ td {
   color: var(--muted);
 }
 
-#statusMsg {
+.statusBox {
   margin-top: 10px;
   color: var(--faint);
 }
@@ -1566,7 +1587,7 @@ button {
     font-size: 0.65rem;
   }
 
-  #statusMsg {
+  .statusBox {
     font-size: 0.65rem;
   }
 

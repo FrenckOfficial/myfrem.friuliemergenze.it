@@ -31,11 +31,14 @@
           </ul>
         </div>
 
-        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 FriuliEmergenze · Tutti i diritti riservati</div>
+        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 Friuli Emergenze · Tutti i diritti riservati</div>
       </div>
 
       <div class="panel-right">
-        <p id="statusMsg" class="statusBox" style="display:none;"></p>
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
         <p class="form-title">Bentornato</p>
         <p class="form-sub">Accedi al tuo account MyFrEM</p>
 
@@ -66,7 +69,10 @@
             <a href="/login/reset-your-password/">Password dimenticata?</a>
           </div>
 
-          <button type="submit" class="submit-btn">Accedi</button>
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span id="btnText">Accedi</span>
+            <span id="btnLoader" class="loader" style="display:none;"></span>
+          </button>
         </form>
 
         <div class="auth-footer">
