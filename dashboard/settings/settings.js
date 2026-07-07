@@ -29,6 +29,10 @@ const mailInput = document.getElementById("mailInput");
 const mailText = document.getElementById("mailText");
 const saveMailBtn = document.getElementById("saveMailBtn");
 
+const phoneInput = document.getElementById("phoneInput");
+const phoneText = document.getElementById("phoneText");
+const savePhoneBtn = document.getElementById("savePhoneBtn");
+
 const bioInput = document.getElementById("bioInput");
 const bioText = document.getElementById("bioText");
 const saveBioBtn = document.getElementById("saveBioBtn");
@@ -166,8 +170,20 @@ saveMailBtn.addEventListener("click", async () => {
     email: newMail
   });
 
-  setStatus("mailStatus", "E-Mail aggiornato!", "success");
+  setStatus("mailStatus", "E-Mail aggiornata!", "success");
 });
+
+savePhoneBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("phoneStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+
+  const newPhone = phoneInput.value.trim();
+
+  await updateDoc(doc(db, "users", currentUserId), {
+    phone: newPhone
+  });
+
+  setStatus("phoneStatus", "Numero di telefono aggiornato!", "success");
+})
 
 saveBioBtn.addEventListener("click", async () => {
   if (isReadOnlyMode) return setStatus("bioStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
