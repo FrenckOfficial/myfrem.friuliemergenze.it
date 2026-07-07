@@ -6,112 +6,118 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>Impostazioni Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/settings/style.css">
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/settings/staff-settings.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
-      <h2>MyFrEM Staff</h2>
-    </div>
-    <nav>
-      <a href="/staff/dashboard/">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-      <a href="/staff/dashboard/users/">👥 Funzionalità</a>
-      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-      <a href="/staff/dashboard/settings/" class="active">⚙️ Impostazioni</a>
-    </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
-  </aside>
-
-  <main class="main-content">
-    <h1>⚙️ Impostazioni Staff</h1>
-    <div class="settings-row">
-      <section class="settings-section" id="settingsRow">
-        <h2>📷 Foto Profilo</h2>
-
-        <div class="profile-upload">
-          <p class="pfpStatusBox" style="display:none;">
-            <span id="pfpStatus"></span>
-            <button id="closePfpMsg">&times;</button>
-          </p>
-          <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
-
-          <form id="profilePicForm" enctype="multipart/form-data">
-            <label>Carica nuova immagine</label>
-            <input type="file" id="profilePicInput" accept="image/*">
-
-            <div class="btns">
-              <button type="submit" class="btn" id="uploadProfilePicBtn">
-                📤 Carica foto
-              </button>
-
-              <button class="btn" id="deleteProfPicBtn" style="background-color:red;">
-                ❌ Elimina foto
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <section class="settings-section" id="settingsRow">
-        <h2>👤 Profilo Staff</h2>
-
-        <div class="profile-box">
-          <div>
-            <p><b>Nome utente:</b> <span id="staffUsername"></span></p>
-            <br>
-            <p><b>Nome staffer:</b> <span id="staffName"></span></p>
-            <br>
-            <p><b>Email:</b> <span id="staffEmail"></span></p>
-            <br>
-            <p><b>Ruolo:</b> <span id="staffRole"></span></p>
-            <br>
-            <p><b>Accesso:</b> <span id="staffAccess"></span></p>
-            <br>
-            <br>
-            <p><b><em>Per cambiare tali dati si prega di farne richiesta alla mail <a href="mailto:banca.dati@friuliemergenze.it">banca.dati@friuliemergenze.it</a> o al numero <a href="tel:+393894757472">389/4757472</a></em></b></p>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display: none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="Logo MyFrEM">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">📊 Dashboard</a>
+        <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+        <a href="/staff/dashboard/users/">👥 Funzionalità</a>
+        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+        <a href="/staff/dashboard/settings/" class="active">⚙️ Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+  
+    <main class="main-content">
+      <h1>⚙️ Impostazioni Staff</h1>
+      <div class="settings-row">
+        <section class="settings-section" id="settingsRow">
+          <h2>📷 Foto Profilo</h2>
+  
+          <div class="profile-upload">
+            <p class="pfpStatusBox" style="display:none;">
+              <span id="pfpStatus"></span>
+              <button id="closePfpMsg">&times;</button>
+            </p>
+            <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+  
+            <form id="profilePicForm" enctype="multipart/form-data">
+              <label>Carica nuova immagine</label>
+              <input type="file" id="profilePicInput" accept="image/*">
+  
+              <div class="btns">
+                <button type="submit" class="btn" id="uploadProfilePicBtn">
+                  📤 Carica foto
+                </button>
+  
+                <button class="btn" id="deleteProfPicBtn" style="background-color:red;">
+                  ❌ Elimina foto
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
+        </section>
+  
+        <section class="settings-section" id="settingsRow">
+          <h2>👤 Profilo Staff</h2>
+  
+          <div class="profile-box">
+            <div>
+              <p><b>Nome utente:</b> <span id="staffUsername"></span></p>
+              <br>
+              <p><b>Nome staffer:</b> <span id="staffName"></span></p>
+              <br>
+              <p><b>Email:</b> <span id="staffEmail"></span></p>
+              <br>
+              <p><b>Ruolo:</b> <span id="staffRole"></span></p>
+              <br>
+              <p><b>Accesso:</b> <span id="staffAccess"></span></p>
+              <br>
+              <br>
+              <p><b><em>Per cambiare tali dati si prega di farne richiesta alla mail <a href="mailto:banca.dati@friuliemergenze.it">banca.dati@friuliemergenze.it</a> o al numero <a href="tel:+393894757472">389/4757472</a></em></b></p>
+            </div>
+          </div>
+        </section>
+      </div>
+  
+      <section class="settings-section">
+        <h2>🔐 Cambia Password</h2>
+        <p class="passwordStatusBox" style="display:none;">
+          <span id="passwordStatusMsg"></span>
+          <button id="closePswMsg">&times;</button>
+        </p>
+        <form id="changePasswordForm" autocomplete="off">
+          <label>Password attuale</label>
+          <input type="password" id="currentPassword" required autocomplete="on">
+  
+          <label>Nuova password</label>
+          <input type="password" id="newPassword" required autocomplete="off">
+  
+          <label>Conferma nuova password</label>
+          <input type="password" id="confirmPassword" required autocomplete="off">
+  
+          <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
+        </form>
       </section>
-    </div>
-
-    <section class="settings-section">
-      <h2>🔐 Cambia Password</h2>
-      <p class="passwordStatusBox" style="display:none;">
-        <span id="passwordStatusMsg"></span>
-        <button id="closePswMsg">&times;</button>
-      </p>
-      <form id="changePasswordForm" autocomplete="off">
-        <label>Password attuale</label>
-        <input type="password" id="currentPassword" required autocomplete="on">
-
-        <label>Nuova password</label>
-        <input type="password" id="newPassword" required autocomplete="off">
-
-        <label>Conferma nuova password</label>
-        <input type="password" id="confirmPassword" required autocomplete="off">
-
-        <button type="submit" class="btn" id="savePasswordBtn">💾 Cambia password</button>
-      </form>
-    </section>
-
-    <section class="settings-section">
-      <h2>Biografia</h2>
-      <p class="bioStatusBox" style="display:none;">
-        <span id="bioStatus"></span>
-        <button id="closeBioMsg">&times;</button>
-      </p>
-      <p>La tua biografia attuale è: <b id="bioText"></b></p>
-      <textarea id="bioInput" class="textarea"></textarea>
-      <button id="saveBioBtn" class="btn" type="submit">💾 Salva bio</button>
-    </section>
-  </main>
+  
+      <section class="settings-section">
+        <h2>Biografia</h2>
+        <p class="bioStatusBox" style="display:none;">
+          <span id="bioStatus"></span>
+          <button id="closeBioMsg">&times;</button>
+        </p>
+        <p>La tua biografia attuale è: <b id="bioText"></b></p>
+        <textarea id="bioInput" class="textarea"></textarea>
+        <button id="saveBioBtn" class="btn" type="submit">💾 Salva bio</button>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

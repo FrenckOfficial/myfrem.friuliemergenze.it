@@ -281,7 +281,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
               ${imageRow}
               <tr>
                 <td style="padding:30px;text-align:center;">
-                  <img src="https://friuliemergenze.it/assets/logo.png" style="width:70px;margin-bottom:15px;">
+                  <img src="https://www.friuliemergenze.it/assets/logo.png" style="width:70px;margin-bottom:15px;">
 
                   <h2 style="color:#ff3b3b;margin-top:10px;">${title}</h2>
 

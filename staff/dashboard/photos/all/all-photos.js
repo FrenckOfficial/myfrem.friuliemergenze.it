@@ -11,7 +11,8 @@ import {
   updateDoc,
   addDoc,
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "/configFirebase.js";
@@ -24,6 +25,8 @@ const photosTableBody = document.getElementById("photosTbody");
 const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
 const messageBox = document.getElementById("messageBox");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 let usersMap = {};
 
@@ -49,25 +52,32 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-    if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
-
-    await loadUsersMap();
-    loadAllPhotos();
-  } catch (err) {
-    console.error("Errore verifica staff:", err);
-    setStatus("Errore verifica permessi", "error");
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadUsersMap();
+  await loadAllPhotos();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadUsersMap() {

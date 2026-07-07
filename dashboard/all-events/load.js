@@ -21,17 +21,29 @@ logoutBtn.onclick = async () => {
   window.location.href = "/login";
 };
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "/login";
-    return;
-  }
+  const timeoutId = setTimeout(() => {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  }, 5000);
 
   try {
+    if (!user) {
+      clearTimeout(timeoutId);
+      window.location.href = "/login";
+      return;
+    }
+
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists()) {
       statusMsg.textContent = "❌ Errore: utente non trovato.";
       statusMsg.className = "error";
+      clearTimeout(timeoutId);
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";;
       return;
     }
 
@@ -52,6 +64,9 @@ onAuthStateChanged(auth, async (user) => {
 
     if (snap.empty) {
       eventsList.innerHTML = "<p class='info' style='margin-top=\"200px\"'>Non hai ancora creato nessun evento.</p>";
+      clearTimeout(timeoutId);
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";;
       return;
     }
 
@@ -81,9 +96,16 @@ onAuthStateChanged(auth, async (user) => {
       eventsList.appendChild(div);
     });
 
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+
   } catch (err) {
-    console.error("Errore caricamento eventi:", err);
+    console.error("❌ Errore caricamento eventi:", err);
     statusMsg.textContent = "❌ Errore nel caricamento degli eventi.";
     statusMsg.className = "error";
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
   }
 });

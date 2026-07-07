@@ -1,34 +1,44 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-onAuthStateChanged(auth, async user => {
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "/login"
-    return;
-  };
-
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
-
-  if (!userDocSnap.exists()) {
-    setStatus("Utente non trovato nel database.", "error");
+    window.location.href = "/login";
     return;
   }
 
-  const userDataRole = userDocSnap.data().role;
-  const allowedRoles = ["advstaff", "advstaffplus", "superadmin"];
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-  if (!allowedRoles.includes(userDataRole)) {
-    setStatus("Accesso negato: non disponi delle autorizzazioni necessarie.", "error");
-    window.location.href = "/staff/dashboard/";
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
     return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {

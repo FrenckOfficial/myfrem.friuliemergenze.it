@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registrati - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -22,7 +22,7 @@
 
         <div class="left-body">
           <h2>Inizia a<br>fare la tua<br><em>differenza.</em></h2>
-          <p>Registrandoti, entrerai a far parte della rete operativa del Friuli-Venezia Giulia per la gestione delle emergenze.</p>
+          <p>Registrandoti, entrerai a far parte della rete di Friuli Emergenze come nostro partecipante.</p>
           <ul class="feature-list">
             <li><span class="dot"></span>Compila il modulo: Inserisci i tuoi dati di accesso</li>
             <li><span class="dot"></span>Verifica la tua email: Riceverai un link per confermare il tuo account</li>
@@ -41,54 +41,88 @@
         <p class="form-title">Crea il tuo account</p>
         <p class="form-sub">Unisciti alla piattaforma MyFrEM</p>
 
-        <form id="registerForm" class="auth-form">
-          <div class="grid-2">
-            <div class="form-group" id="nameGroup">
+        <form id="registerForm" class="auth-form" novalidate>
+          <div class="step-indicator">
+            <div class="step-progress"></div>
+            <span id="stepCounter">Passo 1 di 6</span>
+          </div>
+
+          <div class="step active" data-step="1">
+            <h3>Come ti chiami?</h3>
+
+            <div id="nameGroup">
               <div id="nameSurname">
-                <label for="registerName">Nome</label>
-                <input type="text" id="registerName" required placeholder="Mario" autocomplete="given-name" />
+                <label>Nome</label>
+                <input type="text" name="name" id="registerName" placeholder="Mario" required>
               </div>
+
               <div id="nameSurname">
-                <label for="registerSurname">Cognome</label>
-                <input type="text" id="registerSurname" required placeholder="Rossi" autocomplete="family-name" />
+                <label>Cognome</label>
+                <input type="text" name="surname" id="registerSurname" placeholder="Rossi" required>
               </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="registerUsername">Username</label>
-            <input type="text" id="registerUsername" required placeholder="mariorossi" autocomplete="username" />
-          </div>
+          <div class="step" data-step="2">
+            <h3>Scegli un username</h3>
 
-          <div class="form-group">
-            <label for="registerEmail">Email</label>
-            <input type="email" id="registerEmail" required placeholder="nome@esempio.com" autocomplete="email" />
-          </div>
-
-          <div class="form-group">
-            <label for="registerPassword">Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="registerPassword" required placeholder="••••••••" autocomplete="new-password" />
-              <button type="button" class="toggle-password" onclick="togglePassword('registerPassword', this)" aria-label="Mostra password">
-                <i class="far fa-eye"></i>
-              </button>
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" name="username" id="registerUsername" placeholder="mario.rossi" required>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="registerConfirmPassword">Conferma password</label>
-            <div class="password-wrapper">
-              <input type="password" id="registerConfirmPassword" required placeholder="••••••••" autocomplete="new-password" />
-              <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword', this)" aria-label="Mostra password">
-                <i class="far fa-eye"></i>
-              </button>
+          <div class="step" data-step="3">
+            <h3>Qual è la tua email?</h3>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" name="email" id="registerEmail" placeholder="nome@esempio.com" required>
             </div>
           </div>
 
-          <button type="submit" class="submit-btn" id="submitBtn">
-            <span id="btnText">Crea un account</span>
-            <span id="btnLoader" class="loader" style="display:none;"></span>
-          </button>
+          <div class="step" data-step="4">
+            <h3>Numero di telefono</h3>
+
+            <p class="step-desc">
+              Facoltativo ma consigliato per il recupero dell'account.
+            </p>
+
+            <div class="form-group">
+              <label>Telefono</label>
+              <input type="tel" name="phone" id="registerPhone" placeholder="Numero di telefono" autocomplete="tel">
+            </div>
+          </div>
+
+          <div class="step" data-step="5">
+            <h3>Crea una password</h3>
+            
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" name="password" id="registerPassword" autocomplete="new-password" required placeholder="Nuova password">
+            </div>
+
+            <div class="form-group">
+              <label>Conferma password</label>
+              <input type="password" name="confirmPassword" id="registerConfirmPassword" autocomplete="new-password" required placeholder="Conferma nuova password">
+            </div>
+          </div>
+
+          <div class="step" data-step="6">
+            <h3>Controlla le informazioni</h3>
+
+            <div id="reviewContainer"></div>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" id="prevBtn">Indietro</button>
+            <button type="button" id="nextBtn">Continua</button>
+            <button type="submit" id="submitBtn"style="display:none">
+              <span id="btnText">Registrati</span>
+              <span id="btnLoader" class="loader" style="display:none;"></span>
+            </button>
+          </div>
+
         </form>
 
         <div class="auth-footer">

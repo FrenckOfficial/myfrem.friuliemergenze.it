@@ -101,12 +101,13 @@ form.addEventListener("submit", async (e) => {
 });
 
 function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
   statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
-  statusMsg.style.display = "block";
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
   const closeBtn = document.getElementById("closeSMsg");
   closeBtn.onclick = () => {
-    statusMsg.style.display = "none";
+    classNameBox.style.display = "none";
   }
 }
 

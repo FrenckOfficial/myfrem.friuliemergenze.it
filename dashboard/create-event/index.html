@@ -6,62 +6,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compila Richiesta Organizzazione Evento | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
     <link rel="stylesheet" href="/dashboard/dsh.css">
-    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script type="module" src="/dashboard/create-event/create.js"></script>
+    <style>
+      .form-group {
+        flex-direction:column
+      }
+    </style>
 </head>
 <body>
-<aside class="sidebar">
-    <div class="logo">
-      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>MyFrEM</h2>
-    </div>
-    <nav>
-      <a href="/dashboard">🏠 Home</a>
-      <a href="/dashboard/upload">📸 Carica una foto</a>
-      <a href="/dashboard/all-photos">📸 Le mie foto</a>
-      <a href="/dashboard/create-event/" class="active">🗂️ Crea un evento</a>
-      <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
-      <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-      <a href="/dashboard/contact/">📞 Contattaci</a>
-    </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
-</aside>
-
-<main class="main-content">
-    <div class="content-box">
-    <h2>📅 Richiedi l'organizzazione di un evento</h2>
-
-    <form id="eventForm" class="event-form">
-      <div class="form-group">
-        <label for="eventTitle">📌 Titolo Evento *</label>
-        <input type="text" id="eventTitle" required>
-      </div>
-      <div class="form-group">
-        <label for="description">📝 Descrizione dettagliata *</label>
-        <textarea id="description" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="location">📍 Luogo di incontro suggerito *</label>
-        <input type="text" id="location" required>
-      </div>
-      <div class="form-group">
-        <label for="contact">📞 Contatto (o nome utente WhatsApp) *</label>
-        <input type="text" id="contact" required>
-      </div>
-
-      <button type="submit" class="btn-primary">📤 Invia proposta evento</button>
-      <p id="statusMsg"></p>
-    </form>
-    <div id="statusMsg"></div>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
   </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+        <div class="logo">
+          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+          <h2>MyFrEM</h2>
+        </div>
+        <nav>
+          <a href="/dashboard">🏠 Home</a>
+          <a href="/dashboard/upload">📸 Carica una foto</a>
+          <a href="/dashboard/all-photos">📸 Le mie foto</a>
+          <a href="/dashboard/create-event/" class="active">🗂️ Crea un evento</a>
+          <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
+          <a href="/dashboard/settings/">⚙️ Impostazioni</a>
+          <a href="/dashboard/contact/">📞 Contattaci</a>
+        </nav>
+        <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
 
-</main>
+    <main class="main-content">
+        <div class="content-box">
+        <h2>📅 Richiedi l'organizzazione di un evento</h2>
+
+        <form id="eventForm" class="event-form">
+          <div class="form-group">
+            <label for="eventTitle">📌 Titolo Evento *</label>
+            <input type="text" id="eventTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="description">📝 Descrizione dettagliata *</label>
+            <textarea id="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="location">📍 Luogo di incontro suggerito *</label>
+            <input type="text" id="location" required>
+          </div>
+          <div class="form-group">
+            <label for="contact">📞 Contatto (o nome utente WhatsApp) *</label>
+            <input type="text" id="contact" required>
+          </div>
+
+          <button type="submit" class="btn-primary">📤 Invia proposta evento</button>
+          <p id="statusMsg"></p>
+        </form>
+        <div id="statusMsg"></div>
+      </div>
+
+    </main>
+  </div>
 </body>
 </html>

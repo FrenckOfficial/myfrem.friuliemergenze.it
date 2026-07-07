@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 
@@ -15,16 +15,40 @@ const titleEvent = document.getElementById("titleEvent");
 const eventsList = document.getElementById("eventsList");
 const eventIdPage = document.getElementById("eventId");
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "/login";
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
-    const allowedRoles = ["advstaffplus", "superadmin"];
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "/login";
+    return;
+  }
 
-    if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
+
+  const allowedRoles = ["advstaffplus", "superadmin"];
+
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
+  }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadEventPage();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadEventPage() {
@@ -94,5 +118,3 @@ function setStatus(message, type = "info") {
     classNameBox.style.display = "none";
   }
 }
-
-loadEventPage();

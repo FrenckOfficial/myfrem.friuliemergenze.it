@@ -11,3 +11,7 @@
 [Accedi - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/auth/signin): Effettua il login al tuo account MyFrEM e contribuisci anche tu all'arricchimento della galleria di Friuli Emergenze!
 [Registrati - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/auth/signup): Crea un account MyFrEM e carica le tue foto di mezzi di emergenza!
 [Reimposta password · MyFrEM](https://myfrem.friuliemergenze.it/auth/reset-your-password): Reimposta la password del tuo account MyFrEM attraverso questo link!
+
+## Dashboard
+
+[Dashboard MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/dashboard): Home dashboard di MyFrEM

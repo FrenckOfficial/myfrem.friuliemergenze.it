@@ -4,6 +4,7 @@ import {
     collection,
     getDocs,
     query,
+    where,
     orderBy,
     getDoc,
     updateDoc,
@@ -25,6 +26,8 @@ const logoutBtn = document.getElementById('logoutBtn');
 const modalClose = document.querySelector('.modal-close');
 const btnCancel = document.querySelector('.btn-cancel');
 const statusMsg = document.getElementById('statusMsg');
+const loadingEl = document.querySelector('.loading');
+const contentEl = document.querySelector('.content');
 
 modalClose?.addEventListener('click', () => {
     closeDraftModal();
@@ -44,30 +47,29 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-    if (!userData) {
-      await signOut(auth);
-      window.location.href = "/login";
-      return;
-    }
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-    const allowedRoles = ["advstaffplus", "superadmin"];
-
-    if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      await signOut(auth);
-      window.location.href = "/login/";
-      return;
-    }
-    
-  } catch (err) {
-    console.error("Errore verifica staff:", err);
-    setStatus("Errore verifica permessi", "error");
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    this.setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 console.log('✅ Firebase inizializzato');
@@ -900,7 +902,7 @@ class VehicleDraftsManager {
         if (window.showNotification) {
             window.showNotification(message, 'error');
         } else {
-            setStatus(message, "error");
+            this.setStatus(message, "error");
         }
     }
 
@@ -909,7 +911,7 @@ class VehicleDraftsManager {
         if (window.showNotification) {
             window.showNotification(message, 'success');
         } else {
-            setStatus(message, "success");
+            this.setStatus(message, "success");
         }
     }
 

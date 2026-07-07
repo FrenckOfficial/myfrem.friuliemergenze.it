@@ -160,7 +160,7 @@ async function sendPersonalLinkEmail() {
                       <td style="padding:35px;text-align:center;">
 
                         <img
-                          src="https://friuliemergenze.it/assets/logo.png"
+                          src="https://www.friuliemergenze.it/assets/logo.png"
                           style="width:80px;margin-bottom:20px;"
                         >
 

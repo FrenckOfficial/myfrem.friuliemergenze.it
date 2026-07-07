@@ -275,6 +275,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: 20px;
 }
 
 .form-group {
@@ -294,7 +295,8 @@ label {
 
 input[type="email"],
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="tel"] {
   width: 100%;
   padding: 11px 14px;
   border-radius: var(--radius-sm);
@@ -540,12 +542,20 @@ input:focus {
 }
 
 #closeSMsg {
-  position: absolute;
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 16px;
+  color: var(--muted);
+  font-size: 1.5rem;
   cursor: pointer;
-  color: inherit;
+  transition: color 0.2s;
+  padding: 0;
+  margin: 0;
+  width: 30px;
+  height: 30px;
+}
+
+#closeSMsg:hover {
+  color: var(--faint);
 }
 
 @keyframes slideIn {
@@ -557,6 +567,161 @@ input:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.step {
+  display: none;
+  animation: fadeUp .25s ease;
+}
+
+.step h3 {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.step.active {
+  display: block;
+}
+
+.step-desc {
+  margin-bottom: 24px;
+  color: var(--muted);
+}
+
+.step-indicator {
+  margin-bottom: 25px;
+}
+
+.step-progress {
+  height: 4px;
+  width: 16.66%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width .3s ease;
+}
+
+#stepCounter {
+  display: block;
+  margin-top: 10px;
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+#nextBtn {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+#prevBtn {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+#submitBtn {
+  flex: 1;
+  padding: 12px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+#nextBtn:hover,
+#prevBtn:hover,
+#submitBtn:hover {
+  background: var(--bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  animation: pulse 1s ease infinite;
+}
+
+#reviewContainer {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.success-icon {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, .12);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.success-card {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  line-height: 1.7;
+}
+
+.success-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.success-card p + p {
+  margin-top: 12px;
+}
+
+.success-page .submit-btn {
+  width: 100%;
+  text-decoration: none;
+  text-align: center;
+}
+
+.success-page .back-home {
+  margin-top: 5px;
 }
 
 main {

@@ -22,12 +22,33 @@ const db = getFirestore(app);
 const photosContainer = document.getElementById("photosContainer");
 const statusMsg = document.getElementById("statusMsg");
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "/login/";
-  } else {
+  const timeoutId = setTimeout(() => {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 5000);
+
+  try {
+    if (!user) {
+      clearTimeout(timeoutId);
+      window.location.href = "/login/";
+      return;
+    }
+
     await checkUserRole(user.uid);
-    loadAllPhotos(user.uid);
+    await loadAllPhotos(user.uid);
+
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  } catch (err) {
+    console.error("❌ Errore:", err);
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
   }
 });
 

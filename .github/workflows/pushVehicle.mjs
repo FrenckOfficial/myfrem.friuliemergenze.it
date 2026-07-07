@@ -218,7 +218,7 @@ async function createVehicleDetailsPage(
 function getServiceLabel(service) {
   switch (service) {
     case "ambulanza":
-      return "Emergenza Sanitaria Territoriale";
+      return "Soccorso Sanitario";
 
     case "pompieri":
       return "Soccorso Tecnico Urgente";

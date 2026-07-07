@@ -45,16 +45,35 @@ let currentUserId = null;
 let currentUser = null;
 let isReadOnlyMode = false;
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 onAuthStateChanged(auth, async user => {
   if (!user) {
+    loadingEl.style.display = "none";
     window.location.href = "/login/";
     return;
   }
 
-  currentUserId = user.uid;
-  currentUser = user;
+  const timeoutId = setTimeout(() => {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  }, 5000);
 
-  await loadUserData(user.uid);
+  try {
+    currentUserId = user.uid;
+    currentUser = user;
+    await loadUserData(user.uid);
+    
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  } catch (err) {
+    console.error("❌ Errore:", err);
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  }
 });
 
 async function loadUserData(uid) {
@@ -259,12 +278,6 @@ deleteProfPicBtn.addEventListener("click", async (e) => {
 })
 
 logoutBtn.addEventListener("click", () => {
-  signOut(auth).then(() => {
-    window.location.href = "/login/";
-  });
-});
-
-logoutBtnSettings.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.href = "/login/";
   });

@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione Notizie - Dashboard Staff | MyFrEM</title>
     <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
-    <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script type="module" src="/staff/dashboard/management/news/load.js"></script>
 </head>
 <body>
+    <div class="loading">
+        <div class="loader"></div>
+        <p>Caricamento in corso...</p>
+    </div>
+    <div class="content" style="display:none">
     <aside class="sidebar">
         <div class="logo">
-            <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+            <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
             <h2>MyFrEM Staff</h2>
         </div>
         <nav>
@@ -237,5 +242,6 @@
             }
         });
     </script>
+    </div>
 </body>
 </html>

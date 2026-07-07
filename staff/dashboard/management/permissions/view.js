@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -10,6 +10,8 @@ const db = getFirestore(app);
 const permissionsTableBody = document.querySelector("#permissionTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 const totalPermissionsCountEl = document.getElementById("totalPermissionsCount");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
@@ -18,25 +20,37 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "/login/";
 });
 
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "/login/";
+    window.location.href = "/login";
     return;
   }
 
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
-  const userData = userDocSnap.data();
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
   const allowedRoles = ["advstaffplus", "superadmin"];
 
-  if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
+  }
 
-  loadPermissions();
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadPermissions();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadPermissions() {

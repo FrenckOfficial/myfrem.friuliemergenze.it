@@ -31,6 +31,9 @@ const profilePicForm = document.getElementById("profilePicForm");
 const profilePreview = document.getElementById("profilePreview");
 const deleteProfPicBtn = document.getElementById("deleteProfPicBtn");
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 let currentUserId = null;
 let currentUser = null;
 
@@ -46,6 +49,22 @@ auth.onAuthStateChanged(async (user) => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data();
+
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
+  if (snap.empty || !allowedRoles.includes(snap.data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
+  }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
 
   staffUsername.textContent = data.username || "Non disponibile.";
   staffName.textContent = `${data.name || ""} ${data.surname || ""}`.trim() || "Non disponibile.";
@@ -85,6 +104,10 @@ auth.onAuthStateChanged(async (user) => {
   } else {
     profilePreview.src = "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
   }
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 logoutBtn.addEventListener("click", async () => {

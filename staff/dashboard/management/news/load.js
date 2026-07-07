@@ -10,7 +10,8 @@ import {
     deleteDoc,
     doc,
     Timestamp,
-    addDoc
+    addDoc,
+    where
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -25,6 +26,8 @@ const logoutBtn = document.getElementById('logoutBtn');
 const modalClose = document.querySelector('.modal-close');
 const btnCancel = document.querySelector('.btn-cancel');
 const statusMsg = document.getElementById('statusMsg');
+const loadingEl = document.querySelector('.loading');
+const contentEl = document.querySelector('.content');
 
 modalClose?.addEventListener('click', () => {
     this.closeCreateModal();
@@ -44,30 +47,29 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-    if (!userData) {
-      await signOut(auth);
-      window.location.href = "/login";
-      return;
-    }
+  const allowedRoles = ["advstaffplus", "superadmin"];
 
-    const allowedRoles = ["advstaffplus", "superadmin"];
-
-    if (!allowedRoles.includes(userData.role)) {
-      this.setStatus("Accesso negato: solo staff autorizzato.", "error");
-      await signOut(auth);
-      window.location.href = "/login/";
-      return;
-    }
-    
-  } catch (err) {
-    console.error("Errore verifica staff:", err);
-    this.setStatus("Errore verifica permessi", "error");
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    this.setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 console.log('✅ Firebase inizializzato');
@@ -1031,6 +1033,8 @@ class NewsManager {
         console.log('⏳', message);
         if (window.showNotification) {
             window.showNotification(message, 'loading');
+        } else {
+            this.setStatus(message, "loading");
         }
     }
 

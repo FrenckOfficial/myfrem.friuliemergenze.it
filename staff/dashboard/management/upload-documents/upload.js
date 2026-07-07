@@ -28,14 +28,15 @@ onAuthStateChanged(auth, (user) => {
   if (!user) setStatus("⚠️ Devi essere loggato");
 });
 
-function setStatus(msg) {
-  console.log("STATUS:", msg);
-  statusMsg.textContent = msg;
-  statusMsg.style.display = "block";
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
   const closeBtn = document.getElementById("closeSMsg");
   closeBtn.onclick = () => {
-    statusMsg.style.display = "none";
-  };
+    classNameBox.style.display = "none";
+  }
 }
 
 fileInput.addEventListener("change", () => {
@@ -53,7 +54,7 @@ uploadBtn.addEventListener("click", async (e) => {
   const files = fileInput.files;
   if (files.length === 0) return setStatus("❌ Seleziona almeno una foto");
 
-  setStatus("⏳ Upload file in corso...");
+  setStatus("⏳ Upload file in corso...", "info");
 
   let uploadedCount = 0;
 
@@ -92,7 +93,7 @@ uploadBtn.addEventListener("click", async (e) => {
     progressText.textContent = percent + "%";
   }
 
-  setStatus(`✅ Caricati ${uploadedCount}/${files.length} file!`);
+  setStatus(`✅ Caricati ${uploadedCount}/${files.length} file!`, "success");
   fileInput.value = "";
   fileNameSpan.textContent = "Nessun file";
   uploadForm.reset();

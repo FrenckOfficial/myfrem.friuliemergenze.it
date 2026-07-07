@@ -21,6 +21,8 @@ const organizedEventsEl = document.getElementById("organizedEvents");
 const recentActivityListEl = document.getElementById("recentActivityList");
 const recentLoginsListEl = document.getElementById("recentLoginsList");
 const logoutBtn = document.getElementById("logoutBtn");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
@@ -40,12 +42,24 @@ onAuthStateChanged(auth, async (user) => {
   const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
     setStatus("Accesso negato: non sei staff!", "error");
     window.location.href = "/dashboard";
     return;
   }
 
-  loadStats();
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadStats();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadStats() {
@@ -160,5 +174,19 @@ async function loadStats() {
     }
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
+    setStatus("❌ Errore caricamento statistiche", "error");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }
+}
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
   }
 }

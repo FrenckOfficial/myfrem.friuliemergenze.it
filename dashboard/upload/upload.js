@@ -30,23 +30,53 @@ const progressText = document.getElementById("progressText");
 let currentUser = null;
 let isReadOnlyMode = false;
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
-  if (!user) return setStatus("⚠️ Devi essere loggato");
+  
+  if (!user) {
+    setStatus("⚠️ Devi essere loggato");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+    window.location.href = "/login/";
+    return;
+  }
 
-  const userDocSnap = await getDoc(doc(db, "users", user.uid));
-  if (userDocSnap.exists()) {
-    const userData = userDocSnap.data();
-    if (userData.role === "testacc") {
-      isReadOnlyMode = true;
-      document.body.classList.add("read-only-mode");
-      uploadBtn.disabled = true;
-      uploadBtn.style.opacity = "0.5";
-      uploadBtn.style.cursor = "not-allowed";
-      uploadBtn.title = "Non disponibile in modalità sola lettura";
-      setStatus("📖 Modalità sola lettura: puoi solo visualizzare i contenuti");
-      fileInput.disabled = true;
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  }, 5000);
+
+  try {
+    const userDocSnap = await getDoc(doc(db, "users", user.uid));
+    
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      
+      if (userData.role === "testacc") {
+        isReadOnlyMode = true;
+        document.body.classList.add("read-only-mode");
+        uploadBtn.disabled = true;
+        uploadBtn.style.opacity = "0.5";
+        uploadBtn.style.cursor = "not-allowed";
+        uploadBtn.title = "Non disponibile in modalità sola lettura";
+        setStatus("📖 Modalità sola lettura: puoi solo visualizzare i contenuti");
+        fileInput.disabled = true;
+      }
     }
+
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+
+  } catch (err) {
+    console.error("❌ Errore caricamento auth:", err);
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
   }
 });
 

@@ -20,29 +20,48 @@ const statusMsg = document.getElementById("statusMsg");
 let currentUser = null;
 let isReadOnlyMode = false;
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+
 onAuthStateChanged(auth, async (user) => {
   currentUser = user || null;
-  
-  if (user) {
-    const userDocSnap = await getDoc(doc(db, "users", user.uid));
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      if (userData.role === "testacc") {
-        isReadOnlyMode = true;
-        document.body.classList.add("read-only-mode");
-      
-        form.style.opacity = "0.5";
-        form.style.pointerEvents = "none";
+
+  const timeoutId = setTimeout(() => {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  }, 5000);
+
+  try {
+    if (user) {
+      const userDocSnap = await getDoc(doc(db, "users", user.uid));
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        if (userData.role === "testacc") {
+          isReadOnlyMode = true;
+          document.body.classList.add("read-only-mode");
         
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.title = "Non disponibile in modalità sola lettura";
+          form.style.opacity = "0.5";
+          form.style.pointerEvents = "none";
+          
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.title = "Non disponibile in modalità sola lettura";
+          }
+          
+          setStatus("Modalità sola lettura: non puoi inviare messaggi", "info");
         }
-        
-        setStatus("Modalità sola lettura: non puoi inviare messaggi", "info");
       }
     }
+
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
+  } catch (err) {
+    console.error("❌ Errore:", err);
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;
   }
 });
 

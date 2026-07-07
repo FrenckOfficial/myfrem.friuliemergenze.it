@@ -6,84 +6,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/staff.css">
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/staff.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>MyFrEM Staff</h2>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff" class="active">📊 Dashboard</a>
+        <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+        <a href="/staff/dashboard/users/">👥 Funzionalità</a>
+        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+        <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+  
+    <div class="main-content">
+      <div class="statusBox" style="display:none;">
+        <span id="statusMsg"></span>
+        <button id="closeSMsg">&times;</button>
+      </div>
+      <header class="header">
+        <h1>Ciao, <span id="userName"></span> 👋</h1>
+      </header>
+      <h1>📊 Panoramica Staff</h1>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h2 id="totalUsers">0</h2>
+          <p>Utenti registrati</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="pendingPhotos">0</h2>
+          <p>Foto in attesa</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="approvedPhotos">0</h2>
+          <p>Foto approvate</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="rejectedPhotos">0</h2>
+          <p>Foto rifiutate</p>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h2 id="totalEvents">0</h2>
+          <p>Eventi totali</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="pendingEvents">0</h2>
+          <p>Eventi in attesa</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="approvedEvents">0</h2>
+          <p>Eventi approvati</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="rejectedEvents">0</h2>
+          <p>Eventi rifiutati</p>
+        </div>
+        <div class="stat-box">
+          <h2 id="organizedEvents">0</h2>
+          <p>Eventi organizzati</p>
+        </div>
+      </div>
+      <section class="activity">
+        <h2>Attività recenti <a href="/staff/dashboard/activities/">(visualizza tutte)</a></h2>
+        <ul id="recentActivityList">
+        </ul>
+      </section>
+      <section class="activity">
+        <h2>Logins <a href="/staff/dashboard/logins/">(visualizza tutti)</a></h2>
+        <ul id="recentLoginsList"></ul>
+      </section>
     </div>
-    <nav>
-      <a href="/staff" class="active">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-      <a href="/staff/dashboard/users/">👥 Funzionalità</a>
-      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
-    </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
-  </aside>
-
-  <div class="main-content">
-    <header class="header">
-      <h1>Ciao, <span id="userName"></span> 👋</h1>
-    </header>
-    <h1>📊 Panoramica Staff</h1>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <h2 id="totalUsers">0</h2>
-        <p>Utenti registrati</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="pendingPhotos">0</h2>
-        <p>Foto in attesa</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="approvedPhotos">0</h2>
-        <p>Foto approvate</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="rejectedPhotos">0</h2>
-        <p>Foto rifiutate</p>
-      </div>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <h2 id="totalEvents">0</h2>
-        <p>Eventi totali</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="pendingEvents">0</h2>
-        <p>Eventi in attesa</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="approvedEvents">0</h2>
-        <p>Eventi approvati</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="rejectedEvents">0</h2>
-        <p>Eventi rifiutati</p>
-      </div>
-      <div class="stat-box">
-        <h2 id="organizedEvents">0</h2>
-        <p>Eventi organizzati</p>
-      </div>
-    </div>
-    <section class="activity">
-      <h2>Attività recenti <a href="/staff/dashboard/activities/">(visualizza tutte)</a></h2>
-      <ul id="recentActivityList">
-      </ul>
-    </section>
-    <section class="activity">
-      <h2>Logins <a href="/staff/dashboard/logins/">(visualizza tutti)</a></h2>
-      <ul id="recentLoginsList"></ul>
-    </section>
   </div>
 </body>
 </html>

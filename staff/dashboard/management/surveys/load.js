@@ -20,6 +20,8 @@ const db = getFirestore(app);
 const surveyList = document.getElementById("surveyTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
 const statusMsg = document.getElementById("statusMsg");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
@@ -27,36 +29,36 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-    console.log("Auth state:", user);
+  if (!user) {
+    window.location.href = "/login";
+    return;
+  }
 
-    if (!user) {
-        window.location.href = "/login";
-        return;
-    }
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-    console.log("User logged:", user.uid);
+  const allowedRoles = ["advstaffplus", "superadmin"];
 
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
+  }
 
-    if (!userSnap.exists()) {
-        console.warn("User doc not found in Firestore");
-        window.location.href = "/login";
-        return;
-    }
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
 
-    const userData = userSnap.data();
-    const allowedRoles = ["advstaffplus", "superadmin"];
+  await loadSurveys();
 
-    console.log("User role:", userData.role);
-
-    if (!allowedRoles.includes(userData.role)) {
-     setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
-
-    loadSurveys();
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadSurveys() {

@@ -5,85 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Moderazione Foto | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/staff/dashboard/staff.css">
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/photos/photos.js"></script>
 </head>
 <body>
-  <!-- Sidebar staff -->
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>MyFrEM Staff</h2>
-    </div>
-    <nav>
-      <a href="/staff/dashboard/">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/" class="active">🖼️ Moderazione foto</a>
-      <a href="/staff/dashboard/users/">👥 Funzionalità</a>
-      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
-    </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
-  </aside>
-
-  <!-- Main content -->
-  <main class="main-content">
-    <h1>🖼️ Moderazione foto</h1>
-    <p>Qui puoi approvare o rifiutare le foto caricate dagli utenti.</p>
-
-    <div id="viewAllPhotos">Visualizza tutte le foto</div>
-
-    <table class="photos-table">
-      <p class="statusBox" style="display:none;">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display: none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">📊 Dashboard</a>
+        <a href="/staff/dashboard/photos/" class="active">🖼️ Moderazione foto</a>
+        <a href="/staff/dashboard/users/">👥 Funzionalità</a>
+        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+        <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+    <main class="main-content">
+      <h1>🖼️ Moderazione foto</h1>
+      <p>Qui puoi approvare o rifiutare le foto caricate dagli utenti.</p>
+  
+      <div id="viewAllPhotos">Visualizza tutte le foto</div>
+  
+      <table class="photos-table">
+        <p class="statusBox" style="display:none;">
           <span id="statusMsg"></span>
           <button id="closeSMsg">&times;</button>
         </p>
-      <thead>
-        <tr>
-          <th>Anteprima</th>
-          <th>Modello</th>
-          <th>Allestitore</th>
-          <th>Numero di targa</th>
-          <th>Servizio svolto</th>
-          <th>Sede di appartenenza</th>
-          <th>Utente</th>
-          <th>Data</th>
-          <th>Note</th>
-          <th>Azioni</th>
-        </tr>
-      </thead>
-      <tbody id="photosTableBody">
-        <!-- JS inserirà le foto qui -->
-      </tbody>
-    </table>
-
-    <div id="draftModal" class="draft-modal">
-      <div class="draft-modal-content">
-        <div class="draft-modal-header">
-          <h2>Crea Bozza Veicolo</h2>
-          <button id="draft-modal-close">&times;</button>
-        </div>
-        
-        <div class="draft-modal-body">
-          <p>Vuoi creare una bozza di veicolo per questa foto?</p>
-          <div id="photoPreviewInModal">
-            <img id="draftPhotoPreview" src="" alt="Foto" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
-            <p id="draftFileName" style="margin-top: 10px; color: #666;"></p>
+        <thead>
+          <tr>
+            <th>Anteprima</th>
+            <th>Modello</th>
+            <th>Allestitore</th>
+            <th>Numero di targa</th>
+            <th>Servizio svolto</th>
+            <th>Sede di appartenenza</th>
+            <th>Utente</th>
+            <th>Data</th>
+            <th>Note</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="photosTableBody">
+          <!-- JS inserirà le foto qui -->
+        </tbody>
+      </table>
+  
+      <div id="draftModal" class="draft-modal">
+        <div class="draft-modal-content">
+          <div class="draft-modal-header">
+            <h2>Crea Bozza Veicolo</h2>
+            <button id="draft-modal-close">&times;</button>
+          </div>
+          
+          <div class="draft-modal-body">
+            <p>Vuoi creare una bozza di veicolo per questa foto?</p>
+            <div id="photoPreviewInModal">
+              <img id="draftPhotoPreview" src="" alt="Foto" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+              <p id="draftFileName" style="margin-top: 10px; color: #666;"></p>
+            </div>
+          </div>
+          
+          <div class="draft-modal-actions">
+            <button id="draft-btn-create">✅ Crea Bozza</button>
+            <button id="draft-btn-skip">⏭️ Salta</button>
           </div>
         </div>
-        
-        <div class="draft-modal-actions">
-          <button id="draft-btn-create">✅ Crea Bozza</button>
-          <button id="draft-btn-skip">⏭️ Salta</button>
-        </div>
       </div>
-    </div>
-
-    <p id="statusMsg"></p>
-  </main>
+    </main>
+  </div>
 </body>
 </html>

@@ -50,5 +50,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/staff/dashboard/staff",
+      "destination": "/staff/dashboard",
+      "permanent": true
+    }
   ]
 }

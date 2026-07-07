@@ -25,6 +25,8 @@ const viewAllPhotos = document.getElementById("viewAllPhotos");
 const draftBtnCreate = document.getElementById("draft-btn-create");
 const draftBtnSkip = document.getElementById("draft-btn-skip");
 const draftModalClose = document.getElementById("draft-modal-close");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 let usersMap = {};
 let currentPhotoForDraft = null;
@@ -65,25 +67,32 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-    const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-    if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
-
-    await loadUsersMap();
-    loadPendingPhotos();
-  } catch (err) {
-    console.error("Errore verifica staff:", err);
-    setStatus("Errore verifica permessi", "error");
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadUsersMap();
+  await loadPendingPhotos();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadUsersMap() {

@@ -9,7 +9,9 @@ import {
   deleteDoc, 
   getDoc, 
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -20,6 +22,8 @@ const db = getFirestore(app);
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 const statusMsg = document.getElementById("statusMsg");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
@@ -28,34 +32,37 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "/login/";
 });
 
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "/login/";
+    window.location.href = "/login";
     return;
   }
 
-  const userID = user.uid;
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-  const userDocRef = doc(db, "users", user.uid);
-  const userDocSnap = await getDoc(userDocRef);
-  
-  if (!userDocSnap.exists()) {
-    setStatus("Profilo utente non trovato.", "error");
-    await signOut(auth);
-    window.location.href = "/login/";
-    return;
-  }
-
-  const userData = userDocSnap.data();
   const allowedRoles = ["advstaffplus", "superadmin"];
 
-  if (!allowedRoles.includes(userData.role)) {
-      setStatus("Accesso negato: solo staff autorizzato.", "error");
-      window.location.href = "/login/";
-      return;
-    }
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
+    return;
+  }
 
-  loadUsers();
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  await loadUsers();
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 });
 
 async function loadUsers() {
@@ -78,8 +85,6 @@ async function loadUsers() {
     simplestaff: 5,
     user: 6
   };
-
-  const getAlphabetKey = (str) => (str.username || str.name || str.surname || "").toString().toLowerCase();
 
   users.sort((a, b) => {
     const roleA = rolePriority[a.role] || 999;
@@ -199,11 +204,12 @@ async function deleteUser(userId) {
 }
 
 function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
   statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
-  statusMsg.style.display = "block";
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
   const closeBtn = document.getElementById("closeSMsg");
   closeBtn.onclick = () => {
-    statusMsg.style.display = "none";
+    classNameBox.style.display = "none";
   }
 }

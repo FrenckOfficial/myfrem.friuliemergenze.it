@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contattaci | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-  <link rel="shortcut icon" href="https://friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,37 +13,43 @@
   <script type="module" src="./contact.js"></script>
 </head>
 <body class="layout">
-  <aside class="sidebar">
-    <div class="logo">
-      <img src="https://friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
-      <h2>MyFrEM</h2>
-    </div>
-    <nav>
-      <a href="/dashboard">🏠 Home</a>
-      <a href="/dashboard/upload">📸 Carica una foto</a>
-      <a href="/dashboard/all-photos">📸 Le mie foto</a>
-      <a href="/dashboard/create-event/">🗂️ Crea un evento</a>
-      <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
-      <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-      <a href="/dashboard/contact/" class="active">📞 Contattaci</a>
-    </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
-  </aside>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <h2>MyFrEM</h2>
+      </div>
+      <nav>
+        <a href="/dashboard">🏠 Home</a>
+        <a href="/dashboard/upload">📸 Carica una foto</a>
+        <a href="/dashboard/all-photos">📸 Le mie foto</a>
+        <a href="/dashboard/create-event/">🗂️ Crea un evento</a>
+        <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
+        <a href="/dashboard/settings/">⚙️ Impostazioni</a>
+        <a href="/dashboard/contact/" class="active">📞 Contattaci</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
 
-  <div class="main-content">
-    <div class="content-box" style="max-width:410px;">
-      <h2>📩 Contattaci</h2>
-      <p>Hai trovato un bug? Hai bisogno di assistenza? Inviaci un messaggio.</p>
+    <div class="main-content">
+      <div class="content-box" style="max-width:410px;">
+        <h2>📩 Contattaci</h2>
+        <p>Hai trovato un bug? Hai bisogno di assistenza? Inviaci un messaggio.</p>
 
-      <p class="statusBox" style="display:none;">
-        <span id="statusMsg"></span>
-        <button id="closeSMsg">&times;</button>
-      </p>
-      <form id="contactForm">
-        <input type="text" id="subject" placeholder="Oggetto del messaggio" required>
-        <textarea id="message" rows="6" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
-        <button type="submit">Invia messaggio</button>
-      </form>
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
+        <form id="contactForm">
+          <input type="text" id="subject" placeholder="Oggetto del messaggio" required>
+          <textarea id="message" rows="6" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
+          <button type="submit">Invia messaggio</button>
+        </form>
+      </div>
     </div>
   </div>
 </body>

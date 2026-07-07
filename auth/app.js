@@ -126,10 +126,10 @@ async function validateAccount(userData) {
 }
 
 if (loginForm) {
-  document.getElementById("loginEmail")?.addEventListener("keypress", (e) => {
+  document.getElementById("loginEmail")?.addEventListener("keyup", (e) => {
     if (e.key === "Enter") loginForm.dispatchEvent(new Event("submit"));
   });
-  document.getElementById("loginPassword")?.addEventListener("keypress", (e) => {
+  document.getElementById("loginPassword")?.addEventListener("keyup", (e) => {
     if (e.key === "Enter") loginForm.dispatchEvent(new Event("submit"));
   });
   loginForm.addEventListener("submit", async (e) => {
@@ -219,6 +219,7 @@ if (loginForm) {
       console.error(err);
     } finally {
       submitBtn.disabled = false;
+      btnText.textContent = "Accedi";
       btnText.style.opacity = '1';
       btnLoader.style.display = 'none';
       isLoggingIn = false;
@@ -343,109 +344,147 @@ if (resetForm) {
 }
 
 if (registerForm) {
-  document.getElementById("registerName")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
-  });
-  document.getElementById("registerSurname")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
-  });
-  document.getElementById("registerEmail")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
-  });
-  document.getElementById("registerUsername")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
-  });
-  document.getElementById("registerPassword")?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") registerForm.dispatchEvent(new Event("submit"));
-  });
-  registerForm.addEventListener("submit", async (e) => {
-    submitBtn.disabled = true;
-    btnText.textContent = "Registrazione in corso..."
-    btnLoader.style.display = 'inline-block';
-    e.preventDefault();
+  let currentStep = 1;
+  const totalSteps = 6;
+  const steps = document.querySelectorAll(".step");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const reviewContainer = document.getElementById("reviewContainer");
 
-    if (isRegistering) return;
+  function showStep(step) {
+    steps.forEach(s => {
+      s.style.display = "none";
+    });
 
-    isRegistering = true;
+    document.querySelector(`[data-step="${step}"]`).style.display = "block";
+    document.getElementById("stepCounter").textContent = `Passo ${step} di ${totalSteps}`;
+    document.querySelector(".step-progress").style.width = `${(step / totalSteps) * 100}%`;
 
-    try {
-      const name =
-        document.getElementById("registerName").value.trim();
+    prevBtn.style.display = step === 1 ? "none" : "block";
 
-      const surname =
-        document.getElementById("registerSurname").value.trim();
+    if (step === totalSteps) {
+      nextBtn.style.display = "none";
+      submitBtn.style.display = "block";
 
-      const email =
-        document.getElementById("registerEmail").value.trim();
+      reviewContainer.innerHTML = `
+        <div><strong>Nome:</strong> ${registerName.value} ${registerSurname.value}</div>
+        <div><strong>Username:</strong> ${registerUsername.value}</div>
+        <div><strong>Email:</strong> ${registerEmail.value}</div>
+        <div><strong>Telefono:</strong> ${registerPhone?.value || "Non inserito"}</div>
+      `;
+    } else {
+      nextBtn.style.display = "block";
+      submitBtn.style.display = "none";
+    }
+  }
 
-      const username =
-        document.getElementById("registerUsername").value.trim();
-
-      const password =
-        document.getElementById("registerPassword").value;
-
-      const usernameQuery = query(
-        collection(db, "users"),
-        where("username", "==", username),
-        limit(1)
-      );
-
-      const usernameSnap = await getDocs(usernameQuery);
-
-      if (!usernameSnap.empty) {
-        throw new Error("Username già utilizzato.");
+  async function validateStep() {
+    if (currentStep === 1) {
+      if (!registerName.value.trim() || !registerSurname.value.trim()) {
+        setStatus( "Inserisci nome e cognome", "error");
+        return false;
       }
+    }
 
-      const cred = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+    if (currentStep === 2) {
+      const username = registerUsername.value.trim();
+      if (!username) {
+        setStatus("Inserisci un username", "error");
+        return false;
+      }
+      const usernameQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
+      const usernameSnap = await getDocs(usernameQuery);
+      if (!usernameSnap.empty) {
+        setStatus("Username già utilizzato", "error");
+        return false;
+      }
+    }
 
-      const user = cred.user;
+    if (currentStep === 3) {
+      if (!registerEmail.value.trim()) {
+        setStatus("Inserisci una email", "error");
+        return false;
+      }
+    }
 
-      await setDoc(doc(db, "users", user.uid), {
-        email,
-        name,
-        surname,
-        username,
-        role: "user",
-        status: "attivo",
-        newsSubbed: false,
-        emailVerified: false,
-        createdAt: serverTimestamp()
-      });
+    if (currentStep === 5) {
+      if (registerPassword.value !== registerConfirmPassword.value) {
+        setStatus("Le password non coincidono", "error");
+        return false;
+      }
+    } return true;
+  }
 
-      const token = self.crypto.randomUUID();
+  nextBtn.addEventListener("click", async () => {
+    const valid = await validateStep();
+    if (!valid) return;
+    currentStep++;
+    showStep(currentStep);
+  });
 
-      await setDoc(
-        doc(db, "emailVerifications", token),
-        {
+  prevBtn.addEventListener("click", () => {
+    currentStep--;
+    showStep(currentStep);
+  });
+
+  showStep(1);
+
+  registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      btnText.textContent = "Registrazione in corso...";
+
+      btnLoader.style.display = "inline-block";
+
+      if (isRegistering) return;
+      isRegistering = true;
+
+      try {
+        const name = registerName.value.trim();
+        const surname = registerSurname.value.trim();
+        const email = registerEmail.value.trim();
+        const username = registerUsername.value.trim();
+        const password = registerPassword.value;
+        const phone = registerPhone?.value.trim() || "";
+
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = cred.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          email,
+          name,
+          surname,
+          username,
+          phone,
+          role: "user",
+          status: "attivo",
+          newsSubbed: false,
+          emailVerified: false,
+          createdAt: serverTimestamp()
+        });
+
+        const token = crypto.randomUUID();
+
+        await setDoc(doc(db, "emailVerifications", token), {
           email,
           userId: user.uid,
           expiresAt: Date.now() + 86400000,
           used: false
-        }
-      );
+        });
 
-      await addDoc(collection(db, "activities"), {
-        type: "user_creation",
-        userName: `${name} ${surname}`,
-        timestamp: serverTimestamp()
-      });
+        await addDoc(collection(db, "activities"), {
+          type: "user_creation",
+          userName: `${name} ${surname}`,
+          timestamp: serverTimestamp()
+        });
 
-      const verifyLink =
-        `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+        const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
-      const htmlContent = buildEmail({
-        verifyLink,
-        email,
-        name
-      });
+        const htmlContent = buildEmail({ verifyLink, email, name});
 
-      const response = await fetch(
-        "https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail",
-        {
+        const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -454,37 +493,42 @@ if (registerForm) {
             userEmail: email,
             htmlContent
           })
+        });
+
+        if (!response.ok) {
+          throw new Error("Errore invio email di verifica.");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(
-          "Errore invio email di verifica."
-        );
+        setStatus("Email di verifica inviata.", "success");
+
+        await signOut(auth);
+        window.location.href ="/auth/confirm-email";
+
+      } catch (err) {
+        btnText.textContent = "Registrazione fallita";
+        switch (err.code) {
+          case "auth/email-already-in-use":
+            setStatus("Email già in uso.", "error");
+            break;
+          case "auth/invalid-email":
+            setStatus("Email non valida.", "error");
+            break;
+          case "auth/weak-password":
+            setStatus("Password debole.", "error");
+            break;
+          default:
+            setStatus("Errore durante la registrazione.", "error");
+        }
+        console.error(err);
+      } finally {
+        isRegistering = false;
+        submitBtn.disabled = false;
+        btnText.textContent = "Crea account";
+        btnLoader.style.display = "none";
       }
-
-      setStatus("Email di verifica inviata.", "success");
-
-      await signOut(auth);
-
-      window.location.href = "/login";
-
-      btnText.style.display = 'inline-block';
-      btnLoader.style.display = 'none';
-
-    } catch (err) {
-      btnText.textContent = "Crea un account";
-      setStatus(err.message, "error");
-      console.error(err);
-
-    } finally {
-      isRegistering = false;
-      submitBtn.disabled = false;
-      btnText.style.opacity = '1';
-      btnLoader.style.display = 'none';
     }
-  });
-};
+  );
+}
 
 function setStatus(message, type = "info") {
   const classNameBox = document.querySelector(".statusBox");
@@ -549,7 +593,7 @@ function buildEmail({ verifyLink, email, name }) {
                 <td style="padding:35px;text-align:center;">
 
                   <img
-                    src="https://friuliemergenze.it/assets/logo.png"
+                    src="https://www.friuliemergenze.it/assets/logo.png"
                     style="width:80px;margin-bottom:20px;"
                   >
 

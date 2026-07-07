@@ -22,15 +22,24 @@ const newsBannerEl = document.getElementById("newsBanner");
 const newsletterBtn = document.getElementById("newsletterBtn");
 const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
 
 auth.onAuthStateChanged(async (user) => {
   console.log("👀 onAuthStateChanged triggered, user:", user);
 
   if (!user) {
     console.warn("⚠️ Nessun utente loggato, redirect al login...");
+    loadingEl.style.display = "none";
     window.location.href = "/login/";
     return;
   }
+
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;;
+  }, 5000);
 
   try {
     const userDoc = await db.collection("users").doc(user.uid).get();
@@ -41,9 +50,13 @@ auth.onAuthStateChanged(async (user) => {
 
     if (!staffRoles.includes(userData.role) && !allowedRoles.includes(userData.role)) {
       setStatus("Accesso negato: ruolo non riconosciuto.", "error");
+      clearTimeout(timeoutId);
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";;;
       window.location.href = "/login/";
       return;
     }
+
     const isReadOnlyMode = userData.role === "testacc";
 
     if (isReadOnlyMode) {
@@ -124,16 +137,7 @@ auth.onAuthStateChanged(async (user) => {
       }
     });
 
-  } catch (err) {
-    console.error("[FOTO] ❌ Errore durante il recupero dati Firestore:", err);
-  }
-
-  try {
-    const userDoc = await db.collection("users").doc(user.uid).get();
-    const userData = userDoc.exists ? userDoc.data() : null;
-    const isReadOnlyMode = userData.role === "testacc";
-
-    const eventsSnap = await db.collection("events")
+    const eventsUserSnap = await db.collection("events")
       .where("userId", "==", userData.name + " " + userData.surname)
       .orderBy("createdAt", "desc")
       .limit(5)
@@ -141,7 +145,7 @@ auth.onAuthStateChanged(async (user) => {
 
     let totalE = 0, approvedE = 0, pendingE = 0, rejectedE = 0, organizedE = 0;
 
-    eventsSnap.forEach(doc => {
+    eventsUserSnap.forEach(doc => {
       const event = doc.data();
       totalE++;
 
@@ -157,7 +161,7 @@ auth.onAuthStateChanged(async (user) => {
     rejectedEventsEl.textContent = rejectedE;
     organizedEventsEl.textContent = organizedE;
 
-    const name = userData.name
+    const name = userData.name;
 
     if (isReadOnlyMode) {
       newsletterBtn.disabled = true;
@@ -172,8 +176,15 @@ auth.onAuthStateChanged(async (user) => {
       })
     }
 
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;;
+
   } catch (err) {
-    console.error("[EVENTI] ❌ Errore durante il recupero dati Firestore:", err);
+    console.error("❌ Errore durante il caricamento:", err);
+    clearTimeout(timeoutId);
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";;;
   }
 });
 

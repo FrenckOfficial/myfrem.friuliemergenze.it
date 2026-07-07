@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifica la tua email - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/auth/style.css" />
+</head>
+<body>
+  <main>
+    <div class="shell">
+      <div class="panel-left">
+        <div class="left-brand">
+          <p class="wordmark">My<span>FrEM</span></p>
+          <p class="tagline">Friuli Emergenze · Piattaforma foto</p>
+        </div>
+
+        <div class="left-body">
+            <h2>Controlla la tua<br>casella di posta<br><em>e conferma l'account.</em></h2>
+            <p>
+                Abbiamo inviato un link di verifica al tuo indirizzo email.
+                Bastano pochi secondi per completare l'attivazione del tuo account MyFrEM.
+            </p>
+            <ul class="feature-list">
+                <li><span class="dot"></span>Email inviata correttamente</li>
+                <li><span class="dot"></span>Conferma il tuo indirizzo email</li>
+                <li><span class="dot"></span>Accedi e inizia a contribuire</li>
+            </ul>
+        </div>
+
+        <div class="left-footer"><i class="fa-regular fa-copyright"></i> 2026 Friuli Emergenze · Tutti i diritti riservati</div>
+      </div>
+
+      <div class="panel-right">
+        <div class="success-page">
+            <div class="success-icon">
+                <i class="fa-regular fa-envelope-open"></i>
+            </div>
+
+            <p class="form-title">Controlla la tua email</p>
+            <p class="form-sub">Ti abbiamo inviato un link di verifica all'indirizzo email che hai utilizzato durante la registrazione.</p>
+
+            <div class="success-card">
+                <p>Per completare la creazione del tuo account MyFrEM, apri la tua casella di posta elettronica e clicca sul link di conferma contenuto nel messaggio.</p>
+                <p>Se non trovi l'email, controlla anche nelle cartelle <strong>Spam</strong>, <strong>Promozioni</strong> o <strong>Posta indesiderata</strong>.</p>
+            </div>
+
+            <a href="/login" class="submit-btn">
+                Ho verificato la mia email
+            </a>
+
+            <a href="/" class="back-home">
+                ← Torna alla homepage
+            </a>
+
+        </div>
+
+        </div>
+
+    </div>
+  </main>
+  <script type="module" src="/auth/app.js"></script>
+
+  <script>
+    function togglePassword(inputId, button) {
+      const input = document.getElementById(inputId);
+      const icon = button.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  </script>
+</body>
+</html>
