@@ -654,8 +654,8 @@ function buildEmail({ verifyLink, email, name }) {
 
                     ·
 
-                    <a href="mailto:soem@friuliemergenze.it">
-                      soem@friuliemergenze.it
+                    <a href="mailto:info@friuliemergenze.it">
+                      info@friuliemergenze.it
                     </a>
                   </p>
 

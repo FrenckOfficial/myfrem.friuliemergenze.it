@@ -39,7 +39,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     await checkUserRole(user.uid);
-    await loadAllPhotos(user.uid);
+    await loadAllPhotos();
 
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
@@ -59,9 +59,8 @@ async function checkUserRole(uid) {
       const userData = userDocSnap.data();
       if (userData.role === "testacc") {
         document.body.classList.add("read-only-mode");
-        // Opzionale: mostra un banner
         const banner = document.createElement("div");
-        banner.style.cssText = "background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;";
+        banner.style.cssText = "background-color:#fff3cd;color:#856404;padding:10px;margin-bottom:10px;border-radius:4px;text-align:center;";
         banner.textContent = "📖 Modalità sola lettura";
         photosContainer.parentElement.insertBefore(banner, photosContainer);
       }
@@ -71,15 +70,14 @@ async function checkUserRole(uid) {
   }
 }
 
-async function loadAllPhotos(userId) {
+async function loadAllPhotos() {
   try {
-    setStatus("⏳ Caricamento foto...", "info");
+    console.log("⏳ Caricamento foto...");
     photosContainer.innerHTML = "";
 
     const photosQuery = query(
       collection(db, "photos"),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc"),
+      orderBy("createdAt", "desc")
     );
 
     const snapshot = await getDocs(photosQuery);
@@ -90,18 +88,23 @@ async function loadAllPhotos(userId) {
       return;
     }
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    snapshot.forEach(async (docs) => {
+      const data = docs.data();
       const card = document.createElement("div");
       card.className = "photo-card";
 
-      const status = data.status === "Approvata ✅" ? "approved" :
-                     data.status === "Rifiutata ❌" ? "rejected" :
-                     "pending";
-
       const service = getServiceLabel(data.serviceType);
+      
+      let userName = data.userId;
 
-      card.innerHTML = `
+      const userDocSnap = await getDoc(doc(db, "users", userName));
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        userName = userData.name + " " + userData.surname || "Sconosciuto";
+      }
+
+      if (data.status === "Approvata ✅") {
+        card.innerHTML = `
         <div class="photo-info">
           <img src="${data.url}" alt="Foto utente" class="photo-img" />
           <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
@@ -109,33 +112,7 @@ async function loadAllPhotos(userId) {
           <p><strong>Posizione:</strong> ${data.location || "–"}</p>
           <p><strong>Servizio:</strong> ${service || "–"}</p>
           <p><strong>Note:</strong> ${data.notes || "–"}</p>
-
-          <p>
-            <strong>Stato:</strong>
-            <span class="status ${status}">
-              ${data.status || "In attesa"}
-            </span>
-          </p>
-
-          <p>
-            <strong>Caricata:</strong>
-            ${
-              data.createdAt?.toDate
-                ? data.createdAt.toDate().toLocaleString("it-IT")
-                : "–"
-            }
-          </p>
-
-          ${
-            data.reviewedAt?.toDate
-              ? `
-                <p>
-                  <strong>Revisionata:</strong>
-                  ${data.reviewedAt.toDate().toLocaleString("it-IT")}
-                </p>
-              `
-              : ""
-          }
+          <p><strong>Publisher:</strong> ${userName || "–"}</p>
 
           ${
             data.vehicleLink
@@ -148,11 +125,14 @@ async function loadAllPhotos(userId) {
           }
         </div>
       `;
+      } else {
+        return
+      }
 
       photosContainer.appendChild(card);
     });
 
-    setStatus(`📸 Caricate ${snapshot.size} foto`, "success");
+    console.log(`📸 Caricate ${snapshot.size} foto`);
   } catch (err) {
     console.error("❌ Errore caricamento foto:", err);
     setStatus("Errore caricamento foto", "error");
@@ -177,17 +157,20 @@ function getServiceLabel(service) {
     case "pompieri":
       return "Soccorso Tecnico Urgente";
 
-    case "protezione_civile":
+    case "protezione-civile":
       return "Protezione Civile";
 
-    case "soccorso_alpino":
+    case "soccorso-alpino":
       return "Soccorso Alpino";
 
-    case "guardia_costiera":
+    case "guardia-costiera":
       return "Guardia Costiera";
 
     case "ordine-pubblico":
       return "Ordine Pubblico";
+
+    case "trasporti-secondari":
+      return "Trasporti Sanitari Secondari";
 
     default:
       return service || "N/A";

@@ -81,6 +81,9 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  setStatus("Messaggio inviato con successo.", "success");
+  form.reset();
+
   try {
     await addDoc(collection(db, "messages"), {
       userId: currentUser?.uid || null,
@@ -99,9 +102,6 @@ form.addEventListener("submit", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    setStatus("Messaggio inviato con successo.", "success");
-    form.reset();
-
   } catch (err) {
     console.error(err);
     setStatus("Errore durante l'invio del messaggio.", "error");
@@ -114,3 +114,14 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   console.log("✅ Logout completato, redirect...");
   window.location.href = "/login/";
 });
+
+function setStatus(message, type = "info") {
+  const classNameBox = document.querySelector(".statusBox");
+  statusMsg.textContent = message;
+  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.style.display = "block";
+  const closeBtn = document.getElementById("closeSMsg");
+  closeBtn.onclick = () => {
+    classNameBox.style.display = "none";
+  }
+}

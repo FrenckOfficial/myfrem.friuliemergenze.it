@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="/dashboard/dsh.css">
   <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png">
   <style>
+    .btn {
+      margin-top:10px;
+    }
     @media (max-width: 480px) {
       .main-content {
         padding: 0
@@ -30,9 +33,9 @@
       <nav>
         <a href="/dashboard">🏠 Home</a>
         <a href="/dashboard/upload">📸 Carica una foto</a>
-        <a href="/dashboard/all-photos">📸 Le mie foto</a>
-        <a href="/dashboard/create-event/">🗂️ Crea un evento</a>
-        <a href="/dashboard/all-events/">🗂️ I miei eventi</a>
+        <a href="/dashboard/propose/">🗂️ Proponi un evento</a>
+        <a href="/dashboard/my-content">📚 I miei contenuti</a>
+        <a href="/dashboard/myfrem-photos">📸 Tutte le foto</a>
         <a href="/dashboard/settings/" class="active">⚙️ Impostazioni</a>
         <a href="/dashboard/contact/">📞 Contattaci</a>
       </nav>
@@ -47,7 +50,10 @@
             <section class="settings-card">
               <h2>📷 Foto Profilo</h2>
               <div class="profile-upload">
-                <p id="pfpStatus" class="statusBox" style="display:none;"></p>
+                <div class="pfpStatusBox" style="display:none;">
+                  <span id="pfpStatus"></span>
+                  <button id="closePfpStatus">&times;</button>
+                </div>
                 <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
     
                 <form id="profilePicForm" enctype="multipart/form-data">
@@ -60,7 +66,17 @@
             </section>
     
             <section class="settings-card">
-              <p id="fullNameStatus" class="statusBox" style="display:none;"></p>
+              <div class="profileStatusBox" style="display:none;">
+                <span id="profileStatus"></span>
+                <button id="closePStatus">&times;</button>
+              </div>
+              <h2>Link al profilo</h2>
+              <p id="profileID">Il tuo ID profilo è <span id="profileIDText"></span></p>
+              <button id="copyProfileLinkBtn" class="btn" style="margin-bottom:40px">Copia link profilo</button>
+              <div class="fullNameStatusBox" style="display:none;">
+                <span id="fullNameStatus"></span>
+                <button id="closeFNStatus">&times;</button>
+              </div>
               <h2>Nome e cognome</h2>
               <p id="fullName">Il tuo attuale nome e cognome è
                 <span id="fullNameText"></span>
@@ -75,7 +91,10 @@
 
           <div class="settings-row">
             <section class="settings-card">
-              <p id="usernameStatus" class="statusBox" style="display:none;"></p>
+              <div class="usernameStatusBox" style="display:none;">
+                <span id="usernameStatus"></span>
+                <button id="closeUserStatus">&times;</button>
+              </div>
               <h2>Username</h2>
               <p id="username">Il tuo username è
                   <span id="userText"></span>
@@ -85,7 +104,10 @@
             </section>
     
             <section class="settings-card">
-              <p id="mailStatus" class="statusBox" style="display:none;"></p>
+              <div class="mailStatusBox" style="display:none;">
+                <span id="mailStatus"></span>
+                <button id="closeMailStatus">&times;</button>
+              </div>
               <h2>E-Mail</h2>
               <p id="mail">La tua mail di accesso è
                   <span id="mailText"></span>
@@ -95,7 +117,10 @@
             </section>
 
             <section class="settings-card">
-              <p id="phoneStatus" class="statusBox" style="display:none;"></p>
+              <div class="phoneStatusBox" style="display:none;">
+                <span id="phoneStatus"></span>
+                <button id="closePhoneStatus">&times;</button>
+              </div>
               <h2>Telefono</h2>
               <p id="phone">Il tuo numero di telefono é
                   <span id="phoneText"></span>
@@ -107,7 +132,10 @@
 
           <div class="settings-row">
             <section class="settings-card">
-              <p id="bioStatus" class="statusBox" style="display:none;"></p>
+              <div class="bioStatusBox" style="display:none;">
+                <span id="bioStatus"></span>
+                <button id="closeBioStatus">&times;</button>
+              </div>
               <h2>Biografia</h2>
               <p id="bio">La tua biografia è:
                   <span id="bioText"></span>
@@ -117,17 +145,53 @@
             </section>
     
             <section class="settings-card" id="passwordCard">
-              <p id="pswStatus" class="statusBox" style="display:none;"></p>
-              <h2>Cambia password</h2>
-              <h3>Password attuale</h3>
-              <input type="password" id="currentPassword" class="input">
-              <h3>Nuova password</h3>
-              <input type="password" id="newPassword" class="input">
-              <h3>Conferma nuova password</h3>
-              <input type="password" id="confirmPassword" class="input">
-              <button id="savePasswordBtn" class="btn">Aggiorna password</button>
+              <div class="pswStatusBox" style="display:none;">
+                <span id="pswStatus"></span>
+                <button id="closePswStatus">&times;</button>
+              </div>
+              <h2>Cambia la tua password</h2>
+              <button id="savePasswordBtn" class="btn">Invia link via email</button>
             </section>
           </div>
+
+          <div class="settings-row">
+            <section class="settings-card preferences-card">
+              <h2>⚙️ Preferenze account</h2>
+              <div class="prefStatusBox" style="display:none;">
+                <span id="prefStatus"></span>
+                <button id="closePrefStatus">&times;</button>
+              </div>
+              
+              <div class="preferences-list">
+                <div class="preference-item">
+                  <div class="preference-content">
+                    <label for="emailNotifications" class="preference-label">Notifiche email</label>
+                    <p class="preference-desc">Ricevi email di aggiornamento sullo stato delle tue foto o eventi</p>
+                  </div>
+                  <input type="checkbox" id="emailNotifications" class="toggle-checkbox">
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-content">
+                    <label for="newsletter" class="preference-label">Newsletter</label>
+                    <p class="preference-desc">Resta aggiornato con le nostre news</p>
+                  </div>
+                  <input type="checkbox" id="newsletter" class="toggle-checkbox">
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-content">
+                    <label for="publicProfile" class="preference-label">Profilo pubblico</label>
+                    <p class="preference-desc">Rendi il tuo profilo visibile a tutti</p>
+                  </div>
+                  <input type="checkbox" id="publicProfile" class="toggle-checkbox">
+                </div>
+              </div>
+
+              <button id="savePreferencesBtn" class="btn btn-preferences">Salva preferenze</button>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   </div>

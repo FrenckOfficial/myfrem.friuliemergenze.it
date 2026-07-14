@@ -10,10 +10,34 @@ const auth = getAuth(app);
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get("userid");
 
+const loadingEl = document.querySelector(".loading");
+const contentEl = document.querySelector(".content");
+const messageBox = document.getElementById("messageBox");
+
+let currentUser = null;
+let currentUserId = null;
+
 if (!userId) {
   messageBox.classList.add("error");
   messageBox.textContent = "ID utente mancante.";
 }
+
+onAuthStateChanged(auth, async (user) => {
+  const timeoutId = setTimeout(() => {
+    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    loadingEl.style.display = "none";
+    contentEl.style.display = "block";
+  }, 7000);
+
+  currentUser = user;
+  currentUserId = user.uid;
+
+  await loadUserProfile(userId);
+
+  clearTimeout(timeoutId);
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
+});
 
 const elements = {
   title: document.getElementById("profileTitle"),
@@ -47,8 +71,6 @@ const adminRoles = [
   "simplestaff"
 ];
 
-loadUserProfile(userId);
-
 async function loadUserProfile(uid) {
     try {
         const docRef = doc(db, "users", uid);
@@ -69,6 +91,33 @@ async function loadUserProfile(uid) {
         const status = user.status || "Offline";
         const avatar = user.photoURL || "/assets/profile/defpic.png";
         const createdAt = user.createdAt;
+        const isPublic = user.publicProfile !== false;
+
+        const isOwnProfile = currentUserId === uid;
+
+        if (!isPublic && !isOwnProfile) {
+          messageBox.classList.add("error");
+          messageBox.textContent = "❌ Questo profilo è privato.";
+          elements.statsGrid.classList.add("none");
+          elements.staffGrid.classList.add("none");
+          return;
+        }
+
+        if (!isPublic) {
+          const privateIndicator = document.createElement("div");
+          privateIndicator.innerHTML = "🔒 PROFILO PRIVATO";
+          privateIndicator.style.cssText = `
+            background: rgba(232, 72, 85, 0.12);
+            color: #e84855;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+          `;
+          document.querySelector(".header").appendChild(privateIndicator);
+        }
 
         if (adminRoles.includes(role.toLowerCase())) {
           elements.role.textContent = "AMMINISTRATORE";
@@ -93,7 +142,7 @@ async function loadUserProfile(uid) {
         elements.avatar.src = avatar;
 
         elements.avatar.onerror = () => {
-            elements.avatar.src = "/assets/profile/defpic.png";
+          elements.avatar.src = "/assets/profile/defpic.png";
         };
 
         renderBadges(role);
@@ -120,23 +169,16 @@ async function loadUserProfile(uid) {
             const photosQuery = query(photosRef, where("userId", "==", uid));
             const photosSnap = await getDocs(photosQuery);
             const eventsRef = collection(db, "events");
-            const eventsQuery = query(photosRef, where("uid", "==", uid));
+            const eventsQuery = query(eventsRef, where("uid", "==", uid));
             const eventsSnap = await getDocs(eventsQuery)
 
             const photos = photosSnap.size;
             const events = eventsSnap.size;
 
-            elements.userPhotos.textContent =
-                photos;
-
-            elements.userEvents.textContent =
-                events;
-
-            elements.userSince.textContent =
-                formatDate(user.createdAt) || "2025";
-
-            elements.userBadge.textContent =
-                getActivityBadge(user.createdAt);
+            elements.userPhotos.textContent = photos;
+            elements.userEvents.textContent = events;
+            elements.userSince.textContent = formatDate(user.createdAt) || "2025";
+            elements.userBadge.textContent = getActivityBadge(user.createdAt);
 
             elements.userPhotos.addEventListener("click", async () => {
               loadUserPhotos(userId);
@@ -332,7 +374,7 @@ async function loadUserPhotos(userId) {
         <img src="${data.url}" class="popup-photo">
 
         <div class="photo-info">
-          <p><b>Titolo:</b> ${data.title}</p>
+          <p><b>Titolo:</b> ${data.title || data.vehicleModel}</p>
           <p><b>ID:</b> ${docSnap.id}</p>
           <p><b>Data:</b> ${
             data.createdAt?.toDate

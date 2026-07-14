@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I miei contenuti | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <style>
+    .tab-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--border-color, #333);
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-secondary, #999);
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-family: Lexend, sans-serif;
+    }
+
+    .tab-btn:hover {
+      color: var(--accent, #ff7b00);
+    }
+
+    .tab-btn.active {
+      color: var(--accent, #ff7b00);
+      border-bottom-color: var(--accent, #ff7b00);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <h2>MyFrEM</h2>
+      </div>
+      <nav>
+        <a href="/dashboard">🏠 Home</a>
+        <a href="/dashboard/upload">📸 Carica una foto</a>
+        <a href="/dashboard/propose/">🗂️ Proponi un evento</a>
+        <a href="/dashboard/my-content" class="active">📚 I miei contenuti</a>
+        <a href="/dashboard/myfrem-photos">📸 Tutte le foto</a>
+        <a href="/dashboard/settings/">⚙️ Impostazioni</a>
+        <a href="/dashboard/contact/">📞 Contattaci</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <div class="content-box" style="max-width:none;">
+        <h1>📚 I miei contenuti</h1>
+        <p>Qui trovi tutte le foto e gli eventi creati da te.</p>
+
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="photos-tab">📸 Le mie foto</button>
+          <button class="tab-btn" data-tab="events-tab">🗂️ I miei eventi</button>
+        </div>
+
+        <p class="statusBox" style="display:none;">
+          <span id="statusMsg"></span>
+          <button id="closeSMsg">&times;</button>
+        </p>
+
+        <div class="tab-content active" id="photos-tab">
+          <div id="photosContainer" class="photos-grid">
+            <!-- JS inserirà le foto -->
+          </div>
+        </div>
+
+        <div class="tab-content" id="events-tab">
+          <div id="eventsList" class="events-container">
+            <!-- JS inserirà gli eventi -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/dashboard/my-content/load.js"></script>
+</body>
+</html>

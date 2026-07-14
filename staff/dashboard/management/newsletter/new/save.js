@@ -264,7 +264,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
       <br><br>
       <a href="https://friuliemergenze.it">friuliemergenze.it</a>
       ·
-      <a href="mailto:soem@friuliemergenze.it">soem@friuliemergenze.it</a>
+      <a href="mailto:info@friuliemergenze.it">info@friuliemergenze.it</a>
     </p>
   `;
 

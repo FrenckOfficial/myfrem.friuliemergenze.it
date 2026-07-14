@@ -17,6 +17,15 @@
   ],
   "headers": [
     {
+      "source": "/staff/dashboard/management/(.*)/style.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {

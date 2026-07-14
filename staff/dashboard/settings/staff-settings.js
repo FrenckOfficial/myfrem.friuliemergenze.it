@@ -18,6 +18,7 @@ const staffName = document.getElementById("staffName");
 const staffEmail = document.getElementById("staffEmail");
 const staffRole = document.getElementById("staffRole");
 const staffAccess = document.getElementById("staffAccess");
+const staffPhone = document.getElementById("staffPhone");
 
 const changePasswordForm = document.getElementById("changePasswordForm");
 const passwordStatusMsg = document.getElementById("passwordStatusMsg");
@@ -69,6 +70,7 @@ auth.onAuthStateChanged(async (user) => {
   staffUsername.textContent = data.username || "Non disponibile.";
   staffName.textContent = `${data.name || ""} ${data.surname || ""}`.trim() || "Non disponibile.";
   staffEmail.innerHTML = data.email ? `<a href="mailto:${data.email}">${data.email}</a>` : "Non disponibile.";
+  staffPhone.textContent = data.phone || "Non disponibile.";
   if (data.role === "superadmin") {
     staffRole.textContent = "Super Amministratore";
   } else if (data.role === "advstaffplus") {

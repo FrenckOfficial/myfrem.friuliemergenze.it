@@ -243,8 +243,8 @@ async function sendPersonalLinkEmail() {
 
                           ·
 
-                          <a href="mailto:soem@friuliemergenze.it">
-                            soem@friuliemergenze.it
+                          <a href="mailto:info@friuliemergenze.it">
+                            info@friuliemergenze.it
                           </a>
                         </p>
 

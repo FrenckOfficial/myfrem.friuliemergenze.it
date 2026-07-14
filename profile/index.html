@@ -3,93 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title id="profileTitle">Profilo Utenza | MyFrEM - Piattaforma ufficiale di Friuli Emergenze</title>
-
     <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
     <link rel="stylesheet" href="/profile/style.css">
-
-    <script>
-        window.va = window.va || function () {
-            (window.vaq = window.vaq || []).push(arguments);
-        };
-    </script>
-
+    <script>window.va = window.va || function () {(window.vaq = window.vaq || []).push(arguments);};</script>
     <script defer src="/_vercel/insights/script.js"></script>
     <script type="module" src="/profile/script.js"></script>
 </head>
 <body>
-    <div class="profileBanner"></div>
-    <main class="profileWrapper">
-        <p id="messageBox"></p>
-        <div class="profileCard">
-            <div class="profileTop">
-                <div class="avatarContainer">
-                    <img id="profileAvatar" class="profileAvatar" src="/assets/profile/defpic.png" alt="Avatar utente" >
-                    <div class="statusDot" id="statusDot"></div>
+    <div class="loading">
+        <div class="loader"></div>
+        <p>Caricamento in corso...</p>
+    </div>
+    <div class="content" style="display:none;">
+        <div class="profileBanner"></div>
+        <main class="profileWrapper">
+            <p id="messageBox"></p>
+            <div class="profileCard">
+                <div class="profileTop">
+                    <div class="avatarContainer">
+                        <img id="profileAvatar" class="profileAvatar" src="/assets/profile/defpic.png" alt="Avatar utente" >
+                        <div class="statusDot" id="statusDot"></div>
+                    </div>
+    
+                    <div class="profileIdentity">
+                        <h1 id="profileName">Utente</h1>
+                        <p id="profileUsername">@username</p>
+                        <div class="profileBadges" id="profileBadges"></div>
+                    </div>
                 </div>
-
-                <div class="profileIdentity">
-                    <h1 id="profileName">Utente</h1>
-                    <p id="profileUsername">@username</p>
-                    <div class="profileBadges" id="profileBadges"></div>
+    
+                <div class="profileGrid">
+                    <div class="infoCard">
+                        <span>Email</span>
+                        <h3 id="profileEmail">Dato non disponibile</h3>
+                    </div>
+                    <div class="infoCard">
+                        <span>Ruolo</span>
+                        <h3 id="profileRole">Dato non disponibile</h3>
+                    </div>
+                    <div class="infoCard">
+                        <span>Status</span>
+                        <h3 id="profileStatus">Dato non disponibile</h3>
+                    </div>
                 </div>
+    
+                <div class="statsGrid" id="statsGrid">
+                    <div class="statCard" id="statPhotos">
+                        <span>📸 Foto caricate</span>
+                        <h2 id="userPhotos">Dato non disponibile</h2>
+                    </div>
+                    <div class="statCard" id="statEvents">
+                        <span>🚨 Eventi pubblicati</span>
+                        <h2 id="userEvents">Dato non disponibile</h2>
+                    </div>
+                    <div class="statCard">
+                        <span>⭐ Membro dal</span>
+                        <h2 id="userSince">Dato non disponibile</h2>
+                    </div>
+                    <div class="statCard" id="statHiddenCard" style="visibility:hidden;"></div>
+                    <div class="statCard">
+                        <span>🏅 Badge attività</span>
+                        <h2 id="userBadge">Dato non disponibile</h2>
+                    </div>
+                </div>
+    
+                <div class="staffGrid none" id="staffGrid">
+                    <div class="statCard">
+                        <span>🛡️ Livello staff</span>
+                        <h2 id="staffRole">Dato non disponibile</h2>
+                    </div>
+                    <div class="statCard">
+                        <span>⚙️ Permessi</span>
+                        <h2 id="staffPerms">Dato non disponibile</h2>
+                    </div>
+                    <div class="statCard">
+                        <span>📅 Staff dal</span>
+                        <h2 id="staffSince">Dato non disponibile</h2>
+                    </div>
+                </div>
+                <p class="callCenter">Per problematiche è attivo il call center telefonico dal lunedì al venerdì dalle 9 alle 20, il sabato dalle 11 alle 18. Il call center risponde al numero <a href="tel:+39 0431 980003">+39 0431 980003</a></p>
             </div>
-
-            <div class="profileGrid">
-                <div class="infoCard">
-                    <span>Email</span>
-                    <h3 id="profileEmail">Dato non disponibile</h3>
-                </div>
-                <div class="infoCard">
-                    <span>Ruolo</span>
-                    <h3 id="profileRole">Dato non disponibile</h3>
-                </div>
-                <div class="infoCard">
-                    <span>Status</span>
-                    <h3 id="profileStatus">Dato non disponibile</h3>
-                </div>
-            </div>
-
-            <div class="statsGrid" id="statsGrid">
-                <div class="statCard" id="statPhotos">
-                    <span>📸 Foto caricate</span>
-                    <h2 id="userPhotos">Dato non disponibile</h2>
-                </div>
-                <div class="statCard" id="statEvents">
-                    <span>🚨 Eventi pubblicati</span>
-                    <h2 id="userEvents">Dato non disponibile</h2>
-                </div>
-                <div class="statCard">
-                    <span>⭐ Membro dal</span>
-                    <h2 id="userSince">Dato non disponibile</h2>
-                </div>
-                <div class="statCard" id="statHiddenCard" style="visibility:hidden;"></div>
-                <div class="statCard">
-                    <span>🏅 Badge attività</span>
-                    <h2 id="userBadge">Dato non disponibile</h2>
-                </div>
-            </div>
-
-            <div class="staffGrid none" id="staffGrid">
-                <div class="statCard">
-                    <span>🛡️ Livello staff</span>
-                    <h2 id="staffRole">Dato non disponibile</h2>
-                </div>
-                <div class="statCard">
-                    <span>⚙️ Permessi</span>
-                    <h2 id="staffPerms">Dato non disponibile</h2>
-                </div>
-                <div class="statCard">
-                    <span>📅 Staff dal</span>
-                    <h2 id="staffSince">Dato non disponibile</h2>
-                </div>
-            </div>
-        </div>
-    </main>
+        </main>
+    </div>
 </body>
 </html>
