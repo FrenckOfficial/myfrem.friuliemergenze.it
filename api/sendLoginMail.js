@@ -283,7 +283,7 @@ body {
     © 2026 Friuli Emergenze - MyFrEM. Questa è una notifica automatica, non rispondere a questa email.
   </div>
 </div>
-<script src="//codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-55951055-66dfb"></script>
+  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
