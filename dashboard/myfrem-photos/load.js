@@ -106,7 +106,7 @@ async function loadAllPhotos() {
       if (data.status === "Approvata ✅") {
         card.innerHTML = `
         <div class="photo-info">
-          <img src="${data.url}" alt="Foto utente" class="photo-img" />
+          <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
           <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
           <p><strong>Targa:</strong> ${data.licensePlate || "–"}</p>
           <p><strong>Posizione:</strong> ${data.location || "–"}</p>

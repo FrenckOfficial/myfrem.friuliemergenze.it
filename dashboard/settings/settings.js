@@ -31,6 +31,7 @@ const saveUsernameBtn = document.getElementById("saveUsernameBtn");
 const mailInput = document.getElementById("mailInput");
 const mailText = document.getElementById("mailText");
 const saveMailBtn = document.getElementById("saveMailBtn");
+const mailTextPsw = document.getElementById("mailTextPsw");
 
 const phoneInput = document.getElementById("phoneInput");
 const phoneText = document.getElementById("phoneText");
@@ -105,6 +106,7 @@ async function loadUserData(uid) {
   fullNameText.innerHTML = `<b>${data.name || ""} ${data.surname || ""}</b>`;
   userText.innerHTML = `<b>${data.username}</b>` || "";
   mailText.innerHTML = `<b>${data.email}</b>` || "";
+  mailTextPsw.innerHTML = `<b>${data.email}</b>` || "";
   bioText.innerHTML = `<b>${data.bio ? data.bio : ""}</b>` || "";
   if (data.photoURL) {
     profilePreview.src = data.photoURL;
