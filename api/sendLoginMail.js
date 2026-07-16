@@ -21,18 +21,18 @@ export default async function handler(req, res) {
   }
 
   const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    const token = authHeader.split(' ')[1];
+  const token = authHeader.split(' ')[1];
     
-    try {
-        await admin.auth().verifyIdToken(token);
-    } catch (error) {
-        console.error("❌ Token verification failed:", error);
-        return res.status(401).json({ error: "Invalid token" });
-    }
+  try {
+    await admin.auth().verifyIdToken(token);
+  } catch (error) {
+    console.error("❌ Token verification failed:", error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
 
   try {
     const { email, name, timestamp, userAgent } = req.body;
@@ -57,9 +57,17 @@ export default async function handler(req, res) {
     const sanitizedEmail = sanitizeHtml(email);
     const sanitizedUserAgent = sanitizeHtml(userAgent || "Informazione non disponibile");
 
-    const formattedDate = timestamp 
-      ? new Date(timestamp).toLocaleString('it-IT') 
-      : new Date().toLocaleString('it-IT');
+    const date = timestamp ? new Date(timestamp) : new Date();
+    const formatter = new Intl.DateTimeFormat('it-IT', {
+      timeZone: 'Europe/Rome',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    const formattedDate = formatter.format(date);
 
     const htmlContent = generateLoginNotificationHtml({
       name: sanitizedName,

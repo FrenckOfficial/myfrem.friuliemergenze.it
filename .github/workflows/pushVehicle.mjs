@@ -284,14 +284,15 @@ function generateVehicleHtml(vehicleData, fileName, slug, photoUrl) {
           <i class="fas fa-bars"><\/i>
         </button>
         <ul class="nav-links">
-          <li><a href="/" class="nav-link">Home<\/a><\/li>
-          <li><a href="/gallery" class="nav-link active">Galleria<\/a><\/li>
-          <li><a href="/photobook" class="nav-link">Photobooks<\/a><\/li>
-          <li><a href="/contact-us" class="nav-link">Contatti<\/a><\/li>
-          
-          <li><a href="https://myfrem.friuliemergenze.it" target="_blank" class="nav-icon" aria-label="MyFrEM">Progetto MyFrEM<\/a><\/li>
-          <li><a href="https://instagram.com/friuliemergenze" target="_blank" class="nav-icon" aria-label="Instagram"><i class="fab fa-instagram"><\/i><\/a><\/li>
-          <li><a href="https://chat.whatsapp.com/DxtvDvxXgWr5XVZ4ZkM4k1?mode=gi_t" target="_blank" class="nav-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"><\/i><\/a><\/li>
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/chi-sono" class="nav-link">Chi sono</a></li>
+          <li><a href="/gallery" class="nav-link active">Galleria</a></li>
+          <li><a href="/photobook" class="nav-link">Photobooks</a></li>
+          <li><a href="/news" class="nav-link">Notizie</a></li>
+          <li><a href="/piattaforma-myfrem" class="nav-icon" aria-label="MyFrEM">Piattaforma MyFrEM</a></li>
+          <li><a href="/contact-us" class="nav-link">Contatti</a></li>
+          <li><a href="https://www.friuliemergenze.it/social/instagram" target="_blank" class="nav-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
+          <li><a href="https://www.friuliemergenze.it/social/whatsapp" target="_blank" class="nav-icon"><i class="fab fa-whatsapp"></i></a></li>
         <\/ul>
       <\/div>
     <\/nav>
@@ -301,6 +302,7 @@ function generateVehicleHtml(vehicleData, fileName, slug, photoUrl) {
       <img
         src="${photoUrl}"
         alt="${escapeHtml(vehicleData.title)}"
+        loading="lazy"
       />
 
       <section class="dettagli-mezzo">
