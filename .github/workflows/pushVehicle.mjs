@@ -25,9 +25,11 @@ const serviceAccount = {
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 };
 
+console.log("Inizializzazione Firebase");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+console.log("Firebase inizializzato");
 
 const db = admin.firestore();
 
@@ -72,6 +74,7 @@ async function pushVehicleToGithub() {
 
   const fileName = draft.fileName.replace(/\.[^.]+$/, "");
   const vehicleData = draft.data || {};
+  const sourcePhotoId = draft.sourcePhotoId || "";
   const slug = draft.slug || fileName;
 
   await updateGalleryJson(
@@ -86,6 +89,7 @@ async function pushVehicleToGithub() {
   await createVehicleDetailsPage(
     fileName,
     vehicleData,
+    sourcePhotoId,
     slug,
     draft.photoUrl
   );
@@ -170,13 +174,15 @@ async function updateGalleryJson(
 async function createVehicleDetailsPage(
   fileName,
   vehicleData,
+  sourcePhotoId,
   slug,
   photoUrl
 ) {
   const html =
-    generateVehicleHtml(
+    await generateVehicleHtml(
       vehicleData,
       fileName,
+      sourcePhotoId,
       slug,
       photoUrl
     );
@@ -249,10 +255,16 @@ function getServiceLabel(service) {
   }
 }
 
-function generateVehicleHtml(vehicleData, fileName, slug, photoUrl) {
+async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, photoUrl) {
   const imageFileName = vehicleData.imageFileName || `${fileName}.jpg`;
   const pageUrl = `https://friuliemergenze.it/gallery/scheda/${slug}`;
   const service = getServiceLabel(vehicleData.service);
+  const imageDoc = await db.collection("photos").doc(sourcePhotoId).get();
+  const imageDocData = imageDoc.data();
+  const userId = imageDocData.userId;
+  const userDoc = await db.collection("users").doc(userId).get();
+  const userData = userDoc.data();
+  const author = userData.name + " " + userData.surname || "Utente sconosciuto";
 
   return `<!doctype html>
 <html lang="it">
@@ -315,6 +327,10 @@ function generateVehicleHtml(vehicleData, fileName, slug, photoUrl) {
           <li><strong>Servizio:<\/strong> ${escapeHtml(service)}<\/li>
           <li><strong>Sede:<\/strong> ${escapeHtml(vehicleData.headquarters)}<\/li>
         <\/ul>
+        <p id="galleryRecognition">
+          Photo by <em>${escapeHtml(author)}</em> from
+          <a href="https://myfrem.friuliemergenze.it">MyFrEM</a>
+        <\/p>
       <\/section>
 
       <div class="share">
@@ -402,12 +418,12 @@ function generateVehicleHtml(vehicleData, fileName, slug, photoUrl) {
           <a href="https://www.iubenda.com/privacy-policy/95409163/cookie-policy">Cookie Policy<\/a>
         <\/p>
         <p class="footer-extra"> 
-          Versione 2.4.1.4
+          Versione 2.6.0.0
         <\/p>
       <\/div>
     <\/footer>
 
-    <script src="/shinystat_script.js?USER=SS-53595029-55bae" style="display: none;"><\/script>
+    <script src="/scripts/shinystat.js?USER=SS-53595029-55bae" style="display: none;"><\/script>
     <noscript>
       <a href="https://www.shinystat.com/it/" target="_top" style="display: none;">
       <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-53595029-55bae" alt="Statistiche web" style="border:0px; display: none;" /><\/a>
