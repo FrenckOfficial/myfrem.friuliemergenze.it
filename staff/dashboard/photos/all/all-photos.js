@@ -145,13 +145,13 @@ async function loadAllPhotos() {
               />
               <div class="link-input-buttons">
                 <button class="edit-link-btn save-btn" onclick="saveVehicleLink('${id}')" title="Salva">
-                  <img src="/assets/icons/floppy-disk-regular-full.svg" alt="Salva" />
+                  <img src="/assets/icons/floppy-disk-regular-full.svg" alt="Salva" loading="lazy" />
                 </button>
               </div>
             </div>
 
             <button class="edit-link-btn edit-btn ${hasLink ? "" : "hidden"}" onclick="editLink('${id}')" title="Modifica">
-              <img src="/assets/icons/pen-solid-full.svg" alt="Modifica" />
+              <img src="/assets/icons/pen-solid-full.svg" alt="Modifica" loading="lazy" />
             </button>
           </div>
         `;
@@ -180,7 +180,7 @@ async function loadAllPhotos() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="status-indicator" style="color: ${statusColor};"></span> <b style="color:${statusColor};">${status || "Sconosciuto"}</b></td>  
-        <td><img src="${photo.url}" class="preview" alt="Preview della foto caricata tramite i sistemi Friuli Emergenze" /></td>
+        <td><img src="${photo.url}" class="preview" alt="Preview della foto caricata tramite i sistemi Friuli Emergenze" loading="lazy" /></td>
         <td><b>${photo.vehicleModel || "Non inserito"}</b></td>
         <td><b>${photo.sponsor || "Non inserito"}</b></td>
         <td><b>${photo.licensePlate || "Non inserita"}</b></td>
@@ -190,7 +190,7 @@ async function loadAllPhotos() {
         <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
         <td><b>${photo.notes || "Non inserite"}</b></td>
         <td><b>${linkBox}</b></td>
-        <td><button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina"/></button></td>
+        <td><button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy"/></button></td>
       `;
 
       photosTableBody.appendChild(tr);

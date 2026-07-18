@@ -91,7 +91,7 @@ async function loadUserProfile(uid) {
         const status = user.status || "Offline";
         const avatar = user.photoURL || "/assets/profile/defpic.png";
         const createdAt = user.createdAt;
-        const isPublic = user.publicProfile !== false;
+        const isPublic = user.privateProfile === false;
 
         const isOwnProfile = currentUserId === uid;
 
@@ -104,19 +104,24 @@ async function loadUserProfile(uid) {
         }
 
         if (!isPublic) {
-          const privateIndicator = document.createElement("div");
-          privateIndicator.innerHTML = "🔒 PROFILO PRIVATO";
-          privateIndicator.style.cssText = `
-            background: rgba(232, 72, 85, 0.12);
-            color: #e84855;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 15px;
+          document.querySelector(".profileCard").innerHTML = `
+            <div style="
+              background: rgba(232, 72, 85, 0.12);
+              color: #e84855;
+              padding: 20px;
+              border-radius: 4px;
+              text-align: center;
+              font-weight: 700;
+            ">
+              🔒 PROFILO PRIVATO
+              <p style="font-size: 0.85rem; margin-top: 8px; color: #999;">
+                I dati di questo profilo non sono pubblicamente visibili
+              </p>
+            </div>
           `;
-          document.querySelector(".header").appendChild(privateIndicator);
+          return;
+        } else if (!isPublic && isOwnProfile) {
+          return
         }
 
         if (adminRoles.includes(role.toLowerCase())) {
@@ -371,7 +376,7 @@ async function loadUserPhotos(userId) {
       card.className = "photo-card";
 
       card.innerHTML = `
-        <img src="${data.url}" class="popup-photo">
+        <img src="${data.url}" class="popup-photo" loading="lazy>
 
         <div class="photo-info">
           <p><b>Titolo:</b> ${data.title || data.vehicleModel}</p>

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { supa } from "/configSupabase.js";
@@ -54,6 +54,7 @@ const logoutBtnSettings = document.getElementById("logoutBtnSettings");
 let currentUserId = null;
 let currentUser = null;
 let isReadOnlyMode = false;
+emailjs.init("49-8564mCPRVWNmBW");
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
@@ -99,7 +100,7 @@ async function loadUserData(uid) {
     isReadOnlyMode = true;
     document.body.classList.add("read-only-mode");
     disableAllButtons();
-    setStatus("readOnlyStatus", "📖 Modalità sola lettura: non puoi modificare i dati", "warning");
+    setStatus("closeReadOnlyStatus", "readOnlyStatusBox", "readOnlyStatus", "📖 Modalità sola lettura: non puoi modificare i dati", "warning");
   }
 
   profileIDText.innerHTML = `<b>${uid}</b>`;
@@ -125,7 +126,7 @@ function disableAllButtons() {
     savePhoneBtn,
     saveBioBtn,
     savePasswordBtn,
-    savePreferencesBtn,
+    savePreferencesBtn
   ];
 
   buttons.forEach(btn => {
@@ -314,7 +315,7 @@ savePreferencesBtn.addEventListener("click", async () => {
     await updateDoc(userRef, {
       emailNotifications: emailNotificationsCheckbox.checked,
       newsSubbed: newsletterCheckbox.checked,
-      publicProfile: publicProfileCheckbox.checked
+      privateProfile: publicProfileCheckbox.checked
     });
     
     const newsRef = collection(db, "newsletterSubs");
@@ -356,11 +357,11 @@ savePreferencesBtn.addEventListener("click", async () => {
   }
 });
 
-function setStatus(closeBox,statusBox, statusMsg, message, type = "info") {
+function setStatus(closeBox, statusBox, statusMsg, message, type = "info") {
   const classNameBox = document.querySelector(`${"." + statusBox}`);
   if (!statusMsg) return;
   document.getElementById(`${statusMsg}`).textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
+  classNameBox.className = `${"statusBox" + " " + statusBox + " " + type}`;
   classNameBox.style.display = "block";
   const closeBtn = document.getElementById(closeBox);
   closeBtn.onclick = () => {

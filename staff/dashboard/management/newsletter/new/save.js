@@ -269,7 +269,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
   `;
 
   const imageRow = image
-    ? `<tr><td><img src="${image}" style="width:100%;display:block;"></td></tr>`
+    ? `<tr><td><img src="${image}" style="width:100%;display:block;" loading="lazy"></td></tr>`
     : "";
 
   const card = `

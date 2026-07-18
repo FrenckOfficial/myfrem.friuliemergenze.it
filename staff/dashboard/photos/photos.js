@@ -140,7 +140,7 @@ async function loadPendingPhotos() {
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><img src="${photo.url}" class="preview" /></td>
+        <td><img src="${photo.url}" class="preview" loading="lazy" /></td>
         <td>${photo.vehicleModel || "Non inserito"}</td>
         <td>${photo.sponsor || "Non inserito"}</td>
         <td>${photo.licensePlate || "Non inserita"}</td>

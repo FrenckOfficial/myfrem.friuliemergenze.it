@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
   <div class="loading">
@@ -22,7 +23,7 @@
   <div class="content" style="display:none;">
     <aside class="sidebar">
       <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
         <h2>MyFrEM</h2>
       </div>
       <nav>
@@ -44,8 +45,6 @@
         <p>Benvenuto nella tua dashboard personale.</p>
       </header>
 
-      <p id="statusMsg"></p>
-
       <section class="newsletter-banner" id="newsBanner" style="display:none;">
         <div class="newsletter-content">
           <div>
@@ -57,8 +56,14 @@
           </div>
 
           <button id="newsletterBtn">
-            Iscriviti
+            <span id="btnText">Iscriviti</span>
+            <span id="btnLoader" class="loader" style="display:none;"></span>
           </button>
+
+          <div class="statusBox" style="display:none;">
+            <span id="statusMsg"></span>
+            <button id="closeSMsg">&times;</button>
+          </div>
         </div>
       </section>
 

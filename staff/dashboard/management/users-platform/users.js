@@ -11,7 +11,9 @@ import {
   addDoc,
   serverTimestamp,
   query,
-  where
+  where,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -101,9 +103,19 @@ async function loadUsers() {
     return 0;
   });
 
-  users.forEach(u => {
+  users.forEach(async u => {
     const tr = document.createElement("tr");
     const emailVerified = u.emailVerified ? "Sì" : "No"
+    const preferences = {
+      newsletter: u.newsSubbed ? "Newsletter" : "",
+      emailNotifications: u.emailNotifications ? "Notifiche email" : "",
+      publicProfile: u.publicProfile ? "Profilo pubblico" : ""
+    }
+
+    const loginRef = collection(db, "logins");
+    const userLoginDocs = query(loginRef, where("userId", "==", u.id), orderBy("timestamp", "desc"), limit(1));
+    const lastLoginSnap = await getDocs(userLoginDocs);
+    const lastLogin = lastLoginSnap.docs[0]?.data().timestamp ? lastLoginSnap.docs[0].data().timestamp.toDate().toLocaleString() : "N/A";
 
     tr.innerHTML = `
       <td>${emailVerified}</td>
@@ -112,7 +124,9 @@ async function loadUsers() {
       <td>${u.email || ""}</td>
       <td>${u.username || ""}</td>
       <td>${u.role || "Ruolo utente non disponibile."}</td>
+      <td>${Object.values(preferences).filter(Boolean).join(", ") || "Preferenze utente non disponibili."}</td>
       <td>${u.status || "Status utente non disponibile."}</td>
+      <td>${lastLogin}</td>
       <td>
         <button class="promote">Promuovi</button>
         <button class="suspend">Sospendi/Riattiva</button>

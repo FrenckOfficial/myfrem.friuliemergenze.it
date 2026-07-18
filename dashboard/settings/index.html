@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Impostazioni utente | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png">
   <style>
     .btn {
@@ -27,7 +28,7 @@
   <div class="content" style="display:none;">
     <aside class="sidebar">
       <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
         <h2>MyFrEM</h2>
       </div>
       <nav>
@@ -43,6 +44,10 @@
     </aside>
 
     <div class="main-content">
+      <div class="readOnlyStatusBox" style="display:none;">
+        <span id="readOnlyStatus"></span>
+        <button id="closeReadOnlyStatus">&times;</button>
+      </div>
       <div class="settings-container">
           <h1 class="title">Impostazioni account</h1>
 
@@ -54,7 +59,7 @@
                   <span id="pfpStatus"></span>
                   <button id="closePfpStatus">&times;</button>
                 </div>
-                <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
+                <img id="profilePreview" src="/assets/profile/defpic.png" alt="Anteprima foto profilo" loading="lazy" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;">
     
                 <form id="profilePicForm" enctype="multipart/form-data">
                   <label>Carica nuova immagine</label>
@@ -187,8 +192,8 @@
 
                 <div class="preference-item">
                   <div class="preference-content">
-                    <label for="publicProfile" class="preference-label">Profilo pubblico</label>
-                    <p class="preference-desc">Rendi il tuo profilo visibile a tutti</p>
+                    <label for="publicProfile" class="preference-label">Profilo privato</label>
+                    <p class="preference-desc">Rendi il tuo profilo privato</p>
                   </div>
                   <input type="checkbox" id="publicProfile" class="toggle-checkbox">
                 </div>

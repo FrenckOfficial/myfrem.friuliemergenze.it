@@ -22,10 +22,13 @@ const newsBannerEl = document.getElementById("newsBanner");
 const newsletterBtn = document.getElementById("newsletterBtn");
 const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
+const btnText = document.getElementById("btnText");
+const btnLoader = document.getElementById("btnLoader");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
 auth.onAuthStateChanged(async (user) => {
+  emailjs.init("49-8564mCPRVWNmBW");
   console.log("👀 onAuthStateChanged triggered, user:", user);
 
   if (!user) {
@@ -38,21 +41,30 @@ auth.onAuthStateChanged(async (user) => {
   const timeoutId = setTimeout(() => {
     console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
-    contentEl.style.display = "block";;;
+    contentEl.style.display = "block";
   }, 5000);
 
   try {
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
 
-    const staffRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+    const staffRoles = [
+      "simplestaff",
+      "modstaff",
+      "advstaff",
+      "advstaffplus",
+      "superadmin",
+    ];
     const allowedRoles = ["testacc", "user"];
 
-    if (!staffRoles.includes(userData.role) && !allowedRoles.includes(userData.role)) {
+    if (
+      !staffRoles.includes(userData.role) &&
+      !allowedRoles.includes(userData.role)
+    ) {
       setStatus("Accesso negato: ruolo non riconosciuto.", "error");
       clearTimeout(timeoutId);
       loadingEl.style.display = "none";
-      contentEl.style.display = "block";;;
+      contentEl.style.display = "block";
       window.location.href = "/login/";
       return;
     }
@@ -71,21 +83,25 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     if (userData.newsSubbed === false) {
-      newsBannerEl.style.display = "block"
+      newsBannerEl.style.display = "block";
     } else {
-      newsBannerEl.style.display = "none"
+      newsBannerEl.style.display = "none";
     }
 
-    const photosSnap = await db.collection("photos")
+    const photosSnap = await db
+      .collection("photos")
       .where("userId", "==", user.uid)
       .orderBy("createdAt", "desc")
       .limit(5)
       .get();
 
-    let total = 0, approved = 0, pending = 0, rejected = 0;
+    let total = 0,
+      approved = 0,
+      pending = 0,
+      rejected = 0;
     activityListEl.innerHTML = "";
 
-    photosSnap.forEach(doc => {
+    photosSnap.forEach((doc) => {
       const photo = doc.data();
       total++;
 
@@ -111,12 +127,13 @@ auth.onAuthStateChanged(async (user) => {
       activityListEl.innerHTML = "<li>Nessuna attività recente.</li>";
     }
 
-    const eventsSnap = await db.collection("events")
+    const eventsSnap = await db
+      .collection("events")
       .orderBy("createdAt", "desc")
       .limit(5)
       .get();
-    
-    eventsSnap.forEach(doc => {
+
+    eventsSnap.forEach((doc) => {
       const event = doc.data();
       if (event.status === "Organizzato" && event.showInDash === true) {
         let eventHTML = `
@@ -125,27 +142,32 @@ auth.onAuthStateChanged(async (user) => {
             <p>Data e ora: ${event.date || "Data e/o ora sconosciute"}  ${event.time || ""}</p>
             <p>Luogo: ${event.location || "Luogo sconosciuto"}</p>
         `;
-        
+
         if (isReadOnlyMode) {
           eventHTML += `<button class="btn" disabled title="Modalità sola lettura">Iscriviti (Non disponibile)</button>`;
         } else {
           eventHTML += `<a href="/events/join/?event=${doc.id}" class="btn" target="_blank">Iscriviti</a>`;
         }
-        
+
         eventHTML += `</div>`;
         eventsListEl.innerHTML += eventHTML;
       }
     });
 
-    const eventsUserSnap = await db.collection("events")
+    const eventsUserSnap = await db
+      .collection("events")
       .where("userId", "==", userData.name + " " + userData.surname)
       .orderBy("createdAt", "desc")
       .limit(5)
       .get();
 
-    let totalE = 0, approvedE = 0, pendingE = 0, rejectedE = 0, organizedE = 0;
+    let totalE = 0,
+      approvedE = 0,
+      pendingE = 0,
+      rejectedE = 0,
+      organizedE = 0;
 
-    eventsUserSnap.forEach(doc => {
+    eventsUserSnap.forEach((doc) => {
       const event = doc.data();
       totalE++;
 
@@ -168,23 +190,66 @@ auth.onAuthStateChanged(async (user) => {
       newsletterBtn.title = "Non disponibile in modalità sola lettura";
       newsletterBtn.style.opacity = "0.5";
       newsletterBtn.style.cursor = "not-allowed";
+      return;
     } else {
       newsletterBtn.addEventListener("click", async () => {
-        if(confirm("Sarai reindirizzato alla pagina di iscrizione alla newsletter. Saranno precompilati il tuo nome e la tua email, dovrai solo cliccare su 'Iscriviti' per completare l'iscrizione. Vuoi procedere?")) {
-          window.location.href = `https://friuliemergenze.it/newsletter/?name=${encodeURIComponent(name)}&email=${encodeURIComponent(auth.currentUser.email)}&privacyChecked=true`;
-        };
-      })
+        newsletterBtn.disabled = true;
+        btnText.textContent = "Iscrizione in corso...";
+        btnLoader.style.display = 'inline-block';
+        
+        try {
+          const userRef = db.collection("users").doc(user.uid);
+          const userDoc = await userRef.get();
+          const userData = userDoc.data();
+
+          await userRef.update({ newsSubbed: true });
+
+          const existingQuery = await db.collection("newsletterSubs")
+            .where("email", "==", userData.email)
+            .get();
+
+          if (existingQuery.empty) {
+            const token = crypto.randomUUID();
+            await db.collection("newsletterSubs").add({
+              email: userData.email,
+              name: userData.name,
+              verified: false,
+              subscribed: false,
+              verifiedAt: null,
+              token: token,
+              createdAt: new Date(),
+            });
+
+            await emailjs.send("service_ngxrsq8", "template_32nd0dv", {
+              email: userData.email,
+              name: userData.name,
+              link: `https://www.friuliemergenze.it/newsletter/confirm/?token=${token}`,
+            });
+
+            setStatus("E-mail di conferma inviata!", "success");
+          } else {
+            setStatus("Email già iscritta.", "warning");
+          }
+        } catch (error) {
+          console.error("Errore:", error);
+          setStatus("Errore nel salvataggio.", "error");
+        } finally {
+          newsletterBtn.disabled = false;
+          btnText.textContent = "Iscriviti";
+          btnLoader.style.display = 'none';
+          window.location.reload();
+        }
+      });
     }
 
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
-    contentEl.style.display = "block";;;
-
+    contentEl.style.display = "block";
   } catch (err) {
     console.error("❌ Errore durante il caricamento:", err);
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
-    contentEl.style.display = "block";;;
+    contentEl.style.display = "block";
   }
 });
 

@@ -125,6 +125,8 @@ uploadBtn.addEventListener("click", async (e) => {
     timestamp: serverTimestamp(),
     type: "photo_submission",
   });
+  progressBar.value = 20;
+  progressText.textContent = "20%";
 
   let uploadedCount = 0;
   const logoUrl = "/assets/icons/logo.png";
@@ -138,8 +140,14 @@ uploadBtn.addEventListener("click", async (e) => {
       console.error("❌ Errore watermark:", error);
       continue;
     }
+
+    progressBar.value = 40;
+    progressText.textContent = "40%";
     
     const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
+
+    progressBar.value = 50;
+    progressText.textContent = "50%";
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from("MyFrEM Photos")
@@ -150,11 +158,17 @@ uploadBtn.addEventListener("click", async (e) => {
       continue;
     }
 
+    progressBar.value = 60;
+    progressText.textContent = "60%";
+
     const { data: publicURL } = supabase.storage
       .from("MyFrEM Photos")
       .getPublicUrl(path);
 
     const fileUrl = publicURL.publicUrl;
+
+    progressBar.value = 80;
+    progressText.textContent = "80%";
 
     await addDoc(collection(db, "photos"), {
       userId: currentUser.uid,
@@ -172,6 +186,9 @@ uploadBtn.addEventListener("click", async (e) => {
     });
 
     uploadedCount++;
+
+    progressBar.value = 90;
+    progressText.textContent = "90%";
 
     const percent = Math.round(((i + 1) / files.length) * 100);
     progressBar.value = percent;

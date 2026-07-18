@@ -162,6 +162,7 @@ async function sendPersonalLinkEmail() {
                         <img
                           src="https://www.friuliemergenze.it/assets/logo.png"
                           style="width:80px;margin-bottom:20px;"
+                          loading="lazy"
                         >
 
                         <h1 style="

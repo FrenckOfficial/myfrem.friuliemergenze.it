@@ -284,7 +284,7 @@ if (resetForm) {
     if (e.key === "Enter") resetForm.dispatchEvent(new Event("submit"));
   });
   resetForm.addEventListener("submit", async (e) => {
-    submitBtn.disabled = true;
+    resetButton.disabled = true;
     btnText.textContent = "Invio in corso..."
     btnLoader.style.display = 'inline-block';
     e.preventDefault();
@@ -336,7 +336,7 @@ if (resetForm) {
       console.error(error);
 
     } finally {
-      submitBtn.disabled = false;
+      resetButton.disabled = false;
       btnText.style.opacity = '1';
       btnLoader.style.display = 'none';
     }
@@ -595,6 +595,7 @@ function buildEmail({ verifyLink, email, name }) {
                   <img
                     src="https://www.friuliemergenze.it/assets/logo.png"
                     style="width:80px;margin-bottom:20px;"
+                    loading="lazy"
                   >
 
                   <h1 style="color:#ff3b3b;margin:0;font-size:28px;">

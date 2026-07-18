@@ -75,13 +75,9 @@ async function loadUsers() {
       <td>${data.userId ?? "—"}</td>
       <td>${data.ipAddress ?? "—"}</td>
       <td>${data.userAgent ?? "—"}</td>
-      <td>
-        <a href="mailto:${data.email}" class="btn btn-sm btn-outline-primary">Contatta</a>
-        <a class="btn btn-sm btn-danger dbdelete">Elimina login da DB</a>
-      </td>
     `;
 
-    row.querySelector(".dbdelete").addEventListener("click", () => {
+    row.addEventListener("click", () => {
       deleteDB(docSnap.id);
     });
 
