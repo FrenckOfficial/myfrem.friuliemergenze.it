@@ -123,6 +123,7 @@ async function loadUsers() {
       <td>${u.surname || ""}</td>
       <td>${u.email || ""}</td>
       <td>${u.username || ""}</td>
+      <td>${u.phone || "Non fornito"}</td>
       <td>${u.role || "Ruolo utente non disponibile."}</td>
       <td>${Object.values(preferences).filter(Boolean).join(", ") || "Preferenze utente non disponibili."}</td>
       <td>${u.status || "Status utente non disponibile."}</td>
