@@ -91,7 +91,7 @@ async function loadUserProfile(uid) {
         const status = user.status || "Offline";
         const avatar = user.photoURL || "/assets/profile/defpic.png";
         const createdAt = user.createdAt;
-        const isPublic = user.privateProfile === true || null || undefined;
+        const isPublic = user.privateProfile !== true;
 
         const isOwnProfile = currentUserId === uid;
 
