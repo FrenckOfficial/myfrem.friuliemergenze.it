@@ -413,9 +413,9 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
 
       <div class="footer-bottom">
         <p class="footer-legal">
-          <a href="https://www.iubenda.com/privacy-policy/95409163">Privacy Policy<\/a>
+          <a href="https://www.friuliemergenze.it/policies/privacy">Privacy Policy<\/a>
           <span>·<\/span>
-          <a href="https://www.iubenda.com/privacy-policy/95409163/cookie-policy">Cookie Policy<\/a>
+          <a href="https://www.friuliemergenze.it/policies/cookie">Cookie Policy<\/a>
         <\/p>
         <p class="footer-extra"> 
           Versione 2.6.0.0
