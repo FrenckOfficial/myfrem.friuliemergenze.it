@@ -319,6 +319,7 @@ async function sendNotificationEmail(email, userName, photoName, link) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
+      userEmail,
       userName,
       photoName,
       link

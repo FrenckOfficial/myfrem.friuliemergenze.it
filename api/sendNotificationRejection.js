@@ -12,16 +12,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, name, photoName } = req.body;
+    const { userName, userEmail, photoName } = req.body;
 
-    if (!email || !name) {
+    if (!userName || !userEmail) {
       return res.status(400).json({ 
         error: "Email e nome sono obbligatori" 
       });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(userEmail)) {
       return res.status(400).json({ error: "Email non valida" });
     }
 
@@ -30,8 +30,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Configurazione server errata" });
     }
 
-    const sanitizedName = sanitizeHtml(name);
-    const sanitizedEmail = sanitizeHtml(email);
+    const sanitizedName = sanitizeHtml(userName);
+    const sanitizedEmail = sanitizeHtml(userEmail);
     const sanitizedPhotoName = sanitizeHtml(photoName);
 
     const date = timestamp ? new Date(timestamp) : new Date();
