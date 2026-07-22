@@ -114,7 +114,8 @@ async function loadAllPhotos() {
 
       const statusColor =
         photo.status?.includes("Approvata") ? "green" :
-        photo.status?.includes("Rifiutata") ? "red" : "orange";
+        photo.status?.includes("Rifiutata") ? "red" : 
+        photo.status?.includes("Foto in attesa di approvazione") ? "orange" : "blue";
 
       let linkBox = "Non disponibile in quanto foto in attesa o rifiutata";
       let serviceType = "Non inserito";

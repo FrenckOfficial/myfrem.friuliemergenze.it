@@ -271,7 +271,7 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 0;
     previewContainer.style.display = "none";
     preview.src = "";
-  }, 5000);
+  }, 1500);
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
