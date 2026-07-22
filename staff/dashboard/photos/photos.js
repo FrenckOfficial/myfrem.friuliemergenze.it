@@ -325,31 +325,59 @@ async function createVehicleDraft() {
 }
 
 async function sendNotificationApprovement(userName, userEmail, photoName) {
-  const response = await fetch('/api/sendNotificationApprovement', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      userName,
-      userEmail,
-      photoName
-    })
-  })
+  try {
+    const response = await fetch('/api/sendNotificationApprovement', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userName,
+        userEmail,
+        photoName
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Errore ${response.status}:`, errorText);
+      setStatus(`Errore notifica: ${response.status}`, 'error');
+      return;
+    }
+
+    console.log('✅ Notifica inviata');
+  } catch (error) {
+    console.error('Errore fetch:', error);
+    setStatus('Errore invio notifica', 'error');
+  }
 }
 
 async function sendNotificationRejection(userName, userEmail, photoName) {
-  const response = await fetch('/api/sendNotificationRejection', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      userName,
-      userEmail,
-      photoName
-    })
-  })
+  try {
+    const response = await fetch('/api/sendNotificationRejection', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userName,
+        userEmail,
+        photoName
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Errore ${response.status}:`, errorText);
+      setStatus(`Errore notifica: ${response.status}`, 'error');
+      return;
+    }
+
+    console.log('✅ Notifica inviata');
+  } catch (error) {
+    console.error('Errore fetch:', error);
+    setStatus('Errore invio notifica', 'error');
+  }
 }
 
 function extractFileName(url) {
