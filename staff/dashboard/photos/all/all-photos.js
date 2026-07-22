@@ -176,6 +176,8 @@ async function loadAllPhotos() {
         status = "Approvata";
       } else if (photo.status?.includes("Rifiutata")) {
         status = "Rifiutata";
+      } else if (photo.status?.includes("Foto in attesa di approvazione")) {
+        status = "Foto in attesa di approvazione";
       }
 
       const tr = document.createElement("tr");
