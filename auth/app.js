@@ -483,6 +483,7 @@ if (registerForm) {
         const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
         const htmlContent = buildEmail({ verifyLink, email, name});
+        const staffContent = buildEmailStaff({ name, surname, email, username, phone, verifyLink });
 
         const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
           method: "POST",
@@ -490,13 +491,29 @@ if (registerForm) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
+            userName: `${name} ${surname}`,
             userEmail: email,
             htmlContent
           })
         });
 
+        const newUserStaffResponse = await fetch("/api/sendStaffNewUserEmail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userName: `${name} ${surname}`,
+            staffContent
+          })
+        })
+
         if (!response.ok) {
           throw new Error("Errore invio email di verifica.");
+        }
+
+        if (!newUserStaffResponse.ok) {
+          console.log("❌ Errore invio email staff:", newUserStaffResponse.status);
         }
 
         setStatus("Email di verifica inviata.", "success");
@@ -637,6 +654,74 @@ function buildEmail({ verifyLink, email, name }) {
 
                     <a
                       href="${verifyLink}"
+                      style="color:#ff3b3b;"
+                    >
+                      ${verifyLink}
+                    </a>
+                  </p>
+
+                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
+                    MyFrEM · Friuli Emergenze<br>
+                    Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
+                    Se non sei stato tu, puoi ignorare questa email.
+                    <br><br>
+
+                    <a href="https://friuliemergenze.it">
+                      friuliemergenze.it
+                    </a>
+
+                    ·
+
+                    <a href="mailto:info@friuliemergenze.it">
+                      info@friuliemergenze.it
+                    </a>
+                  </p>
+
+                </td>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
+
+function buildStaffEmail({ name, surname, email, username, phone, verifyLink }) {
+  return `
+    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+
+            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+              <tr>
+                <td style="padding:35px;text-align:center;">
+
+                  <img
+                    src="https://www.friuliemergenze.it/assets/logo.png"
+                    style="width:80px;margin-bottom:20px;"
+                    loading="lazy"
+                  >
+
+                  <h1 style="color:#ff3b3b;margin:0;font-size:28px;">
+                    Nuovo utente registrato
+                  </h1>
+
+                  <p style="font-size:18px;color:#333;margin-top:25px;">
+                    <b>Nome:</b> ${name + " " + surname}<br>
+                    <b>Email:</b> ${email}<br>
+                    <b>Username:</b> ${username}<br>
+                    <b>Telefono:</b> ${phone}
+                  </p>
+
+                  <p style="color:#888;font-size:13px;margin-top:25px;line-height:1.6;">
+                    Il link di conferma che è stato inviato a ${name} utente è:
+                    <br><br>
+
+                    <a
+                      href="#"
                       style="color:#ff3b3b;"
                     >
                       ${verifyLink}

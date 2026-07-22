@@ -234,7 +234,7 @@ window.saveVehicleLink = async (photoId) => {
   }
 
   if (!isValidUrl(link)) {
-    setStatus("Formato URL non valido. Usa: https://friuliemergenze.it", "error");
+    setStatus("Formato URL non valido. Usa: https://www.friuliemergenze.it", "error");
     return;
   }
 
@@ -245,6 +245,11 @@ window.saveVehicleLink = async (photoId) => {
     const photoRef = doc(db, "photos", photoId);
     const photoSnap = await getDoc(photoRef);
     const photoData = photoSnap.data() || {};
+    const photoName = photoData.vehicleModel;
+    const userDoc = doc(db, "users", photoData.userId);
+    const userData = (await getDoc(userDoc)).data();
+    const userName = userData.name + " " + userData.surname;
+    const userEmail = userData.email;
 
     await updateDoc(photoRef, {
       vehicleLink: link,
@@ -271,6 +276,10 @@ window.saveVehicleLink = async (photoId) => {
     if (input) input.setAttribute("value", link);
 
     setStatus("✅ Link salvato con successo", "success");
+
+    if (userData.emailNotifications === true) {
+      sendNotificationEmail(userEmail, userName, photoName, link);
+    }
 
   } catch (err) {
     console.error("Errore salvataggio link:", err);
@@ -301,4 +310,18 @@ window.deletePhoto = async (photoId) => {
       setStatus("❌ Errore eliminazione foto", "error");
     }
   }
+}
+
+async function sendNotificationEmail(email, userName, photoName, link) {
+  const response = await fetch('/api/sendNotificationPhotoLink', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      userName,
+      photoName,
+      link
+    })
+  })
 }

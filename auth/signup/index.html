@@ -117,7 +117,7 @@
           <div class="step-actions">
             <button type="button" id="prevBtn">Indietro</button>
             <button type="button" id="nextBtn">Continua</button>
-            <button type="submit" id="submitBtn"style="display:none">
+            <button type="submit" id="submitBtn" style="display:none">
               <span id="btnText">Registrati</span>
               <span id="btnLoader" class="loader" style="display:none;"></span>
             </button>
@@ -141,6 +141,7 @@
     </div>
   </main>
   <script type="module" src="/auth/app.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js"></script>
 
   <script>
     function togglePassword(inputId, button) {
@@ -153,6 +154,10 @@
         input.type = 'password';
         icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
+    }
+
+    function reCaptchaSumbit(token) {
+      document.getElementById('').submit();
     }
   </script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>

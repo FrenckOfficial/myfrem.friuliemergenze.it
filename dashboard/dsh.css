@@ -1192,6 +1192,76 @@ form button {
   border: 1px solid var(--border);
 }
 
+.preview-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 123, 0, 0.08) 0%, rgba(255, 123, 0, 0.04) 100%);
+  border: 1px solid rgba(255, 123, 0, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+ 
+.preview-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+ 
+.preview-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 123, 0, 0.2), 0 0 20px rgba(255, 123, 0, 0.1);
+}
+ 
+.preview-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+ 
+.delete-preview-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  background: rgba(255, 59, 48, 0.9);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+ 
+.delete-preview-btn:hover {
+  background: rgba(255, 59, 48, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.4);
+}
+ 
+.delete-preview-btn:active {
+  transform: scale(0.95);
+}
+ 
+.delete-preview-btn i {
+  display: block;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 @media (max-width: 1024px) {
   .surveys-grid {
     font-size: 0.85rem;
@@ -1347,6 +1417,23 @@ form button {
   .survey-action-btn {
     flex: 1;
     min-width: 70px;
+  }
+}
+
+@media (max-width: 600px) {
+  .preview-container {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .preview-wrapper {
+    max-width: 100%;
+  }
+  
+  .delete-preview-btn {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
   }
 }
 

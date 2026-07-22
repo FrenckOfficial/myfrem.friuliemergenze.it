@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css" integrity="sha512-ApSLB1Pd3/bZN8fWB/RG9YhN/7bd9Hkf3AGaE2mPfebjrxagjuBtx2GcgdqIlJkUzwylBo61r9Xa9NmgBI0swA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
   <div class="loading">
@@ -92,6 +93,15 @@
   
           <button id="btn-upl">📤 Carica</button>
           <p id="disclaimer">Tutti i campi evidenziati con * sono richiesti</p>
+
+          <div id="previewContainer" class="preview-container">
+            <div class="preview-wrapper">
+              <img id="preview" class="preview-image" alt="Anteprima foto" />
+              <button type="button" id="deletePreviewBtn" class="delete-preview-btn" title="Elimina preview">
+                <i class="fa-solid fa-trash-can" style="color: rgb(255, 255, 255);"></i>
+              </button>
+            </div>
+          </div>
         </form>
     </div>
   </div>

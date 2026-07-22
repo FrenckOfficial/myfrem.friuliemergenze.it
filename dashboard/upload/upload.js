@@ -26,6 +26,9 @@ const notesInput = document.getElementById("notes");
 
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
+const previewContainer = document.getElementById("previewContainer");
+const preview = document.getElementById("preview");
+const deletePreviewBtn = document.getElementById("deletePreviewBtn");
 
 let currentUser = null;
 let isReadOnlyMode = false;
@@ -85,12 +88,36 @@ function setStatus(msg) {
   statusMsg.textContent = msg;
 }
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener("change", async () => {
   if (fileInput.files.length > 0) {
     fileNameSpan.textContent = `📸 ${fileInput.files.length} foto selezionate`;
+    
+    try {
+      const firstFile = fileInput.files[0];
+      const watermarkedFile = await addWatermarkToImage(firstFile, "/assets/icons/logo.png");
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        previewContainer.style.display = "flex";
+      };
+      reader.readAsDataURL(watermarkedFile);
+    } catch (error) {
+      console.error("❌ Errore preview:", error);
+      previewContainer.style.display = "none";
+    }
   } else {
     fileNameSpan.textContent = "Nessun file";
+    previewContainer.style.display = "none";
   }
+});
+
+deletePreviewBtn.addEventListener("click", () => {
+  fileInput.value = "";
+  fileNameSpan.textContent = "Nessun file";
+  preview.src = "";
+  previewContainer.style.display = "none";
+  setStatus("Preview eliminato");
 });
 
 uploadBtn.addEventListener("click", async (e) => {
@@ -170,7 +197,7 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 80;
     progressText.textContent = "80%";
 
-    await addDoc(collection(db, "photos"), {
+    const ptDoc = await addDoc(collection(db, "photos"), {
       userId: currentUser.uid,
       activityId: activityRef.id,
       vehicleModel: titleInput.value,
@@ -190,18 +217,50 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 90;
     progressText.textContent = "90%";
 
-    const percent = Math.round(((i + 1) / files.length) * 100);
-    progressBar.value = percent;
-    progressText.textContent = `${percent}% (${uploadedCount}/${files.length})`;
+    const userRef = await doc(db, "users", currentUser.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = await userDoc.data();
+
+    if (userData.emailNotifications === true) {
+      const userEmail = userData.email
+      const userName = userData.name
+  
+      const uploadedAt = new Date(Date.now()).toISOString();
+  
+      const response = await fetch("/api/sendPhotoNotification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userEmail: userEmail,
+          userName: userName,
+          photoName: file.name,
+          uploadedAt: uploadedAt
+        })
+      })
+
+      if (!response.ok) {
+        console.error("❌ Errore invio notifica email:", response.status);
+      }
+    }
   }
 
   setStatus(`✅ Caricate ${uploadedCount}/${files.length} foto!`);
   fileInput.value = "";
   fileNameSpan.textContent = "Nessun file";
-  uploadForm.reset();
-
-  progressText.textContent = "Completato ✅";
+  progressText.textContent = "100%";
   progressBar.value = 100;
+  setTimeout(() => {
+    uploadForm.reset();
+  }, 5000);
+  preview.style.display = "none";
+
+  progressText.textContent = "0%";
+  progressBar.value = 0;
+
+  previewContainer.style.display = "none";
+  preview.src = "";
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
