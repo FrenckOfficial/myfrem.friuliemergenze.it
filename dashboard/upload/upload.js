@@ -99,6 +99,7 @@ fileInput.addEventListener("change", async () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         preview.src = e.target.result;
+        preview.style.display = "block";
         previewContainer.style.display = "flex";
       };
       reader.readAsDataURL(watermarkedFile);
@@ -265,14 +266,12 @@ uploadBtn.addEventListener("click", async (e) => {
   progressBar.value = 100;
   setTimeout(() => {
     uploadForm.reset();
+    preview.style.display = "none";
+    progressText.textContent = "0%";
+    progressBar.value = 0;
+    previewContainer.style.display = "none";
+    preview.src = "";
   }, 5000);
-  preview.style.display = "none";
-
-  progressText.textContent = "0%";
-  progressBar.value = 0;
-
-  previewContainer.style.display = "none";
-  preview.src = "";
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
