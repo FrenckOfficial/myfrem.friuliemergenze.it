@@ -231,6 +231,13 @@ uploadBtn.addEventListener("click", async (e) => {
       const userName = userData.name
   
       const uploadedAt = new Date().toISOString();
+
+      console.log(uploadedAt);
+
+      if (uploadedAt.undefined === true) {
+        console.error("❌ uploadedAt undefined");
+        continue;
+      }
   
       const response = await fetch("/api/sendPhotoNotification", {
         method: "POST",
