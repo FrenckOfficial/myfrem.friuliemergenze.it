@@ -242,7 +242,7 @@ body {
     <div class="greeting">
       Ciao <strong>${name}</strong>,
       <br><br>
-      C'è un aggiornamento su una foto che hai caricato su MyFrEM!
+      Hai caricato correttamente la tua foto su MyFrEM!
     </div>
 
     <div class="info-box">

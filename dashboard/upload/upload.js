@@ -217,15 +217,20 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 90;
     progressText.textContent = "90%";
 
-    const userRef = await doc(db, "users", currentUser.uid);
+    const userRef = doc(db, "users", currentUser.uid);
     const userDoc = await getDoc(userRef);
-    const userData = await userDoc.data();
+    const userData = userDoc.data();
+
+    if (!userData) {
+      console.error("❌ userData è undefined");
+      continue;
+    }
 
     if (userData.emailNotifications === true) {
       const userEmail = userData.email
       const userName = userData.name
   
-      const uploadedAt = new Date(Date.now()).toISOString();
+      const uploadedAt = new Date().toISOString();
   
       const response = await fetch("/api/sendPhotoNotification", {
         method: "POST",
@@ -235,7 +240,7 @@ uploadBtn.addEventListener("click", async (e) => {
         body: JSON.stringify({
           userEmail: userEmail,
           userName: userName,
-          photoName: file.name,
+          photoName: titleInput.value,
           uploadedAt: uploadedAt
         })
       })
