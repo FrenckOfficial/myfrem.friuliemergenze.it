@@ -92,30 +92,31 @@ auth.onAuthStateChanged(async (user) => {
       .collection("photos")
       .where("userId", "==", user.uid)
       .orderBy("createdAt", "desc")
-      .limit(5)
       .get();
 
-    let total = 0,
-      approved = 0,
-      pending = 0,
-      rejected = 0;
+    let total = 0, approved = 0, pending = 0, rejected = 0;
+    let displayCount = 0; // Contatore per il DOM
     activityListEl.innerHTML = "";
 
     photosSnap.forEach((doc) => {
       const photo = doc.data();
+      console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
       if (photo.status === "Approvata ✅") approved++;
       if (photo.status === "Foto in attesa di approvazione ⌛") pending++;
       if (photo.status === "Rifiutata ❌") rejected++;
 
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <p>📸 Foto caricata il ${
-          photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"
-        } - Stato: <b>${photo.status}</b></p>
-      `;
-      activityListEl.appendChild(li);
+      if (displayCount < 5) {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <p>📸 Foto caricata il ${
+            photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"
+          } - Stato: <b>${photo.status}</b></p>
+        `;
+        activityListEl.appendChild(li);
+        displayCount++;
+      }
     });
 
     totalPhotosEl.textContent = total;

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Bozze Photobook - Dashboard Staff | MyFrEM</title>
+    <link rel="stylesheet" href="/staff/dashboard/management/users-whatsapp/style.css">
+    <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="/staff/dashboard/management/photobooks/load.js"></script>
+</head>
+<body>
+    <div class="loading">
+        <div class="loader"></div>
+        <p>Caricamento in corso...</p>
+    </div>
+    <div class="content" style="display:none">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+                <h2>MyFrEM Staff</h2>
+            </div>
+            <nav>
+                <a href="/staff/">📊 Dashboard</a>
+                <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+                <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+                <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+                <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+                <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+                <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+            </nav>
+            <button id="logoutBtn" class="logout">🚪 Logout</button>
+        </aside>
+    
+        <div class="main-content">
+            <h1>📖 Gestione Bozze Photobook</h1>
+            
+            <div class="drafts-container">
+                <div class="drafts-header">
+                    <h2>Photobook totali:</h2>
+                    <span class="draft-count" id="totalPhotobooksCount">0</span>
+                    <h2>Bozze in attesa di completamento:</h2>
+                    <span class="draft-count" id="draftCount">0</span>
+                    <h2>Photobook pubblicati:</h2>
+                    <span class="draft-count" id="publishedPhotobooksCount">0</span>
+                </div>
+                <button id="newPhotobookBtn" class="btn-new-draft">➕ Nuovo Photobook</button>
+    
+                <div id="draftsTableContainer">
+                    <table class="drafts-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Nome File</th>
+                                <th style="width: 12%;">Stato</th>
+                                <th style="width: 20%;">Titolo</th>
+                                <th style="width: 15%;">Servizio</th>
+                                <th style="width: 18%;">Data Creazione</th>
+                                <th style="width: 15%;">Creato da</th>
+                                <th style="width: 15%;">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="photobooksDraftsList">
+                            <!-- Bozze caricate dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+    
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <p style="font-size: 3rem; margin: 20px 0;">📭</p>
+                    <p>Nessun photobook in attesa</p>
+                    <p style="color: var(--faint); font-size: 0.75rem;">Crea un nuovo photobook dalla moderazione foto</p>
+                </div>
+            </div>
+        </div>
+    
+        <div id="createPhotobookModal" class="modal">
+            <div class="modal-content">
+                <p class="statusBox" style="display:none;">
+                    <span id="statusMsg"></span>
+                    <button id="closeSMsg">&times;</button>
+                </p>
+                <div class="modal-header">
+                    <h2>Crea Nuovo Photobook</h2>
+                    <button class="modal-close" onclick="window.photobookDraftsManager.closeCreateModal()">&times;</button>
+                </div>
+     
+                <form id="createPhotobookForm">
+                    <div class="form-group">
+                        <label for="photobookCoverInput">🖼️ Cover Photobook *</label>
+                        <div class="photo-upload-area">
+                            <input 
+                                type="file" 
+                                id="photobookCoverInput" 
+                                name="cover" 
+                                accept="image/*" 
+                                required
+                                style="display: none;">
+                            
+                            <div id="coverDropZone" class="photo-drop-zone">
+                                <p style="font-size: 2rem; margin: 10px 0;">📷</p>
+                                <p><strong>Trascina la cover qui</strong></p>
+                                <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
+                                <button type="button" class="btn-browse" id="coverBrowseBtn">Sfoglia file</button>
+                                <p style="color: var(--faint); font-size: 0.85rem; margin-top: 10px;">Formati: JPG, PNG, WebP | Max 5MB</p>
+                            </div>
+     
+                            <div id="coverPreviewCreate" class="photo-preview" style="display: none; margin-top: 15px;">
+                                <img id="previewCoverCreate" src="" alt="Anteprima cover" loading="lazy" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
+                                <p id="coverFileNameCreate" style="text-align: center; margin-top: 10px; color: var(--faint); font-size: 0.9rem;"></p>
+                                <button type="button" class="btn-remove-photo" id="removeCoverBtn">❌ Rimuovi cover</button>
+                            </div>
+                        </div>
+                    </div>
+     
+                    <hr style="margin: 20px 0; opacity: 0.2;">
+     
+                    <div class="form-group">
+                        <label for="createPhotobookTitle">Titolo Photobook *</label>
+                        <input type="text" id="createPhotobookTitle" name="title" required placeholder="Es: Polizia Locale Grado">
+                    </div>
+     
+                    <div class="form-group">
+                        <label for="createPhotobookDescription">Descrizione *</label>
+                        <textarea id="createPhotobookDescription" name="description" required placeholder="Descrizione del photobook e dell'ente..." style="min-height: 100px;"></textarea>
+                    </div>
+     
+                    <div class="form-group">
+                        <label for="createPhotobookService">Servizio/Ente *</label>
+                        <select id="createPhotobookService" name="service" required>
+                            <option value="">-- Seleziona un servizio --</option>
+                            <option value="ambulanza">Ambulanza</option>
+                            <option value="pompieri">Vigili del Fuoco</option>
+                            <option value="protezione_civile">Protezione Civile</option>
+                            <option value="polizia_locale">Polizia Locale</option>
+                            <option value="polizia_di_stato">Polizia</option>
+                            <option value="carabinieri">Carabinieri</option>
+                            <option value="guardia_di_finanza">Guardia di Finanza</option>
+                            <option value="soccorso_alpino">Soccorso Alpino</option>
+                            <option value="guardia_costiera">Guardia Costiera</option>
+                            <option value="soccorso_sanitario">Soccorso Sanitario</option>
+                            <option value="altro">Altro</option>
+                        </select>
+                    </div>
+     
+                    <div class="form-group">
+                        <label for="createPhotobookSlug">Slug (URL percorso) *</label>
+                        <input type="text" id="createPhotobookSlug" name="slug" required placeholder="Es: polizialocale/grado" style="text-transform: lowercase;">
+                    </div>
+     
+                    <div class="form-group">
+                        <label for="createPhotobookVehiclesInput">Veicoli Associati</label>
+                        <div class="vehicle-autocomplete">
+                            <input 
+                                type="text" 
+                                id="createPhotobookVehiclesInput" 
+                                placeholder="Scrivi il nome del veicolo..." 
+                                autocomplete="off"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+                            <div id="createPhotobookVehiclesDropdown" class="autocomplete-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 10;"></div>
+                        </div>
+                        <div id="createVehicleChips" class="vehicle-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                    </div>
+     
+                    <div class="form-group">
+                        <label for="createPhotobookNotes">Note Aggiuntive</label>
+                        <textarea id="createPhotobookNotes" name="notes" placeholder="Informazioni aggiuntive sul photobook..."></textarea>
+                    </div>
+     
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-save">💾 Crea Photobook</button>
+                        <button type="button" class="btn-cancel" onclick="window.photobookDraftsManager.closeCreateModal()">Annulla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+        <div id="editPhotobookModal" class="modal">
+            <div class="modal-content">
+                <p class="statusBox" style="display:none;">
+                    <span id="statusMsg"></span>
+                    <button id="closeSMsg">&times;</button>
+                </p>
+                <div class="modal-header">
+                    <h2>Modifica Photobook</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+    
+                <div class="photo-preview" id="photoPreview">
+                    <img id="previewCover" src="" alt="Cover photobook" loading="lazy" style="display: none; max-height: 250px;">
+                    <p id="coverFileName"></p>
+                </div>
+    
+                <form id="photobookForm">
+                    <div class="form-group">
+                        <label for="photobookTitle">Titolo Photobook</label>
+                        <input type="text" id="photobookTitle" name="title" required placeholder="Es: Polizia Locale Grado">
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="photobookDescription">Descrizione</label>
+                        <textarea id="photobookDescription" name="description" required placeholder="Descrizione del photobook..." style="min-height: 100px;"></textarea>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="photobookService">Servizio/Ente</label>
+                        <select id="photobookService" name="service" required>
+                            <option value="">-- Seleziona un servizio --</option>
+                            <option value="ambulanza">Ambulanza</option>
+                            <option value="pompieri">Vigili del Fuoco</option>
+                            <option value="protezione_civile">Protezione Civile</option>
+                            <option value="polizia_locale">Polizia Locale</option>
+                            <option value="polizia_di_stato">Polizia</option>
+                            <option value="carabinieri">Carabinieri</option>
+                            <option value="guardia_di_finanza">Guardia di Finanza</option>
+                            <option value="soccorso_alpino">Soccorso Alpino</option>
+                            <option value="guardia_costiera">Guardia Costiera</option>
+                            <option value="soccorso_sanitario">Soccorso Sanitario</option>
+                            <option value="altro">Altro</option>
+                        </select>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="photobookSlug">Slug (URL percorso)</label>
+                        <input type="text" id="photobookSlug" name="slug" required placeholder="Es: polizialocale/grado" style="text-transform: lowercase;">
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="photobookVehiclesInput">Veicoli Associati</label>
+                        <div class="vehicle-autocomplete">
+                            <input 
+                                type="text" 
+                                id="photobookVehiclesInput" 
+                                placeholder="Scrivi il nome del veicolo..." 
+                                autocomplete="off"
+                                style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+                            <div id="photobookVehiclesDropdown" class="autocomplete-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 10;"></div>
+                        </div>
+                        <div id="vehicleChips" class="vehicle-chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="photobookNotes">Note Aggiuntive</label>
+                        <textarea id="photobookNotes" name="notes" placeholder="Informazioni aggiuntive..."></textarea>
+                    </div>
+    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn-save">💾 Salva e Pubblica</button>
+                        <button type="button" class="btn-cancel">Annulla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+        <div id="viewPhotobookModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>👁️ Visualizza Photobook</h2>
+                    <button class="modal-close" onclick="window.photobookDraftsManager.closeViewerModal()">&times;</button>
+                </div>
+    
+                <div class="photo-preview" id="viewerPhotoPreview">
+                    <img id="viewerCoverImg" src="" alt="Cover photobook" loading="lazy" style="display: none; max-width: 300px; margin: 20px auto;">
+                    <p id="viewerCoverFileName" style="text-align: center; color: var(--faint);"></p>
+                </div>
+    
+                <div class="viewer-content">
+                    <div class="form-group">
+                        <label>Titolo Photobook</label>
+                        <p id="viewerTitle" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Descrizione</label>
+                        <p id="viewerDescription" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Servizio/Ente</label>
+                        <p id="viewerService" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Slug (URL percorso)</label>
+                        <p id="viewerSlug" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Veicoli Associati</label>
+                        <p id="viewerVehicles" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="form-group">
+                        <label>Note Aggiuntive</label>
+                        <p id="viewerNotes" class="viewer-field">-</p>
+                    </div>
+    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-primary" onclick="window.photobookDraftsManager.closeViewerModal()">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
+  <noscript>
+    <a href="https://www.shinystat.com/it/" target="_top">
+    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
+  </noscript>
+
+  <style>
+    .vehicle-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--accent, #ff7b00);
+      color: white;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .chip-remove {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .chip-remove:hover {
+      opacity: 1;
+    }
+
+    .autocomplete-dropdown {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .autocomplete-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background 0.2s;
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+      background: rgba(255, 123, 0, 0.1);
+    }
+
+    .vehicle-autocomplete {
+      position: relative;
+    }
+  </style>
+</body>
+</html>
