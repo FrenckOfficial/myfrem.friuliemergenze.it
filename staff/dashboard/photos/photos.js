@@ -177,7 +177,7 @@ async function loadPendingPhotos() {
             updatePhotoStatus(btn.dataset.id, "Approvata ✅");
 
             if (userData.emailNotifications === true) {
-              return;
+              
               // sendNotificationApprovement(userName, userEmail, photoName);
             }
 
@@ -211,7 +211,7 @@ async function loadPendingPhotos() {
             updatePhotoStatus(btn.dataset.id, "Rifiutata ❌");
 
             if (userData.emailNotifications === true) {
-              return;
+              
               // sendNotificationRejection(userName, userEmail, photoName);
             }
           } catch (err) {
