@@ -330,7 +330,7 @@ window.reapprovaPhoto = async (photoId) => {
   }
 }
 
-async function sendNotificationEmail(email, userName, photoName, link) {
+async function sendNotificationEmail(userEmail, userName, photoName, link) {
   const response = await fetch('/api/sendNotificationPhotoLink', {
     method: 'POST',
     headers: {

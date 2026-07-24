@@ -155,70 +155,6 @@ async function loadPendingPhotos() {
         </td>
       `;
       photosTableBody.appendChild(tr);
-
-      document.querySelectorAll(".approve").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          try {
-            const photoSnap = await getDoc(doc(db, "photos", btn.dataset.id));
-            const photoData = photoSnap.data();
-            const userSnap = await getDoc(doc(db, "users", photoData.userId));
-            const userData = userSnap.data();
-            const photoPublisher = photoData.userId;
-            const photoName = photoData.vehicleModel;
-            const userEmail = userData.email;
-            const userName = `${userData.name} ${userData.surname}`;
-
-            addDoc(collection(db, "activities"), {
-              type: "photo_approval",
-              approvalStaffer: auth.currentUser.email || "-",
-              timestamp: serverTimestamp()
-            });
-            
-            updatePhotoStatus(btn.dataset.id, "Approvata ✅");
-
-            if (userData.emailNotifications === true) {
-              
-              // sendNotificationApprovement(userName, userEmail, photoName);
-            }
-
-            setTimeout(() => {
-              openDraftModal(photoData, btn.dataset.id);
-            }, 500);
-          } catch (err) {
-            console.error("Errore:", err);
-          }
-        });
-      });
-
-      document.querySelectorAll(".reject").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          try {
-            const photoSnap = await getDoc(doc(db, "photos", btn.dataset.id));
-            const photoData = photoSnap.data();
-            const userSnap = await getDoc(doc(db, "users", photoData.userId));
-            const userData = userSnap.data();
-            const photoPublisher = photoData.userId;
-            const photoName = photoData.vehicleModel;
-            const userEmail = userData.email;
-            const userName = `${userData.name} ${userData.surname}`;
-
-            addDoc(collection(db, "activities"), {
-              type: "photo_rejection",
-              rejectionStaffer: auth.currentUser.email || "-",
-              timestamp: serverTimestamp()
-            });
-            
-            updatePhotoStatus(btn.dataset.id, "Rifiutata ❌");
-
-            if (userData.emailNotifications === true) {
-              
-              // sendNotificationRejection(userName, userEmail, photoName);
-            }
-          } catch (err) {
-            console.error("Errore:", err);
-          }
-        });
-      });
     });
 
     setStatus(`📸 Caricate ${snapshot.size} foto`);
@@ -227,6 +163,49 @@ async function loadPendingPhotos() {
     setStatus("Errore caricamento foto", "error");
   }
 }
+
+photosTableBody.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".approve, .reject");
+  if (!btn) return;
+
+  try {
+    const photoId = btn.dataset.id;
+    const photoSnap = await getDoc(doc(db, "photos", photoId));
+    const photoData = photoSnap.data();
+    const userSnap = await getDoc(doc(db, "users", photoData.userId));
+    const userData = userSnap.data();
+
+    const photoName = photoData.vehicleModel;
+    const userEmail = userData.email;
+    const userName = `${userData.name} ${userData.surname}`;
+    const isApprove = btn.classList.contains("approve");
+
+    addDoc(collection(db, "activities"), {
+      type: isApprove ? "photo_approval" : "photo_rejection",
+      staffMember: auth.currentUser.email || "-",
+      timestamp: serverTimestamp()
+    });
+
+    await updatePhotoStatus(photoId, isApprove ? "Approvata ✅" : "Rifiutata ❌");
+
+    if (userData.emailNotifications === true) {
+      if (isApprove) {
+        await sendNotificationApprovement(userName, userEmail, photoName);
+      } else {
+        await sendNotificationRejection(userName, userEmail, photoName);
+      }
+    }
+
+    if (isApprove) {
+      setTimeout(() => {
+        openDraftModal(photoData, photoId);
+      }, 500);
+    }
+  } catch (err) {
+    console.error("Errore:", err);
+    setStatus("Errore durante l'azione", "error");
+  }
+});
 
 async function updatePhotoStatus(photoId, status) {
   try {
