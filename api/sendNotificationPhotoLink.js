@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   try {
     const { userEmail, userName, photoName, link } = req.body;
 
-    if (!link || !name || !email) {
+    if (!link || !userName || !userEmail) {
       return res.status(400).json({ 
         error: "Email, nome e link sono obbligatori" 
       });
@@ -257,12 +257,7 @@ body {
     © 2026 Friuli Emergenze - MyFrEM. Questa è una notifica automatica, non rispondere a questa email.
   </div>
 </div>
-  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
-  <noscript>
-    <a href="https://www.shinystat.com/it/" target="_top">
-    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
-  </noscript>
-</body>
+  </body>
 </html>
 `;
 }

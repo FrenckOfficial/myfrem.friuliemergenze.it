@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>404 - Pagina non trovata | MyFrEM - Piattaforma ufficiale di Friuli Emergenze</title>
+
+  <meta
+    name="description"
+    content="La pagina che stai cercando non esiste oppure è stata spostata."
+  />
+
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#e53935" />
+
+  <link
+    rel="shortcut icon"
+    href="https://www.friuliemergenze.it/assets/logo.png"
+    type="image/x-icon"
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, "Space Mono", sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 50px 35px;
+      text-align: center;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      width: 90px;
+      margin-bottom: 25px;
+    }
+
+    .code {
+      font-size: 90px;
+      font-weight: 700;
+      color: #e53935;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin-bottom: 18px;
+      color: #111;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.7;
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+
+    .actions {
+      margin-top: 35px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s ease;
+      min-width: 180px;
+    }
+
+    .btn-primary {
+      background: #e53935;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .btn-secondary {
+      background: #f1f1f1;
+      color: #222;
+    }
+
+    .btn-secondary:hover {
+      background: #e7e7e7;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .footer a {
+      color: #e53935;
+      text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+
+      .container {
+        padding: 40px 25px;
+      }
+
+      .code {
+        font-size: 72px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+
+    <img
+      src="https://www.friuliemergenze.it/assets/logo.png"
+      alt="Logo Friuli Emergenze"
+      class="logo"
+    />
+
+    <div class="code">
+      404
+    </div>
+
+    <h1>
+      Pagina non trovata
+    </h1>
+
+    <p>
+      La pagina che stai cercando potrebbe essere stata rimossa,
+      rinominata oppure non essere temporaneamente disponibile.
+    </p>
+
+    <p>
+      Puoi tornare alla home oppure accedere direttamente
+      alla piattaforma MyFrEM.
+    </p>
+
+    <div class="actions">
+
+      <a
+        href="/"
+        class="btn btn-primary"
+        aria-label="Torna alla home"
+      >
+        Torna alla home
+      </a>
+
+      <a
+        href="/login/signin"
+        class="btn btn-secondary"
+        aria-label="Accedi a MyFrEM"
+      >
+        Accedi
+      </a>
+
+    </div>
+
+    <div class="footer">
+
+      © 2026 Friuli Emergenze
+
+      <br><br>
+
+      <a
+        href="https://friuliemergenze.it"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Sito ufficiale
+      </a>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

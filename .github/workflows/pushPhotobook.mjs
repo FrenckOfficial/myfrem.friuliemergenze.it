@@ -11,7 +11,7 @@ process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
 });
 
-console.log("🚀 Avvio pushVehicle.mjs");
+console.log("🚀 Avvio pushPhotobook.mjs");
 
 console.log("FIREBASE_PROJECT_ID:", !!process.env.FIREBASE_PROJECT_ID);
 console.log("FIREBASE_CLIENT_EMAIL:", !!process.env.FIREBASE_CLIENT_EMAIL);
@@ -50,53 +50,49 @@ const repoInfo = await octokit.repos.get({
 
 console.log("Repository trovato:", repoInfo.data.full_name);
 
-async function pushVehicleToGithub() {
+async function pushPhotobookToGithub() {
   const draftId = process.env.DRAFT_ID;
 
   if (!draftId) {
     throw new Error("DRAFT_ID non fornito");
   }
 
-  console.log("📦 Draft:", draftId);
+  console.log("📖 Photobook Draft:", draftId);
 
   const draftSnapshot = await db
-    .collection("vehiclesDraft")
+    .collection("photobooksDraft")
     .doc(draftId)
     .get();
 
   if (!draftSnapshot.exists) {
-    throw new Error(`Bozza ${draftId} non trovata`);
+    throw new Error(`Bozza photobook ${draftId} non trovata`);
   }
 
   const draft = draftSnapshot.data();
 
-  console.log("✅ Bozza caricata:", draft.fileName);
+  console.log("✅ Bozza photobook caricata:", draft.fileName);
 
   const fileName = draft.fileName.replace(/\.[^.]+$/, "");
-  const vehicleData = draft.data || {};
-  const sourcePhotoId = draft.sourcePhotoId || "";
+  const photobookData = draft.data || {};
   const slug = draft.slug || fileName;
 
-  await updateGalleryJson(
-    fileName,
-    vehicleData,
+  await updatePhotobooksJson(
     slug,
-    draft.photoUrl
+    photobookData,
+    draft.coverUrl
   );
 
-  console.log("✅ gallery.json aggiornato");
+  console.log("✅ photobooks.json aggiornato");
 
-  await createVehicleDetailsPage(
-    fileName,
-    vehicleData,
-    sourcePhotoId,
+  await createPhotobookDetailsPage(
     slug,
-    draft.photoUrl
+    photobookData,
+    draft.coverUrl
   );
 
-  console.log("✅ Pagina HTML creata");
+  console.log("✅ Pagina HTML photobook creata");
 
-  await db.collection("vehiclesDraft")
+  await db.collection("photobooksDraft")
     .doc(draftId)
     .update({
       status: "published",
@@ -104,102 +100,119 @@ async function pushVehicleToGithub() {
       publishedBy: "github-action"
     });
 
-  console.log("🎉 Pubblicazione completata");
+  console.log("🎉 Pubblicazione photobook completata");
 }
 
-async function updateGalleryJson(
-  fileName,
-  vehicleData,
+async function updatePhotobooksJson(
   slug,
-  photoUrl
+  photobookData,
+  coverUrl
 ) {
-  console.log("📖 Lettura gallery.json");
+  console.log("📖 Lettura photobooks.json");
 
-  const response =
-    await octokit.repos.getContent({
-      owner: GITHUB_OWNER,
-      repo: GITHUB_REPO,
-      path: "gallery.json",
-    });
-
-  const content = JSON.parse(
-    Buffer.from(
-      response.data.content,
-      "base64"
-    ).toString()
-  );
-
-  if (!Array.isArray(content)) {
-    throw new Error("gallery.json non è un array");
-  }
-
-  const service = getServiceLabel(vehicleData.service);
-
-  const imageName = photoUrl
-    ? photoUrl.split("/").pop()
-    : "";
-
-  const vehicle = {
-    title: vehicleData.title || "",
-    image: photoUrl || "",
-    category: service || "",
-    spotter: "",
-    link: `/gallery/scheda/${slug}/`,
-  };
-
-  const existingIndex = content.findIndex((v) => v.link === `/gallery/scheda/${slug}/`);
-
-  if (existingIndex >= 0) {
-    content[existingIndex] = vehicle;
-  } else {
-    content.push(vehicle);
-  }
-
-  console.log("💾 Salvataggio gallery.json");
-  console.log(JSON.stringify(content, null, 2));
-
-  await octokit.repos.createOrUpdateFileContents({
-    owner: GITHUB_OWNER,
-    repo: GITHUB_REPO,
-    path: "gallery.json",
-    message: `🚗 Add vehicle ${vehicleData.title}`,
-    content: Buffer
-      .from(JSON.stringify(content, null, 2))
-      .toString("base64"),
-    sha: response.data.sha,
-    branch: GITHUB_BRANCH,
-  });
-}
-
-async function createVehicleDetailsPage(
-  fileName,
-  vehicleData,
-  sourcePhotoId,
-  slug,
-  photoUrl
-) {
-  const html =
-    await generateVehicleHtml(
-      vehicleData,
-      fileName,
-      sourcePhotoId,
-      slug,
-      photoUrl
-    );
+  let content = [];
+  let sha = null;
 
   try {
-    const existing =
-      await octokit.repos.getContent({
-        owner: GITHUB_OWNER,
-        repo: GITHUB_REPO,
-        path: `gallery/scheda/${slug}/index.html`,
-      });
+    const response = await octokit.repos.getContent({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: "photobooks.json",
+    });
+
+    content = JSON.parse(
+      Buffer.from(
+        response.data.content,
+        "base64"
+      ).toString()
+    );
+    sha = response.data.sha;
+  } catch (error) {
+    if (error.status === 404) {
+      console.log("⚠️ photobooks.json non esiste, creazione nuovo file");
+      content = [];
+      sha = null;
+    } else {
+      throw error;
+    }
+  }
+
+  if (!Array.isArray(content)) {
+    throw new Error("photobooks.json non è un array");
+  }
+
+  const service = getServiceLabel(photobookData.service);
+
+  const photobook = {
+    title: photobookData.title || "",
+    description: photobookData.description || "",
+    image: coverUrl || "",
+    service: service || "",
+    slug: slug,
+    link: `/photobook/${slug}/`,
+    vehicles: photobookData.vehicles || [],
+  };
+
+  const existingIndex = content.findIndex((p) => p.slug === slug);
+
+  if (existingIndex >= 0) {
+    content[existingIndex] = photobook;
+  } else {
+    content.push(photobook);
+  }
+
+  console.log("💾 Salvataggio photobooks.json");
+  console.log(JSON.stringify(content, null, 2));
+
+  if (sha) {
+    await octokit.repos.createOrUpdateFileContents({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: "photobooks.json",
+      message: `📖 Update photobook ${photobookData.title}`,
+      content: Buffer
+        .from(JSON.stringify(content, null, 2))
+        .toString("base64"),
+      sha: sha,
+      branch: GITHUB_BRANCH,
+    });
+  } else {
+    await octokit.repos.createOrUpdateFileContents({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: "photobooks.json",
+      message: `📖 Add photobook ${photobookData.title}`,
+      content: Buffer
+        .from(JSON.stringify(content, null, 2))
+        .toString("base64"),
+      branch: GITHUB_BRANCH,
+    });
+  }
+}
+
+async function createPhotobookDetailsPage(
+  slug,
+  photobookData,
+  coverUrl
+) {
+  const html = await generatePhotobookHtml(
+    slug,
+    photobookData,
+    coverUrl
+  );
+
+  try {
+    const existing = await octokit.repos.getContent({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: `photobook/${slug}/index.html`,
+    });
 
     await octokit.repos.createOrUpdateFileContents({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: `gallery/scheda/${slug}/index.html`,
-      message: `📄 Update vehicle ${vehicleData.title}`,
+      path: `photobook/${slug}/index.html`,
+      message: `📄 Update photobook ${photobookData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -211,8 +224,8 @@ async function createVehicleDetailsPage(
     await octokit.repos.createOrUpdateFileContents({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
-      path: `gallery/scheda/${slug}/index.html`,
-      message: `📄 Add vehicle ${vehicleData.title}`,
+      path: `photobook/${slug}/index.html`,
+      message: `📄 Add photobook ${photobookData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -227,7 +240,7 @@ function getServiceLabel(service) {
       return "Soccorso Sanitario";
 
     case "pompieri":
-      return "Soccorso Tecnico Urgente";
+      return "Vigili del Fuoco";
 
     case "protezione_civile":
       return "Protezione Civile";
@@ -250,21 +263,18 @@ function getServiceLabel(service) {
     case "polizia_locale":
       return "Polizia Locale";
 
+    case "soccorso_sanitario":
+      return "Soccorso Sanitario";
+
     default:
       return service || "N/A";
   }
 }
 
-async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, photoUrl) {
-  const imageFileName = vehicleData.imageFileName || `${fileName}.jpg`;
-  const pageUrl = `https://friuliemergenze.it/gallery/scheda/${slug}`;
-  const service = getServiceLabel(vehicleData.service);
-  const imageDoc = await db.collection("photos").doc(sourcePhotoId).get();
-  const imageDocData = imageDoc.data();
-  const userId = imageDocData.userId;
-  const userDoc = await db.collection("users").doc(userId).get();
-  const userData = userDoc.data();
-  const author = userData.name + " " + userData.surname || "Utente sconosciuto";
+async function generatePhotobookHtml(slug, photobookData, coverUrl) {
+  const pageUrl = `https://friuliemergenze.it/photobook/${slug}`;
+  const service = getServiceLabel(photobookData.service);
+  const vehiclesHtml = await generateVehiclesSection(photobookData.vehicles || []);
 
   return `<!doctype html>
 <html lang="it">
@@ -273,62 +283,22 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
     <script src="/heading.js"><\/script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <title>${escapeHtml(vehicleData.title)} | Friuli Emergenze</title>
-    <style>
-      #donate-float {
-        position: fixed !important;
-        bottom: 2rem !important;
-        left: 2rem !important;
-        z-index: 999999 !important;
-        animation: slideInUp 0.5s ease-out;
-      }
+    <title>${escapeHtml(photobookData.title)} - Photobook | Friuli Emergenze</title>
+    <script src="/heading.js"><\/script>
 
-      .donate-btn {
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.5rem;
-        padding: 0.875rem 1.5rem;
-        background: #ff7b00 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 50px !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 12px rgba(255, 123, 0, 0.3) !important;
-        transition: all 0.3s ease !important;
-        font-family: 'Lexend', sans-serif !important;
-        text-decoration: none !important;
-      }
-
-      .donate-btn:hover {
-        background: #ff6800 !important;
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 16px rgba(255, 123, 0, 0.4) !important;
-      }
-
-      @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      @media (max-width: 768px) {
-        .donate-float { bottom: 1rem !important; left: 1rem !important; }
-        .donate-btn { padding: 0.75rem 1rem !important; font-size: 0.95rem !important; }
-      }
-    </style>
+    <link rel="stylesheet" href="/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="/assets/logo.png" type="image/png" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
   </head>
   <body class="fade-in">
-    <div id="donate-float" style="position: fixed !important; bottom: 2rem !important; left: 2rem !important; z-index: 999999 !important; display: block !important; width: auto !important; height: auto !important;">
-      <a href="https://www.paypal.com/ncp/payment/QQMQWZQYDL28S" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="donate-btn"
-        style="display: flex !important; align-items: center !important; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #ff7b00 !important; color: white; border: none; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; font-family: Lexend, sans-serif;">
-        <span style="font-size: 1.2rem;">❤️</span>
-        Sostieni
-      <\/a>
-    <\/div>
     <nav class="navbar">
       <div class="navbar-container">
         <a href="/" class="logo">🚨 Friuli Emergenze</a>
@@ -338,8 +308,8 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
         <ul class="nav-links">
           <li><a href="/" class="nav-link">Home</a></li>
           <li><a href="/chi-sono" class="nav-link">Chi sono</a></li>
-          <li><a href="/gallery" class="nav-link active">Galleria</a></li>
-          <li><a href="/photobook" class="nav-link">Photobooks</a></li>
+          <li><a href="/gallery" class="nav-link">Galleria</a></li>
+          <li><a href="/photobook" class="nav-link active">Photobooks</a></li>
           <li><a href="/news" class="nav-link">Notizie</a></li>
           <li><a href="/piattaforma-myfrem" class="nav-icon" aria-label="MyFrEM">Piattaforma MyFrEM</a></li>
           <li><a href="/contact-us" class="nav-link">Contatti</a></li>
@@ -349,28 +319,27 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
       <\/div>
     <\/nav>
 
-    <main class="scheda-mezzo">
-      <h1>${escapeHtml(vehicleData.title)}<\/h1>
-      <img
-        src="${photoUrl}"
-        alt="${escapeHtml(vehicleData.title)}"
-        loading="lazy"
-      />
+    <header class="hero">
+      <img src="https://friuliemergenze.it/assets/logo.png" alt="Logo Friuli Emergenze" class="logoHeading" loading="lazy">
+      <h1>Photobook<\/h1>
+      <p>Tutti i mezzi fotografati e pubblicati di <b>${escapeHtml(photobookData.title)}<\/b><\/p>
+    <\/header>
 
-      <section class="dettagli-mezzo">
-        <h2>Dati Tecnici<\/h2>
-        <ul>
-          <li><strong>Marca:<\/strong> ${escapeHtml(vehicleData.brand)}<\/li>
-          <li><strong>Modello:<\/strong> ${escapeHtml(vehicleData.model)}<\/li>
-          <li><strong>Allestimento:<\/strong> ${escapeHtml(vehicleData.builder ? vehicleData.builder : "N/A")}<\/li>
-          <li><strong>Targa:<\/strong> ${escapeHtml(vehicleData.plate ? vehicleData.plate : "N/A")}<\/li>
-          <li><strong>Servizio:<\/strong> ${escapeHtml(service)}<\/li>
-          <li><strong>Sede:<\/strong> ${escapeHtml(vehicleData.headquarters)}<\/li>
-        <\/ul>
-        <p id="galleryRecognition">
-          Photo by <em>${escapeHtml(author)}</em> from
-          <a href="https://myfrem.friuliemergenze.it">MyFrEM</a>
-        <\/p>
+    <main>
+      <section class="photobook-details">
+        <div class="photobook-description">
+          <h2>Descrizione<\/h2>
+          <p>${escapeHtml(photobookData.description)}<\/p>
+          
+          ${photobookData.notes ? `
+          <div class="photobook-notes">
+            <h3>Note Aggiuntive<\/h3>
+            <p>${escapeHtml(photobookData.notes)}<\/p>
+          </div>
+          ` : ''}
+        <\/div>
+
+        ${vehiclesHtml}
       <\/section>
 
       <div class="share">
@@ -389,7 +358,7 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
 
       <div style="text-align: center; margin-top: 2rem">
         <a
-          href="/gallery"
+          href="/photobook"
           style="
             display: inline-block;
             background-color: #00bcd4;
@@ -401,7 +370,7 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
             transition: background-color 0.3s;
           "
         >
-          ⬅ Torna alla galleria
+          ⬅ Torna ai photobook
         <\/a>
       <\/div>
     <\/main>
@@ -468,27 +437,64 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
       <a href="https://www.shinystat.com/it/" target="_top" style="display: none;">
       <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-53595029-55bae" alt="Statistiche web" style="border:0px; display: none;" /><\/a>
     <\/noscript>
-    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="12f1a448-b292-4481-a1b1-00e4f77025d3";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();<\/script>
-
-    <script>
-      document.querySelector(".menu-toggle").addEventListener("click", () => {
-        document.querySelector(".nav-links").classList.toggle("open");
-        const liMyFrEM = document.querySelector(".nav-links a[href='/piattaforma-myfrem']");
-
-        if(liMyFrEM) {
-          console.log("MyFrEM link found, updating innerHTML.");
-          liMyFrEM.innerHTML = ${`<a href="/piattaforma-myfrem" target="_blank" class="nav-icon" aria-label="MyFrEM" style="margin-left:0;">MyFrEM</a>`}
-        }
-      });
-
-      window.addEventListener("load", () => {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.register("/scripts/sw.js");
-        }
-      });
-    <\/script>
   <\/body>
 <\/html>`;
+}
+
+async function generateVehiclesSection(vehicleIds) {
+  if (!vehicleIds || vehicleIds.length === 0) {
+    return '';
+  }
+
+  console.log(`🚗 Recupero ${vehicleIds.length} veicoli associati...`);
+
+  const vehiclePromises = vehicleIds.map(async (vehicleId) => {
+    try {
+      const vehicleDoc = await db.collection("vehiclesDraft").doc(vehicleId).get();
+      if (vehicleDoc.exists) {
+        const data = vehicleDoc.data();
+        return {
+          slug: data.slug || vehicleId,
+          title: data.data?.title || 'Senza titolo',
+          image: data.photoUrl || '',
+        };
+      }
+    } catch (error) {
+      console.warn(`⚠️ Errore caricamento veicolo ${vehicleId}:`, error.message);
+    }
+    return null;
+  });
+
+  const vehicles = (await Promise.all(vehiclePromises)).filter(v => v !== null);
+
+  if (vehicles.length === 0) {
+    return '';
+  }
+
+  const vehicleCards = vehicles
+    .map(vehicle => `
+      <div class="grid-item">
+        <div class="grid-item-img-wrap">
+          <a href="/gallery/scheda/${vehicle.slug}/" title="${escapeHtml(vehicle.title)}">
+            <img src="${vehicle.image}" alt="${escapeHtml(vehicle.title)}" loading="lazy">
+          </a>
+        </div>
+        <div class="grid-item-body">
+          <p>${escapeHtml(vehicle.title)}<\/p>
+          <a href="/gallery/scheda/${vehicle.slug}/" class="btn-scopri">Scopri di più<\/a>
+        </div>
+      <\/div>
+    `)
+    .join('');
+
+  return `
+    <section class="photobook-vehicles">
+      <h2>Veicoli in questo Photobook<\/h2>
+      <div class="grid">
+        ${vehicleCards}
+      </div>
+    </section>
+  `;
 }
 
 function escapeHtml(text) {
@@ -508,9 +514,9 @@ function escapeHtml(text) {
     .replace(/[&<>"']/g, (m) => map[m]);
 }
 
-pushVehicleToGithub()
+pushPhotobookToGithub()
   .then(() => {
-    console.log("✅ Fine workflow");
+    console.log("✅ Fine workflow photobook");
     process.exit(0);
   })
   .catch(async (error) => {
@@ -520,13 +526,12 @@ pushVehicleToGithub()
       const draftId = process.env.DRAFT_ID;
 
       if (draftId) {
-        await db.collection("vehiclesDraft")
+        await db.collection("photobooksDraft")
           .doc(draftId)
           .update({
             status: "error",
             errorMessage: error.message,
-            errorAt:
-              admin.firestore.Timestamp.now(),
+            errorAt: admin.firestore.Timestamp.now(),
           });
       }
     } catch (e) {

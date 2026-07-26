@@ -195,7 +195,6 @@ async function loadAllPhotos() {
         <td><b>${linkBox}</b></td>
         <td>
           <button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy"/></button>
-          <button class="reapprovazione-btn" onclick="reapprovaPhoto('${id}')">Reapprova foto <img src="/assets/icons/rotate-right-solid-full.svg" alt="Reapprova" loading="lazy"/></button>
         </td>
       `;
 
@@ -315,18 +314,6 @@ window.deletePhoto = async (photoId) => {
       console.error("Errore eliminazione foto:", err);
       setStatus("❌ Errore eliminazione foto", "error");
     }
-  }
-}
-
-window.reapprovaPhoto = async (photoId) => {
-  try {
-    const photoRef = doc(db, "photos", photoId);
-    await updateDoc(photoRef, { status: "Foto in attesa di approvazione ⌛" });
-    setStatus("Da ora è necessario riapprovare la foto", "success");
-    loadAllPhotos();
-  } catch (err) {
-    console.error("Errore riapprovazione foto:", err);
-    setStatus("❌ Errore riapprovazione foto", "error");
   }
 }
 
