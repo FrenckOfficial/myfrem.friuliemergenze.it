@@ -123,17 +123,17 @@ async function loadAllPhotos() {
 
       if (photo.status?.includes("Approvata")) {
         const hasLink = photo.vehicleLink && photo.vehicleLink.trim().length > 0;
-
+        const link = hasLink ? photo.vehicleLink.split("https://www.friuliemergenze.it/gallery/scheda/")[1] : "";
         linkBox = `
           <div class="photo-link-box" id="box-${id}">
             <a
-              href="${hasLink ? photo.vehicleLink : "#"}"
+              href="https://www.friuliemergenze.it/gallery/scheda/${link}"
               target="_blank"
               id="link-view-${id}"
               style="text-decoration: underline; font-size: 1em; word-break: break-all;"
               class="photo-link-static ${hasLink ? "" : "hidden"}"
             >
-              ${hasLink ? photo.vehicleLink : ""}
+              ${link}
             </a>
 
             <div id="link-input-wrapper-${id}" class="link-input-wrapper ${hasLink ? "hidden" : ""}">
@@ -141,7 +141,7 @@ async function loadAllPhotos() {
                 type="url"
                 id="link-input-${id}"
                 class="photo-link-input"
-                placeholder="https://friuliemergenze.it/gallery/scheda/(mezzo)"
+                placeholder="Es: peugeoute2008-vvfgorizia"
                 value="${hasLink ? photo.vehicleLink : ""}"
               />
               <div class="link-input-buttons">
@@ -208,15 +208,6 @@ async function loadAllPhotos() {
   }
 }
 
-function isValidUrl(string) {
-  try {
-    new URL(string);
-    return true;
-  } catch (_) {
-    return false;
-  }
-}
-
 window.editLink = (photoId) => {
   const view = document.getElementById(`link-view-${photoId}`);
   const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
@@ -238,11 +229,6 @@ window.saveVehicleLink = async (photoId) => {
     return;
   }
 
-  if (!isValidUrl(link)) {
-    setStatus("Formato URL non valido. Usa: https://www.friuliemergenze.it", "error");
-    return;
-  }
-
   try {
     const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
     if (saveBtn) saveBtn.disabled = true;
@@ -257,7 +243,7 @@ window.saveVehicleLink = async (photoId) => {
     const userEmail = userData.email;
 
     await updateDoc(photoRef, {
-      vehicleLink: link,
+      vehicleLink: `https://www.friuliemergenze.it/gallery/scheda/${link}`,
       updatedAt: serverTimestamp()
     });
 

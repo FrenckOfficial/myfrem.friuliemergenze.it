@@ -318,9 +318,9 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
       }
     </style>
   </head>
-  <body class="fade-in">
+  <body>
     <div id="donate-float" style="position: fixed !important; bottom: 2rem !important; left: 2rem !important; z-index: 999999 !important; display: block !important; width: auto !important; height: auto !important;">
-      <a href="https://www.paypal.com/ncp/payment/QQMQWZQYDL28S" 
+      <a href="https://www.friuliemergenze.it/sostienici/donate" 
         target="_blank" 
         rel="noopener noreferrer"
         class="donate-btn"
@@ -341,6 +341,7 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
           <li><a href="/gallery" class="nav-link active">Galleria</a></li>
           <li><a href="/photobook" class="nav-link">Photobooks</a></li>
           <li><a href="/news" class="nav-link">Notizie</a></li>
+          <li><a href="/sostienici" class="nav-link">Sostienici</a></li>
           <li><a href="/piattaforma-myfrem" class="nav-icon" aria-label="MyFrEM">Piattaforma MyFrEM</a></li>
           <li><a href="/contact-us" class="nav-link">Contatti</a></li>
           <li><a href="https://www.friuliemergenze.it/social/instagram" target="_blank" class="nav-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
@@ -458,7 +459,7 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
           <a href="https://www.friuliemergenze.it/policies/cookie">Cookie Policy<\/a>
         <\/p>
         <p class="footer-extra"> 
-          Versione 2.6.0.0
+          Versione 2.8.0.0
         <\/p>
       <\/div>
     <\/footer>

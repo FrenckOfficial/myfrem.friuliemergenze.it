@@ -54,7 +54,7 @@ export default async function handler(req, res) {
           email: "autosystem@friuliemergenze.it"
         },
         to: [{ email: sanitizedEmail, name: sanitizedName }],
-        subject: `C'è un aggiornamento sullo stato di una foto MyFrEM!`,
+        subject: `${sanitizedPhotoName}: Link aggiunto!`,
         htmlContent,
         replyTo: { 
           name: "Friuli Emergenze",
