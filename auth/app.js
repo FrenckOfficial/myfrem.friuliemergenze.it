@@ -483,7 +483,7 @@ if (registerForm) {
         const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
         const htmlContent = buildEmail({ verifyLink, email, name});
-        const staffContent = buildEmailStaff({ name, surname, email, username, phone, verifyLink });
+        const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
 
         const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
           method: "POST",

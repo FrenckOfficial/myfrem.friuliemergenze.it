@@ -60,7 +60,8 @@ const elements = {
   staffSince: document.getElementById("staffSince"),
   messageBox: document.getElementById("messageBox"),
   staffPhotos: document.getElementById("staffPhotos"),
-  staffEvents: document.getElementById("staffEvents")
+  staffEvents: document.getElementById("staffEvents"),
+  badgesContainer: document.getElementById("userBadgesContainer")
 };
 
 const adminRoles = [
@@ -100,6 +101,7 @@ async function loadUserProfile(uid) {
           messageBox.textContent = "❌ Questo profilo è privato.";
           elements.statsGrid.classList.add("none");
           elements.staffGrid.classList.add("none");
+          document.getElementById("userBadgesSection").style.display = "none";
           return;
         }
 
@@ -152,6 +154,7 @@ async function loadUserProfile(uid) {
 
         renderBadges(role);
         renderStatus(status);
+        await loadUserBadges(uid);
 
         const isStaff = adminRoles.includes(role.toLowerCase());
 
@@ -196,6 +199,93 @@ async function loadUserProfile(uid) {
     } catch (err) {
         console.error("Errore caricamento profilo:", err);
     }
+}
+
+async function loadUserBadges(uid) {
+  try {
+    const badgesRef = collection(db, "users", uid, "badges");
+    const badgesSnap = await getDocs(badgesRef);
+
+    elements.badgesContainer.innerHTML = "";
+
+    if (badgesSnap.empty) {
+      elements.badgesContainer.innerHTML = `
+        <p style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">
+          Nessun badge guadagnato
+        </p>
+      `;
+      return;
+    }
+
+    for (const badgeDocSnap of badgesSnap.docs) {
+      const badgeId = badgeDocSnap.id;
+      const badgeData = badgeDocSnap.data();
+
+      const badgeDocRef = doc(db, "badges", badgeId);
+      const badgeMeta = await getDoc(badgeDocRef);
+
+      if (!badgeMeta.exists()) continue;
+
+      const meta = badgeMeta.data();
+
+      const badgeEl = document.createElement("div");
+      badgeEl.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.25rem;
+        background: var(--bg-surface);
+        border: 2px solid #00d4e8;
+        border-radius: 8px;
+        transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+        cursor: pointer;
+        min-width: 120px;
+        text-align: center;
+      `;
+
+      const img = document.createElement("img");
+      img.src = meta.icon || "/assets/badges/default.svg";
+      img.alt = meta.name;
+      img.style.cssText = "width: 56px; height: 56px; border: 2px solid #00d4e8; border-radius: 50%; padding: 4px; background: rgba(0, 212, 232, 0.1);";
+      img.onerror = () => {
+        img.src = "/assets/badges/default.svg";
+      };
+
+      const label = document.createElement("span");
+      label.textContent = meta.name;
+      label.style.cssText = "font-size: 0.75rem; font-weight: 700; text-align: center; max-width: 100px; color: #00d4e8; line-height: 1.3;";
+      label.title = meta.description;
+
+      const earnedDate = document.createElement("span");
+      earnedDate.style.cssText = "font-size: 0.65rem; color: var(--text-muted);";
+      if (badgeData.earnedAt?.toDate) {
+        const date = badgeData.earnedAt.toDate();
+        earnedDate.textContent = `📅 ${date.toLocaleDateString("it-IT")}`;
+      }
+
+      badgeEl.appendChild(img);
+      badgeEl.appendChild(label);
+      badgeEl.appendChild(earnedDate);
+
+      badgeEl.addEventListener("mouseenter", () => {
+        badgeEl.style.transform = "scale(1.1) translateY(-4px)";
+        badgeEl.style.boxShadow = "0 8px 20px rgba(0, 212, 232, 0.25)";
+        badgeEl.style.filter = "brightness(1.1)";
+      });
+
+      badgeEl.addEventListener("mouseleave", () => {
+        badgeEl.style.transform = "scale(1)";
+        badgeEl.style.boxShadow = "none";
+        badgeEl.style.filter = "brightness(1)";
+      });
+
+      elements.badgesContainer.appendChild(badgeEl);
+    }
+
+  } catch (err) {
+    console.error("Errore caricamento badge:", err);
+  }
 }
 
 function formatDate(timestamp) {
@@ -376,7 +466,7 @@ async function loadUserPhotos(userId) {
       card.className = "photo-card";
 
       card.innerHTML = `
-        <img src="${data.url}" class="popup-photo" loading="lazy>
+        <img src="${data.url}" class="popup-photo" loading="lazy">
 
         <div class="photo-info">
           <p><b>Titolo:</b> ${data.title || data.vehicleModel}</p>

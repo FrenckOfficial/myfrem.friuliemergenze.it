@@ -224,7 +224,7 @@ body {
 <div class="container">
   <div class="header">
     <h1>Aggiornamento sulla foto</h1>
-    <p>Notifica di accesso a MyFrEM</p>
+    <p>Sistemi di notifica Friuli Emergenze</p>
   </div>
 
   <div class="content">

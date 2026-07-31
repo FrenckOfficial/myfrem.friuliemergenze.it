@@ -230,6 +230,7 @@ uploadBtn.addEventListener("click", async (e) => {
     if (userData.emailNotifications === true) {
       const userEmail = userData.email
       const userName = userData.name
+      const htmlContent = await buildStaffEmail(userEmail, userName, titleInput.value, fileUrl);
   
       const uploadedAt = new Date().toISOString();
 
@@ -255,6 +256,22 @@ uploadBtn.addEventListener("click", async (e) => {
 
       if (!response.ok) {
         console.error("❌ Errore invio notifica email:", response.status);
+      }
+
+      const staffResponse = await fetch("/api/sendStaffNewPhotoEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          photoName: titleInput.value,
+          userName: userName,
+          htmlContent
+        })
+      })
+
+      if (!staffResponse.ok) {
+        console.error("❌ Errore invio email staff:", staffResponse.status);
       }
     }
   }
@@ -343,4 +360,42 @@ function finalizCanvas(canvas, originalFile, resolve) {
     );
     resolve(watermarkedFile);
   }, "image/jpeg", 0.95);
+}
+
+function buildStaffEmail(userEmail, userName, photoName, photoLink) {
+  return `
+    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+              <tr>
+                <td style="padding:35px;text-align:center;">
+                  <img src="https://www.friuliemergenze.it/assets/logo.png" style="width:80px;margin-bottom:20px;" loading="lazy">
+                  
+                  <h1 style="color:#00d4e8;margin:0;font-size:28px;">📸 Nuova foto caricata</h1>
+
+                  <p style="font-size:16px;color:#333;margin-top:25px;text-align:left;">
+                    <b>Utente:</b> ${userName}<br>
+                    <b>Email:</b> ${userEmail}<br>
+                    <b>Foto:</b> ${photoName}
+                  </p>
+
+                  <p style="text-align:center;margin-top:30px;">
+                    <img src="${photoLink}" style="width:100%;max-width:400px;">
+                  </p>
+
+                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
+                    MyFrEM · Friuli Emergenze<br>
+                    <a href="https://friuliemergenze.it" style="color:#00d4e8;text-decoration:none;">friuliemergenze.it</a> · 
+                    <a href="mailto:info@friuliemergenze.it" style="color:#00d4e8;text-decoration:none;">info@friuliemergenze.it</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
 }

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Badge | Dashboard Staff - MyFrEM</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/badges/style.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="/staff/dashboard/management/badges/load.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">📊 Dashboard</a>
+        <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
+        <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
+        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
+        <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">🚪 Logout</button>
+    </aside>
+  
+    <main class="main-content">
+      <h1>🏅 Gestione Badge Utenti</h1>
+      <p style="color: var(--muted); margin-bottom: 20px;">Visualizza, aggiungi e rimuovi badge associati agli utenti MyFrEM</p>
+
+      <p class="statusBox" style="display:none;">
+        <span id="statusMsg"></span>
+        <button id="closeSMsg">&times;</button>
+      </p>
+
+      <div class="badge-management-container">
+        <div class="search-section">
+          <h2 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 0; margin-bottom: 15px;">🔍 Ricerca Utente</h2>
+          <input 
+            type="text" 
+            class="user-search" 
+            id="userSearch" 
+            placeholder="Cerca per nome, email o username..."
+          >
+          <div class="users-list" id="usersList">
+            <div style="color: var(--muted); text-align: center; padding: 2rem;">Digita per cercare...</div>
+          </div>
+        </div>
+
+        <div class="badges-section">
+          <h2 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 0; margin-bottom: 15px;">🎖️ Badge Utente</h2>
+          
+          <div id="badgesContent" style="color: var(--muted); text-align: center; padding: 2rem;">
+            Seleziona un utente per gestire i badge
+          </div>
+
+          <div id="earnedBadgesContainer" style="display:none;">
+            <h3 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 20px; margin-bottom: 15px;">Badge Guadagnati</h3>
+            <div class="badges-grid" id="earnedBadgesList"></div>
+          </div>
+
+          <div id="availableBadgesContainer" style="display:none;">
+            <h3 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 20px; margin-bottom: 15px;">Badge Disponibili</h3>
+            <div class="badges-grid" id="availableBadgesList"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
+  <noscript>
+    <a href="https://www.shinystat.com/it/" target="_top">
+    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
+  </noscript>
+  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+</body>
+</html>

@@ -218,6 +218,8 @@ window.editLink = (photoId) => {
   if (inputWrapper) inputWrapper.classList.remove("hidden");
   if (editBtn) editBtn.classList.add("hidden");
   if (input) input.focus();
+
+  loadAllPhotos();
 };
 
 window.saveVehicleLink = async (photoId) => {
@@ -269,7 +271,7 @@ window.saveVehicleLink = async (photoId) => {
     setStatus("✅ Link salvato con successo", "success");
 
     if (userData.emailNotifications === true) {
-      sendNotificationEmail(userEmail, userName, photoName, link);
+      sendNotificationEmail(userEmail, userName, photoName, `https://www.friuliemergenze.it/gallery/scheda/${link}`);
     }
 
   } catch (err) {
@@ -278,6 +280,7 @@ window.saveVehicleLink = async (photoId) => {
   } finally {
     const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
     if (saveBtn) saveBtn.disabled = false;
+    loadAllPhotos();
   }
 };
 

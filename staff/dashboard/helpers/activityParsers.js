@@ -139,6 +139,16 @@ export async function parseActivity(activity, date) {
             return `[${date}] Notizia "${activity.title}" pubblicata da ${activity.editStaffer}.`;
         }
 
+        case "badge_added": {
+            const staff = await getNameById("users", activity.staffUserId);
+            return `[${date}] Badge aggiunto: Membro: ${activity.userId} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
+        }
+
+        case "badge_removed": {
+            const staff = await getNameById("users", activity.staffUserId);
+            return `[${date}] Badge rimosso: Membro: ${activity.userId} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
+        }
+
         default:
             console.warn("Tipo attività sconosciuto:", activity);
             return `[${date}] Attività sconosciuta (${activity.type || "Tipo non definito"}).`;
