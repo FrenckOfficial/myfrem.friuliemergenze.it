@@ -51,6 +51,7 @@ const statusMsg = document.getElementById("statusMsg");
 const submitBtn = document.getElementById("submitBtn");
 const btnText = document.getElementById('btnText');
 const btnLoader = document.getElementById('btnLoader');
+const resendEmailBtn = document.getElementById("resendEmail");
 
 const resetForm = document.getElementById("resetForm");
 const resetEmail = document.getElementById("resetEmail");
@@ -161,14 +162,15 @@ if (loginForm) {
       const userSnap = await getUserDoc(user.uid);
       const userData = userSnap.data();
 
-      if (userData.emailVerified === false) {
-        await signOut(auth);
-        throw new Error("Verifica il tuo indirizzo email prima di accedere.");
-      }
-
+      
       if (!userSnap.exists()) {
         await signOut(auth);
         throw new Error("Profilo non trovato.");
+      }
+      
+      if (userData.emailVerified === false) {
+        await signOut(auth);
+        throw new Error("Verifica il tuo indirizzo email prima di accedere.");
       }
 
       await validateAccount(userData);
@@ -231,32 +233,36 @@ if (googleBtn) {
   googleBtn.addEventListener("click", async () => {
     try {
       const provider = new GoogleAuthProvider();
-
       const result = await signInWithPopup(auth, provider);
-
       const user = result.user;
 
-      const userSnap = await getUserDoc(user.uid);
+      let userSnap = await getUserDoc(user.uid);
 
       if (!userSnap.exists()) {
-        await signOut(auth);
-        throw new Error(
-          "Accesso negato. Crea prima un account."
-        );
+        const nameParts = (user.displayName || "").split(" ");
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          name: nameParts[0] || "",
+          surname: nameParts.slice(1).join(" ") || "",
+          username: user.email.split("@")[0],
+          phone: "",
+          role: "user",
+          status: "attivo",
+          newsSubbed: false,
+          emailVerified: true,
+          createdAt: serverTimestamp()
+        });
+
+        userSnap = await getUserDoc(user.uid);
       }
 
       const userData = userSnap.data();
-
       await validateAccount(userData);
-
       await createLoginLog(user);
-
-      redirectByRole(userData.role);
 
       try {
         const token = await auth.currentUser.getIdToken();
-
-        await fetch("/api/sendLoginMail",  {
+        await fetch("/api/sendLoginMail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -264,7 +270,7 @@ if (googleBtn) {
           },
           body: JSON.stringify({
             email: user.email,
-            name: userData.nome || "Utente",
+            name: userData.name || "Utente",
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent
           })
@@ -272,6 +278,9 @@ if (googleBtn) {
       } catch (error) {
         console.error("Errore nell'invio della notifica di login:", error);
       }
+
+      redirectByRole(userData.role);
+
     } catch (err) {
       setStatus(err.message, "error");
       console.error(err);
@@ -393,6 +402,10 @@ if (registerForm) {
         setStatus("Inserisci un username", "error");
         return false;
       }
+      if (/[^\w.-]/.test(username) || /\s/.test(username)) {
+        setStatus("Lo username può contenere solo lettere, numeri, trattini e underscore", "error");
+        return false;
+      }
       const usernameQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
       const usernameSnap = await getDocs(usernameQuery);
       if (!usernameSnap.empty) {
@@ -451,6 +464,8 @@ if (registerForm) {
 
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         const user = cred.user;
+        const token = crypto.randomUUID();
+        const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
         await setDoc(doc(db, "users", user.uid), {
           email,
@@ -462,10 +477,10 @@ if (registerForm) {
           status: "attivo",
           newsSubbed: false,
           emailVerified: false,
+          verifyLink: verifyLink,
           createdAt: serverTimestamp()
         });
 
-        const token = crypto.randomUUID();
 
         await setDoc(doc(db, "emailVerifications", token), {
           email,
@@ -480,7 +495,6 @@ if (registerForm) {
           timestamp: serverTimestamp()
         });
 
-        const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
 
         const htmlContent = buildEmail({ verifyLink, email, name});
         const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
@@ -519,6 +533,7 @@ if (registerForm) {
         setStatus("Email di verifica inviata.", "success");
 
         await signOut(auth);
+        localStorage.setItem("email", email);
         window.location.href ="/auth/confirm-email";
 
       } catch (err) {
@@ -546,6 +561,55 @@ if (registerForm) {
     }
   );
 }
+
+
+resendEmailBtn?.addEventListener("click", async () => {
+  const email = localStorage.getItem("email");
+  
+  if (!email) {
+    setStatus("Email non trovata. Ricarica la pagina.", "error");
+    return;
+  }
+
+  try {
+    const userQuery = query(collection(db, "users"), where("email", "==", email), limit(1));
+    const userSnap = await getDocs(userQuery);
+
+    if (userSnap.empty) {
+      setStatus("Utente non trovato.", "error");
+      return;
+    }
+
+    const userDoc = userSnap.docs[0];
+    const userData = userDoc.data();
+
+    if (!userData?.verifyLink || !userData?.email) {
+      setStatus("Dati utente incompleti.", "error");
+      return;
+    }
+
+    const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userName: `${userData.name} ${userData.surname}`,
+        userEmail: userData.email,
+        htmlContent: buildEmail({ verifyLink: userData.verifyLink, email: userData.email, name: userData.name })
+      })
+    });
+
+    if (!response.ok) {
+      setStatus("Errore reinvio email di verifica.", "error");
+      return;
+    }
+
+    setStatus("Email reinviata! Controlla la tua casella.", "success");
+
+  } catch (error) {
+    setStatus("Errore durante il reinvio.", "error");
+    console.error(error);
+  }
+});
 
 function setStatus(message, type = "info") {
   const classNameBox = document.querySelector(".statusBox");

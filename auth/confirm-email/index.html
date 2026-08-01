@@ -46,13 +46,19 @@
             <p class="form-sub">Ti abbiamo inviato un link di verifica all'indirizzo email che hai utilizzato durante la registrazione.</p>
 
             <div class="success-card">
-                <p>Per completare la creazione del tuo account MyFrEM, apri la tua casella di posta elettronica e clicca sul link di conferma contenuto nel messaggio.</p>
+                <p id="email"></p>
                 <p>Se non trovi l'email, controlla anche nelle cartelle <strong>Spam</strong>, <strong>Promozioni</strong> o <strong>Posta indesiderata</strong>.</p>
             </div>
 
-            <a href="/login" class="submit-btn">
+            <div class="buttons">
+              <a href="/login" class="submit-btn">
                 Ho verificato la mia email
-            </a>
+              </a>
+              <a id="resendEmail" class="resend-btn">
+                Invia di nuovo l'email di conferma
+              </a>
+            </div>
+
 
             <a href="/" class="back-home">
                 ← Torna alla homepage
@@ -67,16 +73,11 @@
   <script type="module" src="/auth/app.js"></script>
 
   <script>
-    function togglePassword(inputId, button) {
-      const input = document.getElementById(inputId);
-      const icon = button.querySelector('i');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
+    const email = localStorage.getItem("email");
+    if (email) {
+      document.getElementById("email").textContent = `Per completare la creazione del tuo account MyFrEM, apri la tua casella di posta elettronica (${email}) e clicca sul link di conferma contenuto nel messaggio.`;
+    } else {
+      document.getElementById("email").textContent = "Per completare la creazione del tuo account MyFrEM, apri la tua casella di posta elettronica e clicca sul link di conferma contenuto nel messaggio.";
     }
   </script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
