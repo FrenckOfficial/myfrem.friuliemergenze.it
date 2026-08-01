@@ -24,6 +24,7 @@ const db = getFirestore(app);
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 const statusMsg = document.getElementById("statusMsg");
+const totalUsersCountEl = document.getElementById("totalUsersCount");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
@@ -70,6 +71,7 @@ onAuthStateChanged(auth, async (user) => {
 async function loadUsers() {
   usersTableBody.innerHTML = "";
   const usersSnap = await getDocs(collection(db, "users"));
+  totalUsersCountEl.textContent = usersSnap.size;
 
   let users = [];
 
