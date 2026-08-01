@@ -240,6 +240,11 @@ if (googleBtn) {
 
       if (!userSnap.exists()) {
         const nameParts = (user.displayName || "").split(" ");
+        await addDoc(collection(db, "activities"), {
+        	type: "user_creation",
+          userName: `${nameParts[0]} ${nameParts.slice(1).join(" ")}`,
+          timestamp: serverTimestamp()
+        });
         await setDoc(doc(db, "users", user.uid), {
           email: user.email,
           name: nameParts[0] || "",
