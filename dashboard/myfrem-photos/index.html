@@ -71,11 +71,11 @@
   <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
   <script>
     const searchInput = document.getElementById("searchInput");
-    const tableBody = document.getElementById("usersTableBody");
+    const tableBody = document.getElementById("photosContainer");
   
     searchInput.addEventListener("keyup", () => {
       const filter = searchInput.value.toLowerCase();
-      const rows = tableBody.querySelectorAll("tr");
+      const rows = tableBody.querySelectorAll(".photo-info");
   
       rows.forEach(row => {
         const text = row.textContent.toLowerCase();
