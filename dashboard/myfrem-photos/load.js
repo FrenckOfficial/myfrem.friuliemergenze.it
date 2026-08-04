@@ -110,7 +110,6 @@ async function loadAllPhotos() {
       }
 
       if (data.status === "Approvata ✅"|| "Approvata") {
-        // Carica conteggio voti
         const voteCounts = await getVoteCounts(photoId);
         const userVote = await getUserVote(photoId);
 
@@ -122,7 +121,7 @@ async function loadAllPhotos() {
           <p><b>Posizione:</b> ${data.location || "–"}</p>
           <p><b>Servizio:</b> ${service || "–"}</p>
           <p><b>Note:</b> ${data.notes || "–"}</p>
-          <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank">${userName || "–"}</a></p>
+          <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank" style="font-size: var(--text-sm);color: var(--muted);margin: 0 0 var(--space-md) 0;line-height: 1.5;">${userName || "–"}</a></p>
 
           <div class="vote-container">
             <button class="vote-btn like-btn" data-photo-id="${photoId}" data-vote-type="like" data-user-vote="${userVote}">
