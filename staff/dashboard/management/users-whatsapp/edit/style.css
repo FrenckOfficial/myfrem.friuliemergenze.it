@@ -401,7 +401,7 @@ button {
   line-height: 1.6;
 }
 
-.user-card strong {
+.user-card b {
   color: var(--text);
   font-weight: 700;
 }
@@ -445,7 +445,7 @@ button {
   word-break: break-word;
 }
 
-#userDetails strong {
+#userDetails b {
   color: var(--accent);
   font-weight: 700;
   font-size: 0.75rem;
@@ -454,7 +454,7 @@ button {
   display: block;
 }
 
-#userDetails p:first-child strong {
+#userDetails p:first-child b {
   color: var(--text);
 }
 
@@ -495,7 +495,7 @@ button {
   margin-right: 4px;
 }
 
-#userDetails p:has(+ p, :last-child):not(:has(strong)) {
+#userDetails p:has(+ p, :last-child):not(:has(b)) {
   color: var(--faint);
   font-style: italic;
   font-size: 0.8rem;
@@ -631,7 +631,7 @@ button {
     font-size: 0.8rem;
   }
 
-  #userDetails strong {
+  #userDetails b {
     font-size: 0.7rem;
   }
 
@@ -684,7 +684,7 @@ button {
     font-size: 0.75rem;
   }
 
-  #userDetails strong {
+  #userDetails b {
     font-size: 0.65rem;
   }
 }

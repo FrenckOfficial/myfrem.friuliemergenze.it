@@ -23,19 +23,18 @@
                 <h2>MyFrEM Staff</h2>
             </div>
             <nav>
-                <a href="/staff/">📊 Dashboard</a>
-                <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-                <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
-                <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-                <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-                <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-                <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+                <a href="/staff/">Dashboard</a>
+                <a href="/staff/dashboard/photos/">Moderazione foto</a>
+                <a href="/staff/dashboard/users/" class="active">Funzionalità</a>
+                <a href="/staff/dashboard/events/">Moderazione eventi</a>
+                <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
+                <a href="/staff/dashboard/settings/">Impostazioni</a>
             </nav>
-            <button id="logoutBtn" class="logout">🚪 Logout</button>
+            <button id="logoutBtn" class="logout">Logout</button>
         </aside>
     
         <div class="main-content">
-            <h1>📖 Gestione Bozze Photobook</h1>
+            <h1>Gestione Bozze Photobook</h1>
             
             <div class="drafts-container">
                 <div class="drafts-header">
@@ -46,7 +45,7 @@
                     <h2>Photobook pubblicati:</h2>
                     <span class="draft-count" id="publishedPhotobooksCount">0</span>
                 </div>
-                <button id="newPhotobookBtn" class="btn-new-draft">➕ Nuovo Photobook</button>
+                <button id="newPhotobookBtn" class="btn-new-draft">Nuovo Photobook</button>
     
                 <div id="draftsTableContainer">
                     <table class="drafts-table">
@@ -88,7 +87,7 @@
      
                 <form id="createPhotobookForm">
                     <div class="form-group">
-                        <label for="photobookCoverInput">🖼️ Cover Photobook *</label>
+                        <label for="photobookCoverInput">Cover Photobook *</label>
                         <div class="photo-upload-area">
                             <input 
                                 type="file" 
@@ -100,7 +99,7 @@
                             
                             <div id="coverDropZone" class="photo-drop-zone">
                                 <p style="font-size: 2rem; margin: 10px 0;">📷</p>
-                                <p><strong>Trascina la cover qui</strong></p>
+                                <p><b>Trascina la cover qui</b></p>
                                 <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
                                 <button type="button" class="btn-browse" id="coverBrowseBtn">Sfoglia file</button>
                                 <p style="color: var(--faint); font-size: 0.85rem; margin-top: 10px;">Formati: JPG, PNG, WebP | Max 5MB</p>
@@ -109,7 +108,7 @@
                             <div id="coverPreviewCreate" class="photo-preview" style="display: none; margin-top: 15px;">
                                 <img id="previewCoverCreate" src="" alt="Anteprima cover" loading="lazy" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
                                 <p id="coverFileNameCreate" style="text-align: center; margin-top: 10px; color: var(--faint); font-size: 0.9rem;"></p>
-                                <button type="button" class="btn-remove-photo" id="removeCoverBtn">❌ Rimuovi cover</button>
+                                <button type="button" class="btn-remove-photo" id="removeCoverBtn">Rimuovi cover</button>
                             </div>
                         </div>
                     </div>
@@ -169,7 +168,7 @@
                     </div>
      
                     <div class="modal-actions">
-                        <button type="submit" class="btn-save">💾 Crea Photobook</button>
+                        <button type="submit" class="btn-save">Crea Photobook</button>
                         <button type="button" class="btn-cancel" onclick="window.photobookDraftsManager.closeCreateModal()">Annulla</button>
                     </div>
                 </form>
@@ -246,7 +245,7 @@
                     </div>
     
                     <div class="modal-actions">
-                        <button type="submit" class="btn-save">💾 Salva e Pubblica</button>
+                        <button type="submit" class="btn-save">Salva e Pubblica</button>
                         <button type="button" class="btn-cancel">Annulla</button>
                     </div>
                 </form>

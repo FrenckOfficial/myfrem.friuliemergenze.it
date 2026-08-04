@@ -83,13 +83,13 @@ async function loadUser() {
     currentData = data;
 
     userDetails.innerHTML = `
-        <p><strong>ID Utente:</strong> ${userId}</p>
-        <p><strong>Nome:</strong> ${data.name || "-"}</p>
-        <p><strong>Numero:</strong> ${data.phone || "-"}</p>
-        <p><strong>Data iscrizione:</strong> ${data.date || "-"}</p>
-        <p><strong>Tag:</strong> ${(data.tags || []).join(", ") || "-"}</p>
-        <p><strong>Linked MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.name ? data.linkedMyFremUser.name + " (" + data.linkedMyFremUser.role + ")" : "-" : "-"}</p>
-        <p><strong>ID MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.id || "-" : "-"}</p>
+        <p><b>ID Utente:</b> ${userId}</p>
+        <p><b>Nome:</b> ${data.name || "-"}</p>
+        <p><b>Numero:</b> ${data.phone || "-"}</p>
+        <p><b>Data iscrizione:</b> ${data.date || "-"}</p>
+        <p><b>Tag:</b> ${(data.tags || []).join(", ") || "-"}</p>
+        <p><b>Linked MyFrEM:</b> ${data.linkedMyFremUser ? data.linkedMyFremUser.name ? data.linkedMyFremUser.name + " (" + data.linkedMyFremUser.role + ")" : "-" : "-"}</p>
+        <p><b>ID MyFrEM:</b> ${data.linkedMyFremUser ? data.linkedMyFremUser.id || "-" : "-"}</p>
     `;
 
     document.getElementById("name").value = data.name || "";

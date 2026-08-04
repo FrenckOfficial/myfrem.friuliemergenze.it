@@ -148,7 +148,7 @@ profilePicForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (isReadOnlyMode) {
-    setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+    setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Non puoi modificare in modalità sola lettura", "error");
     return;
   }
 
@@ -200,7 +200,7 @@ copyProfileLinkBtn.addEventListener("click", () => {
 })
 
 saveFullNameBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newName = nameInput.value.trim();
   const newSurname = surnameInput.value.trim();
@@ -216,7 +216,7 @@ saveFullNameBtn.addEventListener("click", async () => {
 });
 
 saveUsernameBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newUsername = usernameInput.value.trim();
   if (newUsername.length < 3) return setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "Minimo 3 caratteri!", "error");
@@ -229,7 +229,7 @@ saveUsernameBtn.addEventListener("click", async () => {
 });
 
 saveMailBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newMail = mailInput.value.trim();
   if (newMail.length < 5 || !newMail.includes("@")) return setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "Inserisci una mail valida!", "error");
@@ -244,7 +244,7 @@ saveMailBtn.addEventListener("click", async () => {
 });
 
 savePhoneBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newPhone = phoneInput.value.trim();
 
@@ -256,7 +256,7 @@ savePhoneBtn.addEventListener("click", async () => {
 })
 
 saveBioBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newBio = bioInput.value.trim();
 
@@ -268,7 +268,7 @@ saveBioBtn.addEventListener("click", async () => {
 });
 
 savePasswordBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePswStatus", "pswStatusBox", "pswStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closePswStatus", "pswStatusBox", "pswStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   try {
     const user = auth.currentUser;
@@ -307,7 +307,7 @@ async function loadPreferences() {
 }
 
 savePreferencesBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "❌ Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   try {
     const userRef = doc(db, "users", currentUserId);
@@ -343,19 +343,19 @@ savePreferencesBtn.addEventListener("click", async () => {
           link: `https://www.friuliemergenze.it/newsletter/confirm/?token=${token}`
         });
 
-        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "✅ Preferenze salvate! E-mail di conferma inviata!", "success");
+        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate! E-mail di conferma inviata!", "success");
       } else {
-        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "✅ Preferenze salvate!", "success");
+        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate!", "success");
       }
     } else {
       if (!existingDoc.empty) {
         await deleteDoc(doc(db, "newsletterSubs", existingDoc.docs[0].id));
       }
-      setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "✅ Preferenze salvate!", "success");
+      setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate!", "success");
     }
   } catch (error) {
     console.error("Errore:", error);
-    setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "❌ Errore nel salvataggio", "error");
+    setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Errore nel salvataggio", "error");
   }
 });
 
@@ -375,7 +375,7 @@ async function loadUserBadgesSettings() {
     if (badgesSnap.empty) {
       badgesContainer.innerHTML = `
         <div style="text-align: center; padding: 2rem; color: var(--muted);">
-          <p>Non hai ancora guadagnato badge. 🏅</p>
+          <p>Non hai ancora guadagnato badge.</p>
           <p style="font-size: 0.9rem;">Continua con foto e partecipazione!</p>
         </div>
       `;
@@ -421,7 +421,7 @@ async function loadUserBadgesSettings() {
       const earnedDate = document.createElement("div");
       earnedDate.style.cssText = "font-size: 0.75rem; color: var(--muted);";
       if (badgeData.earnedAt?.toDate) {
-        earnedDate.textContent = `📅 ${badgeData.earnedAt.toDate().toLocaleDateString("it-IT")}`;
+        earnedDate.textContent = `${badgeData.earnedAt.toDate().toLocaleDateString("it-IT")}`;
       }
  
       badgeEl.appendChild(img);
@@ -447,8 +447,7 @@ async function loadUserBadgesSettings() {
     console.error("Errore caricamento badge:", err);
   }
 }
- 
-// Aggiungere anche il caricamento del progress badge:
+
 async function loadBadgesProgress() {
   try {
     const progressContainer = document.getElementById("badgesProgressContainer");
@@ -465,7 +464,7 @@ async function loadBadgesProgress() {
     progressList.style.cssText = "display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;";
  
     for (const badgeDoc of badgesSnap.docs) {
-      if (earnedIds.has(badgeDoc.id)) continue; // skip earned
+      if (earnedIds.has(badgeDoc.id)) continue;
  
       const badge = badgeDoc.data();
       if (!badge.enabled) continue;
@@ -517,7 +516,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
         query(
           collection(db, "photos"),
           where("userId", "==", userId),
-          where("status", "==", "Approvata ✅")
+          where("status", "==", `${"Approvata ✅" || "Approvata"}`)
         )
       );
       current = snap.size;
@@ -552,7 +551,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
         query(
           collection(db, "photos"),
           where("userId", "==", userId),
-          where("status", "==", "Approvata ✅")
+          where("status", "==", `${"Approvata ✅" || "Approvata"}`)
         )
       );
       const services = new Set(snap.docs.map(d => d.data().serviceId));

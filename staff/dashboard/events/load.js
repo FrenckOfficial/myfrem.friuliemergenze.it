@@ -58,7 +58,7 @@ onAuthStateChanged(auth, async (user) => {
 
       div.innerHTML = `
         <h3>${e.title}</h3>
-        <p><strong>📍 Luogo:</strong> ${e.location}</p>
+        <p><b>📍 Luogo:</b> ${e.location}</p>
         <p>${e.description.length > 150 ? e.description.slice(0,150)+"..." : e.description}</p>
         <span class="status ${e.status === "In revisione..." ? "revision" :
                              e.status === "Approvato" ? "approved" :

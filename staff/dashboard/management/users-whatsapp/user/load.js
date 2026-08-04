@@ -51,15 +51,15 @@ async function loadUser() {
 
   userDataDiv.innerHTML = `
     <div class="user-card">
-      <p><strong>Nome:</strong> ${data.name}</p>
-      <p><strong>Numero:</strong> ${data.phone ?? "N/D"}</p>
-      <p><strong>Data entrata:</strong> ${date}</p>
-      <p><strong>Ruolo:</strong> ${role}</p>
-      <p><strong>Status:</strong> ${status}</p>
-      <p><strong>Note:</strong> ${data.notes ? data.notes : "Nessuna nota fornita"}</p>
-      <p><strong>Tag:</strong> ${data.tags ? data.tags.join(", ") : "Nessun tag fornito"}</p>
-      <p><strong>Linked MyFrEM:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.name : "Nessun account fornito"}</p>
-      <p><strong>Linked MyFrEM Account ID:</strong> ${data.linkedMyFremUser ? data.linkedMyFremUser.id : "Nessun ID account disponibile in quanto account non fornito"}</p>
+      <p><b>Nome:</b> ${data.name}</p>
+      <p><b>Numero:</b> ${data.phone ?? "N/D"}</p>
+      <p><b>Data entrata:</b> ${date}</p>
+      <p><b>Ruolo:</b> ${role}</p>
+      <p><b>Status:</b> ${status}</p>
+      <p><b>Note:</b> ${data.notes ? data.notes : "Nessuna nota fornita"}</p>
+      <p><b>Tag:</b> ${data.tags ? data.tags.join(", ") : "Nessun tag fornito"}</p>
+      <p><b>Linked MyFrEM:</b> ${data.linkedMyFremUser ? data.linkedMyFremUser.name : "Nessun account fornito"}</p>
+      <p><b>Linked MyFrEM Account ID:</b> ${data.linkedMyFremUser ? data.linkedMyFremUser.id : "Nessun ID account disponibile in quanto account non fornito"}</p>
       <button id="backBtn" class="user-btn btn-back">🔙 Torna alla lista</button>
       <button id="editBtn" class="user-btn btn-edit">✏️ Modifica utente</button>
     </div>

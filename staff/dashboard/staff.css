@@ -1446,6 +1446,51 @@ button {
   transform: translateY(-2px);
 }
 
+.votes-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px !important;
+}
+ 
+.vote-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+ 
+.like-badge {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+ 
+.like-badge:hover {
+  background-color: rgba(34, 197, 94, 0.25);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+ 
+.dislike-badge {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+ 
+.dislike-badge:hover {
+  background-color: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+ 
+.vote-badge i {
+  font-size: 11px;
+}
+
 @media (max-width: 1024px) {
   .sidebar {
     width: 200px;
@@ -1479,6 +1524,16 @@ button {
 
   .user-management-options {
     grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .votes-cell {
+    flex-direction: column;
+    gap: 4px;
+  }
+ 
+  .vote-badge {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -1643,5 +1698,15 @@ button {
 
   .user-management-options {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .like-badge {
+    background-color: rgba(34, 197, 94, 0.12);
+  }
+ 
+  .dislike-badge {
+    background-color: rgba(239, 68, 68, 0.12);
   }
 }

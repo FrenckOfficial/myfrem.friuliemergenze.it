@@ -43,6 +43,7 @@ const elements = {
   title: document.getElementById("profileTitle"),
   name: document.getElementById("profileName"),
   username: document.getElementById("profileUsername"),
+  bio: document.getElementById("profileDescription"),
   email: document.getElementById("profileEmail"),
   role: document.getElementById("profileRole"),
   status: document.getElementById("profileStatus"),
@@ -87,6 +88,7 @@ async function loadUserProfile(uid) {
 
         const fullName = `${user.name || ""} ${user.surname || ""}` || "Utente";
         const username = user.username || "username";
+        const bio = user.bio || "N/D";
         const email = user.email || "N/D";
         const role = user.role || "Utente";
         const status = user.status || "Offline";

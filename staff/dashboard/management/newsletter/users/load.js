@@ -20,6 +20,7 @@ const auth = getAuth(app);
 
 const tableBody = document.getElementById("usersTableBody");
 const messageBox = document.getElementById("messageBox");
+const totalUsersCountEl = document.getElementById("totalUsersCount");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
@@ -74,6 +75,7 @@ async function loadUsers() {
     );
 
     const snap = await getDocs(q);
+    totalUsersCountEl.textContent = snap.size;
 
     if (snap.empty) {
       tableBody.innerHTML = `<tr><td colspan="5">Nessun utente trovato</td></tr>`;

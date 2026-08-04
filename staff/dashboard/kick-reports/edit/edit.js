@@ -59,11 +59,11 @@ async function loadReport() {
     const data = snap.data();
 
     reportDetails.innerHTML = `
-        <p><strong>Utente:</strong> ${data.userName}</p>
-        <p><strong>Contatto:</strong> ${data.userNumber || "-"}</p>
-        <p><strong>Motivo:</strong> ${data.reason}</p>
-        <p><strong>Note iniziali:</strong> ${data.notes || "Nessuna"}</p>
-        <p><strong>Data espulsione:</strong> ${data.expulsionDate}</p>
+        <p><b>Utente:</b> ${data.userName}</p>
+        <p><b>Contatto:</b> ${data.userNumber || "-"}</p>
+        <p><b>Motivo:</b> ${data.reason}</p>
+        <p><b>Note iniziali:</b> ${data.notes || "Nessuna"}</p>
+        <p><b>Data espulsione:</b> ${data.expulsionDate}</p>
     `;
 
     loadNotes(data.notesHistory || []);
@@ -75,7 +75,7 @@ function loadNotes(notes) {
     notes.forEach((n) => {
         const li = document.createElement("li");
         li.innerHTML = `
-            <strong>🕒 ${new Date(n.time.toDate()).toLocaleString()}</strong><br>
+            <b>🕒 ${new Date(n.time.toDate()).toLocaleString()}</b><br>
             ${n.text}
             ${n.attachment ? `<a class="attachment" href="${n.attachment}" target="_blank">📎 Allegato</a>` : ""}
         `;

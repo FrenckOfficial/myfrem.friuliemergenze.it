@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compila Richiesta Organizzazione Evento | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
     <link rel="stylesheet" href="/dashboard/dsh.css">
-    <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -29,19 +30,19 @@
   <div class="content" style="display:none;">
     <aside class="sidebar">
         <div class="logo">
-          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+          <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
           <h2>MyFrEM</h2>
         </div>
         <nav>
-          <a href="/dashboard">🏠 Home</a>
-          <a href="/dashboard/upload">📸 Carica una foto</a>
-          <a href="/dashboard/propose/" class="active">🗂️ Proponi un evento</a>
-          <a href="/dashboard/my-content">📚 I miei contenuti</a>
-          <a href="/dashboard/myfrem-photos">📸 Tutte le foto</a>
-          <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-          <a href="/dashboard/contact/">📞 Contattaci</a>
+          <a href="/dashboard">Home</a>
+          <a href="/dashboard/upload">Carica una foto</a>
+          <a href="/dashboard/propose/" class="active">Proponi un evento</a>
+          <a href="/dashboard/my-content">I miei contenuti</a>
+          <a href="/dashboard/myfrem-photos">Tutte le foto</a>
+          <a href="/dashboard/settings/">Impostazioni</a>
+          <a href="/dashboard/contact/">Contattaci</a>
         </nav>
-        <button id="logoutBtn" class="logout">🚪 Logout</button>
+        <button id="logoutBtn" class="logout">Logout</button>
     </aside>
 
     <main class="main-content">
@@ -54,23 +55,23 @@
 
         <form id="eventForm" class="event-form">
           <div class="form-group">
-            <label for="eventTitle">📌 Titolo Evento *</label>
+            <label for="eventTitle">Titolo Evento *</label>
             <input type="text" id="eventTitle" required>
           </div>
           <div class="form-group">
-            <label for="description">📝 Descrizione dettagliata *</label>
+            <label for="description">Descrizione dettagliata *</label>
             <textarea id="description" required></textarea>
           </div>
           <div class="form-group">
-            <label for="location">📍 Luogo di incontro suggerito *</label>
+            <label for="location">Luogo di incontro suggerito *</label>
             <input type="text" id="location" required>
           </div>
           <div class="form-group">
-            <label for="contact">📞 Contatto (o nome utente WhatsApp) *</label>
+            <label for="contact">Contatto (o nome utente WhatsApp) *</label>
             <input type="text" id="contact" required>
           </div>
 
-          <button type="submit" class="btn-primary">📤 Invia proposta evento</button>
+          <button type="submit" class="btn-primary">Invia proposta evento</button>
         </form>
     </main>
   </div>
@@ -80,5 +81,70 @@
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
   <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+  <script>
+    (function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+
+      if (!menuToggle || !sidebar) {
+        console.warn('Menu toggle or sidebar not found');
+        return;
+      }
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+      function openSidebar() {
+        sidebar.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      const navLinks = sidebar.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          closeSidebar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+          if (e.target === menuToggle || menuToggle.contains(e.target)) {
+            return;
+          }
+          if (!sidebar.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768) {
+            closeSidebar();
+          }
+        }, 250);
+      });
+    })();
+  </script>
 </body>
 </html>

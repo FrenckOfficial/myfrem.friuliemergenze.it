@@ -4,7 +4,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-console.log("👉 Inizializzo Firebase...");
+console.log("Inizializzo Firebase...");
 
 const userNameEl = document.getElementById("userName");
 const totalPhotosEl = document.getElementById("totalPhotos");
@@ -29,10 +29,10 @@ const contentEl = document.querySelector(".content");
 
 auth.onAuthStateChanged(async (user) => {
   emailjs.init("49-8564mCPRVWNmBW");
-  console.log("👀 onAuthStateChanged triggered, user:", user);
+  console.log("onAuthStateChanged triggered, user:", user);
 
   if (!user) {
-    console.warn("⚠️ Nessun utente loggato, redirect al login...");
+    console.warn("Nessun utente loggato, redirect al login...");
     loadingEl.style.display = "none";
     window.location.href = "/login/";
     return;
@@ -72,7 +72,7 @@ auth.onAuthStateChanged(async (user) => {
     const isReadOnlyMode = userData.role === "testacc";
 
     if (isReadOnlyMode) {
-      console.log("📖 Modalità sola lettura attivata per testacc");
+      console.log("Modalità sola lettura attivata");
       document.body.classList.add("read-only-mode");
     }
 
@@ -95,7 +95,7 @@ auth.onAuthStateChanged(async (user) => {
       .get();
 
     let total = 0, approved = 0, pending = 0, rejected = 0;
-    let displayCount = 0; // Contatore per il DOM
+    let displayCount = 0;
     activityListEl.innerHTML = "";
 
     photosSnap.forEach((doc) => {
@@ -103,14 +103,14 @@ auth.onAuthStateChanged(async (user) => {
       console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
-      if (photo.status === "Approvata ✅") approved++;
-      if (photo.status === "Foto in attesa di approvazione ⌛") pending++;
-      if (photo.status === "Rifiutata ❌") rejected++;
+      if (photo.status === `${"Approvata ✅" || "Approvata"}`) approved++;
+      if (photo.status === `${"Foto in attesa di approvazione ⌛" || "Foto in attesa di approvazione"}`) pending++;
+      if (photo.status === `${"Rifiutata ❌" || "Rifiutata"}`) rejected++;
 
       if (displayCount < 5) {
         const li = document.createElement("li");
         li.innerHTML = `
-          <p>📸 Foto caricata il ${
+          <p>Foto caricata il ${
             photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"
           } - Stato: <b>${photo.status}</b></p>
         `;
@@ -247,7 +247,7 @@ auth.onAuthStateChanged(async (user) => {
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   } catch (err) {
-    console.error("❌ Errore durante il caricamento:", err);
+    console.error("Errore durante il caricamento:", err);
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
     contentEl.style.display = "block";

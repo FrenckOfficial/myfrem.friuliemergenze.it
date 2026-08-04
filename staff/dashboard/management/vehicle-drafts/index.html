@@ -25,17 +25,16 @@
             <nav>
                 <a href="/staff/">📊 Dashboard</a>
                 <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-                <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
+                <a href="/staff/dashboard/users/" class="active">Funzionalità</a>
                 <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
                 <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-                <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-                <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+                <a href="/staff/dashboard/settings/">Impostazioni</a>
             </nav>
-            <button id="logoutBtn" class="logout">🚪 Logout</button>
+            <button id="logoutBtn" class="logout">Logout</button>
         </aside>
     
         <div class="main-content">
-            <h1>🚗 Gestione Bozze Veicoli</h1>
+            <h1>Gestione Bozze Veicoli</h1>
             
             <div class="drafts-container">
                 <div class="drafts-header">
@@ -46,7 +45,7 @@
                     <h2>Bozze pubblicate:</h2>
                     <span class="draft-count" id="publishedDraftsCount"> 0</span>
                 </div>
-                <button id="newDraftBtn" class="btn-new-draft">➕ Nuova Bozza</button>
+                <button id="newDraftBtn" class="btn-new-draft">Nuova Bozza</button>
     
                 <div id="draftsTableContainer">
                     <table class="drafts-table">
@@ -87,7 +86,7 @@
      
                 <form id="createVehicleForm">
                     <div class="form-group">
-                        <label for="vehiclePhotoInput">📸 Foto Veicolo *</label>
+                        <label for="vehiclePhotoInput">Foto Veicolo *</label>
                         <div class="photo-upload-area">
                             <input 
                                 type="file" 
@@ -99,7 +98,7 @@
                             
                             <div id="photoDropZone" class="photo-drop-zone">
                                 <p style="font-size: 2rem; margin: 10px 0;">📷</p>
-                                <p><strong>Trascina la foto qui</strong></p>
+                                <p><b>Trascina la foto qui</b></p>
                                 <p style="color: var(--faint); font-size: 0.9rem;">oppure</p>
                                 <button type="button" class="btn-browse" id="photoBrowseBtn">Sfoglia file</button>
                                 <p style="color: var(--faint); font-size: 0.85rem; margin-top: 10px;">Formati: JPG, PNG, WebP | Max 5MB</p>
@@ -108,7 +107,7 @@
                             <div id="photoPreviewCreate" class="photo-preview" style="display: none; margin-top: 15px;">
                                 <img id="previewImgCreate" src="" alt="Anteprima foto" loading="lazy" style="max-width: 100%; max-height: 250px; border-radius: 8px;">
                                 <p id="photoFileNameCreate" style="text-align: center; margin-top: 10px; color: var(--faint); font-size: 0.9rem;"></p>
-                                <button type="button" class="btn-remove-photo" id="removePhotoBtn">❌ Rimuovi foto</button>
+                                <button type="button" class="btn-remove-photo" id="removePhotoBtn">Rimuovi foto</button>
                             </div>
                         </div>
                     </div>
@@ -174,7 +173,7 @@
                     </div>
      
                     <div class="modal-actions">
-                        <button type="submit" class="btn-save">💾 Crea Bozza</button>
+                        <button type="submit" class="btn-save">Crea Bozza</button>
                         <button type="button" class="btn-cancel" onclick="window.vehicleDraftsManager.closeCreateModal()">Annulla</button>
                     </div>
                 </form>
@@ -257,7 +256,7 @@
                     </div>
     
                     <div class="modal-actions">
-                        <button type="submit" class="btn-save">💾 Salva e Pubblica</button>
+                        <button type="submit" class="btn-save">Salva e Pubblica</button>
                         <button type="button" class="btn-cancel">Annulla</button>
                     </div>
                 </form>
@@ -335,6 +334,5 @@
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
 </body>
 </html>

@@ -850,7 +850,7 @@ button:nth-child(3):hover {
   font-size: 0.75rem;
 }
 
-.photo-drop-zone p strong {
+.photo-drop-zone p b {
   color: var(--accent);
   font-weight: 700;
 }

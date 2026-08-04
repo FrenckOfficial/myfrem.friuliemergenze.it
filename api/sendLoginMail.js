@@ -224,7 +224,7 @@ body {
   line-height: 1.6;
 }
 
-.security-note strong {
+.security-note b {
   color: #333;
 }
 
@@ -263,7 +263,7 @@ body {
 
   <div class="content">
     <div class="greeting">
-      Ciao <strong>${name}</strong>,
+      Ciao <b>${name}</b>,
       <br><br>
       È stato effettuato un accesso al tuo account MyFrEM. Se non sei stato tu, chiama subito il numero 0431/980003.
     </div>
@@ -279,7 +279,7 @@ body {
     </div>
 
     <div class="security-note">
-      <strong>⚠️ Nota di Sicurezza:</strong> Se non hai effettuato tu questo accesso, accedi subito al tuo account e cambia la password. Se hai dubbi sulla sicurezza del tuo account, chiamaci al numero 0431/980003.
+      <b>⚠️ Nota di Sicurezza:</b> Se non hai effettuato tu questo accesso, accedi subito al tuo account e cambia la password. Se hai dubbi sulla sicurezza del tuo account, chiamaci al numero 0431/980003.
     </div>
 
     <div class="cta-link">

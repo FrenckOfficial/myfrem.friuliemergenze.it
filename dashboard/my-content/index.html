@@ -6,52 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I miei contenuti | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
-  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-  <style>
-    .tab-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      border-bottom: 2px solid var(--border-color, #333);
-    }
-
-    .tab-btn {
-      padding: 12px 20px;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      color: var(--text-secondary, #999);
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      font-family: Lexend, sans-serif;
-    }
-
-    .tab-btn:hover {
-      color: var(--accent, #ff7b00);
-    }
-
-    .tab-btn.active {
-      color: var(--accent, #ff7b00);
-      border-bottom-color: var(--accent, #ff7b00);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-  </style>
 </head>
 <body>
   <div class="loading">
@@ -60,31 +23,33 @@
   </div>
 
   <div class="content" style="display:none;">
+    <button class="menu-toggle" aria-label="Toggle navigation menu">
+      <i class="fas fa-bars"></i>
+    </button>
     <aside class="sidebar">
       <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
         <h2>MyFrEM</h2>
       </div>
       <nav>
-        <a href="/dashboard">🏠 Home</a>
-        <a href="/dashboard/upload">📸 Carica una foto</a>
-        <a href="/dashboard/propose/">🗂️ Proponi un evento</a>
-        <a href="/dashboard/my-content" class="active">📚 I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos">📸 Tutte le foto</a>
-        <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-        <a href="/dashboard/contact/">📞 Contattaci</a>
+        <a href="/dashboard">Home</a>
+        <a href="/dashboard/upload">Carica una foto</a>
+        <a href="/dashboard/propose/">Proponi un evento</a>
+        <a href="/dashboard/my-content" class="active">I miei contenuti</a>
+        <a href="/dashboard/myfrem-photos">Tutte le foto</a>
+        <a href="/dashboard/settings/">Impostazioni</a>
       </nav>
-      <button id="logoutBtn" class="logout">🚪 Logout</button>
+      <button id="logoutBtn" class="logout">Logout</button>
     </aside>
 
     <main class="main-content">
       <div class="content-box" style="max-width:none;">
-        <h1>📚 I miei contenuti</h1>
+        <h1>I miei contenuti</h1>
         <p>Qui trovi tutte le foto e gli eventi creati da te.</p>
 
         <div class="tab-buttons">
-          <button class="tab-btn active" data-tab="photos-tab">📸 Le mie foto</button>
-          <button class="tab-btn" data-tab="events-tab">🗂️ I miei eventi</button>
+          <button class="tab-btn active" data-tab="photos-tab">Le mie foto</button>
+          <button class="tab-btn" data-tab="events-tab">I miei eventi</button>
         </div>
 
         <p class="statusBox" style="display:none;">
@@ -114,5 +79,70 @@
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
   <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+  <script>
+    (function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+
+      if (!menuToggle || !sidebar) {
+        console.warn('Menu toggle or sidebar not found');
+        return;
+      }
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+      function openSidebar() {
+        sidebar.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      const navLinks = sidebar.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          closeSidebar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+          if (e.target === menuToggle || menuToggle.contains(e.target)) {
+            return;
+          }
+          if (!sidebar.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768) {
+            closeSidebar();
+          }
+        }, 250);
+      });
+    })();
+  </script>
 </body>
 </html>

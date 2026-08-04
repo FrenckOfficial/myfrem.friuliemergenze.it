@@ -40,7 +40,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   
   if (!user) {
-    setStatus("⚠️ Devi essere loggato");
+    setStatus("Devi essere loggato");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";;
     window.location.href = "/login/";
@@ -76,7 +76,7 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";;
 
   } catch (err) {
-    console.error("❌ Errore caricamento auth:", err);
+    console.error("Errore caricamento auth:", err);
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
     contentEl.style.display = "block";;
@@ -104,7 +104,7 @@ fileInput.addEventListener("change", async () => {
       };
       reader.readAsDataURL(watermarkedFile);
     } catch (error) {
-      console.error("❌ Errore preview:", error);
+      console.error("Errore preview:", error);
       previewContainer.style.display = "none";
     }
   } else {
@@ -125,22 +125,22 @@ uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
   
   if (isReadOnlyMode) {
-    return setStatus("❌ Non puoi caricare foto in modalità sola lettura");
+    return setStatus("Non puoi caricare foto in modalità sola lettura");
   }
 
-  if (!currentUser) return setStatus("❌ Devi essere loggato");
+  if (!currentUser) return setStatus("Devi essere loggato");
   if (!titleInput.value.trim()) {
-    return setStatus("❌ Il modello del veicolo è obbligatorio");
+    return setStatus("Il modello del veicolo è obbligatorio");
   }
   if (!locationInput.value.trim()) {
-    return setStatus("❌ La sede di appartenenza è obbligatoria");
+    return setStatus("La sede di appartenenza è obbligatoria");
   }
   if (serviceTypeInput.value === "none") {
-    return setStatus("❌ Seleziona una tipologia di servizio");
+    return setStatus("Seleziona una tipologia di servizio");
   }
 
   const files = fileInput.files;
-  if (files.length === 0) return setStatus("❌ Seleziona almeno una foto");
+  if (files.length === 0) return setStatus("Seleziona almeno una foto");
 
   setStatus("⏳ Upload foto in corso...");
   progressBar.style.display = "block";
@@ -165,7 +165,7 @@ uploadBtn.addEventListener("click", async (e) => {
     try {
       file = await addWatermarkToImage(file, logoUrl);
     } catch (error) {
-      console.error("❌ Errore watermark:", error);
+      console.error("Errore watermark:", error);
       continue;
     }
 
@@ -182,7 +182,7 @@ uploadBtn.addEventListener("click", async (e) => {
       .upload(path, file, { upsert: false });
 
     if (uploadError) {
-      console.error("❌ Upload fallito:", uploadError);
+      console.error("Upload fallito:", uploadError);
       continue;
     }
 
@@ -209,7 +209,7 @@ uploadBtn.addEventListener("click", async (e) => {
       fileName: file.name,
       url: fileUrl,
       notes: notesInput.value || "-",
-      status: "Foto in attesa di approvazione ⌛",
+      status: "Foto in attesa di approvazione",
       createdAt: serverTimestamp()
     });
 
@@ -223,7 +223,7 @@ uploadBtn.addEventListener("click", async (e) => {
     const userData = userDoc.data();
 
     if (!userData) {
-      console.error("❌ userData è undefined");
+      console.error("userData è undefined");
       continue;
     }
 
@@ -237,7 +237,7 @@ uploadBtn.addEventListener("click", async (e) => {
       console.log(uploadedAt);
 
       if (uploadedAt.undefined === true) {
-        console.error("❌ uploadedAt undefined");
+        console.error("uploadedAt undefined");
         continue;
       }
   
@@ -255,7 +255,7 @@ uploadBtn.addEventListener("click", async (e) => {
       })
 
       if (!response.ok) {
-        console.error("❌ Errore invio notifica email:", response.status);
+        console.error("Errore invio notifica email:", response.status);
       }
 
       const staffResponse = await fetch("/api/sendStaffNewPhotoEmail", {
@@ -271,12 +271,12 @@ uploadBtn.addEventListener("click", async (e) => {
       })
 
       if (!staffResponse.ok) {
-        console.error("❌ Errore invio email staff:", staffResponse.status);
+        console.error("Errore invio email staff:", staffResponse.status);
       }
     }
   }
 
-  setStatus(`✅ Caricate ${uploadedCount}/${files.length} foto!`);
+  setStatus(`Caricate ${uploadedCount}/${files.length} foto!`);
   fileInput.value = "";
   fileNameSpan.textContent = "Nessun file";
   progressText.textContent = "100%";
@@ -373,7 +373,7 @@ function buildStaffEmail(userEmail, userName, photoName, photoLink) {
                 <td style="padding:35px;text-align:center;">
                   <img src="https://www.friuliemergenze.it/assets/logo.png" style="width:80px;margin-bottom:20px;" loading="lazy">
                   
-                  <h1 style="color:#00d4e8;margin:0;font-size:28px;">📸 Nuova foto caricata</h1>
+                  <h1 style="color:#00d4e8;margin:0;font-size:28px;">Nuova foto caricata</h1>
 
                   <p style="font-size:16px;color:#333;margin-top:25px;text-align:left;">
                     <b>Utente:</b> ${userName}<br>

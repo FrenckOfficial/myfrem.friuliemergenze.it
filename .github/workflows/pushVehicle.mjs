@@ -361,12 +361,12 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
       <section class="dettagli-mezzo">
         <h2>Dati Tecnici<\/h2>
         <ul>
-          <li><strong>Marca:<\/strong> ${escapeHtml(vehicleData.brand)}<\/li>
-          <li><strong>Modello:<\/strong> ${escapeHtml(vehicleData.model)}<\/li>
-          <li><strong>Allestimento:<\/strong> ${escapeHtml(vehicleData.builder ? vehicleData.builder : "N/A")}<\/li>
-          <li><strong>Targa:<\/strong> ${escapeHtml(vehicleData.plate ? vehicleData.plate : "N/A")}<\/li>
-          <li><strong>Servizio:<\/strong> ${escapeHtml(service)}<\/li>
-          <li><strong>Sede:<\/strong> ${escapeHtml(vehicleData.headquarters)}<\/li>
+          <li><b>Marca:<\/b> ${escapeHtml(vehicleData.brand)}<\/li>
+          <li><b>Modello:<\/b> ${escapeHtml(vehicleData.model)}<\/li>
+          <li><b>Allestimento:<\/b> ${escapeHtml(vehicleData.builder ? vehicleData.builder : "N/A")}<\/li>
+          <li><b>Targa:<\/b> ${escapeHtml(vehicleData.plate ? vehicleData.plate : "N/A")}<\/li>
+          <li><b>Servizio:<\/b> ${escapeHtml(service)}<\/li>
+          <li><b>Sede:<\/b> ${escapeHtml(vehicleData.headquarters)}<\/li>
         <\/ul>
         <p id="galleryRecognition">
           Photo by <em>${escapeHtml(author)}</em> from

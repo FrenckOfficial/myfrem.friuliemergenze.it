@@ -20,19 +20,18 @@
       <h2>MyFrEM Staff</h2>
     </div>
     <nav>
-      <a href="/staff/dashboard/">📊 Dashboard</a>
-      <a href="/staff/dashboard/photos/">🖼️ Moderazione foto</a>
-      <a href="/staff/dashboard/users/" class="active">👥 Funzionalità</a>
-      <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-      <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-      <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-      <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+      <a href="/staff/dashboard/">Dashboard</a>
+      <a href="/staff/dashboard/photos/">Moderazione foto</a>
+      <a href="/staff/dashboard/users/" class="active">Funzionalità</a>
+      <a href="/staff/dashboard/events/">Moderazione eventi</a>
+      <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
+      <a href="/staff/dashboard/settings/">Impostazioni</a>
     </nav>
-    <button id="logoutBtn" class="logout">🚪 Logout</button>
+    <button id="logoutBtn" class="logout">Logout</button>
   </aside>
   <main class="main-content">
     <div class="top-bar">
-        <h1>📄 Nuovo Utente WhatsApp</h1>
+        <h1>Nuovo Utente WhatsApp</h1>
     </div>
 
     <p>Compila il modulo qui sotto per aggiungere un nuovo utente WhatsApp.</p>
@@ -44,25 +43,25 @@
         <form id="expulsionReportForm">
             <div class="form-row">
               <div class="form-col">
-                <label for="userSelect">👤 Nome utente:</label>
+                <label for="userSelect">Nome utente:</label>
                 <textarea id="userSelect" class="photo-link-input"></textarea>
               </div>
 
               <div class="form-col">
-                <label for="userNumber">📞 Numero contatto utente:</label>
+                <label for="userNumber">Numero contatto utente:</label>
                 <input type="tel" id="userNumber" class="photo-link-input">
               </div>
             </div>
             <div class="form-group">
-                <label for="expulsionDate">📅 Data entrata:</label>
+                <label for="expulsionDate">Data entrata:</label>
                 <input type="date" id="expulsionDate" class="photo-link-input" required>
             </div>
             <div class="form-group">
-                <label for="notes">🗒️ Note aggiuntive (facoltativo):</label>
+                <label for="notes">Note aggiuntive (facoltativo):</label>
                 <textarea id="notes" class="photo-link-input" placeholder="Eventuali note aggiuntive..."></textarea>
             </div>
             <div class="form-group">
-              <h3>🏷️ Tag utente</h3>
+              <h3>Tag utente</h3>
               <div id="tagsContainer">
                 <label><input type="checkbox" class="tagCheck" value="Amministratore"> #Amministratore</label><br>
                 <label><input type="checkbox" class="tagCheck" value="Nuovo Utente"> #Nuovo Utente</label><br>
@@ -73,14 +72,14 @@
             </div>
 
             <div class="form-group">
-              <h3>🔗 Collegamento a utente MyFrEM</h3>
+              <h3>Collegamento a utente MyFrEM</h3>
               <input id="myfremIdInput" type="text" class="photo-link-input" placeholder="ID utente MyFrEM">
-              <button type="button" id="linkMyFremBtn" class="quick-btn">🔍 Collega</button>
+              <button type="button" id="linkMyFremBtn" class="quick-btn">Collega</button>
 
               <div id="myfremResult" style="margin-top:10px;font-size:14px;display:none;"></div>
             </div>
             <div class="form-group">
-                <button type="submit" class="quick-btn">📤 Aggiungi Utente</button>
+                <button type="submit" class="quick-btn">Aggiungi Utente</button>
             </div>
         </form>
         <div id="statusMsg"></div>
@@ -91,6 +90,5 @@
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
 </body>
 </html>

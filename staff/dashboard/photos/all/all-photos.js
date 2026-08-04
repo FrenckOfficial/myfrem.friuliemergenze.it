@@ -91,6 +91,29 @@ async function loadUsersMap() {
   }
 }
 
+async function getVoteCounts(photoId) {
+  try {
+    const votesQuery = query(
+      collection(db, "photos", photoId, "votes")
+    );
+    const snapshot = await getDocs(votesQuery);
+
+    let likes = 0;
+    let dislikes = 0;
+
+    snapshot.forEach((doc) => {
+      const voteData = doc.data();
+      if (voteData.voteType === "like") likes++;
+      else if (voteData.voteType === "dislike") dislikes++;
+    });
+
+    return { likes, dislikes };
+  } catch (err) {
+    console.error("Errore caricamento conteggio voti:", err);
+    return { likes: 0, dislikes: 0 };
+  }
+}
+
 async function loadAllPhotos() {
   try {
     console.log("⏳ Caricamento tutte le foto...");
@@ -108,9 +131,10 @@ async function loadAllPhotos() {
       return;
     }
 
-    snapshot.forEach((docSnap) => {
+    snapshot.forEach(async (docSnap) => {
       const photo = docSnap.data();
       const id = docSnap.id;
+      const voteCounts = await getVoteCounts(id);
 
       const statusColor =
         photo.status?.includes("Approvata") ? "green" :
@@ -193,6 +217,14 @@ async function loadAllPhotos() {
         <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
         <td><b>${photo.notes || "Non inserite"}</b></td>
         <td><b>${linkBox}</b></td>
+        <td class="votes-cell">
+          <span class="vote-badge like-badge" title="Mi piace">
+            <i class="fas fa-thumbs-up"></i> ${voteCounts.likes}
+          </span>
+          <span class="vote-badge dislike-badge" title="Non mi piace">
+            <i class="fas fa-thumbs-down"></i> ${voteCounts.dislikes}
+          </span>
+        </td>
         <td>
           <button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy"/></button>
         </td>

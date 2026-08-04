@@ -23,18 +23,17 @@
         <h2>MyFrEM Staff</h2>
       </div>
       <nav>
-        <a href="/staff/dashboard/">📊 Dashboard</a>
-        <a href="/staff/dashboard/photos/" class="active">🖼️ Moderazione foto</a>
-        <a href="/staff/dashboard/users/">👥 Funzionalità</a>
-        <a href="/staff/dashboard/events/">🗂️ Moderazione eventi</a>
-        <a href="/staff/dashboard/kick-reports/">🗂️ Rapporti di espulsione</a>
-        <a href="/staff/dashboard/contactrq/">📞 Richieste di assistenza</a>
-        <a href="/staff/dashboard/settings/">⚙️ Impostazioni</a>
+        <a href="/staff/dashboard/">Dashboard</a>
+        <a href="/staff/dashboard/photos/" class="active">Moderazione foto</a>
+        <a href="/staff/dashboard/users/">Funzionalità</a>
+        <a href="/staff/dashboard/events/">Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
+        <a href="/staff/dashboard/settings/">Impostazioni</a>
       </nav>
-      <button id="logoutBtn" class="logout">🚪 Logout</button>
+      <button id="logoutBtn" class="logout">Logout</button>
     </aside>
     <main class="main-content">
-      <h1>🖼️ Moderazione foto</h1>
+      <h1>Moderazione foto</h1>
       <p>Qui puoi approvare o rifiutare le foto caricate dagli utenti.</p>
   
       <div id="viewAllPhotos">Visualizza tutte le foto</div>
@@ -79,8 +78,28 @@
           </div>
           
           <div class="draft-modal-actions">
-            <button id="draft-btn-create">✅ Crea Bozza</button>
-            <button id="draft-btn-skip">⏭️ Salta</button>
+            <button id="draft-btn-create">Crea Bozza</button>
+            <button id="draft-btn-skip">Salta</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="rejectionModal" class="draft-modal">
+        <div class="draft-modal-content">
+          <div class="draft-modal-header">
+            <h2>Specifica motivazione del rifiuto</h2>
+            <button id="draft-modal-close">&times;</button>
+          </div>
+          
+          <div class="draft-modal-body">
+            <p>Fornisci all'utente una motivazione del rifiuto della foto caricata</p>
+            <div id="photoPreviewInModal">
+              <textarea id="rejectionReason" placeholder="Motivazione del rifiuto..." rows="4" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
+            </div>
+          </div>
+          
+          <div class="draft-modal-actions">
+            <button id="rejectionConfirmBtn">Salva</button>
           </div>
         </div>
       </div>
@@ -91,6 +110,5 @@
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
 </body>
 </html>

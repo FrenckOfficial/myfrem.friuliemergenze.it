@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Badge Sistema | Staff MyFrEM</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/badges/new/style.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="/staff/dashboard/management/badges/new/create.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">Dashboard</a>
+        <a href="/staff/dashboard/photos/">Moderazione foto</a>
+        <a href="/staff/dashboard/users/" class="active">Funzionalità</a>
+        <a href="/staff/dashboard/events/">Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
+        <a href="/staff/dashboard/settings/">Impostazioni</a>
+      </nav>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </aside>
+  
+    <main class="main-content">
+      <h1>Nuovo - Gestione Badge Utenti</h1>
+      <p style="color: var(--muted); margin-bottom: 20px;">Crea, modifica e gestisci i badge disponibili nel sistema</p>
+
+      <p class="statusBox" style="display:none;">
+        <span id="statusMsg"></span>
+        <button id="closeSMsg">&times;</button>
+      </p>
+
+      <div class="badge-system-container">
+        <div class="create-badge-section">
+          <h2 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 0; margin-bottom: 20px;">Nuovo Badge</h2>
+          
+          <form id="badgeForm">
+            <div class="form-group">
+              <label for="badgeName">Nome Badge *</label>
+              <input type="text" id="badgeName" placeholder="Es. Primo Scatto" required>
+            </div>
+
+            <div class="form-group">
+              <label for="badgeDescription">Descrizione *</label>
+              <textarea id="badgeDescription" placeholder="Descrivi il badge..." rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="badgeIcon">URL Icona *</label>
+              <input type="url" id="badgeIcon" placeholder="https://static.friuliemergenze.it/badges/..." required>
+              <div id="iconPreview" style="margin-top: 10px; display: none;">
+                <img id="previewImg" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent);" alt="Anteprima">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="badgeColor">Colore Hex *</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="badgeColor" value="#ff7b00">
+                <input type="text" id="badgeColorHex" placeholder="#ff7b00" value="#ff7b00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="criteriaType">Tipo Criterio *</label>
+              <select id="criteriaType" required>
+                <option value="">-- Seleziona --</option>
+                <option value="photos">📸 Foto Caricate</option>
+                <option value="events">🚨 Eventi Creati</option>
+                <option value="surveys">📋 Survey Completati</option>
+                <option value="exploration">🗺️ Esplorazione Servizi</option>
+                <option value="time">⏰ Tempo Membro</option>
+                <option value="manual">👤 Manuale (Staff Only)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="criteriaThreshold">Soglia *</label>
+              <input type="number" id="criteriaThreshold" placeholder="Es. 5" min="1" required>
+              <small id="thresholdHint" style="color: var(--muted); display: block; margin-top: 5px;"></small>
+            </div>
+
+            <div class="form-group form-checkbox">
+              <input type="checkbox" id="badgeEnabled" checked>
+              <label for="badgeEnabled">Attivo</label>
+            </div>
+
+            <button type="submit" class="btn-create">Crea Badge</button>
+          </form>
+        </div>
+
+        <div class="badges-list-section">
+          <h2 style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 0; margin-bottom: 20px;">📋 Badge Esistenti</h2>
+          
+          <div class="badges-list" id="badgesList">
+            <div style="color: var(--muted); text-align: center; padding: 2rem;">Caricamento badge...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
+  <noscript>
+    <a href="https://www.shinystat.com/it/" target="_top">
+    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
+  </noscript>
+</body>
+</html>

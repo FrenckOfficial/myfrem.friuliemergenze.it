@@ -48,7 +48,7 @@ onAuthStateChanged(auth, async (user) => {
 
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists()) {
-      setStatus("❌ Errore: utente non trovato.", "error");
+      setStatus("Errore: utente non trovato.", "error");
       clearTimeout(timeoutId);
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
@@ -61,7 +61,7 @@ onAuthStateChanged(auth, async (user) => {
       document.body.classList.add("read-only-mode");
       const banner = document.createElement("div");
       banner.style.cssText = "background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;";
-      banner.textContent = "📖 Modalità sola lettura";
+      banner.textContent = "Modalità sola lettura";
       document.querySelector(".content").insertBefore(banner, document.querySelector(".content").firstChild);
     }
 
@@ -72,8 +72,8 @@ onAuthStateChanged(auth, async (user) => {
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   } catch (err) {
-    console.error("❌ Errore:", err);
-    setStatus("❌ Errore nel caricamento.", "error");
+    console.error("Errore:", err);
+    setStatus("Errore nel caricamento.", "error");
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
@@ -82,7 +82,7 @@ onAuthStateChanged(auth, async (user) => {
 
 async function loadPhotos(userId) {
   try {
-    console.log("⏳ Caricamento foto...");
+    console.log("Caricamento foto...");
     photosContainer.innerHTML = "";
 
     const photosQuery = query(
@@ -107,42 +107,46 @@ async function loadPhotos(userId) {
                      data.status === "Rifiutata ❌" ? "rejected" :
                      "pending";
 
+      const statusText = data.status === "Approvata ✅" ? "Approvata" :
+                         data.status === "Rifiutata ❌" ? "Rifiutata" :
+                         "In attesa di approvazione";
+
       const service = getServiceLabel(data.serviceType);
 
       card.innerHTML = `
         <div class="photo-info">
           <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
           <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
-          <p><strong>Targa:</strong> ${data.licensePlate || "–"}</p>
-          <p><strong>Posizione:</strong> ${data.location || "–"}</p>
-          <p><strong>Servizio:</strong> ${service || "–"}</p>
-          <p><strong>Note:</strong> ${data.notes || "–"}</p>
+          <p><b>Targa:</b> ${data.licensePlate || "–"}</p>
+          <p><b>Posizione:</b> ${data.location || "–"}</p>
+          <p><b>Servizio:</b> ${service || "–"}</p>
+          <p><b>Note:</b> ${data.notes || "–"}</p>
           <p>
-            <strong>Stato:</strong>
-            <span class="status ${status}">${data.status || "In attesa"}</span>
+            <b>Stato:</b>
+            <span class="status ${status}">${statusText || "In attesa"}</span>
           </p>
           <p>
-            <strong>Caricata:</strong>
+            <b>Caricata:</b>
             ${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString("it-IT") : "–"}
           </p>
-          ${data.reviewedAt?.toDate ? `<p><strong>Revisionata:</strong> ${data.reviewedAt.toDate().toLocaleString("it-IT")}</p>` : ""}
-          ${data.vehicleLink ? `<a href="${data.vehicleLink}" target="_blank" class="gallery-link">🔗 Vai al mezzo in galleria</a>` : ""}
+          ${data.reviewedAt?.toDate ? `<p><b>Revisionata:</b> ${data.reviewedAt.toDate().toLocaleString("it-IT")}</p>` : ""}
+          ${data.vehicleLink ? `<a href="${data.vehicleLink}" target="_blank" class="gallery-link">Vai al mezzo in galleria</a>` : ""}
         </div>
       `;
 
       photosContainer.appendChild(card);
     });
 
-    console.log(`📸 Caricate ${snapshot.size} foto`);
+    console.log(`Caricate ${snapshot.size} foto`);
   } catch (err) {
-    console.error("❌ Errore caricamento foto:", err);
+    console.error("Errore caricamento foto:", err);
     setStatus("Errore caricamento foto", "error");
   }
 }
 
 async function loadEvents(firstName, lastName) {
   try {
-    console.log("⏳ Caricamento eventi...");
+    console.log("Caricamento eventi...");
     eventsList.innerHTML = "";
 
     const eventsQuery = query(
@@ -170,8 +174,8 @@ async function loadEvents(firstName, lastName) {
       div.innerHTML = `
         <div class="photo-info">
           <h3>${data.title}</h3>
-          <p><strong>📍 Luogo:</strong> ${data.location}</p>
-          <p><strong>📝 Descrizione:</strong> ${data.description.length > 150 ? data.description.slice(0, 150) + "..." : data.description}</p>
+          <p><b>Luogo:</b> ${data.location}</p>
+          <p><b>Descrizione:</b> ${data.description.length > 150 ? data.description.slice(0, 150) + "..." : data.description}</p>
           <span class="status ${data.status || 'pending'}">${statusText}</span>
         </div>
         <a href="/events/detail/?id=${docSnap.id}" target="_blank" class="btn-view">Visualizza Evento</a>
@@ -180,9 +184,9 @@ async function loadEvents(firstName, lastName) {
       eventsList.appendChild(div);
     });
 
-    console.log(`📅 Caricati ${snapshot.size} eventi`);
+    console.log(`Caricati ${snapshot.size} eventi`);
   } catch (err) {
-    console.error("❌ Errore caricamento eventi:", err);
+    console.error("Errore caricamento eventi:", err);
     setStatus("Errore caricamento eventi", "error");
   }
 }

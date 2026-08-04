@@ -48,7 +48,7 @@ onAuthStateChanged(auth, async (user) => {
             submitBtn.title = "Non disponibile in modalità sola lettura";
           }
           
-          statusMsg.textContent = "📖 Modalità sola lettura: non puoi creare eventi";
+          statusMsg.textContent = "Modalità sola lettura: non puoi creare eventi";
           statusMsg.className = "warning";
         }
       }
@@ -69,7 +69,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (isReadOnlyMode) {
-    statusMsg.textContent = "❌ Non puoi creare eventi in modalità sola lettura";
+    statusMsg.textContent = "Non puoi creare eventi in modalità sola lettura";
     statusMsg.style.color = "#ff4a4a";
     return;
   }
@@ -77,7 +77,7 @@ form.addEventListener("submit", async (e) => {
   const userDoc = await getDoc(doc(db, "users", currentUser.uid));
 
   if (!userDoc.exists()) {
-    statusMsg.textContent = "❌ Errore: utente non trovato.";
+    statusMsg.textContent = "Errore: utente non trovato.";
     statusMsg.style.color = "#ff4a4a";
     return;
   }
@@ -87,7 +87,7 @@ form.addEventListener("submit", async (e) => {
   const location = document.getElementById("location").value;
   const contact = document.getElementById("contact").value;
 
-  statusMsg.textContent = "⏳ Invio in corso...";
+  statusMsg.textContent = "Invio in corso...";
   statusMsg.style.color = "#ccc";
 
   try {
@@ -109,12 +109,12 @@ form.addEventListener("submit", async (e) => {
       createdAt: serverTimestamp()
     });
 
-    statusMsg.textContent = "✅ Proposta inviata! Lo staff ti contatterà.";
+    statusMsg.textContent = "Proposta inviata! Lo staff ti contatterà appena possibile.";
     statusMsg.style.color = "#4aff4a";
     form.reset();
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "❌ Errore durante l'invio.";
+    statusMsg.textContent = "Errore durante l'invio.";
     statusMsg.style.color = "#ff4a4a";
   }
 });

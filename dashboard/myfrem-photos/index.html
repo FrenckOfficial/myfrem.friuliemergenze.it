@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le mie Foto | Piattaforma MyFrEM di FriuliEmergenze</title>
+  <title>Le mie Foto | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
-  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
@@ -19,30 +20,42 @@
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
+    <button class="menu-toggle" aria-label="Toggle navigation menu">
+      <i class="fas fa-bars"></i>
+    </button>
     <aside class="sidebar">
       <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
         <h2>MyFrEM</h2>
       </div>
       <nav>
-        <a href="/dashboard">🏠 Home</a>
-        <a href="/dashboard/upload">📸 Carica una foto</a>
-        <a href="/dashboard/propose/">🗂️ Proponi un evento</a>
-        <a href="/dashboard/my-content">📚 I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos" class="active">📸 Tutte le foto</a>
-        <a href="/dashboard/settings/">⚙️ Impostazioni</a>
-        <a href="/dashboard/contact/">📞 Contattaci</a>
+        <a href="/dashboard">Home</a>
+        <a href="/dashboard/upload">Carica una foto</a>
+        <a href="/dashboard/propose/">Proponi un evento</a>
+        <a href="/dashboard/my-content">I miei contenuti</a>
+        <a href="/dashboard/myfrem-photos" class="active">Tutte le foto</a>
+        <a href="/dashboard/settings/">Impostazioni</a>
       </nav>
-      <button id="logoutBtn" class="logout">🚪 Logout</button>
+      <button id="logoutBtn" class="logout">Logout</button>
     </aside>
 
     <div class="main-content">
       <div class="content-box" style="max-width:none;">
-        <h1>📸 Tutte le foto</h1>
+        <h1>Tutte le foto</h1>
         <p class="statusBox" style="display:none;">
           <span id="statusMsg"></span>
           <button id="closeSMsg">&times;</button>
         </p>
+        <div class="gallery-search" style="margin-top: 10px;">
+          <input type="text" id="searchInput" placeholder="Cerca..." style="
+            width: 50%;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+          ">
+        </div>
         <div id="photosContainer" class="photos-grid">
           <!-- Qui verranno generate le foto con JS -->
         </div>
@@ -56,5 +69,84 @@
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
   <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.getElementById("usersTableBody");
+  
+    searchInput.addEventListener("keyup", () => {
+      const filter = searchInput.value.toLowerCase();
+      const rows = tableBody.querySelectorAll("tr");
+  
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      });
+    });
+  </script>
+  <script>
+    (function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+
+      if (!menuToggle || !sidebar) {
+        console.warn('Menu toggle or sidebar not found');
+        return;
+      }
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+      function openSidebar() {
+        sidebar.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      const navLinks = sidebar.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          closeSidebar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+          if (e.target === menuToggle || menuToggle.contains(e.target)) {
+            return;
+          }
+          if (!sidebar.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768) {
+            closeSidebar();
+          }
+        }, 250);
+      });
+    })();
+  </script>
 </body>
 </html>

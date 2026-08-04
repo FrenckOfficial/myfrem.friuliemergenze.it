@@ -186,7 +186,7 @@ photosTableBody.addEventListener("click", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    await updatePhotoStatus(photoId, isApprove ? "Approvata ✅" : "Rifiutata ❌");
+    await updatePhotoStatus(photoId, isApprove ? "Approvata" : "Rifiutata");
 
     if (userData.emailNotifications === true) {
       if (isApprove) {
@@ -200,6 +200,10 @@ photosTableBody.addEventListener("click", async (e) => {
       setTimeout(() => {
         openDraftModal(photoData, photoId);
       }, 500);
+    } else {
+      setTimeout(() => {
+        openRejectionModal(photoId);
+      }, 500)
     }
   } catch (err) {
     console.error("Errore:", err);
@@ -222,6 +226,33 @@ async function updatePhotoStatus(photoId, status) {
     console.error("Errore aggiornamento:", err);
     setStatus("Errore aggiornamento", "error");
   }
+}
+
+function openRejectionModal(photoId) {
+  const rejectionModal = document.getElementById("rejectionModal");
+  const rejectionReasonInput = document.getElementById("rejectionReason");
+  const rejectionConfirmBtn = document.getElementById("rejectionConfirmBtn");
+
+  if (rejectionModal) {
+    rejectionModal.classList.add("active");
+
+    if (rejectionReasonInput) {
+      rejectionReasonInput.value = "";
+    }
+
+    if (rejectionConfirmBtn) {
+      rejectionConfirmBtn.addEventListener("click", async () => {
+        const rejectionReason = rejectionReasonInput.value;
+        if (rejectionReason) {
+          await updateDoc(doc(db, "photos", photoId), {
+            rejectionReason: rejectionReason
+          });
+          rejectionModal.classList.remove("active");
+        }
+      });
+    }
+  }
+
 }
 
 function openDraftModal(photoData, photoId) {
@@ -333,7 +364,7 @@ async function sendNotificationApprovement(userName, userEmail, photoName) {
   }
 }
 
-async function sendNotificationRejection(userName, userEmail, photoName) {
+async function sendNotificationRejection(userName, userEmail, photoName, reason) {
   try {
     const response = await fetch('/api/sendNotificationRejection', {
       method: 'POST',
@@ -343,7 +374,8 @@ async function sendNotificationRejection(userName, userEmail, photoName) {
       body: JSON.stringify({
         userName,
         userEmail,
-        photoName
+        photoName,
+        reason
       })
     });
 

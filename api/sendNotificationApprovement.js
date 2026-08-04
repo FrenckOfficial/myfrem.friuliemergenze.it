@@ -188,7 +188,7 @@ body {
   line-height: 1.6;
 }
 
-.security-note strong {
+.security-note b {
   color: #333;
 }
 
@@ -227,7 +227,7 @@ body {
 
   <div class="content">
     <div class="greeting">
-      Ciao <strong>${name}</strong>,
+      Ciao <b>${name}</b>,
       <br><br>
       C'è un aggiornamento su una foto che hai caricato su MyFrEM!
     </div>
@@ -243,7 +243,7 @@ body {
     </div>
 
     <div class="security-note">
-      <strong>⚠️ Nota di Sicurezza:</strong> Se hai ricevuto questa mail per errore inoltrala a info@friuliemergenze.it spiegando l'errore, grazie!
+      <b>⚠️ Nota di Sicurezza:</b> Se hai ricevuto questa mail per errore inoltrala a info@friuliemergenze.it spiegando l'errore, grazie!
     </div>
 
     <div class="cta-link">

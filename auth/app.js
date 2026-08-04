@@ -382,10 +382,10 @@ if (registerForm) {
       submitBtn.style.display = "block";
 
       reviewContainer.innerHTML = `
-        <div><strong>Nome:</strong> ${registerName.value} ${registerSurname.value}</div>
-        <div><strong>Username:</strong> ${registerUsername.value}</div>
-        <div><strong>Email:</strong> ${registerEmail.value}</div>
-        <div><strong>Telefono:</strong> ${registerPhone?.value || "Non inserito"}</div>
+        <div><b>Nome:</b> ${registerName.value} ${registerSurname.value}</div>
+        <div><b>Username:</b> ${registerUsername.value}</div>
+        <div><b>Email:</b> ${registerEmail.value}</div>
+        <div><b>Telefono:</b> ${registerPhone?.value || "Non inserito"}</div>
       `;
     } else {
       nextBtn.style.display = "block";
