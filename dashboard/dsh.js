@@ -76,6 +76,16 @@ auth.onAuthStateChanged(async (user) => {
       document.body.classList.add("read-only-mode");
     }
 
+    if (staffRoles.includes(userData.role)) {
+      const staffLinkEl = document.querySelector('.navbar');
+      const br = document.createElement('br');
+      const link = document.createElement('a');
+      link.href = '/staff/dashboard/';
+      link.textContent = 'Passa alla dashboard staff';
+      staffLinkEl.appendChild(br);
+      staffLinkEl.appendChild(link);
+    }
+
     if (userData) {
       userNameEl.textContent = `${userData.name} (${userData.username})`;
     } else {

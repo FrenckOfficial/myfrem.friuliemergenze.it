@@ -55,6 +55,14 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
+    const staffRoles = [
+      "simplestaff",
+      "modstaff",
+      "advstaff",
+      "advstaffplus",
+      "superadmin",
+    ];
+
     const userData = userDoc.data();
     
     if (userData.role === "testacc") {
@@ -63,6 +71,16 @@ onAuthStateChanged(auth, async (user) => {
       banner.style.cssText = "background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;";
       banner.textContent = "Modalità sola lettura";
       document.querySelector(".content").insertBefore(banner, document.querySelector(".content").firstChild);
+    }
+
+    if (staffRoles.includes(userData.role)) {
+      const staffLinkEl = document.querySelector('.navbar');
+      const br = document.createElement('br');
+      const link = document.createElement('a');
+      link.href = '/staff/dashboard/';
+      link.textContent = 'Passa alla dashboard staff';
+      staffLinkEl.appendChild(br);
+      staffLinkEl.appendChild(link);
     }
 
     await loadPhotos(user.uid);

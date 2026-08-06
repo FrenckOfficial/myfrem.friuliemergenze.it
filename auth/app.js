@@ -61,10 +61,27 @@ const resetButton = document.getElementById("resetEmailButton");
 
 function redirectByRole(role) {
   if (allowedRoles.includes(role)) {
-    window.location.href = "/staff";
+    openChooseDashboardModal();
   } else {
     window.location.href = "/dashboard";
   }
+}
+
+function openChooseDashboardModal() {
+  const modal = document.getElementById("chooseDashboardModal");
+  const closeBtn = document.getElementById("closeChooseDashboardModal");
+  modal.classList.add('active');
+  closeBtn.onclick = () => {
+    modal.classList.remove('active');
+  };
+
+  const dashboardBtns = document.querySelectorAll('.dashboard-btn');
+  dashboardBtns.forEach(btn => {
+    btn.onclick = () => {
+      const dashboard = btn.getAttribute('data-dashboard');
+      window.location.href = dashboard;
+    };
+  });
 }
 
 async function getUserByUsername(username) {

@@ -61,6 +61,14 @@ async function checkUserRole(uid) {
   try {
     const userDocSnap = await getDoc(doc(db, "users", uid));
     if (userDocSnap.exists()) {
+      const staffRoles = [
+        "simplestaff",
+        "modstaff",
+        "advstaff",
+        "advstaffplus",
+        "superadmin",
+      ];
+
       const userData = userDocSnap.data();
       if (userData.role === "testacc") {
         document.body.classList.add("read-only-mode");
@@ -68,6 +76,16 @@ async function checkUserRole(uid) {
         banner.style.cssText = "background-color:#fff3cd;color:#856404;padding:10px;margin-bottom:10px;border-radius:4px;text-align:center;";
         banner.textContent = "Modalità sola lettura";
         photosContainer.parentElement.insertBefore(banner, photosContainer);
+      }
+
+      if (staffRoles.includes(userData.role)) {
+        const staffLinkEl = document.querySelector('.navbar');
+        const br = document.createElement('br');
+        const link = document.createElement('a');
+        link.href = '/staff/dashboard/';
+        link.textContent = 'Passa alla dashboard staff';
+        staffLinkEl.appendChild(br);
+        staffLinkEl.appendChild(link);
       }
     }
   } catch (err) {

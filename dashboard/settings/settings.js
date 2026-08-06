@@ -96,6 +96,14 @@ async function loadUserData(uid) {
 
   if (!snap.exists()) return;
 
+  const staffRoles = [
+    "simplestaff",
+    "modstaff",
+    "advstaff",
+    "advstaffplus",
+    "superadmin",
+  ];
+
   const data = snap.data();
 
   if (data.role === "testacc") {
@@ -103,6 +111,23 @@ async function loadUserData(uid) {
     document.body.classList.add("read-only-mode");
     disableAllButtons();
     setStatus("closeReadOnlyStatus", "readOnlyStatusBox", "readOnlyStatus", "📖 Modalità sola lettura: non puoi modificare i dati", "warning");
+  }
+
+  if (staffRoles.includes(data.role)) {
+    const staffLinkEl = document.querySelector('.navbar');
+    const br = document.createElement('br');
+    const link = document.createElement('a');
+    link.href = '/staff/dashboard/';
+    link.textContent = 'Passa alla dashboard staff';
+    staffLinkEl.appendChild(br);
+    staffLinkEl.appendChild(link);
+    const content = document.querySelector('.main-content');
+    const settingsContainer = document.querySelector('.settings-container');
+    settingsContainer.style.display = 'none';
+    const div = document.createElement('div');
+    div.className = "staff-warning";
+    div.textContent = "Sei un membro dello staff. Non è possibile modificare i tuoi dati personali.";
+    content.appendChild(div);
   }
 
   profileIDText.innerHTML = `<b>${uid}</b>`;

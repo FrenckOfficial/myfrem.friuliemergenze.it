@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />  
 </head>
 <body>
-
   <main>
     <div class="shell">
       <div class="panel-left">
@@ -88,6 +87,18 @@
         </div>
       </div>
 
+    </div>
+
+    <div id="chooseDashboardModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeChooseDashboardModal">&times;</span>
+        <h2>Scegli la dashboard</h2>
+        <p>Seleziona la dashboard alla quale vuoi accedere:</p>
+        <div class="dashboard-options">
+          <button class="dashboard-btn" data-dashboard="/dashboard">Dashboard user</button>
+          <button class="dashboard-btn" data-dashboard="/staff/">Dashboard admin</button>
+        </div>
+      </div>
     </div>
   </main>
 

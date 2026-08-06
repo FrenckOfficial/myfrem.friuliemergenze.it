@@ -13,6 +13,7 @@ const supabase = createClient(supa.url, supa.anonKey);
 
 const logoutBtn = document.getElementById("logoutBtn");
 
+const staffIDText = document.getElementById("staffID");
 const staffUsername = document.getElementById("staffUsername");
 const staffName = document.getElementById("staffName");
 const staffEmail = document.getElementById("staffEmail");
@@ -67,6 +68,7 @@ auth.onAuthStateChanged(async (user) => {
     contentEl.style.display = "block";
   }, 7000);
 
+  staffIDText.textContent = currentUserId || "Non disponibile.";
   staffUsername.textContent = data.username || "Non disponibile.";
   staffName.textContent = `${data.name || ""} ${data.surname || ""}`.trim() || "Non disponibile.";
   staffEmail.innerHTML = data.email ? `<a href="mailto:${data.email}">${data.email}</a>` : "Non disponibile.";

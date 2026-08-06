@@ -54,6 +54,14 @@ onAuthStateChanged(auth, async (user) => {
   }, 5000);
 
   try {
+    const staffRoles = [
+      "simplestaff",
+      "modstaff",
+      "advstaff",
+      "advstaffplus",
+      "superadmin",
+    ];
+
     const userDocSnap = await getDoc(doc(db, "users", user.uid));
     
     if (userDocSnap.exists()) {
@@ -68,6 +76,16 @@ onAuthStateChanged(auth, async (user) => {
         uploadBtn.title = "Non disponibile in modalità sola lettura";
         setStatus("📖 Modalità sola lettura: puoi solo visualizzare i contenuti");
         fileInput.disabled = true;
+      }
+
+      if (staffRoles.includes(userData.role)) {
+        const staffLinkEl = document.querySelector('.navbar');
+        const br = document.createElement('br');
+        const link = document.createElement('a');
+        link.href = '/staff/dashboard/';
+        link.textContent = 'Passa alla dashboard staff';
+        staffLinkEl.appendChild(br);
+        staffLinkEl.appendChild(link);
       }
     }
 

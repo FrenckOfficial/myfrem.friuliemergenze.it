@@ -34,6 +34,14 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
       const userDocSnap = await getDoc(doc(db, "users", user.uid));
       if (userDocSnap.exists()) {
+        const staffRoles = [
+          "simplestaff",
+          "modstaff",
+          "advstaff",
+          "advstaffplus",
+          "superadmin",
+        ];
+
         const userData = userDocSnap.data();
         if (userData.role === "testacc") {
           isReadOnlyMode = true;
@@ -50,6 +58,16 @@ onAuthStateChanged(auth, async (user) => {
           
           statusMsg.textContent = "Modalità sola lettura: non puoi creare eventi";
           statusMsg.className = "warning";
+        }
+
+        if (staffRoles.includes(userData.role)) {
+          const staffLinkEl = document.querySelector('.navbar');
+          const br = document.createElement('br');
+          const link = document.createElement('a');
+          link.href = '/staff/dashboard/';
+          link.textContent = 'Passa alla dashboard staff';
+          staffLinkEl.appendChild(br);
+          staffLinkEl.appendChild(link);
         }
       }
     }

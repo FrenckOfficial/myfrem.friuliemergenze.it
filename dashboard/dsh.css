@@ -993,6 +993,17 @@ form button {
   border-color: rgba(232, 72, 85, 0.3);
 }
 
+.staff-warning {
+  background-color: rgba(255, 123, 0, 0.15);
+  color: #ff7b00;
+  padding: 10px;
+  margin: 50px auto;
+  border-radius: var(--radius-md);
+  text-align: center;
+  border-left: 3px solid #ff7b00;
+  max-width: 600px;
+}
+
 .gallery-link {
   display: inline-block;
   margin-top: var(--space-md);
