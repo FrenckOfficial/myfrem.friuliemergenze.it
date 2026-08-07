@@ -75,7 +75,7 @@ async function loadStats() {
     userNameEl.textContent = `${currentUserData.name} ${currentUserData.surname}`;
 
     const pendingSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "==", "Foto in attesa di approvazione ⌛"))
+      query(collection(db, "photos"), where("status", "in", ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"]))
     );
     pendingPhotosEl.textContent = pendingSnap.size;
 

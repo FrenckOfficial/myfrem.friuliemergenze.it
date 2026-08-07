@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registrati - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Registrati - Zona Logins | Piattaforma MyFrEM</title>
   <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,18 +44,17 @@
         <form id="registerForm" class="auth-form" novalidate>
           <div class="step-indicator">
             <div class="step-progress"></div>
-            <span id="stepCounter">Passo 1 di 6</span>
+            <span id="stepCounter">Passo 1 di 8</span>
           </div>
 
+          <!-- STEP 1 -->
           <div class="step active" data-step="1">
             <h3>Come ti chiami?</h3>
-
             <div id="nameGroup">
               <div id="nameSurname">
                 <label>Nome</label>
                 <input type="text" name="name" id="registerName" placeholder="Mario" required>
               </div>
-
               <div id="nameSurname">
                 <label>Cognome</label>
                 <input type="text" name="surname" id="registerSurname" placeholder="Rossi" required>
@@ -63,54 +62,183 @@
             </div>
           </div>
 
+          <!-- STEP 2 -->
           <div class="step" data-step="2">
             <h3>Scegli un username</h3>
-
             <div class="form-group">
               <label>Username</label>
               <input type="text" name="username" id="registerUsername" placeholder="mario.rossi" required>
             </div>
           </div>
 
+          <!-- STEP 3 -->
           <div class="step" data-step="3">
             <h3>Qual è la tua email?</h3>
-
             <div class="form-group">
               <label>Email</label>
               <input type="email" name="email" id="registerEmail" placeholder="nome@esempio.com" required>
             </div>
           </div>
 
+          <!-- STEP 4 -->
           <div class="step" data-step="4">
             <h3>Numero di telefono</h3>
-
-            <p class="step-desc">
-              Facoltativo ma consigliato per il recupero dell'account.
-            </p>
-
+            <p class="step-desc">Facoltativo ma consigliato per il recupero dell'account.</p>
             <div class="form-group">
               <label>Telefono</label>
               <input type="tel" name="phone" id="registerPhone" placeholder="Numero di telefono" autocomplete="tel">
             </div>
           </div>
 
+          <!-- STEP 5 -->
           <div class="step" data-step="5">
             <h3>Crea una password</h3>
-            
             <div class="form-group">
               <label>Password</label>
               <input type="password" name="password" id="registerPassword" autocomplete="new-password" required placeholder="Nuova password">
             </div>
-
             <div class="form-group">
               <label>Conferma password</label>
               <input type="password" name="confirmPassword" id="registerConfirmPassword" autocomplete="new-password" required placeholder="Conferma nuova password">
             </div>
           </div>
 
+          <!-- STEP 6 - 2FA -->
           <div class="step" data-step="6">
-            <h3>Controlla le informazioni</h3>
+            <h3>Autenticazione a due fattori</h3>
+            <p class="step-desc">
+              Consigliamo di abilitare l'autenticazione a due fattori per proteggere il tuo account.
+            </p>
 
+            <div class="twofa-choice">
+              <div class="choice-option">
+                <input type="radio" id="twofa-none" name="twofa-method" value="none" checked>
+                <label for="twofa-none">
+                  <span class="choice-label">Nessuna autenticazione (sconsigliato)</span>
+                  <span class="choice-desc">Salta per ora</span>
+                </label>
+              </div>
+
+              <div class="choice-option">
+                <input type="radio" id="twofa-email" name="twofa-method" value="email">
+                <label for="twofa-email">
+                  <span class="choice-label">Email</span>
+                  <span class="choice-desc">Riceverai un codice via email ad ogni accesso</span>
+                </label>
+              </div>
+
+              <div class="choice-option">
+                <input type="radio" id="twofa-totp" name="twofa-method" value="totp">
+                <label for="twofa-totp">
+                  <span class="choice-label">App di autenticazione</span>
+                  <span class="choice-desc">Usa Google Authenticator, Authy o Microsoft Authenticator</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- EMAIL 2FA -->
+            <div id="twofa-email-section" class="twofa-section" style="display: none;">
+              <div class="twofa-setup-box">
+                <h4>Setup Email 2FA</h4>
+                <p>Ti invieremo un codice di verifica. Inseriscilo qui per confermare.</p>
+                <div class="form-group">
+                  <button type="button" id="twofa-email-send" class="btn-send-code">
+                    <span id="email-send-text">Invia codice</span>
+                    <span id="email-send-loader" class="loader" style="display: none;"></span>
+                  </button>
+                  <p id="email-send-status" style="font-size: 0.85rem; margin-top: 0.5rem;"></p>
+                </div>
+                <div id="email-code-form" style="display: none;">
+                  <div class="form-group">
+                    <label>Codice di verifica (6 cifre)</label>
+                    <input type="text" id="twofa-email-code" placeholder="000000" maxlength="6" pattern="\d{6}">
+                  </div>
+                  <button type="button" id="twofa-email-verify" class="btn-verify">Verifica codice</button>
+                </div>
+                <div id="email-verified-message" style="display: none; padding: 1rem; background: rgba(79, 202, 122, 0.1); border-radius: 6px; color: #4fca7a; margin-top: 1rem;">
+                  Email 2FA attivato!
+                </div>
+              </div>
+            </div>
+
+            <!-- TOTP 2FA -->
+            <div id="totp-modal" class="totp-modal" style="display: none;">
+              <div class="totp-modal-overlay"></div>
+              <div class="totp-modal-content">
+                <div class="totp-modal-header">
+                  <h3>Configura Autenticazione App</h3>
+                  <button type="button" id="close-totp-modal" class="totp-modal-close">✕</button>
+                </div>
+            
+                <div class="totp-modal-body">
+                  <!-- STEP 1: QR CODE -->
+                  <div class="totp-step" id="totp-step-qr">
+                    <p class="totp-step-title">1. Scansiona il codice QR</p>
+                    <p class="totp-step-desc">Apri Google Authenticator, Authy o Microsoft Authenticator e scansiona questo QR:</p>
+                    
+                    <div id="qrcode-container" style="text-align: center; margin: 2rem 0;">
+                      <div id="qrcode" style="display: inline-block;"></div>
+                    </div>
+            
+                    <div class="totp-key-box">
+                      <p style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 0.5rem;">Oppure inserisci questa chiave manualmente:</p>
+                      <code id="totp-secret"></code>
+                      <button type="button" id="copy-totp-secret" class="btn-copy-secret">Copia</button>
+                    </div>
+            
+                    <button type="button" id="totp-next-step" class="btn-totp-next">Continua</button>
+                  </div>
+            
+                  <!-- STEP 2: VERIFY CODE -->
+                  <div class="totp-step" id="totp-step-verify" style="display: none;">
+                    <p class="totp-step-title">2. Verifica il codice</p>
+                    <p class="totp-step-desc">Inserisci il codice di 6 cifre dalla tua app:</p>
+                    
+                    <div class="form-group" style="margin: 2rem 0;">
+                      <input type="text" id="twofa-totp-code" placeholder="000000" maxlength="6" pattern="\d{6}" style="font-size: 1.5rem; text-align: center; letter-spacing: 4px;">
+                    </div>
+            
+                    <button type="button" id="twofa-totp-verify" class="btn-verify btn-block">Verifica</button>
+                    <p id="totp-verify-status" style="font-size: 0.85rem; margin-top: 1rem; text-align: center;"></p>
+                  </div>
+            
+                  <!-- STEP 3: SUCCESS -->
+                  <div class="totp-step" id="totp-step-success" style="display: none;">
+                    <div style="text-align: center; padding: 2rem 0;">
+                      <div style="font-size: 3rem; margin-bottom: 1rem;">✓</div>
+                      <p style="font-size: 1.1rem; font-weight: 700; color: #4fca7a;">TOTP configurato!</p>
+                      <p style="color: var(--text-secondary, #b8c5d6); margin-top: 1rem;">Il tuo account è protetto con autenticazione app.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RECOVERY CODES -->
+            <div id="recovery-codes-section" style="display: none;">
+              <div class="recovery-codes-box">
+                <h4>Codici di recupero</h4>
+                <p>Salva questi 5 codici in un luogo sicuro. Se perdi l'accesso a email o app, puoi usarli per accedere.</p>
+                <div id="recovery-codes-display" style="background: var(--bg-surface, #161d25); padding: 1.5rem; border-radius: 8px; margin: 1rem 0; border: 1px solid var(--border, rgba(255, 123, 0, 0.2));">
+                  <div style="display: grid; gap: 0.75rem;"></div>
+                </div>
+                <div class="recovery-actions" style="display: flex; gap: 1rem; margin: 1rem 0;">
+                  <button type="button" id="recovery-download" class="btn-action">📥 Scarica</button>
+                  <button type="button" id="recovery-copy" class="btn-action">📋 Copia</button>
+                </div>
+                <div class="form-group">
+                  <label>
+                    <input type="checkbox" id="recovery-confirmed" required>
+                    Ho salvato i codici di recupero in un luogo sicuro
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 7 - REVIEW -->
+          <div class="step" data-step="7">
+            <h3>Controlla le informazioni</h3>
             <div id="reviewContainer"></div>
           </div>
 
@@ -140,6 +268,11 @@
 
     </div>
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/dist/otplib.umd.js"></script>
+  <script src="https://cdn.emailjs.com/sdk/3.11.0/email.min.js"></script>
+
   <script type="module" src="/auth/app.js"></script>
   <script src="https://www.google.com/recaptcha/api.js"></script>
 
@@ -159,6 +292,42 @@
     function reCaptchaSumbit(token) {
       document.getElementById('').submit();
     }
+  </script>
+  <script>
+    const totpModal = document.getElementById("totp-modal");
+    const closeTotpBtn = document.getElementById("close-totp-modal");
+    const totpNextStepBtn = document.getElementById("totp-next-step");
+    const copySecretBtn = document.getElementById("copy-totp-secret");
+  
+    closeTotpBtn.addEventListener("click", () => {
+      totpModal.style.display = "none";
+
+      document.getElementById("totp-step-qr").style.display = "block";
+      document.getElementById("totp-step-verify").style.display = "none";
+      document.getElementById("totp-step-success").style.display = "none";
+      document.getElementById("totp-verify-status").textContent = "";
+    });
+  
+    document.querySelector(".totp-modal-overlay").addEventListener("click", () => {
+      closeTotpBtn.click();
+    });
+  
+    copySecretBtn.addEventListener("click", () => {
+      const secret = document.getElementById("totp-secret").textContent;
+      navigator.clipboard.writeText(secret).then(() => {
+        const original = copySecretBtn.textContent;
+        copySecretBtn.textContent = "✓ Copiato!";
+        setTimeout(() => {
+          copySecretBtn.textContent = original;
+        }, 2000);
+      });
+    });
+  
+    totpNextStepBtn.addEventListener("click", () => {
+      document.getElementById("totp-step-qr").style.display = "none";
+      document.getElementById("totp-step-verify").style.display = "block";
+      document.getElementById("twofa-totp-code").focus();
+    });
   </script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>

@@ -217,7 +217,7 @@ async function loadAllPhotos() {
         <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
         <td><b>${photo.notes || "Non inserite"}</b></td>
         <td><b>${linkBox}</b></td>
-        <td class="votes-cell">
+        <td class="votes-cell" id="votes-cell-${id}">
           <span class="vote-badge like-badge" title="Mi piace">
             <i class="fas fa-thumbs-up"></i> ${voteCounts.likes}
           </span>

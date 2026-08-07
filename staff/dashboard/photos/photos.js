@@ -108,7 +108,7 @@ async function loadPendingPhotos() {
 
     const q = query(
       collection(db, "photos"),
-      where("status", "==", "Foto in attesa di approvazione ⌛")
+      where("status", "in", ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"])
     );
 
     const snapshot = await getDocs(q);

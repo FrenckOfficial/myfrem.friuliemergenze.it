@@ -374,50 +374,312 @@ if (resetForm) {
   });
 }
 
+let twoFASetup = {
+  method: "none",
+  emailVerified: false,
+  totpVerified: false,
+  totpSecret: null,
+  recoveryCodes: [],
+  emailCode: null,
+  emailCodeTimestamp: null
+};
+ 
+// Radio button choice
+document.querySelectorAll('input[name="twofa-method"]').forEach(radio => {
+  radio.addEventListener("change", (e) => {
+    twoFASetup.method = e.target.value;
+    showTwoFASection();
+  });
+});
+ 
+function showTwoFASection() {
+  document.getElementById("twofa-email-section").style.display = "none";
+  
+  if (twoFASetup.method === "email") {
+    document.getElementById("twofa-email-section").style.display = "block";
+  } else if (twoFASetup.method === "totp") {
+    // Apri il modal invece di mostrare inline
+    initTOTPSetup();
+    document.getElementById("totp-modal").style.display = "flex";
+  }
+}
+
+ 
+// EMAIL 2FA
+document.getElementById("twofa-email-send").addEventListener("click", async () => {
+  const btn = document.getElementById("twofa-email-send");
+  const status = document.getElementById("email-send-status");
+  const codeForm = document.getElementById("email-code-form");
+ 
+  btn.disabled = true;
+  status.textContent = "Invio codice...";
+  status.className = "";
+ 
+  try {
+    twoFASetup.emailCode = String(Math.floor(100000 + Math.random() * 900000));
+    twoFASetup.emailCodeTimestamp = Date.now();
+ 
+    await emailjs.send("service_ngxrsq8", "template_2fa_email", {
+      email: registerEmail.value,
+      code: twoFASetup.emailCode
+    });
+ 
+    status.textContent = "Codice inviato!";
+    status.className = "success";
+    codeForm.style.display = "block";
+  } catch (error) {
+    console.error("Errore invio email:", error);
+    status.textContent = "Errore nell'invio del codice";
+    status.className = "error";
+  } finally {
+    btn.disabled = false;
+  }
+});
+ 
+document.getElementById("twofa-email-verify").addEventListener("click", () => {
+  const inputCode = document.getElementById("twofa-email-code").value.trim();
+  const status = document.getElementById("email-send-status");
+ 
+  if (inputCode === twoFASetup.emailCode) {
+    twoFASetup.emailVerified = true;
+    document.getElementById("email-verified-message").style.display = "block";
+    document.getElementById("email-code-form").style.display = "none";
+    document.getElementById("twofa-email-send").style.display = "none";
+    
+    generateRecoveryCodes();
+    showRecoveryCodes();
+  } else {
+    status.textContent = "Codice errato";
+    status.className = "error";
+  }
+});
+ 
+function initTOTPSetup() {
+  if (twoFASetup.totpSecret) return;
+ 
+  const secret = generateTOTPSecret();
+  twoFASetup.totpSecret = secret;
+ 
+  document.getElementById("totp-secret").textContent = secret;
+ 
+  const accountName = registerEmail.value || "MyFrEM";
+  const otpauthUrl = `otpauth://totp/MyFrEM:${accountName}?secret=${secret}&issuer=MyFrEM`;
+ 
+  document.getElementById("qrcode").innerHTML = "";
+ 
+  new QRCode(document.getElementById("qrcode"), {
+    text: otpauthUrl,
+    width: 200,
+    height: 200,
+    colorDark: "#00d4e8",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+ 
+document.getElementById("twofa-totp-verify").addEventListener("click", () => {
+  const inputCode = document.getElementById("twofa-totp-code").value.trim();
+  const status = document.getElementById("totp-verify-status");
+ 
+  if (inputCode.length !== 6 || !/^\d{6}$/.test(inputCode)) {
+    status.textContent = "Inserisci 6 cifre";
+    status.className = "error";
+    return;
+  }
+ 
+  if (verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
+    twoFASetup.totpVerified = true;
+    status.textContent = "Codice verificato!";
+    status.className = "success";
+    
+    setTimeout(() => {
+      document.getElementById("totp-step-verify").style.display = "none";
+      document.getElementById("totp-step-success").style.display = "block";
+    }, 500);
+ 
+    generateRecoveryCodes();
+    
+    setTimeout(() => {
+      document.getElementById("totp-modal").style.display = "none";
+      showRecoveryCodes();
+      
+      document.getElementById("totp-step-qr").style.display = "block";
+      document.getElementById("totp-step-verify").style.display = "none";
+      document.getElementById("totp-step-success").style.display = "none";
+      document.getElementById("totp-verify-status").textContent = "";
+      document.getElementById("twofa-totp-code").value = "";
+    }, 2000);
+  } else {
+    status.textContent = "Codice errato";
+    status.className = "error";
+  }
+});
+ 
+function generateTOTPSecret() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let secret = "";
+  for (let i = 0; i < 32; i++) {
+    secret += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return secret;
+}
+ 
+document.getElementById("twofa-totp-verify").addEventListener("click", () => {
+  const inputCode = document.getElementById("twofa-totp-code").value.trim();
+  const status = document.getElementById("totp-verify-status");
+ 
+  if (inputCode.length !== 6 || !/^\d{6}$/.test(inputCode)) {
+    status.textContent = "Inserisci 6 cifre";
+    status.className = "error";
+    return;
+  }
+ 
+  if (verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
+    twoFASetup.totpVerified = true;
+    document.getElementById("totp-verified-message").style.display = "block";
+    document.getElementById("twofa-totp-verify").disabled = true;
+    
+    generateRecoveryCodes();
+    showRecoveryCodes();
+  } else {
+    status.textContent = "Codice errato";
+    status.className = "error";
+  }
+});
+ 
+function verifyTOTPCode(secret, code) {
+  try {
+    const totp = new OTPAuth.TOTP({
+      issuer: "MyFrEM",
+      label: registerEmail.value,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromString(secret)
+    });
+ 
+    return totp.validate({ token: code, window: 2 }) !== null;
+  } catch (e) {
+    console.error("Errore verifica TOTP:", e);
+    return false;
+  }
+}
+ 
+function generateRecoveryCodes() {
+  const codes = [];
+  for (let i = 0; i < 5; i++) {
+    const code = Array(8)
+      .fill(0)
+      .map(() => Math.floor(Math.random() * 10))
+      .join("");
+    codes.push(code);
+  }
+  twoFASetup.recoveryCodes = codes;
+}
+ 
+function showRecoveryCodes() {
+  const container = document.getElementById("recovery-codes-display");
+  container.innerHTML = twoFASetup.recoveryCodes
+    .map(code => `<div>${code}</div>`)
+    .join("");
+ 
+  document.getElementById("recovery-codes-section").style.display = "block";
+}
+ 
+document.getElementById("recovery-download").addEventListener("click", () => {
+  const content = `Recovery Codes - MyFrEM\n${"=".repeat(40)}\n\nSalva questi codici in un luogo sicuro!\n\n${twoFASetup.recoveryCodes.join("\n")}\n\nGenerato il: ${new Date().toLocaleString()}`;
+  
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `myfrem-recovery-codes-${Date.now()}.txt`;
+  a.click();
+});
+ 
+document.getElementById("recovery-copy").addEventListener("click", () => {
+  const text = twoFASetup.recoveryCodes.join("\n");
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("recovery-copy");
+    const original = btn.textContent;
+    btn.textContent = "✓ Copiato!";
+    setTimeout(() => {
+      btn.textContent = original;
+    }, 2000);
+  });
+});
+ 
+function getTwoFADataForFirestore() {
+  if (twoFASetup.method === "none") {
+    return {
+      twoFactorEnabled: false,
+      twoFactorMethod: null
+    };
+  }
+ 
+  const data = {
+    twoFactorEnabled: true,
+    twoFactorMethod: twoFASetup.method,
+    recoveryCodes: twoFASetup.recoveryCodes,
+    usedRecoveryCodes: []
+  };
+ 
+  if (twoFASetup.method === "totp") {
+    data.totpSecret = twoFASetup.totpSecret;
+  }
+ 
+  return data;
+}
+
 if (registerForm) {
   let currentStep = 1;
-  const totalSteps = 6;
+  const totalSteps = 7;
   const steps = document.querySelectorAll(".step");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const submitBtn = document.getElementById("submitBtn");
-  const reviewContainer = document.getElementById("reviewContainer");
-
+ 
   function showStep(step) {
     steps.forEach(s => {
       s.style.display = "none";
     });
-
+ 
     document.querySelector(`[data-step="${step}"]`).style.display = "block";
     document.getElementById("stepCounter").textContent = `Passo ${step} di ${totalSteps}`;
     document.querySelector(".step-progress").style.width = `${(step / totalSteps) * 100}%`;
-
+    const reviewContainer = document.getElementById("reviewContainer");
+ 
     prevBtn.style.display = step === 1 ? "none" : "block";
-
+ 
     if (step === totalSteps) {
       nextBtn.style.display = "none";
       submitBtn.style.display = "block";
-
+ 
+      let twoFAStatus = "Non abilitato";
+      if (twoFASetup.method === "email") twoFAStatus = "Email ✓";
+      if (twoFASetup.method === "totp") twoFAStatus = "App Authenticator ✓";
+ 
       reviewContainer.innerHTML = `
         <div><b>Nome:</b> ${registerName.value} ${registerSurname.value}</div>
         <div><b>Username:</b> ${registerUsername.value}</div>
         <div><b>Email:</b> ${registerEmail.value}</div>
         <div><b>Telefono:</b> ${registerPhone?.value || "Non inserito"}</div>
+        <div><b>2FA:</b> ${twoFAStatus}</div>
       `;
     } else {
       nextBtn.style.display = "block";
       submitBtn.style.display = "none";
     }
   }
-
+ 
   async function validateStep() {
     if (currentStep === 1) {
       if (!registerName.value.trim() || !registerSurname.value.trim()) {
-        setStatus( "Inserisci nome e cognome", "error");
+        setStatus("Inserisci nome e cognome", "error");
         return false;
       }
     }
-
+ 
     if (currentStep === 2) {
       const username = registerUsername.value.trim();
       if (!username) {
@@ -435,153 +697,177 @@ if (registerForm) {
         return false;
       }
     }
-
+ 
     if (currentStep === 3) {
       if (!registerEmail.value.trim()) {
         setStatus("Inserisci una email", "error");
         return false;
       }
     }
-
+ 
     if (currentStep === 5) {
       if (registerPassword.value !== registerConfirmPassword.value) {
         setStatus("Le password non coincidono", "error");
         return false;
       }
-    } return true;
+    }
+ 
+    if (currentStep === 6) {
+      const method = twoFASetup.method;
+ 
+      if (method === "email" && !twoFASetup.emailVerified) {
+        setStatus("Verifica l'email per continuare", "error");
+        return false;
+      }
+ 
+      if (method === "totp" && !twoFASetup.totpVerified) {
+        setStatus("Verifica l'app di autenticazione per continuare", "error");
+        return false;
+      }
+ 
+      if ((method === "email" || method === "totp") && !document.getElementById("recovery-confirmed").checked) {
+        setStatus("Conferma di aver salvato i recovery codes", "error");
+        return false;
+      }
+    }
+ 
+    return true;
   }
-
+ 
   nextBtn.addEventListener("click", async () => {
     const valid = await validateStep();
     if (!valid) return;
     currentStep++;
     showStep(currentStep);
   });
-
+ 
   prevBtn.addEventListener("click", () => {
     currentStep--;
     showStep(currentStep);
   });
-
+ 
   showStep(1);
-
+ 
   registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      submitBtn.disabled = true;
-      btnText.textContent = "Registrazione in corso...";
-
-      btnLoader.style.display = "inline-block";
-
-      if (isRegistering) return;
-      isRegistering = true;
-
-      try {
-        const name = registerName.value.trim();
-        const surname = registerSurname.value.trim();
-        const email = registerEmail.value.trim();
-        const username = registerUsername.value.trim();
-        const password = registerPassword.value;
-        const phone = registerPhone?.value.trim() || "";
-
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        const user = cred.user;
-        const token = crypto.randomUUID();
-        const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
-
-        await setDoc(doc(db, "users", user.uid), {
-          email,
-          name,
-          surname,
-          username,
-          phone,
-          role: "user",
-          status: "attivo",
-          newsSubbed: false,
-          emailVerified: false,
-          verifyLink: verifyLink,
-          createdAt: serverTimestamp()
-        });
-
-
-        await setDoc(doc(db, "emailVerifications", token), {
-          email,
-          userId: user.uid,
-          expiresAt: Date.now() + 86400000,
-          used: false
-        });
-
-        await addDoc(collection(db, "activities"), {
-          type: "user_creation",
+    e.preventDefault();
+ 
+    submitBtn.disabled = true;
+    btnText.textContent = "Registrazione in corso...";
+    btnLoader.style.display = "inline-block";
+ 
+    if (isRegistering) return;
+    isRegistering = true;
+ 
+    try {
+      const name = registerName.value.trim();
+      const surname = registerSurname.value.trim();
+      const email = registerEmail.value.trim();
+      const username = registerUsername.value.trim();
+      const password = registerPassword.value;
+      const phone = registerPhone?.value.trim() || "";
+ 
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const user = cred.user;
+      const token = crypto.randomUUID();
+      const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
+ 
+      const twoFAData = getTwoFADataForFirestore();
+ 
+      await setDoc(doc(db, "users", user.uid), {
+        email,
+        name,
+        surname,
+        username,
+        phone,
+        role: "user",
+        status: "attivo",
+        newsSubbed: false,
+        emailVerified: false,
+        verifyLink: verifyLink,
+        createdAt: serverTimestamp(),
+        firstAccess: true,
+        ...twoFAData
+      });
+ 
+      await setDoc(doc(db, "emailVerifications", token), {
+        email,
+        userId: user.uid,
+        expiresAt: Date.now() + 86400000,
+        used: false
+      });
+ 
+      await addDoc(collection(db, "activities"), {
+        type: "user_creation",
+        userName: `${name} ${surname}`,
+        timestamp: serverTimestamp()
+      });
+ 
+      const htmlContent = buildEmail({ verifyLink, email, name });
+      const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
+ 
+      const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
           userName: `${name} ${surname}`,
-          timestamp: serverTimestamp()
-        });
-
-
-        const htmlContent = buildEmail({ verifyLink, email, name});
-        const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
-
-        const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userName: `${name} ${surname}`,
-            userEmail: email,
-            htmlContent
-          })
-        });
-
-        const newUserStaffResponse = await fetch("/api/sendStaffNewUserEmail", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userName: `${name} ${surname}`,
-            staffContent
-          })
+          userEmail: email,
+          htmlContent
         })
-
-        if (!response.ok) {
-          throw new Error("Errore invio email di verifica.");
-        }
-
-        if (!newUserStaffResponse.ok) {
-          console.log("❌ Errore invio email staff:", newUserStaffResponse.status);
-        }
-
-        setStatus("Email di verifica inviata.", "success");
-
-        await signOut(auth);
-        localStorage.setItem("email", email);
-        window.location.href ="/auth/confirm-email";
-
-      } catch (err) {
-        btnText.textContent = "Registrazione fallita";
-        switch (err.code) {
-          case "auth/email-already-in-use":
-            setStatus("Email già in uso.", "error");
-            break;
-          case "auth/invalid-email":
-            setStatus("Email non valida.", "error");
-            break;
-          case "auth/weak-password":
-            setStatus("Password debole.", "error");
-            break;
-          default:
-            setStatus("Errore durante la registrazione.", "error");
-        }
-        console.error(err);
-      } finally {
-        isRegistering = false;
-        submitBtn.disabled = false;
-        btnText.textContent = "Crea account";
-        btnLoader.style.display = "none";
+      });
+ 
+      const newUserStaffResponse = await fetch("/api/sendStaffNewUserEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userName: `${name} ${surname}`,
+          staffContent
+        })
+      });
+ 
+      if (!response.ok) {
+        throw new Error("Errore invio email di verifica.");
       }
+ 
+      if (!newUserStaffResponse.ok) {
+        console.log("❌ Errore invio email staff:", newUserStaffResponse.status);
+      }
+ 
+      setStatus("Email di verifica inviata.", "success");
+ 
+      await signOut(auth);
+      localStorage.setItem("email", email);
+      window.location.href = "/auth/confirm-email";
+ 
+    } catch (err) {
+      btnText.textContent = "Registrazione fallita";
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          setStatus("Email già in uso.", "error");
+          break;
+        case "auth/invalid-email":
+          setStatus("Email non valida.", "error");
+          break;
+        case "auth/weak-password":
+          setStatus("Password debole.", "error");
+          break;
+        case "auth/missing-password":
+          setStatus("Compila prima tutti i campi.", "error");
+          break;
+        default:
+          setStatus("Errore durante la registrazione.", "error");
+      }
+      console.error(err);
+    } finally {
+      isRegistering = false;
+      submitBtn.disabled = false;
+      btnText.textContent = "Crea account";
+      btnLoader.style.display = "none";
     }
-  );
+  });
 }
 
 

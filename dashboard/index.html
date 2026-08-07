@@ -127,6 +127,116 @@
     </main>
   </div>
 
+  <div id="firstAccessModal" class="first-access-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-step active" data-step="1">
+        <div class="modal-header">
+          <h2>Benvenuto/a su MyFrEM!</h2>
+        </div>
+        <div class="modal-content">
+          <p>Ciao! Siamo felicissimi che tu ti sia unito/a alla nostra community dedicata alla documentazione dei servizi di emergenza del Friuli-Venezia Giulia.</p>
+          <p>Ti guideremo attraverso le funzionalità principali di MyFrEM in pochi semplici step.</p>
+        </div>
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot" data-step="2"></span>
+            <span class="step-dot" data-step="3"></span>
+            <span class="step-dot" data-step="4"></span>
+          </div>
+          <button class="btn-modal btn-next" data-action="next">Continua</button>
+        </div>
+      </div>
+
+      <div class="modal-step" data-step="2">
+        <div class="modal-header">
+          <h2>Cos'è MyFrEM?</h2>
+        </div>
+        <div class="modal-content">
+          <p>MyFrEM è la piattaforma comunitaria di Friuli Emergenze dove puoi:</p>
+          <ul class="features-list">
+            <li><strong>Condividere foto</strong> — Documenta i servizi di emergenza con la tua fotocamera</li>
+            <li><strong>Partecipare agli eventi</strong> — Iscriviti ai nostri incontri e missioni fotografiche</li>
+            <li><strong>Contribuire alla community</strong> — Aiuta gli altri membri con le tue esperienze</li>
+            <li><strong>Imparare</strong> — Accedi a risorse e documentazione sui servizi di emergenza</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot" data-step="3"></span>
+            <span class="step-dot" data-step="4"></span>
+          </div>
+          <div class="button-group">
+            <button class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button class="btn-modal btn-next" data-action="next">Continua</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-step" data-step="3">
+        <div class="modal-header">
+          <h2>Inizia a Contribuire</h2>
+        </div>
+        <div class="modal-content">
+          <p>Ecco le prime cose che puoi fare:</p>
+          <div class="action-cards">
+            <div class="action-card">
+              <h3>Carica una Foto</h3>
+              <p>Accedi a "Carica una Foto" e condividi le tue documentazioni di servizi di emergenza</p>
+            </div>
+            <div class="action-card">
+              <h3>Iscriviti a un Evento</h3>
+              <p>Scopri i nostri prossimi incontri e partecipa attivamente</p>
+            </div>
+            <div class="action-card">
+              <h3>Conosci la Community</h3>
+              <p>Interagisci con altri appassionati della documentazione di emergenza</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+            <span class="step-dot" data-step="4"></span>
+          </div>
+          <div class="button-group">
+            <button class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button class="btn-modal btn-next" data-action="next">Continua</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-step" data-step="4">
+        <div class="modal-header">
+          <h2>Hai Bisogno di Aiuto?</h2>
+        </div>
+        <div class="modal-content">
+          <p>Se hai domande o hai bisogno di supporto:</p>
+          <div class="help-box">
+            <p><strong>Documentazione:</strong> Consulta la nostra <a href="/docs/" target="_blank">guida completa</a></p>
+            <p><strong>Email:</strong> Contattaci a <a href="mailto:info@friuliemergenze.it">info@friuliemergenze.it</a></p>
+            <p><strong>Social:</strong> Seguici su Instagram e TikTok @friuliemergenze</p>
+          </div>
+          <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; opacity: 0.8;">Buona documentazione!</p>
+        </div>
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+            <span class="step-dot active" data-step="4"></span>
+          </div>
+          <button class="btn-modal btn-finish" data-action="finish">Ho Capito!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/dashboard/dsh.js"></script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>

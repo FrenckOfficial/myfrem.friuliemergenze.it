@@ -48,6 +48,10 @@ auth.onAuthStateChanged(async (user) => {
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
 
+    if (userData.firstAccess === true) {
+      showFirstAccessModal(user.uid);
+    }
+
     const staffRoles = [
       "simplestaff",
       "modstaff",
@@ -263,6 +267,78 @@ auth.onAuthStateChanged(async (user) => {
     contentEl.style.display = "block";
   }
 });
+
+let currentStep = 1;
+const totalSteps = 4;
+
+function showFirstAccessModal(userId) {
+  const modal = document.getElementById("firstAccessModal");
+  modal.classList.add("active");
+  currentStep = 1;
+  showStep(1);
+  setupModalListeners(userId);
+}
+
+function showStep(step) {
+  const steps = document.querySelectorAll(".modal-step");
+  steps.forEach((el) => el.classList.remove("active"));
+
+  const activeStep = document.querySelector(
+    `.modal-step[data-step="${step}"]`
+  );
+  if (activeStep) {
+    activeStep.classList.add("active");
+  }
+
+  currentStep = step;
+}
+
+function setupModalListeners(userId) {
+  const nextButtons = document.querySelectorAll("[data-action='next']");
+  const backButtons = document.querySelectorAll("[data-action='back']");
+  const finishButton = document.querySelector("[data-action='finish']");
+
+  nextButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (currentStep < totalSteps) {
+        showStep(currentStep + 1);
+      }
+    });
+  });
+
+  backButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+      }
+    });
+  });
+
+  finishButton.addEventListener("click", async () => {
+    closeFirstAccessModal(userId);
+  });
+
+  const modal = document.getElementById("firstAccessModal");
+  const overlay = modal.querySelector(".modal-overlay");
+
+  overlay.addEventListener("click", async () => {
+    closeFirstAccessModal(userId);
+  });
+}
+
+async function closeFirstAccessModal(userId) {
+  try {
+    await db.collection("users").doc(userId).update({ firstAccess: false });
+    console.log("✅ firstAccess settato a false");
+
+    const modal = document.getElementById("firstAccessModal");
+    modal.classList.remove("active");
+  } catch (error) {
+    console.error("❌ Errore nell'aggiornamento del doc:", error);
+    const modal = document.getElementById("firstAccessModal");
+    modal.classList.remove("active");
+  }
+}
 
 function setStatus(message, type = "info") {
   const classNameBox = document.querySelector(".statusBox");
