@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7V434J1GZH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-7V434J1GZH');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -10,6 +19,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+  <script type="module" src="/configFirebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/otplib@13.4.1/dist/index.global.min.js"></script>
+  <script src="https://cdn.emailjs.com/sdk/3.11.0/email.min.js"></script>
+  <script type="module" src="/staff/dashboard/settings/2fa.js"></script>
   <script type="module" src="/staff/dashboard/settings/staff-settings.js"></script>
 </head>
 <body>
@@ -105,17 +122,6 @@
   
           <button type="submit" class="btn" id="savePasswordBtn">Cambia password</button>
         </form>
-      </section>
-  
-      <section class="settings-section">
-        <h2>Biografia</h2>
-        <p class="bioStatusBox" style="display:none;">
-          <span id="bioStatus"></span>
-          <button id="closeBioMsg">&times;</button>
-        </p>
-        <p>La tua biografia attuale è: <b id="bioText"></b></p>
-        <textarea id="bioInput" class="textarea"></textarea>
-        <button id="saveBioBtn" class="btn" type="submit">Salva bio</button>
       </section>
 
       <section class="settings-section">
@@ -328,8 +334,21 @@
           </div>
         </div>
       </div>
+  
+      <section class="settings-section">
+        <h2>Biografia</h2>
+        <p class="bioStatusBox" style="display:none;">
+          <span id="bioStatus"></span>
+          <button id="closeBioMsg">&times;</button>
+        </p>
+        <p>La tua biografia attuale è: <b id="bioText"></b></p>
+        <textarea id="bioInput" class="textarea"></textarea>
+        <button id="saveBioBtn" class="btn" type="submit">Salva bio</button>
+      </section>
+
     </main>
   </div>
+  
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">

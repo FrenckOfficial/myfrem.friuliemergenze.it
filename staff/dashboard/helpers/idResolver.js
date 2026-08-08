@@ -25,7 +25,7 @@ export async function getNameById(collectionName, id) {
         }
 
         const data = snap.data();
-        const name = data.name || data.title || data.nome || data.fullName || id;
+        const name = data.name || data.title || data.nome || data.fullName || data.vehicleModel || id;
 
         cache[cacheKey] = name;
         return name;

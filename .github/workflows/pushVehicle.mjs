@@ -274,50 +274,15 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title>${escapeHtml(vehicleData.title)} | Friuli Emergenze</title>
-    <style>
-      #donate-float {
-        position: fixed !important;
-        bottom: 2rem !important;
-        left: 2rem !important;
-        z-index: 999999 !important;
-        animation: slideInUp 0.5s ease-out;
-      }
-
-      .donate-btn {
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.5rem;
-        padding: 0.875rem 1.5rem;
-        background: #ff7b00 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 50px !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 12px rgba(255, 123, 0, 0.3) !important;
-        transition: all 0.3s ease !important;
-        font-family: 'Lexend', sans-serif !important;
-        text-decoration: none !important;
-      }
-
-      .donate-btn:hover {
-        background: #ff6800 !important;
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 16px rgba(255, 123, 0, 0.4) !important;
-      }
-
-      @keyframes slideInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      @media (max-width: 768px) {
-        .donate-float { bottom: 1rem !important; left: 1rem !important; }
-        .donate-btn { padding: 0.75rem 1rem !important; font-size: 0.95rem !important; }
-      }
-    </style>
   </head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LRKW2EXEL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2LRKW2EXEL');
+  </script>
   <body>
     <div id="donate-float" style="position: fixed !important; bottom: 2rem !important; left: 2rem !important; z-index: 999999 !important; display: block !important; width: auto !important; height: auto !important;">
       <a href="https://www.friuliemergenze.it/sostienici/donate" 

@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7V434J1GZH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-7V434J1GZH');
+  </script>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Impostazioni utente | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <!-- Necessario per la generazione/verifica TOTP (2FA) -->
+  <script src="https://cdn.jsdelivr.net/npm/otplib@13.4.1/dist/index.global.min.js"></script>
+  <!-- Necessario per generare il QR code del setup TOTP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link rel="shortcut icon" href="/assets/icons/logo.png">
   <style>
@@ -17,6 +30,114 @@
       .main-content {
         padding: 0
       }
+    }
+
+    /* ===== Modal 2FA ===== */
+    .twofa-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .twofa-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .twofa-modal-content {
+      position: relative;
+      background: var(--bg-surface, #161d25);
+      border: 1px solid var(--border-panel, rgba(255,255,255,0.08));
+      border-radius: var(--radius-md, 12px);
+      padding: 2rem;
+      max-width: 480px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .twofa-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .twofa-modal-close {
+      background: none;
+      border: none;
+      color: var(--muted, #7a8fa6);
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .twofa-choice .choice-option {
+      border: 1px solid var(--border-panel, rgba(255,255,255,0.08));
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .twofa-choice .choice-option label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      cursor: pointer;
+    }
+    .choice-label {
+      font-weight: 600;
+    }
+    .choice-desc {
+      font-size: 0.85rem;
+      color: var(--muted, #7a8fa6);
+    }
+    .twofa-setup-box, .recovery-codes-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-panel, rgba(255,255,255,0.08));
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .totp-key-box {
+      background: var(--bg-surface, #161d25);
+      border: 1px solid var(--border-panel, rgba(255,255,255,0.08));
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .btn-send-code, .btn-verify, .btn-copy-secret, .btn-action {
+      background: var(--accent, #00d4e8);
+      color: #06222a;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text, #e6edf3);
+      border: 1px solid var(--border-panel, rgba(255,255,255,0.08));
+    }
+    .btn-danger {
+      background: #e84855;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .twofa-status-box .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .twofa-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -169,6 +290,38 @@
           </div>
 
           <div class="settings-row">
+            <section class="settings-card">
+              <div class="twofaStatusBox" style="display:none;">
+                <span id="twofaStatus"></span>
+                <button id="closeTwofaStatus">&times;</button>
+              </div>
+              <h2>🔐 Autenticazione a due fattori</h2>
+
+              <div class="twofa-status-box">
+                <div class="status-row">
+                  <div class="status-info">
+                    <p class="status-label" style="margin:0;font-weight:600;">Stato</p>
+                    <p class="status-value" id="twofa-current-status" style="margin:0.25rem 0 0;">Caricamento...</p>
+                  </div>
+                  <div class="status-method" id="twofa-method-display"></div>
+                </div>
+
+                <div class="twofa-actions">
+                  <button type="button" id="enable-twofa-btn" class="btn" style="display:none;">
+                    Abilita 2FA
+                  </button>
+                  <button type="button" id="disable-twofa-btn" class="btn btn-danger" style="display:none;">
+                    Disabilita 2FA
+                  </button>
+                  <button type="button" id="regenerate-recovery-btn" class="btn btn-secondary" style="display:none;">
+                    Rigenera Recovery Codes
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="settings-row">
             <section class="settings-card preferences-card">
               <h2>⚙️ Preferenze account</h2>
               <div class="prefStatusBox" style="display:none;">
@@ -205,6 +358,187 @@
               <button id="savePreferencesBtn" class="btn btn-preferences">Salva preferenze</button>
             </section>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Modal: Abilita 2FA ===== -->
+    <div id="enable-twofa-modal" class="twofa-modal">
+      <div class="twofa-modal-overlay"></div>
+      <div class="twofa-modal-content">
+        <div class="twofa-modal-header">
+          <h3>Abilita Autenticazione a Due Fattori</h3>
+          <button type="button" id="close-enable-modal" class="twofa-modal-close">✕</button>
+        </div>
+
+        <div class="twofa-modal-body">
+          <p style="color: var(--muted, #7a8fa6); margin-bottom: 1.5rem;">
+            Scegli il metodo di autenticazione che preferisci:
+          </p>
+
+          <div class="twofa-choice">
+            <div class="choice-option">
+              <input type="radio" id="settings-twofa-email" name="settings-twofa-method" value="email">
+              <label for="settings-twofa-email">
+                <span class="choice-label">Email</span>
+                <span class="choice-desc">Riceverai un codice via email ad ogni accesso</span>
+              </label>
+            </div>
+
+            <div class="choice-option">
+              <input type="radio" id="settings-twofa-totp" name="settings-twofa-method" value="totp">
+              <label for="settings-twofa-totp">
+                <span class="choice-label">App di autenticazione</span>
+                <span class="choice-desc">Usa Google Authenticator, Authy o Microsoft Authenticator</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="settings-email-setup" style="display: none; margin-top: 2rem;">
+            <div class="twofa-setup-box">
+              <h4>Setup Email 2FA</h4>
+              <p>Ti invieremo un codice di verifica. Inseriscilo qui per confermare.</p>
+              <button type="button" id="settings-email-send" class="btn-send-code">
+                Invia codice
+              </button>
+              <p id="settings-email-status" style="font-size: 0.85rem; margin-top: 0.5rem;"></p>
+
+              <div id="settings-email-form" style="display: none; margin-top: 1rem;">
+                <input type="text" id="settings-email-code" placeholder="000000" maxlength="6" pattern="\d{6}" class="input">
+                <button type="button" id="settings-email-verify" class="btn-verify" style="margin-top: 0.5rem; width: 100%;">
+                  Verifica
+                </button>
+              </div>
+
+              <div id="settings-email-success" style="display: none; padding: 0.75rem; background: rgba(79, 202, 122, 0.1); border-radius: 6px; color: #4fca7a; margin-top: 1rem;">
+                Email 2FA attivato!
+              </div>
+            </div>
+          </div>
+
+          <div id="settings-totp-setup" style="display: none; margin-top: 2rem;">
+            <div class="twofa-setup-box">
+              <h4>Configura Autenticazione App</h4>
+              <p style="margin-bottom: 1rem;">Scansiona il QR con Google Authenticator, Authy o Microsoft Authenticator:</p>
+
+              <div id="settings-qrcode-container" style="text-align: center; margin: 1.5rem 0;">
+                <div id="settings-qrcode"></div>
+              </div>
+
+              <div class="totp-key-box">
+                <p style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 0.5rem;">Chiave di backup:</p>
+                <code id="settings-totp-secret"></code>
+                <button type="button" id="settings-copy-secret" class="btn-copy-secret" style="margin-top: 0.5rem;">
+                  Copia
+                </button>
+              </div>
+
+              <div style="margin-top: 1.5rem;">
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Inserisci il codice dalla tua app:</p>
+                <input type="text" id="settings-totp-code" placeholder="000000" maxlength="6" pattern="\d{6}" class="input" style="font-size: 1.25rem; text-align: center; letter-spacing: 4px; width: 100%;">
+                <button type="button" id="settings-totp-verify" class="btn-verify" style="margin-top: 1rem; width: 100%;">
+                  Verifica
+                </button>
+                <p id="settings-totp-status" style="font-size: 0.85rem; margin-top: 0.5rem; text-align: center;"></p>
+              </div>
+
+              <div id="settings-totp-success" style="display: none; padding: 0.75rem; background: rgba(79, 202, 122, 0.1); border-radius: 6px; color: #4fca7a; margin-top: 1rem; text-align: center;">
+                ✓ TOTP attivato!
+              </div>
+            </div>
+          </div>
+
+          <!-- RECOVERY CODES -->
+          <div id="settings-recovery-codes-section" style="display: none; margin-top: 2rem;">
+            <div class="recovery-codes-box">
+              <h4>Codici di recupero</h4>
+              <p>Salva questi codici in un luogo sicuro. Se perdi l'accesso, puoi usarli per accedere.</p>
+
+              <div id="settings-recovery-codes-display" style="background: var(--bg-surface, #161d25); padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px solid rgba(0, 212, 232, 0.25); font-family: monospace; font-size: 0.85rem; color: var(--accent, #00d4e8);"></div>
+
+              <div class="recovery-actions" style="display: flex; gap: 1rem; margin: 1rem 0;">
+                <button type="button" id="settings-recovery-download" class="btn-action">Scarica</button>
+                <button type="button" id="settings-recovery-copy" class="btn-action">Copia</button>
+              </div>
+
+              <div style="margin-top: 1rem;">
+                <label>
+                  <input type="checkbox" id="settings-recovery-confirmed">
+                  Ho salvato i codici di recupero in un luogo sicuro
+                </label>
+              </div>
+
+              <button type="button" id="settings-enable-final-btn" class="btn" style="width: 100%; margin-top: 1rem; display: none;">
+                Abilita 2FA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Modal: Disabilita 2FA ===== -->
+    <div id="disable-twofa-modal" class="twofa-modal">
+      <div class="twofa-modal-overlay"></div>
+      <div class="twofa-modal-content">
+        <div class="twofa-modal-header">
+          <h3>Disabilita Autenticazione a Due Fattori</h3>
+          <button type="button" id="close-disable-modal" class="twofa-modal-close">✕</button>
+        </div>
+
+        <div class="twofa-modal-body">
+          <p style="color: #e84855; margin-bottom: 1.5rem; background: rgba(232, 72, 85, 0.1); padding: 1rem; border-radius: 6px;">
+            La disabilitazione richiede verifica del codice attuale. Assicurati di avere accesso al tuo metodo 2FA.
+          </p>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label>Inserisci il codice dal tuo metodo 2FA attuale:</label>
+            <input type="text" id="disable-twofa-code" placeholder="000000" maxlength="6" pattern="\d{6}" class="input" style="margin-top: 0.5rem; width: 100%; font-size: 1.25rem; text-align: center; letter-spacing: 4px;">
+          </div>
+
+          <p id="disable-verify-status" style="font-size: 0.85rem; margin: 1rem 0; text-align: center;"></p>
+
+          <button type="button" id="disable-verify-btn" class="btn" style="width: 100%; margin-bottom: 0.5rem;">
+            Verifica e disabilita
+          </button>
+          <button type="button" id="cancel-disable-btn" class="btn btn-secondary" style="width: 100%;">
+            Annulla
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Modal: Rigenera Recovery Codes ===== -->
+    <div id="regenerate-modal" class="twofa-modal">
+      <div class="twofa-modal-overlay"></div>
+      <div class="twofa-modal-content">
+        <div class="twofa-modal-header">
+          <h3>Rigenera Recovery Codes</h3>
+          <button type="button" id="close-regenerate-modal" class="twofa-modal-close">✕</button>
+        </div>
+
+        <div class="twofa-modal-body">
+          <p style="margin-bottom: 1.5rem;">
+            Inserisci il codice dal tuo metodo 2FA attuale per rigenerare i codici di recupero:
+          </p>
+
+          <input type="text" id="regenerate-code" placeholder="000000" maxlength="6" pattern="\d{6}" class="input" style="width: 100%; font-size: 1.25rem; text-align: center; letter-spacing: 4px; margin-bottom: 1rem;">
+
+          <p id="regenerate-status" style="font-size: 0.85rem; margin: 1rem 0; text-align: center;"></p>
+
+          <div id="new-recovery-codes-display" style="display: none; background: var(--bg-surface, #161d25); padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px solid rgba(0, 212, 232, 0.25); font-family: monospace; font-size: 0.85rem; color: var(--accent, #00d4e8);"></div>
+
+          <div class="recovery-actions" id="regenerate-actions" style="display: none; gap: 1rem; margin: 1rem 0;">
+            <button type="button" id="regenerate-download" class="btn-action">Scarica</button>
+            <button type="button" id="regenerate-copy" class="btn-action">Copia</button>
+          </div>
+
+          <button type="button" id="verify-regenerate-btn" class="btn" style="width: 100%; margin-bottom: 0.5rem;">
+            Verifica e rigenera
+          </button>
+          <button type="button" id="cancel-regenerate-btn" class="btn btn-secondary" style="width: 100%;">
+            Annulla
+          </button>
         </div>
       </div>
     </div>

@@ -10,9 +10,13 @@ export async function parseActivity(activity, date) {
 
         case "photo_approval": {
             const staff = activity.approvalStaffer || "Staff sconosciuto";
+            const staff2 = activity.staffMember || "Staff sconosciuto";
 
             if (activity.photoId) {
                 const photo = await getNameById("photos", activity.photoId);
+                if (staff2) {
+                    return `[${date}] Foto "${photo}" approvata da ${staff2}.`; 
+                }
                 return `[${date}] Foto "${photo}" approvata da ${staff}.`;
             }
 
@@ -21,9 +25,14 @@ export async function parseActivity(activity, date) {
 
         case "photo_rejection": {
             const staff = activity.rejectionStaffer || "Staff sconosciuto";
+            const staff2 = activity.staffMember || "Staff sconosciuto";
 
+            
             if (activity.photoId) {
                 const photo = await getNameById("photos", activity.photoId);
+                if (staff2) {
+                    return `[${date}] Foto "${photo}" rifiutata da ${staff2}.`;
+                }
                 return `[${date}] Foto "${photo}" rifiutata da ${staff}.`;
             }
 

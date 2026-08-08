@@ -284,7 +284,6 @@ async function generatePhotobookHtml(slug, photobookData, coverUrl) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title>${escapeHtml(photobookData.title)} - Photobook | Friuli Emergenze</title>
-    <script src="/heading.js"><\/script>
 
     <link rel="stylesheet" href="/style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
@@ -298,6 +297,14 @@ async function generatePhotobookHtml(slug, photobookData, coverUrl) {
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
   </head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LRKW2EXEL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2LRKW2EXEL');
+  </script>
   <body class="fade-in">
     <nav class="navbar">
       <div class="navbar-container">

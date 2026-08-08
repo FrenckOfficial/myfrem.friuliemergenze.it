@@ -23,6 +23,7 @@ import {
   getDoc,
   setDoc,
   addDoc,
+  updateDoc,
   doc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -143,6 +144,239 @@ async function validateAccount(userData) {
   }
 }
 
+let pendingLogin = null;
+
+const twofaLoginModal = document.getElementById("twofa-login-modal");
+const twofaLoginDesc = document.getElementById("twofa-login-desc");
+const twofaLoginEmailBlock = document.getElementById("twofa-login-email-block");
+const twofaLoginResendBtn = document.getElementById("twofa-login-resend-email");
+const twofaLoginCodeInput = document.getElementById("twofa-login-code");
+const twofaLoginStatus = document.getElementById("twofa-login-status");
+const twofaLoginVerifyBtn = document.getElementById("twofa-login-verify-btn");
+const twofaLoginToggleRecovery = document.getElementById("twofa-login-toggle-recovery");
+const twofaLoginCloseBtn = document.getElementById("closeTwoFALoginModal");
+
+async function verifyTOTPLoginCode(secret, code) {
+  try {
+    const result = await otplib.verify({ secret, token: code });
+    return result.valid;
+  } catch (e) {
+    console.error("Errore verifica TOTP login:", e);
+    return false;
+  }
+}
+
+function checkRecoveryCode(userData, code) {
+  const codes = userData.recoveryCodes || [];
+  return codes.includes(code);
+}
+
+async function sendLoginEmailCode() {
+  if (!twofaLoginStatus || !pendingLogin) return;
+
+  try {
+    pendingLogin.emailCode = String(Math.floor(100000 + Math.random() * 900000));
+
+    const token = await pendingLogin.user.getIdToken();
+
+    const response = await fetch("/api/send2FACode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
+        email: pendingLogin.userData.email,
+        ip: await getIpAddress(),
+        code: pendingLogin.emailCode
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Invio codice fallito");
+    }
+
+    twofaLoginStatus.textContent = "Codice inviato via email.";
+    twofaLoginStatus.className = "success";
+  } catch (error) {
+    console.error("Errore invio codice 2FA login:", error);
+    twofaLoginStatus.textContent = "Errore nell'invio del codice.";
+    twofaLoginStatus.className = "error";
+  }
+}
+
+function start2FAChallenge(user, userData) {
+  if (!twofaLoginModal) {
+    console.error("Modal 2FA login non trovato nel DOM.");
+    return;
+  }
+
+  pendingLogin = { user, userData, usingRecovery: false, emailCode: null };
+
+  twofaLoginCodeInput.value = "";
+  twofaLoginCodeInput.maxLength = 6;
+  twofaLoginCodeInput.placeholder = "000000";
+  twofaLoginStatus.textContent = "";
+  twofaLoginStatus.className = "";
+  twofaLoginToggleRecovery.textContent = "Usa un recovery code";
+
+  if (userData.twoFactorMethod === "totp") {
+    twofaLoginDesc.textContent = "Inserisci il codice generato dalla tua app di autenticazione.";
+    twofaLoginEmailBlock.style.display = "none";
+    twofaLoginResendBtn.style.display = "none";
+  } else if (userData.twoFactorMethod === "email") {
+    twofaLoginDesc.textContent = "Ti abbiamo inviato un codice via email.";
+    twofaLoginEmailBlock.style.display = "block";
+    twofaLoginResendBtn.style.display = "inline";
+    sendLoginEmailCode();
+  }
+
+  twofaLoginModal.classList.add("active");
+  twofaLoginCodeInput.focus();
+}
+
+if (twofaLoginVerifyBtn) {
+  twofaLoginVerifyBtn.addEventListener("click", async () => {
+    if (!pendingLogin) return;
+
+    const code = twofaLoginCodeInput.value.trim();
+
+    if (!code) {
+      twofaLoginStatus.textContent = "Inserisci il codice";
+      twofaLoginStatus.className = "error";
+      return;
+    }
+
+    twofaLoginVerifyBtn.disabled = true;
+    twofaLoginStatus.textContent = "Verifica in corso...";
+    twofaLoginStatus.className = "";
+
+    try {
+      let verified = false;
+
+      if (pendingLogin.usingRecovery) {
+        verified = checkRecoveryCode(pendingLogin.userData, code);
+
+        if (verified) {
+          const remaining = (pendingLogin.userData.recoveryCodes || []).filter(c => c !== code);
+          const used = [...(pendingLogin.userData.usedRecoveryCodes || []), code];
+
+          await updateDoc(doc(db, "users", pendingLogin.user.uid), {
+            recoveryCodes: remaining,
+            usedRecoveryCodes: used
+          });
+        }
+      } else if (pendingLogin.userData.twoFactorMethod === "totp") {
+        verified = await verifyTOTPLoginCode(pendingLogin.userData.totpSecret, code);
+      } else if (pendingLogin.userData.twoFactorMethod === "email") {
+        verified = code === pendingLogin.emailCode;
+      }
+
+      if (!verified) {
+        twofaLoginStatus.textContent = "Codice non valido.";
+        twofaLoginStatus.className = "error";
+        return;
+      }
+
+      const finishedUser = pendingLogin.user;
+      const finishedUserData = pendingLogin.userData;
+
+      twofaLoginModal.classList.remove("active");
+      pendingLogin = null;
+
+      await completeLogin(finishedUser, finishedUserData);
+    } catch (error) {
+      console.error("Errore verifica 2FA login:", error);
+      twofaLoginStatus.textContent = "Errore durante la verifica.";
+      twofaLoginStatus.className = "error";
+    } finally {
+      twofaLoginVerifyBtn.disabled = false;
+    }
+  });
+}
+
+if (twofaLoginToggleRecovery) {
+  twofaLoginToggleRecovery.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!pendingLogin) return;
+
+    pendingLogin.usingRecovery = !pendingLogin.usingRecovery;
+    twofaLoginCodeInput.value = "";
+    twofaLoginStatus.textContent = "";
+    twofaLoginStatus.className = "";
+
+    if (pendingLogin.usingRecovery) {
+      twofaLoginDesc.textContent = "Inserisci uno dei tuoi recovery code.";
+      twofaLoginToggleRecovery.textContent = "Usa invece il codice normale";
+      twofaLoginEmailBlock.style.display = "none";
+      twofaLoginCodeInput.maxLength = 8;
+      twofaLoginCodeInput.placeholder = "00000000";
+    } else {
+      if (pendingLogin.userData.twoFactorMethod === "email") {
+        twofaLoginDesc.textContent = "Ti abbiamo inviato un codice via email.";
+        twofaLoginEmailBlock.style.display = "block";
+      } else {
+        twofaLoginDesc.textContent = "Inserisci il codice generato dalla tua app di autenticazione.";
+      }
+      twofaLoginToggleRecovery.textContent = "Usa un recovery code";
+      twofaLoginCodeInput.maxLength = 6;
+      twofaLoginCodeInput.placeholder = "000000";
+    }
+  });
+}
+
+if (twofaLoginResendBtn) {
+  twofaLoginResendBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (pendingLogin && pendingLogin.userData.twoFactorMethod === "email" && !pendingLogin.usingRecovery) {
+      sendLoginEmailCode();
+    }
+  });
+}
+
+if (twofaLoginCodeInput) {
+  twofaLoginCodeInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") twofaLoginVerifyBtn?.click();
+  });
+}
+
+if (twofaLoginCloseBtn) {
+  twofaLoginCloseBtn.addEventListener("click", async () => {
+    twofaLoginModal.classList.remove("active");
+    if (pendingLogin) {
+      await signOut(auth);
+      pendingLogin = null;
+    }
+  });
+}
+
+async function completeLogin(user, userData) {
+  try {
+    const token = await auth.currentUser.getIdToken();
+
+    await fetch("/api/sendLoginMail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        email: user.email,
+        name: (userData.name + " " + userData.surname) || "Utente",
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+      })
+    });
+  } catch (error) {
+    console.error("Errore notifica:", error);
+  }
+
+  await createLoginLog(user);
+
+  redirectByRole(userData.role);
+}
+
 if (loginForm) {
   document.getElementById("loginEmail")?.addEventListener("keyup", (e) => {
     if (e.key === "Enter") loginForm.dispatchEvent(new Event("submit"));
@@ -192,29 +426,15 @@ if (loginForm) {
 
       await validateAccount(userData);
 
-      try {
-        const token = await auth.currentUser.getIdToken();
-
-        await fetch("/api/sendLoginMail", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json", 
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            email: user.email,
-            name: userData.name + " " + userData.surname || "Utente",
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent
-          })
-        });
-      } catch (error) {
-        console.error("Errore notifica:", error);
+      if (userData.twoFactorEnabled) {
+        submitBtn.disabled = false;
+        btnText.textContent = "Accedi";
+        btnLoader.style.display = "none";
+        start2FAChallenge(user, userData);
+        return;
       }
 
-      await createLoginLog(user);
-
-      redirectByRole(userData.role);
+      await completeLogin(user, userData);
 
       btnText.style.display = 'inline-block';
       btnLoader.style.display = 'none';
@@ -280,28 +500,13 @@ if (googleBtn) {
 
       const userData = userSnap.data();
       await validateAccount(userData);
-      await createLoginLog(user);
 
-      try {
-        const token = await auth.currentUser.getIdToken();
-        await fetch("/api/sendLoginMail", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            email: user.email,
-            name: userData.name || "Utente",
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent
-          })
-        });
-      } catch (error) {
-        console.error("Errore nell'invio della notifica di login:", error);
+      if (userData.twoFactorEnabled) {
+        start2FAChallenge(user, userData);
+        return;
       }
 
-      redirectByRole(userData.role);
+      await completeLogin(user, userData);
 
     } catch (err) {
       setStatus(err.message, "error");
@@ -384,7 +589,6 @@ let twoFASetup = {
   emailCodeTimestamp: null
 };
  
-// Radio button choice
 document.querySelectorAll('input[name="twofa-method"]').forEach(radio => {
   radio.addEventListener("change", (e) => {
     twoFASetup.method = e.target.value;
@@ -405,8 +609,7 @@ function showTwoFASection() {
 }
 
  
-// EMAIL 2FA
-document.getElementById("twofa-email-send").addEventListener("click", async () => {
+document.getElementById("twofa-email-send")?.addEventListener("click", async () => {
   const btn = document.getElementById("twofa-email-send");
   const status = document.getElementById("email-send-status");
   const codeForm = document.getElementById("email-code-form");
@@ -419,9 +622,18 @@ document.getElementById("twofa-email-send").addEventListener("click", async () =
     twoFASetup.emailCode = String(Math.floor(100000 + Math.random() * 900000));
     twoFASetup.emailCodeTimestamp = Date.now();
  
-    await emailjs.send("service_ngxrsq8", "template_2fa_email", {
-      email: registerEmail.value,
-      code: twoFASetup.emailCode
+    const response = await fetch("/api/send2FACode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
+        email: registerEmail.value,
+        ip: await getIpAddress(),
+        code: twoFASetup.emailCode
+      })
     });
  
     status.textContent = "Codice inviato!";
@@ -436,7 +648,7 @@ document.getElementById("twofa-email-send").addEventListener("click", async () =
   }
 });
  
-document.getElementById("twofa-email-verify").addEventListener("click", () => {
+document.getElementById("twofa-email-verify")?.addEventListener("click", () => {
   const inputCode = document.getElementById("twofa-email-code").value.trim();
   const status = document.getElementById("email-send-status");
  
@@ -476,8 +688,18 @@ function initTOTPSetup() {
     correctLevel: QRCode.CorrectLevel.H
   });
 }
- 
-document.getElementById("twofa-totp-verify").addEventListener("click", () => {
+
+async function verifyTOTPCode(secret, code) {
+  try {
+    const result = await otplib.verify({ secret, token: code });
+    return result.valid;
+  } catch (e) {
+    console.error("Errore verifica TOTP:", e);
+    return false;
+  }
+}
+
+document.getElementById("twofa-totp-verify")?.addEventListener("click", async () => {
   const inputCode = document.getElementById("twofa-totp-code").value.trim();
   const status = document.getElementById("totp-verify-status");
  
@@ -487,7 +709,7 @@ document.getElementById("twofa-totp-verify").addEventListener("click", () => {
     return;
   }
  
-  if (verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
+  if (await verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
     twoFASetup.totpVerified = true;
     status.textContent = "Codice verificato!";
     status.className = "success";
@@ -524,47 +746,6 @@ function generateTOTPSecret() {
   return secret;
 }
  
-document.getElementById("twofa-totp-verify").addEventListener("click", () => {
-  const inputCode = document.getElementById("twofa-totp-code").value.trim();
-  const status = document.getElementById("totp-verify-status");
- 
-  if (inputCode.length !== 6 || !/^\d{6}$/.test(inputCode)) {
-    status.textContent = "Inserisci 6 cifre";
-    status.className = "error";
-    return;
-  }
- 
-  if (verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
-    twoFASetup.totpVerified = true;
-    document.getElementById("totp-verified-message").style.display = "block";
-    document.getElementById("twofa-totp-verify").disabled = true;
-    
-    generateRecoveryCodes();
-    showRecoveryCodes();
-  } else {
-    status.textContent = "Codice errato";
-    status.className = "error";
-  }
-});
- 
-function verifyTOTPCode(secret, code) {
-  try {
-    const totp = new OTPAuth.TOTP({
-      issuer: "MyFrEM",
-      label: registerEmail.value,
-      algorithm: "SHA1",
-      digits: 6,
-      period: 30,
-      secret: OTPAuth.Secret.fromString(secret)
-    });
- 
-    return totp.validate({ token: code, window: 2 }) !== null;
-  } catch (e) {
-    console.error("Errore verifica TOTP:", e);
-    return false;
-  }
-}
- 
 function generateRecoveryCodes() {
   const codes = [];
   for (let i = 0; i < 5; i++) {
@@ -586,7 +767,7 @@ function showRecoveryCodes() {
   document.getElementById("recovery-codes-section").style.display = "block";
 }
  
-document.getElementById("recovery-download").addEventListener("click", () => {
+document.getElementById("recovery-download")?.addEventListener("click", () => {
   const content = `Recovery Codes - MyFrEM\n${"=".repeat(40)}\n\nSalva questi codici in un luogo sicuro!\n\n${twoFASetup.recoveryCodes.join("\n")}\n\nGenerato il: ${new Date().toLocaleString()}`;
   
   const blob = new Blob([content], { type: "text/plain" });
@@ -597,7 +778,7 @@ document.getElementById("recovery-download").addEventListener("click", () => {
   a.click();
 });
  
-document.getElementById("recovery-copy").addEventListener("click", () => {
+document.getElementById("recovery-copy")?.addEventListener("click", () => {
   const text = twoFASetup.recoveryCodes.join("\n");
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById("recovery-copy");
@@ -934,6 +1115,10 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
   if (isRegistering || isLoggingIn || isRouting) {
+    return;
+  }
+
+  if (pendingLogin) {
     return;
   }
 
