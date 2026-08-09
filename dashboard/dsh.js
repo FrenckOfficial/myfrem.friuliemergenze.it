@@ -117,9 +117,9 @@ auth.onAuthStateChanged(async (user) => {
       console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
-      if (photo.status === `${"Approvata ✅" || "Approvata"}`) approved++;
-      if (photo.status === `${"Foto in attesa di approvazione ⌛" || "Foto in attesa di approvazione"}`) pending++;
-      if (photo.status === `${"Rifiutata ❌" || "Rifiutata"}`) rejected++;
+      if (photo.status === "Approvata ✅" || photo.status === "Approvata") approved++;
+      if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") pending++;
+      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") rejected++;
 
       if (displayCount < 5) {
         const li = document.createElement("li");
