@@ -11,7 +11,6 @@ const badgeForm = document.getElementById("badgeForm");
 const badgesListEl = document.getElementById("badgesList");
 const badgeNameInput = document.getElementById("badgeName");
 const badgeDescriptionInput = document.getElementById("badgeDescription");
-const badgeIconInput = document.getElementById("badgeIcon");
 const badgeColorInput = document.getElementById("badgeColor");
 const badgeColorHexInput = document.getElementById("badgeColorHex");
 const criteriaTypeInput = document.getElementById("criteriaType");
@@ -78,12 +77,6 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function setupFormHandlers() {
-  badgeIconInput.addEventListener("change", () => {
-    if (badgeIconInput.value) {
-      previewImg.src = badgeIconInput.value;
-      iconPreview.style.display = "block";
-    }
-  });
 
   badgeColorInput.addEventListener("change", (e) => {
     badgeColorHexInput.value = e.target.value;
@@ -117,7 +110,6 @@ async function createBadge() {
     id: badgeId,
     name: badgeNameInput.value,
     description: badgeDescriptionInput.value,
-    icon: badgeIconInput.value,
     color: badgeColorInput.value,
     criteria: {
       type: criteriaTypeInput.value,
@@ -223,7 +215,6 @@ function createBadgeCard(badge, badgeId) {
 function editBadge(badgeId, badge) {
   badgeNameInput.value = badge.name;
   badgeDescriptionInput.value = badge.description;
-  badgeIconInput.value = badge.icon;
   badgeColorInput.value = badge.color;
   badgeColorHexInput.value = badge.color;
   criteriaTypeInput.value = badge.criteria.type;
@@ -249,7 +240,6 @@ async function updateBadge(badgeId) {
   const badgeData = {
     name: badgeNameInput.value,
     description: badgeDescriptionInput.value,
-    icon: badgeIconInput.value,
     color: badgeColorInput.value,
     criteria: {
       type: criteriaTypeInput.value,

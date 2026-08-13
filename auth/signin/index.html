@@ -125,14 +125,17 @@
         <div class="form-group">
           <label for="twofa-login-code">Codice</label>
           <input
-            type="text"
+            type="tel"
             id="twofa-login-code"
+            name="verification-code"
             maxlength="6"
             pattern="\d*"
             inputmode="numeric"
             autocomplete="one-time-code"
+            spellcheck="false"
             placeholder="000000"
             style="font-size:1.25rem;text-align:center;letter-spacing:4px;"
+            tabindex="0"
           />
         </div>
 
@@ -141,7 +144,7 @@
         <button type="button" class="submit-btn" id="twofa-login-verify-btn">Verifica</button>
 
         <div style="margin-top:0.85rem;text-align:center;">
-          <a href="#" id="twofa-login-toggle-recovery" style="font-size:0.85rem;color:var(--text-secondary,#7a8fa6);font-size:0.85rem;">Usa un recovery code</a>
+          <a href="#" id="twofa-login-toggle-recovery" style="font-size:0.85rem;color:var(--text-secondary,#7a8fa6);">Usa un recovery code</a>
         </div>
 
         <div style="margin-top:0.5rem;text-align:center;">
@@ -173,6 +176,6 @@
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+  
 </body>
 </html>

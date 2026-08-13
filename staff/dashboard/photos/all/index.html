@@ -75,6 +75,36 @@
         <a id="backPhotoModeration" onclick="window.history.back()">Torna alla moderazione delle foto</a>
       </table>
     </div>
+
+    <div class="first-access-modal" id="votesModal">
+      <div class="modal-overlay"></div>
+      <div class="modal-container votes-modal-content">
+
+        <span class="close" id="closeVotesModal">&times;</span>
+
+        <div class="modal-header">
+          <div class="slide-icon" style="visibility: hidden;">📊</div>
+          <h2 id="votesModalTitle"></h2>
+          <p id="votesCount"></p>
+        </div>
+
+        <div class="modal-content">
+          <table class="votes-table">
+            <thead id="votesTableHead">
+              <tr>
+                <th>Utente</th>
+                <th>Tipologia</th>
+                <th>Votato in data</th>
+              </tr>
+            </thead>
+            <tbody id="votesTableBody">
+              <!-- JS Loading -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
   </div>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>

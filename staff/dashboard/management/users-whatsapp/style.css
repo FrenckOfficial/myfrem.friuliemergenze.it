@@ -616,6 +616,7 @@ button:nth-child(3):hover {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  margin-left: 10px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 15px;
 }

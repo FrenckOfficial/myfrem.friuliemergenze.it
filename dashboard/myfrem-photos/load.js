@@ -127,7 +127,7 @@ async function loadAllPhotos() {
         userName = userData.name + " " + userData.surname || "Sconosciuto";
       }
 
-      if (data.status === "Approvata ✅"|| "Approvata") {
+      if ((data.status === "Approvata ✅" || data.status === "Approvata") && data.vehicleLink !== "") {
         const voteCounts = await getVoteCounts(photoId);
         const userVote = await getUserVote(photoId);
 
@@ -232,11 +232,13 @@ async function handleVote(photoId, voteType, clickedBtn, otherBtn) {
       await deleteDoc(voteRef);
       updateVoteButtonStates(null, null, null);
     } else {
-      await setDoc(voteRef, { voteType });
+      await setDoc(voteRef, { 
+        voteType,
+        createdAt: serverTimestamp()
+      });
       updateVoteButtonStates(clickedBtn, otherBtn, voteType);
     }
 
-    // Aggiorna i conteggi
     const voteCounts = await getVoteCounts(photoId);
     document.querySelector(`[data-photo-id="${photoId}"].like-btn .vote-count`).textContent = voteCounts.likes;
     document.querySelector(`[data-photo-id="${photoId}"].dislike-btn .vote-count`).textContent = voteCounts.dislikes;

@@ -59,7 +59,7 @@
       <section class="newsletter-banner" id="newsBanner" style="display:none;">
         <div class="newsletter-content">
           <div>
-            <h2>📬 Newsletter Friuli Emergenze</h2>
+            <h2>Newsletter Friuli Emergenze</h2>
             <p>
               Ricevi aggiornamenti sugli eventi,
               nuove funzionalità e attività di Friuli Emergenze.
@@ -153,6 +153,7 @@
             <span class="step-dot" data-step="2"></span>
             <span class="step-dot" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
+            <span class="step-dot" data-step="5"></span>
           </div>
           <button class="btn-modal btn-next" data-action="next">Continua</button>
         </div>
@@ -177,6 +178,7 @@
             <span class="step-dot active" data-step="2"></span>
             <span class="step-dot" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
+            <span class="step-dot" data-step="5"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -212,6 +214,7 @@
             <span class="step-dot active" data-step="2"></span>
             <span class="step-dot active" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
+            <span class="step-dot" data-step="5"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -221,6 +224,66 @@
       </div>
 
       <div class="modal-step" data-step="4">
+        <div class="modal-header">
+          <h2>Abilita le notifiche</h2>
+        </div>
+        <div class="modal-content">
+          <p>Ricevi aggiornamenti in tempo reale direttamente nel tuo browser:</p>
+          
+          <div class="notification-status" id="notification-status" style="
+            background: rgba(79, 202, 122, 0.1);
+            border: 1px solid rgba(79, 202, 122, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+          ">
+            <p style="margin: 0; font-weight: 600; color: #4fca7a;">
+              <span id="notification-status-icon">🔔</span>
+              <span id="notification-status-text">Notifiche: Non abilitate</span>
+            </p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; opacity: 0.8;">
+              <span id="notification-status-desc">Clicca il pulsante qui sotto per abilitarle</span>
+            </p>
+          </div>
+      
+          <button type="button" id="enable-notifications-btn" class="btn-enable-notifications" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-bottom: 1rem;
+          ">
+            Abilita Notifiche
+          </button>
+      
+          <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; opacity: 0.8;">Continua con o senza notifiche!</p>
+        </div>
+        
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+            <span class="step-dot active" data-step="4"></span>
+            <span class="step-dot" data-step="5"></span>
+          </div>
+          <div class="button-group">
+            <button class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button class="btn-modal btn-next" data-action="next">Continua</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-step" data-step="5">
         <div class="modal-header">
           <h2>Hai Bisogno di Aiuto?</h2>
         </div>
@@ -239,20 +302,219 @@
             <span class="step-dot active" data-step="2"></span>
             <span class="step-dot active" data-step="3"></span>
             <span class="step-dot active" data-step="4"></span>
+            <span class="step-dot active" data-step="5"></span>
           </div>
-          <button class="btn-modal btn-finish" data-action="finish">Ho Capito!</button>
+          <div class="button-group">
+            <button class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button class="btn-modal btn-finish" data-action="finish">Ho Capito!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="whats-new-modal" class="first-access-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container whats-new-content">
+
+      <span class="close" id="closeWhatsNewModal" style="visibility:hidden;">&times;</span>
+
+      <!-- Slide 1: Nuovo aggiornamento -->
+      <div class="modal-step active" data-step="1">
+        <div class="modal-header">
+          <h2>MyFrEM è stato aggiornato!</h2>
+        </div>
+        <div class="modal-content">
+          <p>La nostra piattaforma e il nostro sito sono stati aggiornati con nuove funzionalità e miglioramenti.</p>
+
+          <h4>Scopri tutte le novità cliccando sul pulsante "Avanti", altrimenti clicca su "Non leggere".</h4>
+
+          <div class="modal-footer">
+            <div class="step-indicator">
+              <span class="step-dot active" data-step="1"></span>
+              <span class="step-dot" data-step="2"></span>
+              <span class="step-dot" data-step="3"></span>
+              <span class="step-dot" data-step="4"></span>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn-modal btn-finish" id="doNotReadWhatsNewBtn" data-action="finish" style="display:block !important; width: 50%">Non leggere</button>
+              <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Notifiche -->
+      <div class="modal-step" data-step="2">
+        <div class="modal-header">
+          <h2>Sistema di Notifiche</h2>
+        </div>
+        <div class="modal-content">
+          <p>Ricevi aggiornamenti in tempo reale su foto approvate, badge ottenuti e attività della community.</p>
+
+          <div class="slide-features">
+            <div class="feature">
+              <div>
+                <strong>Notifiche Personali</strong>
+                <p>Tutti i tuoi aggiornamenti in un unico posto</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div>
+                <strong>Real-time</strong>
+                <p>Ricevi avvisi istantanei</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div>
+                <strong>Gestione Semplice</strong>
+                <p>Segna come letto, archivia o elimina</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot" data-step="3"></span>
+            <span class="step-dot" data-step="4"></span>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
+            <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: 2FA -->
+      <div class="modal-step" data-step="3">
+        <div class="modal-header">
+          <h2>Autenticazione a Due Fattori</h2>
+        </div>
+        <div class="modal-content">
+          <p>Proteggi il tuo account con un ulteriore livello di sicurezza.</p>
+
+          <div class="slide-features">
+            <div class="feature">
+              <div>
+                <strong>Email OTP</strong>
+                <p>Ricevi codici via email</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div>
+                <strong>Authenticator App</strong>
+                <p>Usa app come Google Authenticator o Authy</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div>
+                <strong>Recovery Codes</strong>
+                <p>Codici di backup in caso di emergenza</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-action">
+            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">Vuoi abilitare 2FA adesso?</p>
+            <button type="button" class="btn-enable-2fa" id="enableTwoFABtn">Abilita 2FA</button>
+            <p style="font-size: 0.75rem; color: var(--faint); margin-top: 10px; text-align: center;">Potrai sempre cambiarla nelle impostazioni</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+            <span class="step-dot" data-step="4"></span>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
+            <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Sondaggio nuove funzioni -->
+      <div class="modal-step" data-step="4">
+        <div class="modal-header">
+          <h2>Sondaggio Nuove Funzioni</h2>
+        </div>
+        <div class="modal-content">
+          <p>Resta attivo il sondaggio per proporre nuove funzioni.</p>
+
+          <div class="slide-features">
+            <div class="features">
+              <div>
+                <strong>Profilazione</strong>
+                <p>È necessario inserire nome e email per una corretta profilazione ed eventuale risposta.</p>
+              </div>
+            </div>
+            <div class="features">
+              <div>
+                <strong>Scelta della piattaforma</strong>
+                <p>È possibile scegliere la piattaforma sulla quale si riferisce il sondaggio (FriuliEmergenze.it o MyFrEM).</p>
+              </div>
+            </div>
+            <div class="features">
+              <div>
+                <strong>Compilazione</strong>
+                <p>È necessario scrivere il consiglio di aggiunta. Si prega di essere il più dettagliati possibile.</p>
+              </div>
+            </div>
+            <div class="features">
+              <div>
+                <strong>Grado di importanza</strong>
+                <p>È necessario segnalare il grado secondo il quale l'utente crede sia importante l'aggiunta della funzione.</p>
+              </div>
+            </div>
+            <div class="features">
+              <div>
+                <strong>Note facoltative</strong>
+                <p>Lo staff rende possibile l'aggiunta di note.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-action">
+            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">Vuoi compilare il sondaggio adesso?</p>
+            <button type="button" class="btn-enable-2fa" id="goToSurveyBtn">Vai al sondaggio</button>
+          </div>
+
+          <div class="modal-footer">
+            <div class="step-indicator">
+              <span class="step-dot active" data-step="1"></span>
+              <span class="step-dot active" data-step="2"></span>
+              <span class="step-dot active" data-step="3"></span>
+              <span class="step-dot active" data-step="4"></span>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
+              <button type="button" class="btn-modal btn-finish" id="finishWhatsNewBtn" data-action="finish">Ho capito!</button>
+            </div>
+          </div>
+
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; margin-top: 12px; cursor: pointer;">
+            <input type="checkbox" id="dontShowAgainCheckbox" style="width: 16px; height: 16px; cursor: pointer;">
+            <span style="color: var(--muted);">Non mostrare più</span>
+          </label>
         </div>
       </div>
     </div>
   </div>
 
   <script type="module" src="/dashboard/dsh.js"></script>
+  <script type="module" src="/dashboard/ntf.js"></script>
+  <script type="module" src="/dashboard/crswtn.js"></script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  <script>window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}</script><script id="zsiqscript" src="https://salesiq.zoho.eu/widget?wc=siq62d27a53bb81a657971f317cee5b4ac1aa6c3d7c062b3c0c06045f0b4467eed9" defer></script>
+  
   <script>
     (function() {
       const menuToggle = document.querySelector('.menu-toggle');
@@ -318,5 +580,66 @@
       });
     })();
   </script>
+  <div class="notification-bell-floating">
+    <button class="bell-button" id="bellButton" aria-label="Notifiche">
+      <svg class="bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
+    </button>
+
+    <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
+      <div class="dropdown-header">
+        <h3>Notifiche</h3>
+        <button class="close-btn" id="closeDropdownBtn">✕</button>
+      </div>
+
+      <div class="notification-list" id="notificationList">
+        <!-- Caricato dinamicamente -->
+      </div>
+
+      <div class="dropdown-footer">
+        <a href="/dashboard/notifications" class="view-all-link">
+          Vedi tutte →
+        </a>
+      </div>
+    </div>
+  </div>
+  <style>
+    #enable-notifications-btn:hover {
+      background: #ff7b00;
+      color: #090c0f;
+      transform: translateY(-2px);
+    }
+  
+    #enable-notifications-btn:active {
+      transform: translateY(0);
+    }
+  
+    #enable-notifications-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+  
+    .notification-status.enabled {
+      background: rgba(79, 202, 122, 0.1);
+      border-color: rgba(79, 202, 122, 0.3);
+    }
+  
+    .notification-status.denied {
+      background: rgba(232, 72, 85, 0.1);
+      border-color: rgba(232, 72, 85, 0.3);
+    }
+  
+    .notification-status.enabled p:first-child {
+      color: #4fca7a;
+    }
+  
+    .notification-status.denied p:first-child {
+      color: #e84855;
+    }
+  </style>
 </body>
 </html>

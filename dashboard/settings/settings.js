@@ -419,7 +419,7 @@ let settings2FASetup = {
 async function load2FAStatus() {
   try {
     const statusEl = document.getElementById("twofa-current-status");
-    if (!statusEl) return; // sezione non presente in questa pagina
+    if (!statusEl) return;
 
     const userRef = doc(db, "users", currentUserId);
     const userSnap = await getDoc(userRef);
@@ -435,9 +435,9 @@ async function load2FAStatus() {
 
       let methodText = "";
       if (userData.twoFactorMethod === "email") {
-        methodText = "📧 Email";
+        methodText = "Email";
       } else if (userData.twoFactorMethod === "totp") {
-        methodText = "📱 App Authenticator";
+        methodText = "App Authenticator";
       }
       methodEl.innerHTML = `<p style="color: var(--muted, #7a8fa6);">${methodText}</p>`;
 

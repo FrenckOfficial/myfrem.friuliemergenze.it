@@ -6,6 +6,9 @@ const db = firebase.firestore();
 
 console.log("Inizializzo Firebase...");
 
+let currentUser = null;
+let currentUserId = null;
+
 const userNameEl = document.getElementById("userName");
 const totalPhotosEl = document.getElementById("totalPhotos");
 const approvedPhotosEl = document.getElementById("approvedPhotos");
@@ -26,8 +29,16 @@ const btnText = document.getElementById("btnText");
 const btnLoader = document.getElementById("btnLoader");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
+const enableNotificationsBtn = document.getElementById("enable-notifications-btn");
+const notificationStatus = document.getElementById("notification-status");
+const notificationStatusIcon = document.getElementById("notification-status-icon");
+const notificationStatusText = document.getElementById("notification-status-text");
+const notificationStatusDesc = document.getElementById("notification-status-desc");
+const goToSurveyBtn = document.getElementById("goToSurveyBtn");
 
 auth.onAuthStateChanged(async (user) => {
+  currentUser = user;
+  currentUserId = user ? user.uid : null;
   emailjs.init("49-8564mCPRVWNmBW");
   console.log("onAuthStateChanged triggered, user:", user);
 
@@ -51,6 +62,86 @@ auth.onAuthStateChanged(async (user) => {
     if (userData.firstAccess === true) {
       showFirstAccessModal(user.uid);
     }
+
+    goToSurveyBtn.addEventListener("click", () => {
+      console.log("Vai al sondaggio");
+      window.open("https://www.friuliemergenze.it/sondaggi/aggiunta-servizi-funzioni/", "_blank");
+    });
+
+    function checkNotificationStatus() {
+      if (!("Notification" in window)) {
+        notificationStatusText.textContent = "Notifiche: Non supportate";
+        notificationStatusDesc.textContent = "Il tuo browser non supporta le notifiche";
+        notificationStatus.classList.add("denied");
+        enableNotificationsBtn.disabled = true;
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        notificationStatusIcon.textContent = "✅";
+        notificationStatusText.textContent = "Notifiche: Abilitate";
+        notificationStatusDesc.textContent = "Riceverai notifiche in tempo reale";
+        notificationStatus.classList.add("enabled");
+        enableNotificationsBtn.textContent = "✅ Notifiche Abilitate";
+        enableNotificationsBtn.disabled = true;
+      } else if (Notification.permission === "denied") {
+        notificationStatusIcon.textContent = "❌";
+        notificationStatusText.textContent = "Notifiche: Negate";
+        notificationStatusDesc.textContent = "Abilita le notifiche nelle impostazioni del browser";
+        notificationStatus.classList.add("denied");
+        enableNotificationsBtn.textContent = "❌ Non Disponibili";
+        enableNotificationsBtn.disabled = true;
+      }
+    }
+
+    enableNotificationsBtn.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        alert("Il tuo browser non supporta le notifiche");
+        return;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+          if (currentUserId) {
+            await db.collection("users").doc(currentUserId).update({ notificationsEnabled: true, notificationsEnabledAt: new Date() });
+          }
+
+          notificationStatusIcon.textContent = "✅";
+          notificationStatusText.textContent = "Notifiche: Abilitate";
+          notificationStatusDesc.textContent = "Riceverai notifiche in tempo reale";
+          notificationStatus.classList.remove("denied");
+          notificationStatus.classList.add("enabled");
+
+          enableNotificationsBtn.textContent = "✅ Notifiche Abilitate";
+          enableNotificationsBtn.disabled = true;
+
+          new Notification("MyFrEM", {
+            icon: "https://www.friuliemergenze.it/assets/logo.png",
+            body: "Notifiche abilitate con successo! Riceverai aggiornamenti in tempo reale.",
+            tag: "friuliemergenze-welcome",
+            requireInteraction: false,
+          });
+
+          console.log("✅ Notifiche abilitate");
+        } else if (permission === "denied") {
+          notificationStatusIcon.textContent = "❌";
+          notificationStatusText.textContent = "Notifiche: Negate";
+          notificationStatusDesc.textContent = "Puoi abilitarle dalle impostazioni del browser";
+          notificationStatus.classList.add("denied");
+          enableNotificationsBtn.textContent = "❌ Non Disponibili";
+          enableNotificationsBtn.disabled = true;
+          console.log("❌ Notifiche negate");
+        }
+      } catch (error) {
+        console.error("Errore nell'abilitazione delle notifiche:", error);
+        notificationStatusText.textContent = "Notifiche: Errore";
+        notificationStatusDesc.textContent = "Si è verificato un errore";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", checkNotificationStatus);
 
     const staffRoles = [
       "simplestaff",
@@ -81,11 +172,11 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     if (staffRoles.includes(userData.role)) {
-      const staffLinkEl = document.querySelector('.navbar');
-      const br = document.createElement('br');
-      const link = document.createElement('a');
-      link.href = '/staff/dashboard/';
-      link.textContent = 'Passa alla dashboard staff';
+      const staffLinkEl = document.querySelector(".navbar");
+      const br = document.createElement("br");
+      const link = document.createElement("a");
+      link.href = "/staff/dashboard/";
+      link.textContent = "Passa alla dashboard staff";
       staffLinkEl.appendChild(br);
       staffLinkEl.appendChild(link);
     }
@@ -108,7 +199,10 @@ auth.onAuthStateChanged(async (user) => {
       .orderBy("createdAt", "desc")
       .get();
 
-    let total = 0, approved = 0, pending = 0, rejected = 0;
+    let total = 0,
+      approved = 0,
+      pending = 0,
+      rejected = 0;
     let displayCount = 0;
     activityListEl.innerHTML = "";
 
@@ -117,9 +211,15 @@ auth.onAuthStateChanged(async (user) => {
       console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
-      if (photo.status === "Approvata ✅" || photo.status === "Approvata") approved++;
-      if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") pending++;
-      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") rejected++;
+      if (photo.status === "Approvata ✅" || photo.status === "Approvata")
+        approved++;
+      if (
+        photo.status === "Foto in attesa di approvazione" ||
+        photo.status === "Foto in attesa di approvazione ⌛"
+      )
+        pending++;
+      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata")
+        rejected++;
 
       if (displayCount < 5) {
         const li = document.createElement("li");
@@ -210,8 +310,8 @@ auth.onAuthStateChanged(async (user) => {
       newsletterBtn.addEventListener("click", async () => {
         newsletterBtn.disabled = true;
         btnText.textContent = "Iscrizione in corso...";
-        btnLoader.style.display = 'inline-block';
-        
+        btnLoader.style.display = "inline-block";
+
         try {
           const userRef = db.collection("users").doc(user.uid);
           const userDoc = await userRef.get();
@@ -219,7 +319,8 @@ auth.onAuthStateChanged(async (user) => {
 
           await userRef.update({ newsSubbed: true });
 
-          const existingQuery = await db.collection("newsletterSubs")
+          const existingQuery = await db
+            .collection("newsletterSubs")
             .where("email", "==", userData.email)
             .get();
 
@@ -251,7 +352,7 @@ auth.onAuthStateChanged(async (user) => {
         } finally {
           newsletterBtn.disabled = false;
           btnText.textContent = "Iscriviti";
-          btnLoader.style.display = 'none';
+          btnLoader.style.display = "none";
           window.location.reload();
         }
       });
@@ -269,7 +370,7 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 let currentStep = 1;
-const totalSteps = 4;
+const totalSteps = 5;
 
 function showFirstAccessModal(userId) {
   const modal = document.getElementById("firstAccessModal");
@@ -283,9 +384,7 @@ function showStep(step) {
   const steps = document.querySelectorAll(".modal-step");
   steps.forEach((el) => el.classList.remove("active"));
 
-  const activeStep = document.querySelector(
-    `.modal-step[data-step="${step}"]`
-  );
+  const activeStep = document.querySelector(`.modal-step[data-step="${step}"]`);
   if (activeStep) {
     activeStep.classList.add("active");
   }
@@ -348,7 +447,7 @@ function setStatus(message, type = "info") {
   const closeBtn = document.getElementById("closeSMsg");
   closeBtn.onclick = () => {
     classNameBox.style.display = "none";
-  }
+  };
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {

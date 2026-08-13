@@ -30,7 +30,7 @@ onAuthStateChanged(auth, async (user) => {
   }, 7000);
 
   currentUser = user;
-  currentUserId = user.uid;
+  currentUserId = user ? user.uid : null;
 
   await loadUserProfile(userId);
 
@@ -99,16 +99,20 @@ async function loadUserProfile(uid) {
         const isOwnProfile = currentUserId === uid;
 
         if (!isPublic && !isOwnProfile) {
+          document.title = `Profilo di ${fullName} | MyFrEM - Piattaforma ufficiale di Friuli Emergenze`;
           messageBox.classList.add("error");
           messageBox.textContent = "❌ Questo profilo è privato.";
+          elements.name.textContent = fullName;
+          elements.username.textContent = `@${username}`;
+          elements.bio.style.visibility = "hidden";
+          elements.avatar.src = avatar;
           elements.statsGrid.classList.add("none");
           elements.staffGrid.classList.add("none");
           document.getElementById("userBadgesSection").style.display = "none";
-          return;
         }
 
         if (!isPublic) {
-          document.querySelector(".profileCard").innerHTML = `
+          document.querySelector(".profileGrid").innerHTML = `
             <div style="
               background: rgba(232, 72, 85, 0.12);
               color: #e84855;
@@ -117,7 +121,7 @@ async function loadUserProfile(uid) {
               text-align: center;
               font-weight: 700;
             ">
-              🔒 PROFILO PRIVATO
+              PROFILO PRIVATO
               <p style="font-size: 0.85rem; margin-top: 8px; color: #999;">
                 I dati di questo profilo non sono pubblicamente visibili
               </p>
@@ -146,6 +150,7 @@ async function loadUserProfile(uid) {
 
         elements.name.textContent = fullName;
         elements.username.textContent = `@${username}`;
+        elements.bio.textContent = bio;
         elements.email.textContent = maskEmail(email);
 
         elements.avatar.src = avatar;

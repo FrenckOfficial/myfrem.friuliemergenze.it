@@ -1,20 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  where
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
+import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, updateDoc, addDoc, deleteDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
@@ -114,6 +101,60 @@ async function getVoteCounts(photoId) {
   }
 }
 
+async function openVotesModal(photoId) {
+  try {
+    const votesQuery = query(
+      collection(db, "photos", photoId, "votes"),
+      orderBy("createdAt", "desc")
+    );
+    const snapshot = await getDocs(votesQuery);
+    console.table(snapshot.docs.map(doc => doc.data()));
+
+    const votesTitle = document.getElementById("votesModalTitle");
+    console.log("📊 PhotoId:", photoId);
+    votesTitle.textContent = "Voti foto: " + photoId;
+
+    const votesModal = document.getElementById("votesModal");
+    console.log("📊 Modal:", votesModal);
+    votesModal.classList.add("active");
+
+    const votesCount = document.getElementById("votesCount");
+    const { likes, dislikes } = await getVoteCounts(photoId);
+    votesCount.textContent = `${"Voti totali: " + (likes + dislikes)}`;
+
+    const votesTableBody = document.getElementById("votesTableBody");
+    console.log("📊 TableBody:", votesTableBody);
+    votesTableBody.innerHTML = "";
+
+    snapshot.forEach(async (doc) => {
+      const voteData = doc.data();
+      const userId = doc.id;
+      const userName = await getUserName(userId) || "Sconosciuto";
+      let voteType;
+
+      if (voteData.voteType === "like") voteType = "Like";
+      else if (voteData.voteType === "dislike") voteType = "Dislike";
+
+      votesTableBody.innerHTML += `
+        <tr>
+          <td>${userName}</td>
+          <td>${voteType}</td>
+          <td>${voteData.createdAt.toDate().toLocaleString("it-IT") || "Non disponibile"}</td>
+        </tr>
+      `;
+    });
+
+    const closeVotesModal = document.getElementById("closeVotesModal");
+
+    closeVotesModal.addEventListener("click", () => {
+      votesModal.classList.remove("active");
+    });
+
+  } catch (err) {
+    console.error("Errore caricamento conteggio voti:", err);
+  }
+}
+
 async function loadAllPhotos() {
   try {
     console.log("⏳ Caricamento tutte le foto...");
@@ -175,7 +216,7 @@ async function loadAllPhotos() {
               </div>
             </div>
 
-            <button class="edit-link-btn edit-btn ${hasLink ? "" : "hidden"}" onclick="editLink('${id}')" title="Modifica">
+            <button class="edit-link-btn edit-btn ${hasLink ? "" : "hidden"}" onclick="editLink('${id}', event)" title="Modifica">
               <img src="/assets/icons/pen-solid-full.svg" alt="Modifica" loading="lazy" />
             </button>
           </div>
@@ -213,7 +254,7 @@ async function loadAllPhotos() {
         <td><b>${photo.licensePlate || "Non inserita"}</b></td>
         <td><b>${serviceType}</b></td>
         <td><b>${photo.location || "Non inserita"}</b></td>
-        <td><b>${usersMap[photo.userId] || "Sconosciuto"}</b></td>
+        <td><b>${await getUserName(photo.userId) || "Sconosciuto"}</b></td>
         <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
         <td><b>${photo.notes || "Non inserite"}</b></td>
         <td><b>${linkBox}</b></td>
@@ -231,6 +272,11 @@ async function loadAllPhotos() {
       `;
 
       photosTableBody.appendChild(tr);
+
+      const votesCell = document.getElementById(`votes-cell-${id}`);
+      votesCell.addEventListener("click", () => {
+        openVotesModal(id);
+      });
     });
 
     console.log(`📸 Totale foto: ${snapshot.size}`);
@@ -240,7 +286,7 @@ async function loadAllPhotos() {
   }
 }
 
-window.editLink = (photoId) => {
+window.editLink = (photoId, event) => {
   const view = document.getElementById(`link-view-${photoId}`);
   const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
   const input = document.getElementById(`link-input-${photoId}`);
@@ -250,8 +296,6 @@ window.editLink = (photoId) => {
   if (inputWrapper) inputWrapper.classList.remove("hidden");
   if (editBtn) editBtn.classList.add("hidden");
   if (input) input.focus();
-
-  loadAllPhotos();
 };
 
 window.saveVehicleLink = async (photoId) => {

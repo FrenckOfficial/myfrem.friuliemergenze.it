@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Notifiche Utenze | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/notifications/style.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="/staff/dashboard/management/notifications/create.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">Dashboard</a>
+        <a href="/staff/dashboard/photos/">Moderazione foto</a>
+        <a href="/staff/dashboard/users/" class="active">Funzionalità</a>
+        <a href="/staff/dashboard/events/">Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
+        <a href="/staff/dashboard/settings/">Impostazioni</a>
+        <br>
+        <a href="/dashboard/">Passa a dashboard utente</a>
+      </nav>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </aside>
+
+    <div class="main-content">
+      <div class="header">
+        <h1>Crea Notifiche</h1>
+        <p>Invia notifiche agli utenti</p>
+      </div>
+
+      <div class="notifications-management">
+        
+        <div class="management-section">
+          <h2>Nuova Notifica</h2>
+          
+          <form id="notificationForm" class="notification-form">
+
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="sendToAll" style="width: auto; margin-right: 8px;">
+                <span style="color: var(--text); font-family: var(--font-display); font-size: 0.85rem;">Invia a tutti gli utenti</span>
+              </label>
+            </div>
+            
+            <div class="form-group">
+              <label for="userSearch">Seleziona Utente</label>
+              <div class="user-search-container">
+                <input 
+                  type="text" 
+                  id="userSearch" 
+                  placeholder="Cerca per email o nome..."
+                  autocomplete="off"
+                >
+                <div class="user-dropdown" id="userDropdown" style="display: none;">
+                  <!-- Caricato dinamicamente -->
+                </div>
+              </div>
+              <input type="hidden" id="selectedUserId" required>
+              <small id="selectedUserDisplay"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="notificationType">Tipo Notifica</label>
+              <select id="notificationType" required>
+                <option value="">Seleziona tipo...</option>
+                <option value="activity">Attività</option>
+                <option value="system">Sistema</option>
+                <option value="staff_alert">Avviso Staff</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="notificationTitle">Titolo</label>
+              <input 
+                type="text" 
+                id="notificationTitle" 
+                placeholder="Es: Foto approvata!"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="notificationMessage">Messaggio</label>
+              <textarea 
+                id="notificationMessage" 
+                placeholder="Es: La tua foto 'NOME FOTO' è stata approvata!"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="notificationIcon">Icon (emoji)</label>
+              <input 
+                type="text" 
+                id="notificationIcon" 
+                placeholder="Es: 📸"
+                maxlength="2"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="actionUrl">URL Azione (opzionale)</label>
+              <input 
+                type="text" 
+                id="actionUrl" 
+                placeholder="Es: /gallery/photo-123"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="actionLabel">Etichetta Pulsante (opzionale)</label>
+              <input 
+                type="text" 
+                id="actionLabel" 
+                placeholder="Es: Vedi foto"
+              >
+            </div>
+
+            <button type="submit" class="btn-submit">Invia Notifica</button>
+          </form>
+        </div>
+
+        <div class="management-section">
+          <h2>Anteprima</h2>
+          <div class="preview-notification" id="previewNotification">
+            <div class="notif-icon-lg">📬</div>
+            <div class="notif-card-content">
+              <div class="notif-card-title">Titolo notifica</div>
+              <div class="notif-card-message">Il tuo messaggio apparirà qui...</div>
+              <div class="notif-card-meta">
+                <span>adesso</span>
+                <span class="notif-card-type">activity</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="management-section">
+          <h2>Template Frequenti</h2>
+          <div class="templates-grid" id="templatesGrid">
+            <!-- Caricato dinamicamente -->
+          </div>
+        </div>
+
+        <div class="management-section">
+          <h2>Storico Notifiche (Ultimi 20)</h2>
+          <div class="history-filters">
+            <input 
+              type="text" 
+              id="historySearch" 
+              placeholder="Cerca per titolo/utente..."
+            >
+          </div>
+          <div class="history-list" id="historyList">
+            <!-- Caricato dinamicamente -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

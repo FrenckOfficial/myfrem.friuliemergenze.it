@@ -75,9 +75,9 @@ async function load2FAStatus() {
       
       let methodText = "";
       if (userData.twoFactorMethod === "email") {
-        methodText = "📧 Email";
+        methodText = "Email";
       } else if (userData.twoFactorMethod === "totp") {
-        methodText = "📱 App Authenticator";
+        methodText = "App Authenticator";
       }
       methodEl.innerHTML = `<p style="color: var(--text-secondary, #b8c5d6);">${methodText}</p>`;
 
