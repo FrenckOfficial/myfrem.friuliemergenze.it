@@ -108,6 +108,7 @@ async function loadUsers() {
   users.forEach(async u => {
     const tr = document.createElement("tr");
     const emailVerified = u.emailVerified ? "Sì" : "No"
+    const whatsNewViewed = u.whatsNewViewed ? "Sì" : "No"
     const preferences = {
       newsletter: u.newsSubbed ? "Newsletter" : "",
       emailNotifications: u.emailNotifications ? "Notifiche email" : "",
@@ -121,6 +122,7 @@ async function loadUsers() {
 
     tr.innerHTML = `
       <td>${emailVerified}</td>
+      <td>${whatsNewViewed}</td>
       <td>${u.name || ""}</td>
       <td>${u.surname || ""}</td>
       <td>${u.email || ""}</td>
