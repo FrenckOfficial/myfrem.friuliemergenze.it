@@ -961,7 +961,7 @@ if (registerForm) {
         username,
         phone,
         role: "user",
-        status: "attivo",
+        status: "inattivo",
         newsSubbed: false,
         emailVerified: false,
         verifyLink: verifyLink,

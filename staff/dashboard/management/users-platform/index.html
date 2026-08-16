@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/management/users-platform/users.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
   <div class="loading">
@@ -26,6 +27,9 @@
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
+    <button class="menu-toggle" aria-label="Toggle navigation menu">
+      <i class="fas fa-bars"></i>
+    </button>
     <aside class="sidebar">
       <div class="logo">
         <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
@@ -48,16 +52,42 @@
       <h1>Gestione utenze MyFrEM - Funzionalità</h1>
 
       <p id="totalUsers"><b>Utenti totali: <span id="totalUsersCount">0</span></b></p>
+      <p id="searchResults"><b>Risultati ricerca: <span id="searchResultsCount">0</span></b></p>
   
-      <div class="gallery-search" style="margin-top: 10px;">
-        <input type="text" id="searchInput" placeholder="Cerca un utente..." style="
-          width: 50%;
-          padding: 0.75rem;
-          margin: 1rem 0;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          font-size: 1rem;
-        ">
+      <div class="gallery-search">
+        <input type="text" id="searchInput" placeholder="Cerca un utente...">
+
+        <select id="filterRole">
+          <option value="">Tutti i ruoli</option>
+          <option value="user">User</option>
+          <option value="simplestaff">Nuovo Amministratore</option>
+          <option value="modstaff">Moderatore</option>
+          <option value="advstaff">Amministratore</option>
+          <option value="advstaffplus">Amministratore Avanzato</option>
+          <option value="superadmin">Super Amministratore</option>
+        </select>
+
+        <select id="filterStatus">
+          <option value="">Tutti gli status</option>
+          <option value="attivo">Attivo</option>
+          <option value="inattivo">Inattivo</option>
+          <option value="sospeso">Sospeso</option>
+          <option value="eliminato">Eliminato</option>
+        </select>
+
+        <select id="filterVerified">
+          <option value="">Verificato: tutti</option>
+          <option value="true">Solo verificati</option>
+          <option value="false">Solo non verificati</option>
+        </select>
+
+        <select id="filterViewed">
+          <option value="">What's New Visto: tutti</option>
+          <option value="true">Solo visto</option>
+          <option value="false">Solo non visto</option>
+        </select>
+
+        <button type="button" id="resetFilters" class="btn-reset-filters">Reset</button>
       </div>
   
       <table id="usersTable">
@@ -67,18 +97,12 @@
           </p>
           <thead>
               <tr>
-                <th>Verificato/a?</th>
-                <th>What's New Visto?</th>
+                <th>Nuovo?</th>
                 <th>Nome</th>
-                <th>Cognome</th>
                 <th>Email</th>
-                <th>Nome Utente</th>
-                <th>Telefono</th>
-                <th>Tipo Account</th>
-                <th>Preferenze Account</th>
-                <th>Stato Account</th>
-                <th>Ultimo login</th>
-                <th>Azioni</th>
+                <th>Username</th>
+                <th>Ruolo</th>
+                <th>Status</th>
               </tr>
           </thead>
           <tbody id="usersTableBody">
@@ -87,26 +111,158 @@
       </table>
   
       <p id="messageBox"></p>
-      <script>
-        const searchInput = document.getElementById("searchInput");
-        const tableBody = document.getElementById("usersTableBody");
-  
-        searchInput.addEventListener("keyup", () => {
-          const filter = searchInput.value.toLowerCase();
-          const rows = tableBody.querySelectorAll("tr");
-  
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? "" : "none";
-          });
-        });
-      </script>
     </main>
   </div>
-  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
-  <noscript>
-    <a href="https://www.shinystat.com/it/" target="_top">
-    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
-  </noscript>
+
+  <div id="modalOverlay" class="modal-overlay" style="display:none;"></div>
+
+  <div id="userModal" class="user-modal" style="display:none;">
+    <button id="modalClose" class="modal-close">&times;</button>
+    
+    <div class="modal-content">
+      <h2 id="modalUserName"></h2>
+      
+      <div class="modal-section">
+        <h3>Informazioni Personali</h3>
+        <div class="info-row">
+          <span class="label">ID Utente:</span>
+          <span id="modalUserId" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span id="modalEmail" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Username:</span>
+          <span id="modalUsername" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Telefono:</span>
+          <span id="modalPhone" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Tipologia profilo:</span>
+          <span id="modalProfileType" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Data di registrazione:</span>
+          <span id="modalRegisterDate" class="value"></span>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Stato Account</h3>
+        <div class="info-row">
+          <span class="label">Nuovo Utente:</span>
+          <span id="modalNewBadge" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ruolo:</span>
+          <span id="modalRole" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span id="modalStatus" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ultimo Login:</span>
+          <span id="modalLastLogin" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email Verificata:</span>
+          <span id="modalVerified" class="value"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Modal novità:</span>
+          <span id="modalWhatsNewViewed" class="value"></span>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Preferenze</h3>
+        <div class="info-row">
+          <span class="label">Preferenze Attive:</span>
+          <span id="modalPreferences" class="value"></span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <div class="modal-row">
+          <button id="modalPromote" class="btn-action btn-promote">Promuovi</button>
+          <button id="modalSuspend" class="btn-action btn-suspend">Sospendi/Riattiva</button>
+        </div>
+        <div class="modal-row">
+          <button id="modalDelete" class="btn-action btn-delete">Elimina</button>
+          <button id="modalViewProfile" class="btn-action btn-view">Visualizza Profilo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+
+      if (!menuToggle || !sidebar) {
+        console.warn('Menu toggle or sidebar not found');
+        return;
+      }
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+      function openSidebar() {
+        sidebar.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      const navLinks = sidebar.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          closeSidebar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+          if (e.target === menuToggle || menuToggle.contains(e.target)) {
+            return;
+          }
+          if (!sidebar.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768) {
+            closeSidebar();
+          }
+        }, 250);
+      });
+    })();
+  </script>
 </body>
 </html>

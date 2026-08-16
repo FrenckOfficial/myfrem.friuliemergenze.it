@@ -82,6 +82,13 @@ onAuthStateChanged(auth, async user => {
     contentEl.style.display = "block";;
   }, 5000);
 
+  await addDoc(collection(db, "viewedPages"), {
+    type: "page_view",
+    timestamp: serverTimestamp(),
+    userId: user.uid,
+    page: window.location.pathname
+  });
+
   try {
     currentUserId = user.uid;
     currentUser = user;

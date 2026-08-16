@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js"
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
+import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -20,6 +21,7 @@ const rejectedEventsEl = document.getElementById("rejectedEvents");
 const organizedEventsEl = document.getElementById("organizedEvents");
 const recentActivityListEl = document.getElementById("recentActivityList");
 const recentLoginsListEl = document.getElementById("recentLoginsList");
+const recentPageViewedListEl = document.getElementById("recentViewedPagesList");
 const logoutBtn = document.getElementById("logoutBtn");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
@@ -167,11 +169,30 @@ async function loadStats() {
       recentLoginsListEl.appendChild(li);
     }
 
-    if (recentLoginsListEl.children.length === 0) {
+    const pageViewedSnap = await getDocs(collection(db, "viewedPages"));
+    recentPageViewedListEl.innerHTML = "";
+
+    const sortedPageViewed = pageViewedSnap.docs
+      .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
+      .slice(0, 5);
+    
+    for (const docSnap of sortedPageViewed) {
+      const activity = docSnap.data();
       const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentLoginsListEl.appendChild(li);
+      const date = activity.timestamp.toDate().toLocaleString();
+
+      const text = await parseViewedPage(activity, date);
+      li.innerHTML = text;
+
+      recentPageViewedListEl.appendChild(li);
     }
+
+    if (recentPageViewedListEl.children.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nessuna pagina visualizzata di recente.";
+      recentPageViewedListEl.appendChild(li);
+    }
+
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
     setStatus("❌ Errore caricamento statistiche", "error");

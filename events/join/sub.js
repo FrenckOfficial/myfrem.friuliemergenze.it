@@ -8,6 +8,7 @@ const db = getFirestore(app);
 const eventsList = document.getElementById("eventsList");
 const titleEvent = document.getElementById("titleEvent");
 const eventIdh = document.getElementById("eventId");
+const statusMsg = document.getElementById("statusMsg");
 
 const idParam = new URLSearchParams(window.location.search);
 const eventId = idParam.get("event");
@@ -30,39 +31,69 @@ async function loadPublicEvent() {
     const e = snap.data();
     eventsList.innerHTML = "";
 
-    eventIdh.textContent = `📅 ${e.title}`;
+    eventIdh.textContent = `${e.title}`;
     titleEvent.textContent = `Iscriviti a ${e.title} - Registro Eventi | MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza`;
 
-    const div = document.createElement("div");
-    div.className = "event-card";
-    div.innerHTML = `
-      <h4><b>🆔 ID Evento:</b></h4>
+    const card = document.createElement("div");
+    card.className = "event-card";
+
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "event-info";
+    infoDiv.innerHTML = `
+      <h4>ID Evento</h4>
       <p>${eventId}</p>
 
-      <h4><b>📍 Luogo:</b></h4>
+      <h4>Luogo</h4>
       <p>${e.location || "Non specificato."}</p>
 
-      <h4><b>📅 Data e ora:</b></h4>
+      <h4>Data e ora</h4>
       <p>${e.date || "Non specificata."} ${e.startTime || ""}</p>  
 
-      <h4><b>📝 Descrizione:</b></h4>
+      <h4>Descrizione</h4>
       <p>${e.description || "Non specificata."}</p>
 
-      <h4><b>📲 Nome:</b></h4>
-      <input type="text" id="textName" required />
-
-      <h4><b>📲 Telefono:</b></h4>
-      <input type="number" id="textPhone" required />
-
-      <h4><b>📲 Email:</b></h4>
-      <input type="email" id="textMail" required />
-
-      <button id="joinBtn" class="btn">Iscriviti all'evento</button>
+      <h4>Per altre info:</h4>
+      <p>Per ulteriori informazioni è possibile contattare <b>${e.userId}</b> al numero ${e.contact}.</p>
     `;
 
-    eventsList.appendChild(div);
+    const formDiv = document.createElement("div");
+    formDiv.className = "event-form";
 
-    const joinBtnEl = document.getElementById("joinBtn");
+    const nameGroup = document.createElement("div");
+    nameGroup.className = "form-group";
+    nameGroup.innerHTML = `
+      <label for="textName">Nome completo</label>
+      <input type="text" id="textName" placeholder="Es. Marco Rossi" required />
+    `;
+
+    const phoneGroup = document.createElement("div");
+    phoneGroup.className = "form-group";
+    phoneGroup.innerHTML = `
+      <label for="textPhone">Telefono</label>
+      <input type="tel" id="textPhone" placeholder="Es. +39 348 123 4567" required />
+    `;
+
+    const mailGroup = document.createElement("div");
+    mailGroup.className = "form-group";
+    mailGroup.innerHTML = `
+      <label for="textMail">Email</label>
+      <input type="email" id="textMail" placeholder="Es. mail@example.com" required />
+    `;
+
+    const buttonDiv = document.createElement("div");
+    const joinBtnEl = document.createElement("button");
+    joinBtnEl.id = "joinBtn";
+    joinBtnEl.textContent = "Iscriviti all'evento";
+    buttonDiv.appendChild(joinBtnEl);
+
+    formDiv.appendChild(nameGroup);
+    formDiv.appendChild(phoneGroup);
+    formDiv.appendChild(mailGroup);
+    formDiv.appendChild(buttonDiv);
+
+    card.appendChild(infoDiv);
+    card.appendChild(formDiv);
+    eventsList.appendChild(card);
 
     joinBtnEl.addEventListener("click", async () => {
       const name = document.getElementById("textName").value.trim();
@@ -70,29 +101,36 @@ async function loadPublicEvent() {
       const mail = document.getElementById("textMail").value.trim();
 
       if (!name || !phone || !mail) {
-        setStatus("Per favore, compila tutti i campi richiesti.");
+        setStatus("Per favore, compila tutti i campi richiesti.", "error");
         return;
       }
 
-      await addDoc(collection(db, "activities"), {
-        type: "eventRegistration",
-        nameJoiner: name,
-        eventTitle: e.title,
-        eventId: eventId,
-        timestamp: serverTimestamp()
-      })
+      try {
+        await addDoc(collection(db, "activities"), {
+          type: "eventRegistration",
+          nameJoiner: name,
+          eventTitle: e.title,
+          eventId: eventId,
+          timestamp: serverTimestamp()
+        });
 
-      await addDoc(collection(db, "eventRegistrations"), {
-        eventId,
-        name,
-        phone,
-        mail,
-        registeredAt: new Date()
-      });
+        await addDoc(collection(db, "eventRegistrations"), {
+          eventId,
+          name,
+          phone,
+          mail,
+          registeredAt: new Date()
+        });
 
-      setStatus(`✅ Iscrizione avvenuta con successo!\n\nNome: ${name}\nTelefono: ${phone}\nEmail: ${mail}`, "success");
+        setStatus(`Iscrizione avvenuta con successo!\n\nNome: ${name}\nTelefono: ${phone}\nEmail: ${mail}`, "success");
 
-      window.location.href = "/dashboard/";
+        setTimeout(() => {
+          window.location.href = "/dashboard/";
+        }, 1500);
+      } catch (err) {
+        setStatus("Errore durante l'iscrizione. Riprova.", "error");
+        console.error(err);
+      }
     });
 
   } catch (err) {
@@ -103,7 +141,7 @@ async function loadPublicEvent() {
 
 function setStatus(message, type = "info") {
   statusMsg.textContent = message;
-  statusMsg.classList.add(type);
+  statusMsg.className = `show ${type}`;
 }
 
 loadPublicEvent();

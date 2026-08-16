@@ -55,6 +55,13 @@ auth.onAuthStateChanged(async (user) => {
     contentEl.style.display = "block";
   }, 5000);
 
+  await db.collection("viewedPages").add({
+    type: "page_view",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    userId: user.uid,
+    page: window.location.pathname
+  });
+
   try {
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;

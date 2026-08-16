@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-Z4DJJRR7BY');
   </script>
   <meta charset="UTF-8">
@@ -19,25 +17,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <script>
-    
-  </script>
-  
-  <script type="module" src="/events/detail/events-public.js"></script>
 </head>
 <body>
-  <header>
-    <h1 id="eventId"></h1>
-  </header>
-  <main class="events-container" id="eventsList">
-    <!-- Le card degli eventi saranno generate dinamicamente dal JS -->
+  <nav class="nav-back">
+    <a href="javascript:history.back()">Indietro</a>
+  </nav>
+
+  <main id="eventsList">
+    <!-- Caricato dinamicamente -->
   </main>
-  <p id="statusMsg"></p>
+
+  <div id="statusMsg" class="status-message"></div>
+
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
-    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
+      <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" />
+    </a>
   </noscript>
   
+  <script type="module" src="/events/detail/events-public.js"></script>
 </body>
 </html>

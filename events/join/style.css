@@ -19,8 +19,8 @@
   --text: #e8edf2;
   --muted: #7a8fa6;
   --faint: #3d5068;
-  --font-display: -apple-system, "Syne", sans-serif;
-  --font-mono: -apple-system, "Space Mono", monospace;
+  --font-display: -apple-system, "Manrope", sans-serif;
+  --font-mono: -apple-system, "Roboto", monospace;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 14px;
@@ -30,14 +30,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-display);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px 16px;
+  font-family: var(--font-display);
   background-image:
     linear-gradient(rgba(0, 212, 232, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 212, 232, 0.025) 1px, transparent 1px);
@@ -46,75 +46,198 @@ body {
 
 header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 48px;
 }
 
 header h1 {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--text);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 header p {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--faint);
 }
 
 .events-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 #eventsList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  border-radius: var(--radius-lg);
+  flex-direction: column;
 }
 
 .event-card {
   background: var(--bg-panel);
-  border-radius: var(--radius-lg);
   border: 1px solid var(--border-panel);
-  padding: 20px;
-  width: 300px;
+  border-radius: var(--radius-lg);
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition:
-    border-color 0.2s,
-    transform 0.2s;
 }
 
-.event-card:hover {
-  border-color: var(--border-hard);
-  transform: translateY(-4px);
+.event-info {
+  padding: 32px 28px;
+  border-bottom: 1px solid var(--border-panel);
 }
 
-.event-card h3 {
+.event-info h4 {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+  margin-top: 20px;
+}
+
+.event-info h4:first-child {
+  margin-top: 0;
+}
+
+.event-info p {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.event-form {
+  padding: 32px 28px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
-}
-
-.event-card p {
-  font-size: 0.88rem;
   color: var(--muted);
+  margin-bottom: 8px;
+  display: block;
 }
 
-.event-card .status {
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"] {
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text);
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  width: 100%;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+  box-shadow: 0 0 0 4px var(--accent-dim);
+}
+
+input::placeholder {
+  color: var(--faint);
+}
+
+#joinBtn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--signal-green), #3db857);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+  margin-top: 10px;
+}
+
+#joinBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(79, 202, 122, 0.25);
+  opacity: 0.95;
+}
+
+#joinBtn:active {
+  transform: translateY(0px);
+  box-shadow: 0 4px 8px rgba(79, 202, 122, 0.15);
+}
+
+#statusMsg {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-align: center;
+  min-height: 1px;
+  display: none;
+}
+
+#statusMsg.show {
+  display: block;
+}
+
+#statusMsg.success {
+  background: rgba(79, 202, 122, 0.12);
+  color: var(--signal-green);
+  border: 1px solid rgba(79, 202, 122, 0.3);
+}
+
+#statusMsg.error {
+  background: rgba(232, 72, 85, 0.12);
+  color: var(--signal-red);
+  border: 1px solid rgba(232, 72, 85, 0.3);
+}
+
+#statusMsg.info {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--border-hard);
+}
+
+.status {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 0.62rem;
@@ -151,49 +274,26 @@ header p {
   border: 1px solid rgba(232, 72, 85, 0.3);
 }
 
-#joinBtn {
-  margin-top: 15px;
-  padding: 10px;
-  background: transparent;
-  color: var(--signal-green);
-  border: 1px solid var(--signal-green);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  transition:
-    background 0.2s,
-    color 0.2s;
-}
-
-#joinBtn:hover {
-  background: var(--signal-green);
-  color: var(--bg);
-}
-
 .btn {
   text-decoration: none;
   text-align: center;
-  padding: 7px 12px;
-  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--signal-green);
   background: transparent;
   color: var(--signal-green);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition:
     background 0.2s,
     color 0.2s;
+  cursor: pointer;
 }
 
-.btn:hover,
-input#joinBtn:hover {
+.btn:hover {
   background: var(--signal-green);
   color: var(--bg);
 }
@@ -201,8 +301,8 @@ input#joinBtn:hover {
 .btn-view {
   text-decoration: none;
   text-align: center;
-  padding: 7px 12px;
-  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
@@ -226,13 +326,13 @@ input#joinBtn:hover {
 .btn-close_window {
   text-decoration: none;
   text-align: center;
-  padding: 7px 12px;
-  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(245, 166, 35, 0.4);
   background: transparent;
   color: var(--signal-amber);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -245,45 +345,25 @@ input#joinBtn:hover {
   background: rgba(245, 166, 35, 0.12);
 }
 
-input {
-  outline: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-surface);
-  color: var(--text);
-  padding: 9px 12px;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  width: 100%;
-  transition:
-    border-color 0.2s,
-    background 0.2s,
-    box-shadow 0.2s;
-}
+@media (max-width: 640px) {
+  body {
+    padding: 16px 12px;
+  }
 
-input:focus {
-  border-color: var(--border-hard);
-  background: var(--bg-hover);
-  box-shadow: 0 0 0 3px var(--accent-dim);
-}
+  header {
+    margin-bottom: 36px;
+  }
 
-input::placeholder {
-  color: var(--faint);
-}
+  header h1 {
+    font-size: 1.7rem;
+  }
 
-.statusBox {
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-top: 20px;
-  color: var(--signal-red);
-}
+  .event-info,
+  .event-form {
+    padding: 24px 16px;
+  }
 
-@media (max-width: 768px) {
-  .event-card {
-    width: 90%;
+  .form-group {
+    margin-bottom: 16px;
   }
 }

@@ -63,6 +63,7 @@ class WhatsNewCarousel {
       });
     });
 
+    this.markAsViewed();
     this.updateSlide();
   }
 

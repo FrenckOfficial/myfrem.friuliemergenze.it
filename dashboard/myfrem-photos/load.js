@@ -35,6 +35,13 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";
   }, 5000);
 
+  await addDoc(collection(db, "viewedPages"), {
+    type: "page_view",
+    timestamp: serverTimestamp(),
+    userId: user.uid,
+    page: window.location.pathname
+  });
+
   try {
     if (!user) {
       clearTimeout(timeoutId);
@@ -43,7 +50,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     currentUserId = user.uid;
-    await checkUserRole(user.uid);
+    await checkUserRole(currentUserId);
     await loadAllPhotos();
 
     clearTimeout(timeoutId);
@@ -127,7 +134,7 @@ async function loadAllPhotos() {
         userName = userData.name + " " + userData.surname || "Sconosciuto";
       }
 
-      if ((data.status === "Approvata ✅" || data.status === "Approvata") && data.vehicleLink !== "") {
+      if ((data.status === "Approvata ✅" || data.status === "Approvata") && data.published === true) {
         const voteCounts = await getVoteCounts(photoId);
         const userVote = await getUserVote(photoId);
 

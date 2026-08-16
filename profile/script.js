@@ -319,11 +319,11 @@ function roleData(role) {
     },
     advstaffplus: {
       class: "staff",
-      text: "AMMINISTRATORE AVANZATO PLUS"
+      text: "AMMINISTRATORE AVANZATO"
     },
     advstaff: {
       class: "staff",
-      text: "AMMINISTRATORE AVANZATO"
+      text: "AMMINISTRATORE"
     },
     modstaff: {
       class: "staff",

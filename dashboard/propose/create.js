@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../configFirebase.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -9,6 +9,8 @@ const db = getFirestore(app);
 
 const form = document.getElementById("eventForm");
 const statusMsg = document.getElementById("statusMsg");
+const statusBox = document.querySelector(".statusBox");
+const closeSMsg = document.getElementById("closeSMsg");
 const logoutBtn = document.getElementById("logoutBtn");
 
 logoutBtn.onclick = async () => {
@@ -29,6 +31,13 @@ onAuthStateChanged(auth, async (user) => {
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 5000);
+
+  await addDoc(collection(db, "viewedPages"), {
+    type: "page_view",
+    timestamp: serverTimestamp(),
+    userId: user.uid,
+    page: window.location.pathname
+  });
 
   try {
     if (user) {
@@ -56,8 +65,7 @@ onAuthStateChanged(auth, async (user) => {
             submitBtn.title = "Non disponibile in modalità sola lettura";
           }
           
-          statusMsg.textContent = "Modalità sola lettura: non puoi creare eventi";
-          statusMsg.className = "warning";
+          showStatus("Modalità sola lettura: non puoi creare eventi", "warning");
         }
 
         if (staffRoles.includes(userData.role)) {
@@ -83,30 +91,56 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+closeSMsg.addEventListener("click", () => {
+  statusBox.style.display = "none";
+});
+
+function showStatus(message, type = "info") {
+  statusMsg.textContent = message;
+  statusBox.className = `statusBox ${type}`;
+  statusBox.style.display = "flex";
+  
+  if (type === "success") {
+    setTimeout(() => {
+      statusBox.style.display = "none";
+    }, 6000);
+  }
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (isReadOnlyMode) {
-    statusMsg.textContent = "Non puoi creare eventi in modalità sola lettura";
-    statusMsg.style.color = "#ff4a4a";
+    showStatus("Non puoi creare eventi in modalità sola lettura", "error");
     return;
   }
 
   const userDoc = await getDoc(doc(db, "users", currentUser.uid));
 
   if (!userDoc.exists()) {
-    statusMsg.textContent = "Errore: utente non trovato.";
-    statusMsg.style.color = "#ff4a4a";
+    showStatus("Errore: utente non trovato.", "error");
     return;
   }
 
-  const title = document.getElementById("eventTitle").value;
-  const description = document.getElementById("description").value;
-  const location = document.getElementById("location").value;
-  const contact = document.getElementById("contact").value;
+  const title = document.getElementById("eventTitle").value.trim();
+  const eventType = document.getElementById("eventType").value;
+  const description = document.getElementById("description").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const contact = document.getElementById("contact").value.trim();
 
-  statusMsg.textContent = "Invio in corso...";
-  statusMsg.style.color = "#ccc";
+  const suggestedDate = document.getElementById("suggestedDate").value || null;
+  const suggestedTime = document.getElementById("suggestedTime").value || null;
+  const expectedParticipants = document.getElementById("expectedParticipants").value || null;
+  const contactEmail = document.getElementById("contactEmail").value.trim() || null;
+  const attachmentUrl = document.getElementById("attachmentUrl").value.trim() || null;
+  const additionalNotes = document.getElementById("additionalNotes").value.trim() || null;
+
+  if (!title || !eventType || !description || !location || !contact) {
+    showStatus("Per favore, compila tutti i campi obbligatori.", "error");
+    return;
+  }
+
+  showStatus("Invio in corso...", "info");
 
   try {
     await addDoc(collection(db, "activities"), {
@@ -118,21 +152,29 @@ form.addEventListener("submit", async (e) => {
 
     await addDoc(collection(db, "events"), {
       title,
+      eventType,
       description,
       location,
       contact,
+      
+      ...(suggestedDate && { suggestedDate }),
+      ...(suggestedTime && { suggestedTime }),
+      ...(expectedParticipants && { expectedParticipants: parseInt(expectedParticipants) }),
+      ...(contactEmail && { contactEmail }),
+      ...(attachmentUrl && { attachmentUrl }),
+      ...(additionalNotes && { additionalNotes }),
+      
       userId: userDoc.data().name + " " + userDoc.data().surname,
       uid: currentUser.uid,
-      status: "In revisione...",
+      status: "In revisione",
       createdAt: serverTimestamp()
     });
 
-    statusMsg.textContent = "Proposta inviata! Lo staff ti contatterà appena possibile.";
-    statusMsg.style.color = "#4aff4a";
+    showStatus("Proposta inviata con successo!", "success");
     form.reset();
+
   } catch (err) {
     console.error(err);
-    statusMsg.textContent = "Errore durante l'invio.";
-    statusMsg.style.color = "#ff4a4a";
+    showStatus("Errore durante l'invio. Riprova più tardi.", "error");
   }
 });

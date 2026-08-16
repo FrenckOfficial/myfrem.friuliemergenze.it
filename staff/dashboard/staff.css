@@ -198,6 +198,12 @@ textarea {
   color: var(--text);
 }
 
+.group-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
 .activity {
   margin-top: 40px;
 }
@@ -1619,6 +1625,39 @@ button {
   transform: rotate(90deg) scale(0.9);
 }
 
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--space-md);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+  position: fixed;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  z-index: 1001;
+}
+
+.menu-toggle:hover {
+  background: var(--accent-dim);
+  border-color: var(--border-hard);
+  color: var(--accent-light);
+}
+
+.menu-toggle:active {
+  transform: scale(0.95);
+}
+
 @media (max-width: 1024px) {
   .sidebar {
     width: 200px;
@@ -1774,6 +1813,10 @@ button {
   .draft-btn-create,
   .draft-btn-skip {
     width: 100%;
+  }
+
+  .group-row {
+    flex-direction: column;
   }
 }
 

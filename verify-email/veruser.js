@@ -87,7 +87,8 @@ async function verifyEmail() {
     console.log("✏️ Aggiornamento user emailVerified...");
 
     await userRef.update({
-      emailVerified: true
+      emailVerified: true,
+      status: "attivo"
     });
 
     console.log("✅ User aggiornato");

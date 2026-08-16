@@ -403,7 +403,39 @@ textarea {
   }
 }
  
-/* RESPONSIVE - TABLET */
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--space-md);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+  position: fixed;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  z-index: 1001;
+}
+
+.menu-toggle:hover {
+  background: var(--accent-dim);
+  border-color: var(--border-hard);
+  color: var(--accent-light);
+}
+
+.menu-toggle:active {
+  transform: scale(0.95);
+}
+
 @media (max-width: 1024px) {
   .sidebar {
     width: 200px;
@@ -428,7 +460,6 @@ textarea {
   }
 }
  
-/* RESPONSIVE - MOBILE LANDSCAPE/SMALL TABLET */
 @media (max-width: 768px) {
   .sidebar {
     position: relative;

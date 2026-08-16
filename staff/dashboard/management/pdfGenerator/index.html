@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="/staff/dashboard/management/pdfGenerator/load.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -98,10 +99,70 @@
       });
     </script>
   </main>
-  <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
-  <noscript>
-    <a href="https://www.shinystat.com/it/" target="_top">
-    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
-  </noscript>
+  <script>
+    (function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const body = document.body;
+
+      if (!menuToggle || !sidebar) {
+        console.warn('Menu toggle or sidebar not found');
+        return;
+      }
+      
+      function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        body.classList.toggle('sidebar-open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        body.classList.remove('sidebar-open');
+      }
+      function openSidebar() {
+        sidebar.classList.add('active');
+        body.classList.add('sidebar-open');
+      }
+
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      const navLinks = sidebar.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          closeSidebar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('active')) {
+          if (e.target === menuToggle || menuToggle.contains(e.target)) {
+            return;
+          }
+          if (!sidebar.contains(e.target)) {
+            closeSidebar();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (window.innerWidth > 768) {
+            closeSidebar();
+          }
+        }, 250);
+      });
+    })();
+  </script>
 </body>
 </html>

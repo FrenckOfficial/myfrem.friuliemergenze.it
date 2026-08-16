@@ -1,20 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { 
-  getFirestore, 
-  collection, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  deleteDoc, 
-  getDoc, 
-  addDoc,
-  serverTimestamp,
-  query,
-  where,
-  orderBy,
-  limit
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -24,9 +10,20 @@ const db = getFirestore(app);
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
 const statusMsg = document.getElementById("statusMsg");
+const searchInput = document.getElementById("searchInput");
+const filterRole = document.getElementById("filterRole");
+const filterStatus = document.getElementById("filterStatus");
+const filterVerified = document.getElementById("filterVerified");
+const filterViewed = document.getElementById("filterViewed");
+const resetFilters = document.getElementById("resetFilters");
 const totalUsersCountEl = document.getElementById("totalUsersCount");
+const searchResultsCount = document.getElementById("searchResultsCount");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
+
+const modal = document.getElementById("userModal");
+const modalClose = document.getElementById("modalClose");
+const modalOverlay = document.getElementById("modalOverlay");
 
 logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
@@ -34,6 +31,106 @@ logoutBtn.addEventListener("click", async () => {
   console.log("✅ Logout completato, redirect...");
   window.location.href = "/login/";
 });
+
+modalClose.addEventListener("click", closeModal);
+modalOverlay.addEventListener("click", closeModal);
+
+function closeModal() {
+  modal.style.display = "none";
+  modalOverlay.style.display = "none";
+}
+
+function isUserNew(createdAtTimestamp) {
+  if (!createdAtTimestamp) return false;
+  const createdTime = createdAtTimestamp.toMillis?.() || 0;
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  return (now - createdTime) < sevenDaysMs;
+}
+
+async function openModal(user) {
+  const loginRef = collection(db, "logins");
+  const userLoginDocs = query(loginRef, where("userId", "==", user.id), orderBy("timestamp", "desc"), limit(1));
+  const lastLoginSnap = await getDocs(userLoginDocs);
+  const lastLogin = lastLoginSnap.docs[0]?.data().timestamp ? lastLoginSnap.docs[0].data().timestamp.toDate().toLocaleString() : "N/A";
+
+  let type;
+  let role;
+  let status;
+
+  if (user.role === "user") {
+    role = "Utente Standard"
+  } else if (user.role === "simplestaff") {
+    role = "Nuovo Amministratore"
+  } else if (user.role === "modstaff") {
+    role = "Moderatore"
+  } else if (user.role === "advstaff") {
+    role = "Amministratore"
+  } else if (user.role === "advstaffplus") {
+    role = "Amministratore Avanzato"
+  } else if (user.role === "superadmin") {
+    role = "Super Amministratore"
+  } else if (user.role === "testacc") {
+    role = "Account di Test"
+  } else {
+    role = "Ruolo non riconosciuto";
+  }
+
+  if (user.status === "attivo") {
+    status = "Attivo"
+  } else if (user.status === "inattivo") {
+    status = "Inattivo"
+  } else if (user.status === "sospeso") {
+    status = "Sospeso"
+  } else if (user.status === "eliminato") {
+    status = "Eliminato"
+  } else {
+    status = "Status non riconosciuto";
+  }
+
+  if (user.privateProfile) {
+    type = "Profilo Privato";
+  } else {
+    type = "Profilo Pubblico";
+  }
+
+  document.getElementById("modalUserId").textContent = user.id || "N/A";
+  document.getElementById("modalUserName").textContent = `${user.name || ""} ${user.surname || ""}`;
+  document.getElementById("modalEmail").textContent = user.email || "";
+  document.getElementById("modalUsername").textContent = user.username || "";
+  document.getElementById("modalPhone").textContent = user.phone || "Non fornito";
+  document.getElementById("modalProfileType").textContent = type || "Non disponibile";
+  document.getElementById("modalRegisterDate").textContent = user.createdAt.toDate().toLocaleString("it-IT") || "N/A";
+  document.getElementById("modalRole").textContent = role || "N/A";
+  document.getElementById("modalStatus").textContent = status || "N/A";
+  document.getElementById("modalLastLogin").textContent = lastLogin || "N/A";
+  document.getElementById("modalVerified").textContent = user.emailVerified ? "Sì" : "No";
+  document.getElementById("modalWhatsNewViewed").textContent = user.whatsNewViewed ? "Visto" : "Non visto";
+  
+  const prefs = [];
+  if (user.newsSubbed) prefs.push("Newsletter");
+  if (user.emailNotifications) prefs.push("Notifiche email");
+  if (user.privateProfile) prefs.push("Profilo privato");
+  document.getElementById("modalPreferences").textContent = prefs.length ? prefs.join(", ") : "Nessuna";
+
+  const isNew = isUserNew(user.createdAt);
+  const newBadgeEl = document.getElementById("modalNewBadge");
+  if (newBadgeEl) {
+    if (isNew) {
+      newBadgeEl.innerHTML = '<span class="badge-nuovo">✨ Nuovo Utente</span>';
+    } else {
+      newBadgeEl.innerHTML = '<span class="no-badge">—</span>';
+    }
+  }
+
+  document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
+  document.getElementById("modalSuspend").onclick = () => updateStatus(user.id, user.status);
+  document.getElementById("modalDelete").onclick = () => deleteUser(user.id);
+  document.getElementById("modalViewProfile").onclick = () => window.open(`/profile/?userid=${user.id}`, "_blank");
+
+  modal.style.display = "block";
+  modalOverlay.style.display = "block";
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -62,10 +159,52 @@ onAuthStateChanged(auth, async (user) => {
   }, 7000);
 
   await loadUsers();
+  applyFilters();
 
   clearTimeout(timeoutId);
   loadingEl.style.display = "none";
   contentEl.style.display = "block";
+});
+
+function applyFilters() {
+  const textFilter = searchInput.value.toLowerCase();
+  const roleFilter = filterRole.value;
+  const statusFilter = filterStatus.value;
+  const verifiedFilter = filterVerified.value;
+  const viewedFilter = filterViewed.value;
+
+  const rows = usersTableBody.querySelectorAll("tr");
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    const matchesText = row.textContent.toLowerCase().includes(textFilter);
+    const matchesRole = !roleFilter || row.dataset.role === roleFilter;
+    const matchesStatus = !statusFilter || row.dataset.status === statusFilter;
+    const matchesVerified = !verifiedFilter || row.dataset.verified === verifiedFilter;
+    const matchesViewed = !viewedFilter || row.dataset.whatsNewViewed === viewedFilter;
+
+    const visible = matchesText && matchesRole && matchesStatus && matchesVerified && matchesViewed;
+    row.style.display = visible ? "" : "none";
+
+    if (visible) visibleCount++;
+  });
+
+  searchResultsCount.textContent = visibleCount;
+}
+
+searchInput.addEventListener("keyup", applyFilters);
+filterRole.addEventListener("change", applyFilters);
+filterStatus.addEventListener("change", applyFilters);
+filterVerified.addEventListener("change", applyFilters);
+filterViewed.addEventListener("change", applyFilters);
+
+resetFilters.addEventListener("click", () => {
+  searchInput.value = "";
+  filterRole.value = "";
+  filterStatus.value = "";
+  filterVerified.value = "";
+  filterViewed.value = "";
+  applyFilters();
 });
 
 async function loadUsers() {
@@ -74,6 +213,8 @@ async function loadUsers() {
   totalUsersCountEl.textContent = usersSnap.size;
 
   let users = [];
+  let role;
+  let status;
 
   usersSnap.forEach(docSnap => {
     const u = docSnap.data();
@@ -105,44 +246,58 @@ async function loadUsers() {
     return 0;
   });
 
-  users.forEach(async u => {
-    const tr = document.createElement("tr");
-    const emailVerified = u.emailVerified ? "Sì" : "No"
-    const whatsNewViewed = u.whatsNewViewed ? "Sì" : "No"
-    const preferences = {
-      newsletter: u.newsSubbed ? "Newsletter" : "",
-      emailNotifications: u.emailNotifications ? "Notifiche email" : "",
-      publicProfile: u.publicProfile ? "Profilo pubblico" : ""
+  users.forEach(u => {
+    if (u.role === "user") {
+      role = "Utente Standard"
+    } else if (u.role === "simplestaff") {
+      role = "Nuovo Amministratore"
+    } else if (u.role === "modstaff") {
+      role = "Moderatore"
+    } else if (u.role === "advstaff") {
+      role = "Amministratore"
+    } else if (u.role === "advstaffplus") {
+      role = "Amministratore Avanzato"
+    } else if (u.role === "superadmin") {
+      role = "Super Amministratore"
+    } else if (u.role === "testacc") {
+      role = "Account di Test"
+    } else {
+      role = "Ruolo non riconosciuto";
     }
 
-    const loginRef = collection(db, "logins");
-    const userLoginDocs = query(loginRef, where("userId", "==", u.id), orderBy("timestamp", "desc"), limit(1));
-    const lastLoginSnap = await getDocs(userLoginDocs);
-    const lastLogin = lastLoginSnap.docs[0]?.data().timestamp ? lastLoginSnap.docs[0].data().timestamp.toDate().toLocaleString() : "N/A";
+    if (u.status === "attivo") {
+      status = "Attivo"
+    } else if (u.status === "inattivo") {
+      status = "Inattivo"
+    } else if (u.status === "sospeso") {
+      status = "Sospeso"
+    } else if (u.status === "eliminato") {
+      status = "Eliminato"
+    } else {
+      status = "Status non riconosciuto";
+    }
+
+    const tr = document.createElement("tr");
+
+    tr.dataset.role = u.role || "";
+    tr.dataset.status = u.status || "";
+    tr.dataset.verified = u.emailVerified ? "true" : "false";
+    tr.dataset.whatsNewViewed = u.whatsNewViewed ? "true" : "false";
+
+    const isNew = isUserNew(u.createdAt);
+    const newBadgeHtml = isNew ? '<span class="badge-nuovo">✨ NUOVO</span>' : '<span class="no-badge">—</span>';
 
     tr.innerHTML = `
-      <td>${emailVerified}</td>
-      <td>${whatsNewViewed}</td>
-      <td>${u.name || ""}</td>
-      <td>${u.surname || ""}</td>
+      <td>${newBadgeHtml}</td>
+      <td>${u.name + " " + u.surname || ""}</td>
       <td>${u.email || ""}</td>
       <td>${u.username || ""}</td>
-      <td>${u.phone || "Non fornito"}</td>
-      <td>${u.role || "Ruolo utente non disponibile."}</td>
-      <td>${Object.values(preferences).filter(Boolean).join(", ") || "Preferenze utente non disponibili."}</td>
-      <td>${u.status || "Status utente non disponibile."}</td>
-      <td>${lastLogin}</td>
-      <td>
-        <button class="promote">Promuovi</button>
-        <button class="suspend">Sospendi/Riattiva</button>
-        <button class="delete">Elimina</button>
-        <button class="view" onclick="window.open('/profile/?userid=${u.id}', '_blank')">Visualizza profilo</button>
-      </td>
+      <td>${role || "N/A"}</td>
+      <td>${status || "N/A"}</td>
     `;
 
-    tr.querySelector(".promote").addEventListener("click", () => updateRole(u.id, u.role));
-    tr.querySelector(".suspend").addEventListener("click", () => updateStatus(u.id, u.status));
-    tr.querySelector(".delete").addEventListener("click", () => deleteUser(u.id));
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", () => openModal(u));
 
     usersTableBody.appendChild(tr);
   });
@@ -168,7 +323,10 @@ async function updateRole(userId, currentRole) {
     });
 
     await updateDoc(doc(db, "users", userId), { role: newRole });
-    loadUsers();
+    setStatus(`Ruolo aggiornato a ${newRole}`, "success");
+    closeModal();
+    await loadUsers();
+    applyFilters();
   } catch (error) {
     console.error("Errore nel cambio ruolo:", error);
     setStatus("Errore nel cambio ruolo.", "error");
@@ -179,10 +337,13 @@ async function updateStatus(userId, currentStatus) {
   try {
     const newStatus = currentStatus === "attivo" ? "sospeso" : "attivo";
     await updateDoc(doc(db, "users", userId), { status: newStatus });
-    loadUsers();
+    setStatus(`Status aggiornato a ${newStatus}`, "success");
+    closeModal();
+    await loadUsers();
+    applyFilters();
   } catch (error) {
     console.error("Errore nell'aggiornamento status:", error);
-    setStatus("Errore nell'aggiornamento dello status.", "success");
+    setStatus("Errore nell'aggiornamento dello status.", "error");
   }
 }
 
@@ -197,7 +358,10 @@ async function deleteUser(userId) {
       });
 
       await updateDoc(doc(db, "users", userId), { status: "eliminato" });
-      loadUsers();
+      setStatus("Utente marcato come eliminato", "success");
+      closeModal();
+      await loadUsers();
+      applyFilters();
 
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
       
