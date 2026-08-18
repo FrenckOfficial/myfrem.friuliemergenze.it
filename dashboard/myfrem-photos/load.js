@@ -13,7 +13,9 @@ import {
   getDoc,
   doc,
   setDoc,
-  deleteDoc
+  deleteDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
 
@@ -35,11 +37,11 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";
   }, 5000);
 
-  await db.collection("viewedPages").add({
+  await addDoc(collection(db, "viewedPages"), {
     type: "page_view",
-    timestamp: new Date(),
+    timestamp: serverTimestamp(),
     userId: user.uid,
-    page: window.location.pathname,
+    page: window.location.pathname
   });
 
   try {
