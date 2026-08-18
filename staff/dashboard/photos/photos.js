@@ -191,8 +191,6 @@ photosTableBody.addEventListener("click", async (e) => {
     if (userData.emailNotifications === true) {
       if (isApprove) {
         await sendNotificationApprovement(userName, userEmail, photoName);
-      } else {
-        await sendNotificationRejection(userName, userEmail, photoName);
       }
     }
 
@@ -202,7 +200,7 @@ photosTableBody.addEventListener("click", async (e) => {
       }, 500);
     } else {
       setTimeout(() => {
-        openRejectionModal(photoId);
+        openRejectionModal(userName, userEmail, photoName, photoId);
       }, 500)
     }
   } catch (err) {
@@ -228,7 +226,7 @@ async function updatePhotoStatus(photoId, status) {
   }
 }
 
-function openRejectionModal(photoId) {
+function openRejectionModal(userName, userEmail, photoName, photoId) {
   const rejectionModal = document.getElementById("rejectionModal");
   const rejectionReasonInput = document.getElementById("rejectionReason");
   const rejectionConfirmBtn = document.getElementById("rejectionConfirmBtn");
@@ -247,6 +245,8 @@ function openRejectionModal(photoId) {
           await updateDoc(doc(db, "photos", photoId), {
             rejectionReason: rejectionReason
           });
+
+          await sendNotificationRejection(userName, userEmail, photoName, rejectionReason);
           rejectionModal.classList.remove("active");
         }
       });

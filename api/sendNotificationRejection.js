@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { userName, userEmail, photoName } = req.body;
+    const { userName, userEmail, photoName, reason } = req.body;
 
     if (!userName || !userEmail) {
       return res.status(400).json({ 
@@ -33,11 +33,13 @@ export default async function handler(req, res) {
     const sanitizedName = sanitizeHtml(userName);
     const sanitizedEmail = sanitizeHtml(userEmail);
     const sanitizedPhotoName = sanitizeHtml(photoName);
+    const sanitizedReason = sanitizeHtml(reason);
 
     const htmlContent = generateMailHtml({
       name: sanitizedName,
       email: sanitizedEmail,
-      photoName: sanitizedPhotoName
+      photoName: sanitizedPhotoName,
+      reason: sanitizedReason
     });
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -94,7 +96,7 @@ function sanitizeHtml(str) {
     .substring(0, 5000);
 }
 
-function generateMailHtml({ name, email, photoName }) {
+function generateMailHtml({ name, email, photoName, reason }) {
   return `
 <!DOCTYPE html>
 <html lang="it">
@@ -240,6 +242,11 @@ body {
     <div class="info-box">
       <div class="label">Stato della foto</div>
       <div class="value"><b>Rifiutata</b></div>
+    </div>
+
+    <div class="info-box">
+      <div class="label">Motivazione</div>
+      <div class="value">${reason}</div>
     </div>
 
     <div class="security-note">
