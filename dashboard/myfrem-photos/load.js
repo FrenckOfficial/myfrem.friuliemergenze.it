@@ -35,11 +35,11 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";
   }, 5000);
 
-  await addDoc(collection(db, "viewedPages"), {
+  await db.collection("viewedPages").add({
     type: "page_view",
-    timestamp: serverTimestamp(),
+    timestamp: new Date(),
     userId: user.uid,
-    page: window.location.pathname
+    page: window.location.pathname,
   });
 
   try {
