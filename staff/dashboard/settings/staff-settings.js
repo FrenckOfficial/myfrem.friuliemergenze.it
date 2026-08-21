@@ -1,15 +1,13 @@
 import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../../configFirebase.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { supa } from "/configSupabase.js";
+import { firebaseConfig } from "/configFirebase.js";
+import { uploadFile } from "/helpers/uploadFile.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const supabase = createClient(supa.url, supa.anonKey);
 
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -174,20 +172,7 @@ profilePicForm.addEventListener("submit", async (e) => {
   try {
     const fileBuffer = await file.arrayBuffer();
 
-    const { error } = await supabase.storage
-      .from("profilePic")
-      .upload(filePath, fileBuffer, {
-        upsert: true,
-        contentType: file.type
-      });
-
-    if (error) throw error;
-
-    const { data } = supabase.storage
-      .from("profilePic")
-      .getPublicUrl(filePath);
-
-    const imageUrl = data.publicUrl;
+    const imageUrl = await uploadFile(file, "profile-pics", currentUserId);
 
     await updateDoc(doc(db, "users", currentUserId), {
       photoURL: imageUrl

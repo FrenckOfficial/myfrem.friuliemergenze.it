@@ -2,14 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { supa } from "/configSupabase.js";
+import { uploadFile } from "/helpers/uploadFile.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-const supabase = createClient(supa.url, supa.anonKey);
 
 const uploadForm = document.getElementById("uploadForm");
 const fileInput = document.getElementById("inp-upl");
@@ -52,7 +49,7 @@ uploadBtn.addEventListener("click", async (e) => {
   if (!currentUser) return setStatus("❌ Devi essere loggato");
 
   const files = fileInput.files;
-  if (files.length === 0) return setStatus("❌ Seleziona almeno una foto");
+  if (files.length === 0) return setStatus("❌ Seleziona almeno un file");
 
   setStatus("⏳ Upload file in corso...", "info");
 
@@ -60,37 +57,27 @@ uploadBtn.addEventListener("click", async (e) => {
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const path = `${currentUser.uid}/${file.name}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("MyFrEM Staff Documents")
-      .upload(path, file, { upsert: false });
+    try {
+      const fileUrl = await uploadFile(file, "myfrem-staff-docs", currentUser.uid);
 
-    if (uploadError) {
-      console.error("❌ Upload fallito:", uploadError);
-      continue;
+      await addDoc(collection(db, "staffDocUploads"), {
+        userId: currentUser.uid,
+        title: titleInput.value || "",
+        description: descInput.value || "",
+        name: file.name,
+        url: fileUrl,
+        createdAt: serverTimestamp()
+      });
+
+      uploadedCount++;
+
+      const percent = Math.round(((i + 1) / files.length) * 100);
+      progressBar.value = percent;
+      progressText.textContent = percent + "%";
+    } catch (error) {
+      console.error("❌ Errore upload:", error);
     }
-
-    const { data: publicURL } = supabase.storage
-      .from("MyFrEM Staff Documents")
-      .getPublicUrl(path);
-
-    const fileUrl = publicURL.publicUrl;
-
-    await addDoc(collection(db, "staffDocUploads"), {
-      userId: currentUser.uid,
-      title: titleInput.value || "",
-      description: descInput.value || "",
-      name: file.name,
-      url: fileUrl,
-      createdAt: serverTimestamp()
-    });
-
-    uploadedCount++;
-
-    const percent = Math.round(((i + 1) / files.length) * 100);
-    progressBar.value = percent;
-    progressText.textContent = percent + "%";
   }
 
   setStatus(`✅ Caricati ${uploadedCount}/${files.length} file!`, "success");

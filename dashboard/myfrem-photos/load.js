@@ -120,27 +120,55 @@ async function loadAllPhotos() {
       return;
     }
 
-    snapshot.forEach(async (docs) => {
+    const photoDocs = [];
+    snapshot.forEach((doc) => {
+      photoDocs.push(doc);
+    });
+
+    // Carica i dati di tutte le foto in parallelo
+    const photoPromises = photoDocs.map(async (docs) => {
       const data = docs.data();
       const photoId = docs.id;
-      const card = document.createElement("div");
-      card.className = "photo-card";
+
+      // Solo foto approvate e pubblicate
+      if (!((data.status === "Approvata ✅" || data.status === "Approvata") && data.published === true)) {
+        return null;
+      }
 
       const service = getServiceLabel(data.serviceType);
       
       let userName = data.userId;
-
       const userDocSnap = await getDoc(doc(db, "users", userName));
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
         userName = userData.name + " " + userData.surname || "Sconosciuto";
       }
 
-      if ((data.status === "Approvata ✅" || data.status === "Approvata") && data.published === true) {
-        const voteCounts = await getVoteCounts(photoId);
-        const userVote = await getUserVote(photoId);
+      const voteCounts = await getVoteCounts(photoId);
+      const userVote = await getUserVote(photoId);
 
-        card.innerHTML = `
+      return {
+        photoId,
+        data,
+        service,
+        userName,
+        voteCounts,
+        userVote
+      };
+    });
+
+    // Aspetta tutte le promise contemporaneamente
+    const allPhotos = await Promise.all(photoPromises);
+
+    // Renderizza tutte le foto
+    allPhotos.forEach((photoData) => {
+      if (!photoData) return; // Salta foto non approvate
+
+      const { photoId, data, service, userName, voteCounts, userVote } = photoData;
+      const card = document.createElement("div");
+      card.className = "photo-card";
+
+      card.innerHTML = `
         <div class="photo-info">
           <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
           <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
@@ -173,18 +201,15 @@ async function loadAllPhotos() {
         </div>
       `;
 
-        photosContainer.appendChild(card);
+      photosContainer.appendChild(card);
 
-        const likeBtn = card.querySelector(".like-btn");
-        const dislikeBtn = card.querySelector(".dislike-btn");
+      const likeBtn = card.querySelector(".like-btn");
+      const dislikeBtn = card.querySelector(".dislike-btn");
 
-        updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
+      updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
 
-        likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
-        dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", dislikeBtn, likeBtn));
-      } else {
-        return
-      }
+      likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
+      dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", dislikeBtn, likeBtn));
     });
 
     console.log(`Caricate ${snapshot.size} foto`);

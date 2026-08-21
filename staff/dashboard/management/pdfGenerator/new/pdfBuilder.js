@@ -10,8 +10,7 @@ import {
 
 import { firebaseConfig } from "/configFirebase.js";
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { supa } from "/configSupabase.js";
+import { uploadFile } from "/helpers/uploadFile.js";
 
 import {
   buildPDF,
@@ -22,11 +21,6 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-const supabase = createClient(
-  supa.url,
-  supa.anonKey
-);
 
 let currentUser = null;
 
@@ -165,28 +159,7 @@ generateBtn.addEventListener("click", async () => {
 
     setStatus("⬆️ Upload PDF...");
 
-    const path = `${currentUser.uid}/${typeInput.value}/${fileName}`;
-
-    const { error } = await supabase.storage
-      .from("MyFrEM Staff Documents")
-      .upload(path, pdfBlob, {
-        contentType: "application/pdf",
-        cacheControl: "3600",
-        upsert: false
-      });
-
-    if (error) {
-      console.error("❌ Upload error:", error);
-      return setStatus("❌ Errore upload PDF");
-    }
-
-    const { data: publicUrlData } =
-      supabase.storage
-        .from("MyFrEM Staff Documents")
-        .getPublicUrl(path);
-
-    const pdfUrl =
-      publicUrlData.publicUrl;
+    const pdfUrl = await uploadFile(pdfBlob, "myfrem-staff-docs", currentUser.uid);
 
     console.log("📄 PDF URL:", pdfUrl);
 

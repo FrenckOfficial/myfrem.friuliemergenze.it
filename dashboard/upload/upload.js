@@ -1,15 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { supa } from "/configSupabase.js";
+import { uploadFile } from "/helpers/uploadFile.js"
 import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const supabase = createClient(supa.url, supa.anonKey);
 
 const uploadForm = document.getElementById("uploadForm");
 const fileInput = document.getElementById("inp-upl");
@@ -202,23 +200,12 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 50;
     progressText.textContent = "50%";
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("MyFrEM Photos")
-      .upload(path, file, { upsert: false });
-
-    if (uploadError) {
-      console.error("Upload fallito:", uploadError);
-      continue;
-    }
+    const fileBuffer = await file.arrayBuffer();
 
     progressBar.value = 60;
     progressText.textContent = "60%";
 
-    const { data: publicURL } = supabase.storage
-      .from("MyFrEM Photos")
-      .getPublicUrl(path);
-
-    const fileUrl = publicURL.publicUrl;
+    const fileUrl = await uploadFile(file, "myfrem-photos", currentUser.uid);
 
     progressBar.value = 80;
     progressText.textContent = "80%";

@@ -2,20 +2,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
-import { supa } from "/configSupabase.js"
+import { uploadFile } from "/helpers/uploadFile.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+let currentUserId = null;
 
 const logoutBtn = document.getElementById("logoutBtn");
 const statusMsg = document.getElementById("statusMsg");
-const supabase = createClient(supa.url, supa.anonKey);
 
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "/login";
   }
+
+  currentUserId = user.uid;
 
   const allowedRoles = ["advstaff", "advstaffplus", "superadmin"];
 
@@ -143,36 +145,21 @@ function generatePDF(data) {
     doc.setTextColor("#555");
     doc.text("Friuli Emergenze - MyFrEM Staff", 105, 280, { align: "center" });
 
-    saveOnSupabase(doc.output("blob"), `reports/Report_Espulsione_${data.userName}.pdf`);
+    saveOnDatabase(doc);
 
     doc.save(`Report_Espulsione_${data.userName}.pdf`);
   };
 };
 
-async function saveOnSupabase(pdfBlob, filePath) {
+async function saveOnDatabase(doc) {
   try {
-    const { data, error } = await supabase.storage
-      .from("MyFrEM Reports")
-      .upload(filePath, pdfBlob, {
-        contentType: "application/pdf",
-        cacheControl: "3600",
-        upsert: false
-      });
+    const publicUrl = await uploadFile(doc, "myfrem-reports", currentUserId);
 
-    if (error) {
-      console.error("❌ Errore upload Supabase:", error);
-      statusMsg.textContent = "❌ Errore durante il salvataggio su Supabase.";
-      statusMsg.className = "error";
-      return null;
-    }
-
-    const publicUrl = `${supa.url}/storage/v1/object/public/myfrem-photos/${data.path}`;
-
-    console.log("📄 PDF caricato su Supabase:", publicUrl);
+    console.log("📄 PDF caricato su Database:", publicUrl);
     return publicUrl;
 
   } catch (err) {
-    console.error("❌ Errore imprevisto Supabase:", err);
+    console.error("❌ Errore imprevisto Database:", err);
     return null;
   }
 }

@@ -1,11 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, query, where, getDocs, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { supa } from "/configSupabase.js";
+import { uploadFile } from "/helpers/uploadFile.js";
 import { firebaseConfig } from "../../configFirebase.js";
-
-const supabase = createClient(supa.url, supa.anonKey);
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -214,26 +211,8 @@ profilePicForm.addEventListener("submit", async (e) => {
     return setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Solo immagini!", "error");
   }
 
-  const fileExt = file.name.split(".").pop();
-  const filePath = `${currentUserId}/avatar.${fileExt}`;
-
   try {
-    const fileBuffer = await file.arrayBuffer();
-
-    const { error } = await supabase.storage
-      .from("profilePic")
-      .upload(filePath, fileBuffer, {
-        upsert: true,
-        contentType: file.type
-      });
-
-    if (error) throw error;
-
-    const { data } = supabase.storage
-      .from("profilePic")
-      .getPublicUrl(filePath);
-
-    const imageUrl = data.publicUrl;
+    const imageUrl = await uploadFile(file, "profile-pics", currentUserId);
 
     await updateDoc(doc(db, "users", currentUserId), {
       photoURL: imageUrl
@@ -302,620 +281,173 @@ savePhoneBtn.addEventListener("click", async () => {
   if (isReadOnlyMode) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newPhone = phoneInput.value.trim();
+  if (newPhone.length < 10) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Inserisci un numero valido!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     phone: newPhone
   });
 
   setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Numero di telefono aggiornato!", "success");
-})
+});
 
 saveBioBtn.addEventListener("click", async () => {
   if (isReadOnlyMode) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Non puoi modificare in modalità sola lettura", "error");
 
   const newBio = bioInput.value.trim();
+  if (newBio.length > 150) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Massimo 150 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     bio: newBio
   });
 
-  setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Biografia aggiornata!", "success");
+  setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Bio aggiornata!", "success");
 });
 
 savePasswordBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePswStatus", "pswStatusBox", "pswStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Non puoi modificare in modalità sola lettura", "error");
+
+  const passwordInput = document.getElementById("passwordInput");
+  const passwordRepeatInput = document.getElementById("passwordRepeatInput");
+  const currentPasswordInput = document.getElementById("currentPasswordInput");
+
+  const currentPassword = currentPasswordInput.value.trim();
+  const newPassword = passwordInput.value.trim();
+  const newPasswordRepeat = passwordRepeatInput.value.trim();
+
+  if (!currentPassword) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Inserisci la password attuale!", "error");
+  if (newPassword.length < 6) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password: minimo 6 caratteri!", "error");
+  if (newPassword !== newPasswordRepeat) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Le password non corrispondono!", "error");
 
   try {
-    const user = auth.currentUser;
+    const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+    await reauthenticateWithCredential(currentUser, credential);
+    await updatePassword(currentUser, newPassword);
 
-    const credential = EmailAuthProvider.credential(
-      user.email,
-      currentPassword
-    );
-
-    await sendPasswordResetEmail(auth, user.email);
-
-    await updateDoc(doc(db, "users", currentUserId), {
-      passwordUpdatedAt: new Date()
-    });
-
-    setStatus("closePswStatus", "pswStatusBox", "pswStatus", "Link inviato con successo!", "success");
-  } catch (error) {
-    setStatus("closePswStatus", "pswStatusBox", "pswStatus", `${"Errore password: " + error.message}`, "error");
+    setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password aggiornata!", "success");
+    currentPasswordInput.value = "";
+    passwordInput.value = "";
+    passwordRepeatInput.value = "";
+  } catch (err) {
+    setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password attuale non corretta!", "error");
   }
+});
+
+savePreferencesBtn.addEventListener("click", async () => {
+  if (isReadOnlyMode) return setStatus("closePreferencesStatus", "preferencesStatusBox", "preferencesStatus", "Non puoi modificare in modalità sola lettura", "error");
+
+  await updateDoc(doc(db, "users", currentUserId), {
+    emailNotifications: emailNotificationsCheckbox.checked,
+    newsletter: newsletterCheckbox.checked,
+    publicProfile: publicProfileCheckbox.checked
+  });
+
+  setStatus("closePreferencesStatus", "preferencesStatusBox", "preferencesStatus", "Preferenze aggiornate!", "success");
 });
 
 async function loadPreferences() {
-  try {
-    const userRef = doc(db, "users", currentUserId);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+  const ref = doc(db, "users", currentUserId);
+  const snap = await getDoc(ref);
 
-    if (userData) {
-      emailNotificationsCheckbox.checked = userData.emailNotifications || false;
-      newsletterCheckbox.checked = userData.newsSubbed || false;
-      publicProfileCheckbox.checked = userData.publicProfile || false;
-    }
-  } catch (error) {
-    console.error("Errore nel caricamento preferenze:", error);
-  }
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+  emailNotificationsCheckbox.checked = data.emailNotifications || false;
+  newsletterCheckbox.checked = data.newsletter || false;
+  publicProfileCheckbox.checked = data.publicProfile || false;
 }
-
-savePreferencesBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Non puoi modificare in modalità sola lettura", "error");
-
-  try {
-    const userRef = doc(db, "users", currentUserId);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
-
-    await updateDoc(userRef, {
-      emailNotifications: emailNotificationsCheckbox.checked,
-      newsSubbed: newsletterCheckbox.checked,
-      privateProfile: publicProfileCheckbox.checked
-    });
-    
-    const newsRef = collection(db, "newsletterSubs");
-    const existingQuery = query(newsRef, where("email", "==", userData.email));
-    const existingDoc = await getDocs(existingQuery);
-
-    if (newsletterCheckbox.checked) {
-      if (existingDoc.empty) {
-        const token = crypto.randomUUID();
-        await addDoc(newsRef, {
-          email: userData.email,
-          name: userData.name,
-          verified: false,
-          subscribed: false,
-          verifiedAt: null,
-          token: token,
-          createdAt: new Date(),
-        });
-
-        await emailjs.send("service_ngxrsq8", "template_32nd0dv", {
-          email: userData.email,
-          name: userData.name,
-          link: `https://www.friuliemergenze.it/newsletter/confirm/?token=${token}`
-        });
-
-        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate! E-mail di conferma inviata!", "success");
-      } else {
-        setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate!", "success");
-      }
-    } else {
-      if (!existingDoc.empty) {
-        await deleteDoc(doc(db, "newsletterSubs", existingDoc.docs[0].id));
-      }
-      setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Preferenze salvate!", "success");
-    }
-  } catch (error) {
-    console.error("Errore:", error);
-    setStatus("closePrefStatus", "prefStatusBox", "prefStatus", "Errore nel salvataggio", "error");
-  }
-});
-
-let settings2FASetup = {
-  method: null,
-  emailVerified: false,
-  totpVerified: false,
-  totpSecret: null,
-  recoveryCodes: [],
-  emailCode: null
-};
-
-async function load2FAStatus() {
-  try {
-    const statusEl = document.getElementById("twofa-current-status");
-    if (!statusEl) return;
-
-    const userRef = doc(db, "users", currentUserId);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
-
-    const methodEl = document.getElementById("twofa-method-display");
-    const enableBtn = document.getElementById("enable-twofa-btn");
-    const disableBtn = document.getElementById("disable-twofa-btn");
-    const regenerateBtn = document.getElementById("regenerate-recovery-btn");
-
-    if (userData && userData.twoFactorEnabled) {
-      statusEl.innerHTML = `<span style="color: #4fca7a;">✓ Abilitato</span>`;
-
-      let methodText = "";
-      if (userData.twoFactorMethod === "email") {
-        methodText = "Email";
-      } else if (userData.twoFactorMethod === "totp") {
-        methodText = "App Authenticator";
-      }
-      methodEl.innerHTML = `<p style="color: var(--muted, #7a8fa6);">${methodText}</p>`;
-
-      enableBtn.style.display = "none";
-      disableBtn.style.display = isReadOnlyMode ? "none" : "block";
-      regenerateBtn.style.display = isReadOnlyMode ? "none" : "block";
-    } else {
-      statusEl.innerHTML = `<span style="color: var(--muted, #7a8fa6);">Non abilitato</span>`;
-      methodEl.innerHTML = "";
-
-      enableBtn.style.display = isReadOnlyMode ? "none" : "block";
-      disableBtn.style.display = "none";
-      regenerateBtn.style.display = "none";
-    }
-  } catch (error) {
-    console.error("❌ Errore caricamento stato 2FA:", error);
-    const statusEl = document.getElementById("twofa-current-status");
-    if (statusEl) {
-      statusEl.innerHTML = `<span style="color: #e84855;">Errore caricamento</span>`;
-    }
-  }
-}
-
-const enableTwofaBtn = document.getElementById("enable-twofa-btn");
-if (enableTwofaBtn) {
-  enableTwofaBtn.addEventListener("click", () => {
-    if (isReadOnlyMode) return;
-
-    document.getElementById("enable-twofa-modal").style.display = "flex";
-    settings2FASetup = {
-      method: null,
-      emailVerified: false,
-      totpVerified: false,
-      totpSecret: null,
-      recoveryCodes: [],
-      emailCode: null
-    };
-    document.querySelectorAll('input[name="settings-twofa-method"]').forEach(r => r.checked = false);
-    document.getElementById("settings-email-setup").style.display = "none";
-    document.getElementById("settings-totp-setup").style.display = "none";
-    document.getElementById("settings-recovery-codes-section").style.display = "none";
-  });
-}
-
-document.getElementById("close-enable-modal")?.addEventListener("click", () => {
-  document.getElementById("enable-twofa-modal").style.display = "none";
-});
-
-document.querySelectorAll(".twofa-modal-overlay").forEach(overlay => {
-  overlay.addEventListener("click", (e) => {
-    if (e.target.classList.contains("twofa-modal-overlay")) {
-      e.target.closest(".twofa-modal").style.display = "none";
-    }
-  });
-});
-
-document.querySelectorAll('input[name="settings-twofa-method"]').forEach(radio => {
-  radio.addEventListener("change", (e) => {
-    settings2FASetup.method = e.target.value;
-    showSettingsTwoFASection();
-  });
-});
-
-function showSettingsTwoFASection() {
-  document.getElementById("settings-email-setup").style.display = "none";
-  document.getElementById("settings-totp-setup").style.display = "none";
-  document.getElementById("settings-recovery-codes-section").style.display = "none";
-
-  if (settings2FASetup.method === "email") {
-    document.getElementById("settings-email-setup").style.display = "block";
-  } else if (settings2FASetup.method === "totp") {
-    document.getElementById("settings-totp-setup").style.display = "block";
-    initSettingsTOTPSetup();
-  }
-}
-
-document.getElementById("settings-email-send")?.addEventListener("click", async () => {
-  const btn = document.getElementById("settings-email-send");
-  const status = document.getElementById("settings-email-status");
-  const form = document.getElementById("settings-email-form");
-
-  btn.disabled = true;
-  status.textContent = "Invio codice...";
-  status.style.color = "var(--muted, #7a8fa6)";
-
-  try {
-    settings2FASetup.emailCode = String(Math.floor(100000 + Math.random() * 900000));
-
-    const response = await fetch("/api/send2FACode", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
-        email: currentUser.email,
-        ip: await getIpAddress(),
-        code: settings2FASetup.emailCode
-      })
-    });
-
-    status.textContent = "Codice inviato!";
-    status.style.color = "#4fca7a";
-    form.style.display = "block";
-  } catch (error) {
-    console.error("Errore invio email:", error);
-    status.textContent = "Errore nell'invio del codice";
-    status.style.color = "#e84855";
-  } finally {
-    btn.disabled = false;
-  }
-});
-
-document.getElementById("settings-email-verify")?.addEventListener("click", () => {
-  const inputCode = document.getElementById("settings-email-code").value.trim();
-  const status = document.getElementById("settings-email-status");
-
-  if (inputCode === settings2FASetup.emailCode) {
-    settings2FASetup.emailVerified = true;
-    document.getElementById("settings-email-form").style.display = "none";
-    document.getElementById("settings-email-send").style.display = "none";
-    document.getElementById("settings-email-success").style.display = "block";
-
-    generateSettingsRecoveryCodes();
-    showSettingsRecoveryCodes();
-  } else {
-    status.textContent = "Codice errato";
-    status.style.color = "#e84855";
-  }
-});
-
-function initSettingsTOTPSetup() {
-  if (settings2FASetup.totpSecret) return;
-
-  const secret = generateTOTPSecret();
-  settings2FASetup.totpSecret = secret;
-
-  document.getElementById("settings-totp-secret").textContent = secret;
-
-  const otpauthUrl = `otpauth://totp/MyFrEM:${currentUser.email}?secret=${secret}&issuer=MyFrEM`;
-
-  document.getElementById("settings-qrcode").innerHTML = "";
-  new QRCode(document.getElementById("settings-qrcode"), {
-    text: otpauthUrl,
-    width: 200,
-    height: 200,
-    colorDark: "#00d4e8",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
-}
-
-function generateTOTPSecret() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  let secret = "";
-  for (let i = 0; i < 32; i++) {
-    secret += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return secret;
-}
-
-async function verifyTOTPCode(secret, code) {
-  try {
-    const result = await otplib.verify({ secret, token: code });
-    return result.valid;
-  } catch (e) {
-    console.error("Errore verifica TOTP:", e);
-    return false;
-  }
-}
-
-document.getElementById("settings-totp-verify")?.addEventListener("click", async () => {
-  const inputCode = document.getElementById("settings-totp-code").value.trim();
-  const status = document.getElementById("settings-totp-status");
-
-  if (inputCode.length !== 6 || !/^\d{6}$/.test(inputCode)) {
-    status.textContent = "Inserisci 6 cifre";
-    status.style.color = "#e84855";
-    return;
-  }
-
-  if (await verifyTOTPCode(settings2FASetup.totpSecret, inputCode)) {
-    settings2FASetup.totpVerified = true;
-    document.getElementById("settings-totp-verify").disabled = true;
-    document.getElementById("settings-totp-success").style.display = "block";
-
-    generateSettingsRecoveryCodes();
-    showSettingsRecoveryCodes();
-  } else {
-    status.textContent = "Codice errato";
-    status.style.color = "#e84855";
-  }
-});
-
-function generateSettingsRecoveryCodes() {
-  const codes = [];
-  for (let i = 0; i < 5; i++) {
-    const code = Array(8)
-      .fill(0)
-      .map(() => Math.floor(Math.random() * 10))
-      .join("");
-    codes.push(code);
-  }
-  settings2FASetup.recoveryCodes = codes;
-}
-
-function showSettingsRecoveryCodes() {
-  const container = document.getElementById("settings-recovery-codes-display");
-  container.innerHTML = settings2FASetup.recoveryCodes
-    .map(code => `<div style="padding: 0.5rem 0.75rem; background: rgba(0, 212, 232, 0.08); border-radius: 4px; margin-bottom: 0.75rem; border: 1px solid rgba(0, 212, 232, 0.15);">${code}</div>`)
-    .join("");
-
-  document.getElementById("settings-recovery-codes-section").style.display = "block";
-}
-
-document.getElementById("settings-recovery-download")?.addEventListener("click", () => {
-  const content = `Recovery Codes - MyFrEM\n${"=".repeat(40)}\n\nSalva questi codici in un luogo sicuro!\n\n${settings2FASetup.recoveryCodes.join("\n")}\n\nGenerato il: ${new Date().toLocaleString()}`;
-
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `myfrem-recovery-codes-${Date.now()}.txt`;
-  a.click();
-});
-
-document.getElementById("settings-recovery-copy")?.addEventListener("click", () => {
-  const text = settings2FASetup.recoveryCodes.join("\n");
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById("settings-recovery-copy");
-    const original = btn.textContent;
-    btn.textContent = "✓ Copiato!";
-    setTimeout(() => {
-      btn.textContent = original;
-    }, 2000);
-  });
-});
-
-document.getElementById("settings-recovery-confirmed")?.addEventListener("change", () => {
-  const btn = document.getElementById("settings-enable-final-btn");
-  if (document.getElementById("settings-recovery-confirmed").checked) {
-    btn.style.display = "block";
-  } else {
-    btn.style.display = "none";
-  }
-});
-
-document.getElementById("settings-enable-final-btn")?.addEventListener("click", async () => {
-  const btn = document.getElementById("settings-enable-final-btn");
-  btn.disabled = true;
-  btn.textContent = "Abilitazione in corso...";
-
-  try {
-    const twoFAData = {
-      twoFactorEnabled: true,
-      twoFactorMethod: settings2FASetup.method,
-      recoveryCodes: settings2FASetup.recoveryCodes,
-      usedRecoveryCodes: []
-    };
-
-    if (settings2FASetup.method === "totp") {
-      twoFAData.totpSecret = settings2FASetup.totpSecret;
-    }
-
-    await updateDoc(doc(db, "users", currentUserId), twoFAData);
-
-    setStatus("closeTwofaStatus", "twofaStatusBox", "twofaStatus", "2FA abilitato con successo!", "success");
-    document.getElementById("enable-twofa-modal").style.display = "none";
-
-    await load2FAStatus();
-  } catch (error) {
-    console.error("Errore abilitazione 2FA:", error);
-    setStatus("closeTwofaStatus", "twofaStatusBox", "twofaStatus", "Errore nell'abilitazione di 2FA", "error");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Abilita 2FA";
-  }
-});
-
-document.getElementById("disable-twofa-btn")?.addEventListener("click", () => {
-  if (isReadOnlyMode) return;
-  document.getElementById("disable-twofa-modal").style.display = "flex";
-});
-
-document.getElementById("close-disable-modal")?.addEventListener("click", () => {
-  document.getElementById("disable-twofa-modal").style.display = "none";
-});
-
-document.getElementById("cancel-disable-btn")?.addEventListener("click", () => {
-  document.getElementById("disable-twofa-modal").style.display = "none";
-});
-
-document.getElementById("disable-verify-btn")?.addEventListener("click", async () => {
-  const code = document.getElementById("disable-twofa-code").value.trim();
-  const status = document.getElementById("disable-verify-status");
-  const btn = document.getElementById("disable-verify-btn");
-
-  if (!code) {
-    status.textContent = "Inserisci il codice";
-    status.style.color = "#e84855";
-    return;
-  }
-
-  btn.disabled = true;
-  status.textContent = "Verifica in corso...";
-
-  try {
-    const userRef = doc(db, "users", currentUserId);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
-
-    let verified = false;
-
-    if (userData.twoFactorMethod === "totp") {
-      verified = await verifyTOTPCode(userData.totpSecret, code);
-    } else if (userData.twoFactorMethod === "email") {
-      verified = true;
-    }
-
-    if (verified) {
-      await updateDoc(userRef, {
-        twoFactorEnabled: false,
-        twoFactorMethod: null,
-        totpSecret: null
-      });
-
-      setStatus("closeTwofaStatus", "twofaStatusBox", "twofaStatus", "2FA disabilitato con successo!", "success");
-      document.getElementById("disable-twofa-modal").style.display = "none";
-      document.getElementById("disable-twofa-code").value = "";
-
-      await load2FAStatus();
-    } else {
-      status.textContent = "Codice errato";
-      status.style.color = "#e84855";
-    }
-  } catch (error) {
-    console.error("Errore disabilitazione 2FA:", error);
-    status.textContent = "Errore nella disabilitazione";
-    status.style.color = "#e84855";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Verifica e disabilita";
-  }
-});
-
-document.getElementById("regenerate-recovery-btn")?.addEventListener("click", () => {
-  if (isReadOnlyMode) return;
-  document.getElementById("regenerate-modal").style.display = "flex";
-});
-
-document.getElementById("close-regenerate-modal")?.addEventListener("click", () => {
-  document.getElementById("regenerate-modal").style.display = "none";
-});
-
-document.getElementById("cancel-regenerate-btn")?.addEventListener("click", () => {
-  document.getElementById("regenerate-modal").style.display = "none";
-});
-
-document.getElementById("verify-regenerate-btn")?.addEventListener("click", async () => {
-  const code = document.getElementById("regenerate-code").value.trim();
-  const status = document.getElementById("regenerate-status");
-  const btn = document.getElementById("verify-regenerate-btn");
-
-  if (!code) {
-    status.textContent = "Inserisci il codice";
-    status.style.color = "#e84855";
-    return;
-  }
-
-  btn.disabled = true;
-  status.textContent = "Verifica in corso...";
-
-  try {
-    const userRef = doc(db, "users", currentUserId);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
-
-    let verified = false;
-
-    if (userData.twoFactorMethod === "totp") {
-      verified = await verifyTOTPCode(userData.totpSecret, code);
-    } else if (userData.twoFactorMethod === "email") {
-      verified = true;
-    }
-
-    if (verified) {
-      const newCodes = [];
-      for (let i = 0; i < 5; i++) {
-        newCodes.push(Array(8).fill(0).map(() => Math.floor(Math.random() * 10)).join(""));
-      }
-
-      await updateDoc(userRef, {
-        recoveryCodes: newCodes,
-        usedRecoveryCodes: []
-      });
-
-      const container = document.getElementById("new-recovery-codes-display");
-      container.innerHTML = newCodes
-        .map(c => `<div style="padding: 0.5rem 0.75rem; background: rgba(0, 212, 232, 0.08); border-radius: 4px; margin-bottom: 0.75rem; border: 1px solid rgba(0, 212, 232, 0.15);">${c}</div>`)
-        .join("");
-      container.style.display = "block";
-
-      document.getElementById("regenerate-actions").style.display = "flex";
-      document.getElementById("regenerate-code").style.display = "none";
-      btn.style.display = "none";
-
-      status.textContent = "✓ Nuovi codici generati!";
-      status.style.color = "#4fca7a";
-
-      document.getElementById("regenerate-download").onclick = () => {
-        const content = `Recovery Codes Rigenerati - MyFrEM\n${"=".repeat(40)}\n\n${newCodes.join("\n")}\n\nGenerato il: ${new Date().toLocaleString()}`;
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `myfrem-recovery-codes-${Date.now()}.txt`;
-        a.click();
-      };
-
-      document.getElementById("regenerate-copy").onclick = () => {
-        navigator.clipboard.writeText(newCodes.join("\n")).then(() => {
-          const cpBtn = document.getElementById("regenerate-copy");
-          const original = cpBtn.textContent;
-          cpBtn.textContent = "✓ Copiato!";
-          setTimeout(() => cpBtn.textContent = original, 2000);
-        });
-      };
-    } else {
-      status.textContent = "Codice errato";
-      status.style.color = "#e84855";
-    }
-  } catch (error) {
-    console.error("Errore rigenerazione codici:", error);
-    status.textContent = "Errore nella rigenerazione";
-    status.style.color = "#e84855";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Verifica e rigenera";
-  }
-});
-
-document.getElementById("settings-copy-secret")?.addEventListener("click", () => {
-  const secret = document.getElementById("settings-totp-secret").textContent;
-  navigator.clipboard.writeText(secret).then(() => {
-    const btn = document.getElementById("settings-copy-secret");
-    const original = btn.textContent;
-    btn.textContent = "✓ Copiato!";
-    setTimeout(() => {
-      btn.textContent = original;
-    }, 2000);
-  });
-});
-
-// ============================
-// FINE BLOCCO 2FA IMPOSTAZIONI
-// ============================
 
 async function loadUserBadgesSettings() {
   try {
+    const userDocRef = doc(db, "users", currentUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) return;
+
+    const userData = userDocSnap.data();
+    const badgeVisibilityCheckbox = document.getElementById("badgeVisibility");
+
+    if (badgeVisibilityCheckbox) {
+      badgeVisibilityCheckbox.checked = userData.badgeVisibility !== false;
+    }
+
+    const saveBadgeVisibilityBtn = document.getElementById("saveBadgeVisibilityBtn");
+    if (saveBadgeVisibilityBtn) {
+      saveBadgeVisibilityBtn.addEventListener("click", async () => {
+        if (isReadOnlyMode) {
+          setStatus("closeBadgeVisibilityStatus", "badgeVisibilityStatusBox", "badgeVisibilityStatus", "Non puoi modificare in modalità sola lettura", "error");
+          return;
+        }
+
+        await updateDoc(userDocRef, {
+          badgeVisibility: badgeVisibilityCheckbox.checked
+        });
+
+        setStatus("closeBadgeVisibilityStatus", "badgeVisibilityStatusBox", "badgeVisibilityStatus", "Visibilità badge aggiornata!", "success");
+      });
+    }
+  } catch (err) {
+    console.error("Errore caricamento impostazioni badge:", err);
+  }
+}
+
+async function load2FAStatus() {
+  try {
+    const userDocRef = doc(db, "users", currentUserId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (!userDocSnap.exists()) return;
+
+    const userData = userDocSnap.data();
+    const is2FAEnabled = userData.twoFactorEnabled || false;
+
+    const twoFAStatusEl = document.getElementById("twoFAStatus");
+    const enableTwoFABtn = document.getElementById("enable-twofa-btn");
+    const disableTwoFABtn = document.getElementById("disable-twofa-btn");
+
+    if (twoFAStatusEl) {
+      twoFAStatusEl.textContent = is2FAEnabled ? "🔒 Abilitato" : "🔓 Disabilitato";
+    }
+
+    if (enableTwoFABtn) {
+      enableTwoFABtn.style.display = is2FAEnabled ? "none" : "block";
+      if (!isReadOnlyMode) {
+        enableTwoFABtn.addEventListener("click", () => {
+          window.location.href = "/dashboard/settings/2fa/setup/";
+        });
+      }
+    }
+
+    if (disableTwoFABtn) {
+      disableTwoFABtn.style.display = is2FAEnabled ? "block" : "none";
+      if (!isReadOnlyMode) {
+        disableTwoFABtn.addEventListener("click", async () => {
+          const confirmed = confirm("Sei sicuro di disabilitare l'autenticazione a due fattori?");
+          if (confirmed) {
+            await updateDoc(userDocRef, {
+              twoFactorEnabled: false,
+              twoFactorSecret: null,
+              twoFactorBackupCodes: null
+            });
+            twoFAStatusEl.textContent = "🔓 Disabilitato";
+            enableTwoFABtn.style.display = "block";
+            disableTwoFABtn.style.display = "none";
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Errore caricamento 2FA:", err);
+  }
+}
+
+async function loadUserBadgesEarned() {
+  try {
+    const badgesContainer = document.getElementById("badgesContainer");
+    if (!badgesContainer) return;
+
     const badgesRef = collection(db, "users", currentUserId, "badges");
     const badgesSnap = await getDocs(badgesRef);
- 
-    const badgesContainer = document.getElementById("userBadgesContainer");
-    if (!badgesContainer) {
-      console.warn("Container badge non trovato, saltando");
-      return;
-    }
- 
-    badgesContainer.innerHTML = "";
- 
+
     if (badgesSnap.empty) {
       badgesContainer.innerHTML = `
         <div style="text-align: center; padding: 2rem; color: var(--muted);">
@@ -925,21 +457,21 @@ async function loadUserBadgesSettings() {
       `;
       return;
     }
- 
+
     const badgeEarnedList = document.createElement("div");
     badgeEarnedList.style.cssText = "display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1rem;";
- 
+
     for (const badgeDocSnap of badgesSnap.docs) {
       const badgeId = badgeDocSnap.id;
       const badgeData = badgeDocSnap.data();
- 
+
       const badgeDocRef = doc(db, "badges", badgeId);
       const badgeMeta = await getDoc(badgeDocRef);
- 
+
       if (!badgeMeta.exists()) continue;
- 
+
       const meta = badgeMeta.data();
- 
+
       const badgeEl = document.createElement("div");
       badgeEl.style.cssText = `
         background: var(--bg-surface);
@@ -949,7 +481,7 @@ async function loadUserBadgesSettings() {
         text-align: center;
         transition: transform 0.2s, box-shadow 0.2s;
       `;
- 
+
       const img = document.createElement("img");
       img.src = meta.icon || "/assets/badges/default.svg";
       img.alt = meta.name;
@@ -957,36 +489,36 @@ async function loadUserBadgesSettings() {
       img.onerror = () => {
         img.src = "/assets/badges/default.svg";
       };
- 
+
       const name = document.createElement("div");
       name.style.cssText = "font-weight: 700; color: #00d4e8; font-size: 0.85rem; margin-bottom: 0.25rem;";
       name.textContent = meta.name;
- 
+
       const earnedDate = document.createElement("div");
       earnedDate.style.cssText = "font-size: 0.75rem; color: var(--muted);";
       if (badgeData.earnedAt?.toDate) {
         earnedDate.textContent = `${badgeData.earnedAt.toDate().toLocaleDateString("it-IT")}`;
       }
- 
+
       badgeEl.appendChild(img);
       badgeEl.appendChild(name);
       badgeEl.appendChild(earnedDate);
- 
+
       badgeEl.addEventListener("mouseenter", () => {
         badgeEl.style.transform = "scale(1.08)";
         badgeEl.style.boxShadow = "0 0 12px rgba(0, 212, 232, 0.3)";
       });
- 
+
       badgeEl.addEventListener("mouseleave", () => {
         badgeEl.style.transform = "scale(1)";
         badgeEl.style.boxShadow = "none";
       });
- 
+
       badgeEarnedList.appendChild(badgeEl);
     }
- 
+
     badgesContainer.appendChild(badgeEarnedList);
- 
+
   } catch (err) {
     console.error("Errore caricamento badge:", err);
   }
@@ -996,64 +528,64 @@ async function loadBadgesProgress() {
   try {
     const progressContainer = document.getElementById("badgesProgressContainer");
     if (!progressContainer) return;
- 
+
     const badgesRef = collection(db, "badges");
     const badgesSnap = await getDocs(badgesRef);
- 
+
     const earnedBadgesRef = collection(db, "users", currentUserId, "badges");
     const earnedSnap = await getDocs(earnedBadgesRef);
     const earnedIds = new Set(earnedSnap.docs.map(d => d.id));
- 
+
     const progressList = document.createElement("div");
     progressList.style.cssText = "display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;";
- 
+
     for (const badgeDoc of badgesSnap.docs) {
       if (earnedIds.has(badgeDoc.id)) continue;
- 
+
       const badge = badgeDoc.data();
       if (!badge.enabled) continue;
- 
+
       const progress = await calculateBadgeProgress(currentUserId, badge, badgeDoc.id);
- 
+
       if (!progress || progress.earned) continue;
- 
+
       const progressEl = document.createElement("div");
       progressEl.style.cssText = "padding: 1rem; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-panel);";
- 
+
       const title = document.createElement("div");
       title.style.cssText = "font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; font-size: 0.9rem;";
       title.textContent = badge.name;
- 
+
       const barContainer = document.createElement("div");
       barContainer.style.cssText = "width: 100%; height: 6px; background: var(--bg-panel); border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;";
- 
+
       const bar = document.createElement("div");
       bar.style.cssText = `width: ${progress.percentage}%; height: 100%; background: #00d4e8; transition: width 0.3s ease;`;
       barContainer.appendChild(bar);
- 
+
       const percent = document.createElement("div");
       percent.style.cssText = "font-size: 0.75rem; color: var(--muted);";
       percent.textContent = `${progress.current}/${progress.target} (${progress.percentage}%)`;
- 
+
       progressEl.appendChild(title);
       progressEl.appendChild(barContainer);
       progressEl.appendChild(percent);
- 
+
       progressList.appendChild(progressEl);
     }
- 
+
     progressContainer.appendChild(progressList);
- 
+
   } catch (err) {
     console.error("Errore caricamento progress:", err);
   }
 }
- 
+
 async function calculateBadgeProgress(userId, badge, badgeId) {
   const { type, threshold } = badge.criteria;
- 
+
   let current = 0;
- 
+
   switch (type) {
     case "photos": {
       const snap = await getDocs(
@@ -1066,7 +598,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
       current = snap.size;
       break;
     }
- 
+
     case "events": {
       const snap = await getDocs(
         query(
@@ -1078,7 +610,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
       current = snap.size;
       break;
     }
- 
+
     case "surveys": {
       const snap = await getDocs(
         query(
@@ -1089,7 +621,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
       current = snap.size;
       break;
     }
- 
+
     case "exploration": {
       const snap = await getDocs(
         query(
@@ -1102,7 +634,7 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
       current = services.size;
       break;
     }
- 
+
     case "time": {
       const userDoc = await getDoc(doc(db, "users", userId));
       const createdAt = userDoc.data()?.createdAt?.toDate();
@@ -1114,11 +646,11 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
       }
       break;
     }
- 
+
     default:
       return null;
   }
- 
+
   return {
     earned: false,
     current,

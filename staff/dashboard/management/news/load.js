@@ -14,11 +14,8 @@ import {
     where
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 import { firebaseConfig } from '/configFirebase.js';
-import { supa } from '/configSupabase.js';
 
-const supabase = createClient(supa.url, supa.anonKey);
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);

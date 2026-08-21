@@ -128,13 +128,13 @@ async function loadPhotos(userId) {
       const card = document.createElement("div");
       card.className = "photo-card";
 
-      const status = data.status === "Approvata ✅" ? "approved" :
-                     data.status === "Rifiutata ❌" ? "rejected" :
+      const status = data.status.includes("Approvata") ? "approved" :
+                     data.status.includes("Rifiutata") ? "rejected" :
                      "pending";
 
-      const statusText = data.status === "Approvata ✅" ? "Approvata" :
-                         data.status === "Rifiutata ❌" ? "Rifiutata" :
-                         "In attesa di approvazione";
+      const statusText = data.status.includes("Approvata") ? "Approvata" :
+                         data.status.includes("Rifiutata") ? "Rifiutata" :
+                         "Non disponibile";
 
       const service = getServiceLabel(data.serviceType);
 
