@@ -1,18 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "/configFirebase.js"
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getUserName } from "/helpers/getUserName.js";
+import { firebaseConfig } from "/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -139,6 +129,7 @@ async function loadPendingPhotos() {
       } else serviceType;
 
       const tr = document.createElement("tr");
+      const userName = await getUserName(photo.userId) || "Sconosciuto";
       tr.innerHTML = `
         <td><img src="${photo.url}" class="preview" loading="lazy" /></td>
         <td>${photo.vehicleModel || "Non inserito"}</td>
@@ -146,7 +137,7 @@ async function loadPendingPhotos() {
         <td>${photo.licensePlate || "Non inserita"}</td>
         <td>${serviceType}</td>
         <td>${photo.location || "Non inserita"}</td>
-        <td>${usersMap[photo.userId] || "Sconosciuto"}</td>
+        <td>${userName}</td>
         <td>${photo.createdAt?.toDate().toLocaleString() || "-"}</td>
         <td>${photo.notes || "Non inserite"}</td>
         <td>
