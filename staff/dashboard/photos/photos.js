@@ -109,7 +109,7 @@ async function loadPendingPhotos() {
       return;
     }
 
-    snapshot.forEach((docSnap) => {
+    snapshot.forEach(async (docSnap) => {
       const photo = docSnap.data();
 
       let serviceType = "Non inserito"
