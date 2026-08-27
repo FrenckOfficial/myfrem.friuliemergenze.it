@@ -290,13 +290,12 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
         rel="noopener noreferrer"
         class="donate-btn"
         style="display: flex !important; align-items: center !important; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #ff7b00 !important; color: white; border: none; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; font-family: Lexend, sans-serif;">
-        <span style="font-size: 1.2rem;">❤️</span>
         Sostieni
       <\/a>
     <\/div>
     <nav class="navbar">
       <div class="navbar-container">
-        <a href="/" class="logo">🚨 Friuli Emergenze</a>
+        <a href="/" class="logo">Friuli Emergenze</a>
         <button class="menu-toggle" aria-label="Menu">
           <i class="fas fa-bars"><\/i>
         </button>
@@ -305,7 +304,6 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
           <li><a href="/chi-sono" class="nav-link">Chi sono</a></li>
           <li><a href="/gallery" class="nav-link active">Galleria</a></li>
           <li><a href="/photobook" class="nav-link">Photobooks</a></li>
-          <li><a href="/news" class="nav-link">Notizie</a></li>
           <li><a href="/sostienici" class="nav-link">Sostienici</a></li>
           <li><a href="/piattaforma-myfrem" class="nav-icon" aria-label="MyFrEM">Piattaforma MyFrEM</a></li>
           <li><a href="/contact-us" class="nav-link">Contatti</a></li>
