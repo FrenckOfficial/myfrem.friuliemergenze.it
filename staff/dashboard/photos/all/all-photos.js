@@ -172,10 +172,12 @@ async function loadAllPhotos() {
       return;
     }
 
-    snapshot.forEach(async (docSnap) => {
+    // Carica tutti i dati in parallelo
+    const photoPromises = snapshot.docs.map(async (docSnap) => {
       const photo = docSnap.data();
       const id = docSnap.id;
       const voteCounts = await getVoteCounts(id);
+      const userName = await getUserName(photo.userId) || "Sconosciuto";
 
       const statusColor =
         photo.status?.includes("Approvata") ? "green" :
@@ -245,6 +247,25 @@ async function loadAllPhotos() {
         status = "Foto in attesa di approvazione";
       }
 
+      return {
+        id,
+        photo,
+        statusColor,
+        status,
+        serviceType,
+        userName,
+        voteCounts,
+        linkBox
+      };
+    });
+
+    // Aspetta tutte le promise
+    const allPhotos = await Promise.all(photoPromises);
+
+    // Renderizza tutte le foto in ordine
+    allPhotos.forEach((photoData) => {
+      const { id, photo, statusColor, status, serviceType, userName, voteCounts, linkBox } = photoData;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="status-indicator" style="color: ${statusColor};"></span> <b style="color:${statusColor};">${status || "Sconosciuto"}</b></td>  
@@ -254,7 +275,7 @@ async function loadAllPhotos() {
         <td><b>${photo.licensePlate || "Non inserita"}</b></td>
         <td><b>${serviceType}</b></td>
         <td><b>${photo.location || "Non inserita"}</b></td>
-        <td><b>${await getUserName(photo.userId) || "Sconosciuto"}</b></td>
+        <td><b>${userName}</b></td>
         <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
         <td><b>${photo.notes || "Non inserite"}</b></td>
         <td><b>${linkBox}</b></td>

@@ -7,64 +7,71 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-Z4DJJRR7BY');
   </script>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Eventi - Dashboard Staff | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
-    <link rel="stylesheet" href="/staff/dashboard/events/events-staff.css">
-    <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <script type="module" src="/staff/dashboard/events/load.js"></script>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard di gestione eventi per staff MyFrEM">
+  <title>Gestione Eventi - Dashboard Staff | MyFrEM</title>
+  
+  <link rel="stylesheet" href="/staff/dashboard/events/events-staff.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
-  <div class="loading">
-    <div class="loader"></div>
+  <div class="loading" role="status" aria-label="Caricamento in corso">
+    <div class="loader" aria-hidden="true"></div>
     <p>Caricamento in corso...</p>
   </div>
+
   <div class="content" style="display:none;">
-    <button class="menu-toggle" aria-label="Toggle navigation menu">
-      <i class="fas fa-bars"></i>
+    <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar">
+      <i class="fas fa-bars" aria-hidden="true"></i>
     </button>
-    <aside class="sidebar">
+
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navigazione principale">
       <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
-        <h2>MyFrEM Staff</h2>
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy" width="60" height="60">
+        <h1>MyFrEM Staff</h1>
       </div>
-      <nav>
-        <a href="/staff/dashboard/">Dashboard</a>
-        <a href="/staff/dashboard/photos/">Moderazione foto</a>
-        <a href="/staff/dashboard/users/">Funzionalità</a>
-        <a href="/staff/dashboard/events/" class="active">Moderazione eventi</a>
-        <a href="/staff/dashboard/kick-reports/">Rapporti di espulsione</a>
-        <a href="/staff/dashboard/settings/">Impostazioni</a>
+      
+      <nav aria-label="Menu staff">
+        <a href="/staff/dashboard/" class="nav-link">Dashboard</a>
+        <a href="/staff/dashboard/photos/" class="nav-link">Moderazione foto</a>
+        <a href="/staff/dashboard/users/" class="nav-link">Funzionalità</a>
+        <a href="/staff/dashboard/events/" class="nav-link active" aria-current="page">Moderazione eventi</a>
+        <a href="/staff/dashboard/kick-reports/" class="nav-link">Rapporti di espulsione</a>
+        <a href="/staff/dashboard/settings/" class="nav-link">Impostazioni</a>
         <br>
-        <a href="/dashboard/">Passa a dashboard utente</a>
+        <a href="/dashboard/" class="nav-link">Passa a dashboard utente</a>
       </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
+      
+      <button id="logoutBtn" class="logout" aria-label="Esci dall'account">Logout</button>
     </aside>
-  
-    <main class="main-content">
+
+    <main class="main-content" role="main">
       <div class="page-header">
         <h2>Gestione Eventi</h2>
         <p>Qui puoi vedere tutte le richieste di eventi e gestirne lo stato.</p>
       </div>
-  
-      <p class="statusBox" style="display:none;">
+
+      <div class="statusBox" style="display:none;" role="alert" aria-live="polite" aria-atomic="true">
         <span id="statusMsg"></span>
-        <button id="closeSMsg">&times;</button>
-      </p>
-  
-      <div class="events-container" id="eventsList" style="max-width: 780px;">
+        <button id="closeSMsg" aria-label="Chiudi messaggio" class="close-btn">&times;</button>
+      </div>
+
+      <div class="events-container" id="eventsList" role="list" aria-label="Lista eventi">
         <!-- Eventi caricati dinamicamente con JS -->
       </div>
     </main>
   </div>
+
+  <script type="module" src="/staff/dashboard/events/load.js"></script>
   <script>
     (function() {
       const menuToggle = document.querySelector('.menu-toggle');
@@ -77,17 +84,16 @@
       }
       
       function toggleSidebar() {
+        const isOpen = sidebar.classList.contains('active');
         sidebar.classList.toggle('active');
         body.classList.toggle('sidebar-open');
+        menuToggle.setAttribute('aria-expanded', !isOpen);
       }
 
       function closeSidebar() {
         sidebar.classList.remove('active');
         body.classList.remove('sidebar-open');
-      }
-      function openSidebar() {
-        sidebar.classList.add('active');
-        body.classList.add('sidebar-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
       }
 
       menuToggle.addEventListener('click', (e) => {
