@@ -275,14 +275,6 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title>${escapeHtml(vehicleData.title)} | Friuli Emergenze</title>
   </head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LRKW2EXEL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-2LRKW2EXEL');
-  </script>
   <body>
     <div id="donate-float" style="position: fixed !important; bottom: 2rem !important; left: 2rem !important; z-index: 999999 !important; display: block !important; width: auto !important; height: auto !important;">
       <a href="https://www.friuliemergenze.it/sostienici/donate" 
@@ -432,7 +424,6 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
       <a href="https://www.shinystat.com/it/" target="_top" style="display: none;">
       <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-53595029-55bae" alt="Statistiche web" style="border:0px; display: none;" /><\/a>
     <\/noscript>
-    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="12f1a448-b292-4481-a1b1-00e4f77025d3";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();<\/script>
 
     <script>
       document.querySelector(".menu-toggle").addEventListener("click", () => {
