@@ -188,11 +188,11 @@ photosTableBody.addEventListener("click", async (e) => {
     if (isApprove) {
       setTimeout(() => {
         openDraftModal(photoData, photoId);
-      }, 500);
+      }, 10);
     } else {
       setTimeout(() => {
         openRejectionModal(userName, userEmail, photoName, photoId);
-      }, 500)
+      }, 10)
     }
   } catch (err) {
     console.error("Errore:", err);
