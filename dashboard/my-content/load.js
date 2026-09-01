@@ -219,8 +219,8 @@ async function loadEvents(firstName, lastName) {
 function getServiceLabel(service) {
   const services = {
     "emergenza-sanitaria": "Emergenza Sanitaria Territoriale",
-    "soccorso-tecnico-urgente": "Soccorso Tecnico Urgente",
-    "pompieri": "Soccorso Tecnico Urgente",
+    "soccorso-tecnico-urgente": "Vigili del Fuoco",
+    "pompieri": "Vigili del Fuoco",
     "protezione-civile": "Protezione Civile",
     "soccorso-alpino": "Soccorso Alpino",
     "guardia-costiera": "Guardia Costiera",

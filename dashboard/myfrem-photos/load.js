@@ -329,10 +329,10 @@ function getServiceLabel(service) {
       return "Emergenza Sanitaria Territoriale";
 
     case "soccorso-tecnico-urgente":
-      return "Soccorso Tecnico Urgente";
+      return "Vigili del Fuoco";
 
     case "pompieri":
-      return "Soccorso Tecnico Urgente";
+      return "Vigili del Fuoco";
 
     case "protezione-civile":
       return "Protezione Civile";

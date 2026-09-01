@@ -227,7 +227,7 @@ function getServiceLabel(service) {
       return "Soccorso Sanitario";
 
     case "pompieri":
-      return "Soccorso Tecnico Urgente";
+      return "Vigili del Fuoco";
 
     case "protezione_civile":
       return "Protezione Civile";
