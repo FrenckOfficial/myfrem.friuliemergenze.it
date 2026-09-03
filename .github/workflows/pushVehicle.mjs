@@ -96,13 +96,20 @@ async function pushVehicleToGithub() {
 
   console.log("✅ Pagina HTML creata");
 
-  await db.collection("vehiclesDraft")
-    .doc(draftId)
-    .update({
-      status: "published",
-      publishedAt: admin.firestore.Timestamp.now(),
-      publishedBy: "github-action"
-    });
+  const vehicleRef = db.collection("vehiclesDraft").doc(draftId).get();
+  const sourcePhotoRef = db.collection("photos").doc(sourcePhotoId).get();
+
+  vehicleRef.ref.update({
+    status: "published",
+    publishedAt: admin.firestore.Timestamp.now(),
+    publishedBy: "github-action"
+  });
+
+  sourcePhotoRef.ref.update({
+    published: true,
+    publishedAt: admin.firestore.Timestamp.now(),
+    publishedBy: "github-action"
+  });
 
   console.log("🎉 Pubblicazione completata");
 }

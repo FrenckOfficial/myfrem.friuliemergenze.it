@@ -125,12 +125,10 @@ async function loadAllPhotos() {
       photoDocs.push(doc);
     });
 
-    // Carica i dati di tutte le foto in parallelo
     const photoPromises = photoDocs.map(async (docs) => {
       const data = docs.data();
       const photoId = docs.id;
 
-      // Solo foto approvate e pubblicate
       if (!((data.status === "Approvata ✅" || data.status === "Approvata") && data.published === true)) {
         return null;
       }
@@ -157,12 +155,10 @@ async function loadAllPhotos() {
       };
     });
 
-    // Aspetta tutte le promise contemporaneamente
     const allPhotos = await Promise.all(photoPromises);
 
-    // Renderizza tutte le foto
     allPhotos.forEach((photoData) => {
-      if (!photoData) return; // Salta foto non approvate
+      if (!photoData) return;
 
       const { photoId, data, service, userName, voteCounts, userVote } = photoData;
       const card = document.createElement("div");

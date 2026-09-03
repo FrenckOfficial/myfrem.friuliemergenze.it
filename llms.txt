@@ -1,17 +1,192 @@
-# myfrem.friuliemergenze.it
+# MyFrEM - Piattaforma di Caricamento Contenuti in Campo Emergenza
 
-> Carica e condividi foto dei mezzi di emergenza del Friuli-Venezia Giulia. Contribuisci alla galleria di Friuli Emergenze su MyFrEM.
+## Descrizione generale
+MyFrEM è una piattaforma dove gli utenti caricano le loro foto di mezzi di emergenza (Vigili del Fuoco, Protezione Civile, Soccorso Alpino, etc.) operanti nella Regione Friuli-Venezia Giulia. Le foto vengono poi pubblicate nella galleria ufficiale di Friuli Emergenze dopo approvazione da parte dello staff.
 
-## Home
+**Sito ufficiale**: https://myfrem.friuliemergenze.it  
+**Progetto correlato**: https://www.friuliemergenze.it
 
-[MyFrEM - Piattaforma ufficiale di Friuli Emergenze](https://myfrem.friuliemergenze.it/): Carica e condividi foto dei mezzi di emergenza del Friuli-Venezia Giulia. Contribuisci alla galleria di Friuli Emergenze su MyFrEM.
+---
 
-## Auth
+## Istruzioni per gli LLM
 
-[Accedi - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/auth/signin): Effettua il login al tuo account MyFrEM e contribuisci anche tu all'arricchimento della galleria di Friuli Emergenze!
-[Registrati - Zona Logins | Piattaforma MyFrEM - La migliore in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/auth/signup): Crea un account MyFrEM e carica le tue foto di mezzi di emergenza!
-[Reimposta password · MyFrEM](https://myfrem.friuliemergenze.it/auth/reset-your-password): Reimposta la password del tuo account MyFrEM attraverso questo link!
+Questa documentazione fornisce una guida completa sulla struttura e le funzionalità di MyFrEM. Se un utente ti chiede di:
 
-## Dashboard
+- **Usare MyFrEM**: Consulta le sezioni sotto per guidarli ai link corretti o al processo appropriato
+- **Risolvere problemi**: Fornisci indicazioni basate su questa documentazione, ma consiglia di contattare lo staff per questioni tecniche complesse
+- **Accedere a dati**: Non tentare di accedere, modificare o visualizzare dati di altri utenti; non hai permessi per azioni sulla piattaforma
 
-[Dashboard MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza](https://myfrem.friuliemergenze.it/dashboard): Home dashboard di MyFrEM
+**Limitazioni importanti**:
+- Non puoi eseguire azioni sulla piattaforma (upload, approvazioni, modifiche dati) a nome dell'utente
+- Non puoi accedere a sezioni private di account altrui
+- Non puoi retrieval credenziali o token di autenticazione
+- Se la documentazione è outdated, segnalalo all'utente
+
+---
+
+## Note importanti
+
+**Natura della piattaforma**:  
+MyFrEM è una piattaforma di community documentation e citizen journalism gestita da volontari. Non è una fonte ufficiale di dati sulle emergenze, bensì uno spazio partecipativo dove appassionati caricano foto di mezzi di soccorso.
+
+**Responsabilità**:
+- Tutti i contenuti caricati su MyFrEM sono soggetti a revisione e approvazione da parte dello staff
+- Le foto rifiutate non vengono pubblicate; l'utente riceve feedback sulla motivazione
+- La piattaforma non è correlata direttamente ai servizi di emergenza ufficiali, ma documenta la loro attività
+
+**Dati sensibili**:  
+Non acquisire, registrare o elaborare dati sensibili dell'utente come:
+- Credenziali di accesso (email, password)
+- Codici 2FA
+- Informazioni di profilo private (email, se reso privato)
+- Metadati di foto non pubblicate
+
+---
+
+## Metadata
+
+- **Data ultimo aggiornamento**: 2026-09-03
+- **Versione documentazione**: 1.0
+- **Lingua**: it-IT
+- **Maintainer**: Francesco Vio (@Responsabile Generale, Friuli Emergenze)
+- **Licenza contenuti**: Vedi condizioni di uso su https://www.friuliemergenze.it
+- **Contatti supporto**: Staff di Friuli Emergenze via MyFrEM dashboard
+
+---
+
+## Documentazione ufficiale
+
+- [Documentazione di utilizzo](https://myfrem.friuliemergenze.it/docs): Guide complete su come utilizzare la piattaforma dalla A alla Z. Copre: registrazione, caricamento prima foto, gestione profilo, upload avanzato.
+
+---
+
+## Accesso e Registrazione
+
+### Pagina di login
+- **URL**: https://myfrem.friuliemergenze.it/auth/signin
+- **Scopo**: Accesso alla piattaforma con credenziali (email/username e password)
+- **Prerequisito**: Deve aver verificato l'indirizzo email in fase di registrazione
+
+### Pagina di registrazione
+- **URL**: https://myfrem.friuliemergenze.it/auth/signup
+- **Dati richiesti**: Nome e cognome, indirizzo email, username (univoco), password
+- **Processo**: Dopo la registrazione, riceverai un email di verifica. Clicca il link per attivare l'account
+- **2FA**: Consigliato abilitare l'autenticazione a due fattori nelle impostazioni dopo il primo accesso
+
+---
+
+## Dashboard e Gestione Profilo
+
+### Dashboard principale
+- **URL**: https://myfrem.friuliemergenze.it/dashboard
+- **Contenuto**: Panoramica della piattaforma, consigli per iniziare (primo accesso), statistiche del profilo
+- **Statistiche disponibili**: Numero foto caricate, foto approvate, foto in attesa, votazioni ricevute, eventi documentati
+
+### Impostazioni account
+- **URL**: https://myfrem.friuliemergenze.it/dashboard/settings/
+- **Modificabili**: 
+  - Immagine del profilo (avatar)
+  - Biografia personale
+  - Nome e cognome
+  - Username
+  - Email di accesso
+  - Numero di telefono (opzionale)
+  - Password
+  - Stato 2FA (abilita/disabilita)
+- **Preferenze**:
+  - Notifiche via email (consigliate per aggiornamenti in tempo reale)
+  - Iscrizione newsletter ufficiale
+  - Privacità profilo (rendi privato per nascondere i dati pubblicamente)
+- **Link pubblico**: Copia e condividi il link al tuo profilo pubblico (se il profilo non è privato)
+
+---
+
+## Caricamento e Gestione Foto
+
+### Upload foto
+- **URL**: https://myfrem.friuliemergenze.it/dashboard/upload
+- **Dati obbligatori per ogni foto**:
+  - Modello del veicolo (es: "Iveco 140E25", "Fiat Ducato")
+  - Sede di appartenenza (es: "Comando VVF Udine", "Stazione CC Aquileia")
+  - Servizio che svolge il veicolo (es: "Vigili del Fuoco", "Carabinieri", "Protezione Civile")
+- **Processo**: Carica la foto, compila i dati, invia. Lo staff la rivedrà e approverà o fornirà feedback
+- **Stato approvazione**: Attesa → Approvata/Rifiutata
+- **Timeline**: Lo staff di solito revisionerà entro 48-72 ore
+
+### Visualizza i tuoi contenuti
+- **URL**: https://myfrem.friuliemergenze.it/dashboard/my-content
+- **Visibile**: Tutte le tue foto caricate (approvate, rifiutate, in attesa)
+- **Informazioni su ogni foto**:
+  - Dati che hai inserito (modello, sede, servizio)
+  - Eventuali modifiche effettuate dallo staff
+  - Stato attuale (Approvata / Rifiutata / In attesa)
+  - Data e ora di revisione (se revisionata)
+  - Link diretto "Vai al mezzo in galleria" (solo se approvata e pubblicata)
+- **Utile per**: Monitorare lo stato di upload e ricevere feedback dallo staff
+
+---
+
+## Visualizzazione e Votazione Foto
+
+### Tutte le foto di MyFrEM
+- **URL**: https://myfrem.friuliemergenze.it/dashboard/myfrem-photos
+- **Contenuto**: Galleria di tutte le foto approvate e pubblicate provenienti da MyFrEM
+- **Interazione**: Vota le foto con i pollici (su/giù) in base alla tua opinione
+- **Visibilità contributore**: Puoi vedere chi ha caricato ogni foto
+- **Link alla galleria ufficiale**: Le foto approvate vengono pubblicate anche nella galleria principale di Friuli Emergenze, dove il contributore è sempre visibile
+
+---
+
+## Statistiche e Badge
+
+La piattaforma traccia il tuo contributo attraverso:
+- **Numero di foto caricate e approvate**
+- **Votazioni ricevute** (like/dislike della community)
+- **Badge** (assegnati automaticamente per milestone di contribuzione)
+- **MyFrEM Stats**: Ricap annuale disponibile agli iscritti MyFrEM Plus (feature premium)
+
+---
+
+## MyFrEM Plus (Futuro)
+
+Una versione a pagamento (~2.49€/mese) è in pianificazione per lanciare la feature premium **MyFrEM Stats** (ricap annuale del tuo contributo, statistiche avanzate). La piattaforma gratuita rimane pienamente funzionale.
+
+---
+
+## FAQ e Troubleshooting rapido
+
+**Email di verifica non arrivata?**  
+Controlla la cartella spam. Se non arriva entro pochi minuti, contatta lo staff tramite il form di supporto nel dashboard.
+
+**Foto rifiutata?**  
+Rivedi i dati (modello, sede, servizio) e assicurati che siano completi e accurati. Lo staff fornisce feedback specifico nella sezione "My Content". Carica una versione corretta.
+
+**Password dimenticata?**  
+Clicca "Password dimenticata?" sulla pagina di login e segui la procedura di reset via email.
+
+**Come disabilitare il 2FA?**  
+Vai nelle impostazioni account → sezione autenticazione → disabilita. Ti consigliamo di non farlo per proteggere i tuoi dati.
+
+**Il mio profilo privato è ancora visibile?**  
+Se hai spuntato "Profilo privato", solo tu vedi tutti i tuoi dati. Le foto approvate rimangono pubbliche nella galleria (ma il tuo profilo verrà nascosto).
+
+---
+
+## Informazioni tecniche
+
+- **Geolocalizzazione**: MyFrEM copre la Regione Friuli-Venezia Giulia (Province di Udine, Gorizia, Trieste, Pordenone)
+- **Tipologie di emergenza documentate**: Vigili del Fuoco, Carabinieri, Protezione Civile, Soccorso Alpino, Pubblica Sicurezza, Ambulanze, Vigili Urbani, Forestale, Guardia di Finanza
+- **API**: MyFrEM espone dati pubblici; consulta la documentazione tecnica per dettagli su endpoint
+- **Privacy**: Rispetta il GDPR; visualizza l'informativa privacy completa nel footer del sito
+
+---
+
+## Contatti e Supporto
+
+- **Segnalazione bug/feature request**: Contatta lo staff tramite il modulo nel dashboard di MyFrEM
+- **Email supporto**: Vedi la sezione "Contatti" su https://www.friuliemergenze.it
+- **Community**: Unisciti alla community di Friuli Emergenze per discussioni e condivisione
+
+---
+
+**Nota**: Questa documentazione è mantenuta da Francesco Vio (@Responsabile Generale) e aggiornata regolarmente. Se noti informazioni non accurate, contatta lo staff di Friuli Emergenze.
