@@ -14,11 +14,6 @@ const totalUsersEl = document.getElementById("totalUsers");
 const pendingPhotosEl = document.getElementById("pendingPhotos");
 const approvedPhotosEl = document.getElementById("approvedPhotos");
 const rejectedPhotosEl = document.getElementById("rejectedPhotos");
-const totalEventsEl = document.getElementById("totalEvents");
-const pendingEventsEl = document.getElementById("pendingEvents");
-const approvedEventsEl = document.getElementById("approvedEvents");
-const rejectedEventsEl = document.getElementById("rejectedEvents");
-const organizedEventsEl = document.getElementById("organizedEvents");
 const recentActivityListEl = document.getElementById("recentActivityList");
 const recentLoginsListEl = document.getElementById("recentLoginsList");
 const recentPageViewedListEl = document.getElementById("recentViewedPagesList");
@@ -90,30 +85,6 @@ async function loadStats() {
       query(collection(db, "photos"), where("status", "==", "Rifiutata ❌"))
     );
     rejectedPhotosEl.textContent = rejectedSnap.size;
-
-    const eventsSnap = await getDocs(collection(db, "events"));
-    totalEventsEl.textContent = eventsSnap.size;
-
-    const eventsPendingSnap = await getDocs(
-      query(collection(db, "events"), where("status", "==", "In revisione..."))
-    );
-    pendingEventsEl.textContent = eventsPendingSnap.size;
-
-    const eventsApprovedSnap = await getDocs(
-      query(collection(db, "events"), where("status", "==", "Approvato"))
-    );
-    approvedEventsEl.textContent = eventsApprovedSnap.size;
-
-    const eventsRejectedSnap = await getDocs(
-      query(collection(db, "events"), where("status", "==", "Rifiutato"))
-    );
-    rejectedEventsEl.textContent = eventsRejectedSnap.size;
-
-    const eventsOrganizedSnap = await getDocs(
-      query(collection(db, "events"), where("status", "==", "Organizzato"))
-    );
-
-    organizedEventsEl.textContent = eventsOrganizedSnap.size;
 
     const activitiesSnap = await getDocs(collection(db, "activities"));
     recentActivityListEl.innerHTML = "";

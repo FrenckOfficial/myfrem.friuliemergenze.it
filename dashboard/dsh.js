@@ -16,11 +16,6 @@ const pendingPhotosEl = document.getElementById("pendingPhotos");
 const rejectedPhotosEl = document.getElementById("rejectedPhotos");
 const eventsListEl = document.getElementById("eventsList");
 const activityListEl = document.getElementById("activityList");
-const totalEventsEl = document.getElementById("totalEvents");
-const approvedEventsEl = document.getElementById("approvedEvents");
-const pendingEventsEl = document.getElementById("pendingEvents");
-const rejectedEventsEl = document.getElementById("rejectedEvents");
-const organizedEventsEl = document.getElementById("organizedEvents");
 const newsBannerEl = document.getElementById("newsBanner");
 const newsletterBtn = document.getElementById("newsletterBtn");
 const statusMsg = document.getElementById("statusMsg");
@@ -215,18 +210,21 @@ auth.onAuthStateChanged(async (user) => {
 
     photosSnap.forEach((doc) => {
       const photo = doc.data();
+      let status;
       console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
-      if (photo.status === "Approvata ✅" || photo.status === "Approvata")
-        approved++;
-      if (
-        photo.status === "Foto in attesa di approvazione" ||
-        photo.status === "Foto in attesa di approvazione ⌛"
-      )
-        pending++;
-      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata")
-        rejected++;
+      if (photo.status === "Approvata ✅" || photo.status === "Approvata") approved++;
+      if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") pending++;
+      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") rejected++;
+
+      if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
+        status = "Approvata";
+      } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
+        status = "In attesa";
+      } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
+        status = "Rifiutata";
+      }
 
       if (displayCount < 5) {
         const li = document.createElement("li");
@@ -248,64 +246,6 @@ auth.onAuthStateChanged(async (user) => {
     if (total === 0) {
       activityListEl.innerHTML = "<li>Nessuna attività recente.</li>";
     }
-
-    const eventsSnap = await db
-      .collection("events")
-      .orderBy("createdAt", "desc")
-      .limit(5)
-      .get();
-
-    eventsSnap.forEach((doc) => {
-      const event = doc.data();
-      if (event.status === "Organizzato" && event.showInDash === true) {
-        let eventHTML = `
-          <div class="event-card">
-            <h3>${event.title}</h3>
-            <p>Data e ora: ${event.date || "Data e/o ora sconosciute"}  ${event.time || ""}</p>
-            <p>Luogo: ${event.location || "Luogo sconosciuto"}</p>
-        `;
-
-        if (isReadOnlyMode) {
-          eventHTML += `<button class="btn" disabled title="Modalità sola lettura">Iscriviti (Non disponibile)</button>`;
-        } else {
-          eventHTML += `<a href="/events/join/?event=${doc.id}" class="btn" target="_blank">Iscriviti</a>`;
-        }
-
-        eventHTML += `</div>`;
-        eventsListEl.innerHTML += eventHTML;
-      }
-    });
-
-    const eventsUserSnap = await db
-      .collection("events")
-      .where("userId", "==", userData.name + " " + userData.surname)
-      .orderBy("createdAt", "desc")
-      .limit(5)
-      .get();
-
-    let totalE = 0,
-      approvedE = 0,
-      pendingE = 0,
-      rejectedE = 0,
-      organizedE = 0;
-
-    eventsUserSnap.forEach((doc) => {
-      const event = doc.data();
-      totalE++;
-
-      if (event.status === "Approvato") approvedE++;
-      if (event.status === "In revisione...") pendingE++;
-      if (event.status === "Rifiutato") rejectedE++;
-      if (event.status === "Organizzato") organizedE++;
-    });
-
-    totalEventsEl.textContent = totalE;
-    approvedEventsEl.textContent = approvedE;
-    pendingEventsEl.textContent = pendingE;
-    rejectedEventsEl.textContent = rejectedE;
-    organizedEventsEl.textContent = organizedE;
-
-    const name = userData.name;
 
     if (isReadOnlyMode) {
       newsletterBtn.disabled = true;
@@ -457,7 +397,7 @@ function setStatus(message, type = "info") {
   };
 }
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+logoutBtn.addEventListener("click", async () => {
   console.log("🚪 Logout in corso...");
   await auth.signOut();
   console.log("✅ Logout completato, redirect...");
