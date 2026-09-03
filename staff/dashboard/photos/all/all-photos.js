@@ -233,6 +233,8 @@ async function loadAllPhotos() {
         serviceType = "Automezzo adibito a trasporti secondari";
       } else if (photo.serviceType === "pompieri") {
         serviceType = "Vigili del Fuoco";
+      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
+        serviceType = "Vigili del Fuoco";
       } else if (photo.serviceType === "guardia-costiera") {
         serviceType = "Guardia Costiera";
       } else if (photo.serviceType === "protezione-civile") {
