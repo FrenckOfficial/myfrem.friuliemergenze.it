@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const r2 = new S3Client({
   region: "auto",
@@ -10,11 +11,12 @@ const r2 = new S3Client({
 });
 
 const domainMap = {
-  "myfrem-staff-docs": "https://staffdocs.cdn.friuliemergenze.it",
   "myfrem-photos": "https://cdn.friuliemergenze.it",
   "myfrem-reports": "https://rpt.cdn.friuliemergenze.it",
   "profile-pics": "https://profilepics.cdn.friuliemergenze.it",
 };
+
+const ALLOWED_BUCKETS = Object.keys(domainMap).concat("myfrem-staff-docs");
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -22,33 +24,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { fileBuffer, fileName, uid, bucket, contentType } = req.body;
+    const { fileName, uid, bucket, contentType } = req.body;
 
-    if (!fileBuffer || !fileName || !uid || !bucket) {
+    if (!fileName || !uid || !bucket) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const filePath = `${uid}/${fileName}`;
+    if (!ALLOWED_BUCKETS.includes(bucket)) {
+      return res.status(400).json({ error: "Bucket non valido" });
+    }
 
-    const buffer = Buffer.isBuffer(fileBuffer)
-      ? fileBuffer
-      : Buffer.from(fileBuffer, "base64");
+    const filePath = `${uid}/${Date.now()}-${fileName}`;
 
     const command = new PutObjectCommand({
       Bucket: bucket,
       Key: filePath,
-      Body: buffer,
       ContentType: contentType || "application/octet-stream",
     });
 
-    await r2.send(command);
+    const uploadUrl = await getSignedUrl(r2, command, { expiresIn: 300 });
 
     const domain = domainMap[bucket];
-    const imageUrl = `${domain}/${filePath}`;
+    const publicUrl = domain ? `${domain}/${filePath}` : null;
 
-    return res.status(200).json({ url: imageUrl, success: true });
+    return res.status(200).json({ uploadUrl, publicUrl, success: true });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Upload URL error:", error);
     return res.status(500).json({ error: error.message });
   }
 }
