@@ -120,7 +120,7 @@ async function loadPendingPhotos() {
         serviceType = "Emergenza Sanitaria";
       } else if (photo.serviceType === "trasporti-secondari") {
         serviceType = "Automezzo adibito a trasporti secondari";
-      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
+      } else if (photo.serviceType === "pompieri") {
         serviceType = "Vigili del Fuoco";
       } else if (photo.serviceType === "guardia-costiera") {
         serviceType = "Guardia Costiera";
