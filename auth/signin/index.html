@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
   <script>
@@ -98,8 +100,8 @@
 
     </div>
 
-    <div id="chooseDashboardModal" class="modal">
-      <div class="modal-content">
+    <div id="chooseDashboardModal" class="modal" style="display:none;">
+      <div class="modal-content choose-dashboard">
         <span class="close" id="closeChooseDashboardModal">&times;</span>
         <h2>Scegli la dashboard</h2>
         <p>Seleziona la dashboard alla quale vuoi accedere:</p>
@@ -110,7 +112,7 @@
       </div>
     </div>
 
-    <div id="twofa-login-modal" class="modal">
+    <div id="twofa-login-modal" class="modal" style="display:none;">
       <div class="modal-content">
         <span class="close" id="closeTwoFALoginModal">&times;</span>
         <h2>Verifica in due passaggi</h2>

@@ -15,6 +15,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { firebaseConfig } from '/configFirebase.js';
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -22,7 +23,6 @@ const auth = getAuth(app);
 const logoutBtn = document.getElementById('logoutBtn');
 const modalClose = document.querySelector('.modal-close');
 const btnCancel = document.querySelector('.btn-cancel');
-const statusMsg = document.getElementById('statusMsg');
 const loadingEl = document.querySelector('.loading');
 const contentEl = document.querySelector('.content');
 

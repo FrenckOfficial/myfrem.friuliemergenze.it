@@ -3,6 +3,7 @@ import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, query, where,
 import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { uploadFile } from "/helpers/uploadFile.js";
 import { firebaseConfig } from "../../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -55,17 +56,6 @@ emailjs.init("49-8564mCPRVWNmBW");
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
-
-async function getIpAddress() {
-  try {
-    const response = await fetch("https://api.ipify.org?format=json");
-    const data = await response.json();
-    return data.ip;
-  } catch (error) {
-    console.error("Errore nel recupero IP:", error);
-    return "Non disponibile";
-  }
-}
 
 onAuthStateChanged(auth, async user => {
   if (!user) {
@@ -184,7 +174,6 @@ function disableAllButtons() {
   profilePicInput.disabled = true;
   deleteProfPicBtn.disabled = true;
 
-  // Disabilita anche i controlli 2FA in modalità sola lettura
   ["enable-twofa-btn", "disable-twofa-btn", "regenerate-recovery-btn"].forEach(id => {
     const btn = document.getElementById(id);
     if (btn) {
@@ -200,15 +189,15 @@ profilePicForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (isReadOnlyMode) {
-    setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Non puoi modificare in modalità sola lettura", "error");
+    setStatus("Non puoi modificare in modalità sola lettura", "error");
     return;
   }
 
   const file = profilePicInput.files[0];
-  if (!file) return setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Seleziona un'immagine!", "error");
+  if (!file) return setStatus("Seleziona un'immagine!", "error");
 
   if (!file.type.startsWith("image/")) {
-    return setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Solo immagini!", "error");
+    return setStatus("Solo immagini!", "error");
   }
 
   try {
@@ -220,10 +209,10 @@ profilePicForm.addEventListener("submit", async (e) => {
 
     profilePreview.src = imageUrl;
 
-    setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", "Foto profilo aggiornata!", "success");
+    setStatus("Foto profilo aggiornata!", "success");
   } catch (err) {
     console.error(err);
-    setStatus("closePfpStatus", "pfpStatusBox", "pfpStatus", `${"Errore upload: " + err.message}`, "error");
+    setStatus(`${"Errore upload: " + err.message}`, "error");
   }
 });
 
@@ -234,39 +223,39 @@ copyProfileLinkBtn.addEventListener("click", () => {
 })
 
 saveFullNameBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const newName = nameInput.value.trim();
   const newSurname = surnameInput.value.trim();
-  if (newName.length < 3) return setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "Minimo 3 caratteri!", "error");
-  if (newSurname.length < 3) return setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "Minimo 3 caratteri!", "error");
+  if (newName.length < 3) return setStatus("Minimo 3 caratteri!", "error");
+  if (newSurname.length < 3) return setStatus("Minimo 3 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     name: newName,
     surname: newSurname,
   });
 
-  setStatus("closeFNStatus", "fullNameStatusBox", "fullNameStatus", "Nome e cognome aggiornati!", "success");
+  setStatus("Nome e cognome aggiornati!", "success");
 });
 
 saveUsernameBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const newUsername = usernameInput.value.trim();
-  if (newUsername.length < 3) return setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "Minimo 3 caratteri!", "error");
+  if (newUsername.length < 3) return setStatus("Minimo 3 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     username: newUsername
   });
 
-  setStatus("closeUserStatus", "usernameStatusBox", "usernameStatus", "Username aggiornato!", "success");
+  setStatus("Username aggiornato!", "success");
 });
 
 saveMailBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const newMail = mailInput.value.trim();
-  if (newMail.length < 5 || !newMail.includes("@")) return setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "Inserisci una mail valida!", "error");
+  if (newMail.length < 5 || !newMail.includes("@")) return setStatus("Inserisci una mail valida!", "error");
 
   await updateEmail(currentUser, newMail)
 
@@ -274,37 +263,37 @@ saveMailBtn.addEventListener("click", async () => {
     email: newMail
   });
 
-  setStatus("closeMailStatus", "mailStatusBox", "mailStatus", "E-Mail aggiornata!", "success");
+  setStatus("E-Mail aggiornata!", "success");
 });
 
 savePhoneBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const newPhone = phoneInput.value.trim();
-  if (newPhone.length < 10) return setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Inserisci un numero valido!", "error");
+  if (newPhone.length < 10) return setStatus("Inserisci un numero valido!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     phone: newPhone
   });
 
-  setStatus("closePhoneStatus", "phoneStatusBox", "phoneStatus", "Numero di telefono aggiornato!", "success");
+  setStatus("Numero di telefono aggiornato!", "success");
 });
 
 saveBioBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const newBio = bioInput.value.trim();
-  if (newBio.length > 150) return setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Massimo 150 caratteri!", "error");
+  if (newBio.length > 150) return setStatus("Massimo 150 caratteri!", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     bio: newBio
   });
 
-  setStatus("closeBioStatus", "bioStatusBox", "bioStatus", "Bio aggiornata!", "success");
+  setStatus("Biografia aggiornata!", "success");
 });
 
 savePasswordBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   const passwordInput = document.getElementById("passwordInput");
   const passwordRepeatInput = document.getElementById("passwordRepeatInput");
@@ -314,26 +303,26 @@ savePasswordBtn.addEventListener("click", async () => {
   const newPassword = passwordInput.value.trim();
   const newPasswordRepeat = passwordRepeatInput.value.trim();
 
-  if (!currentPassword) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Inserisci la password attuale!", "error");
-  if (newPassword.length < 6) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password: minimo 6 caratteri!", "error");
-  if (newPassword !== newPasswordRepeat) return setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Le password non corrispondono!", "error");
+  if (!currentPassword) return setStatus("Inserisci la password attuale!", "error");
+  if (newPassword.length < 6) return setStatus("Password: minimo 6 caratteri!", "error");
+  if (newPassword !== newPasswordRepeat) return setStatus("Le password non corrispondono!", "error");
 
   try {
     const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
     await reauthenticateWithCredential(currentUser, credential);
     await updatePassword(currentUser, newPassword);
 
-    setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password aggiornata!", "success");
+    setStatus("Password aggiornata!", "success");
     currentPasswordInput.value = "";
     passwordInput.value = "";
     passwordRepeatInput.value = "";
   } catch (err) {
-    setStatus("closePasswordStatus", "passwordStatusBox", "passwordStatus", "Password attuale non corretta!", "error");
+    setStatus("Password attuale non corretta!", "error");
   }
 });
 
 savePreferencesBtn.addEventListener("click", async () => {
-  if (isReadOnlyMode) return setStatus("closePreferencesStatus", "preferencesStatusBox", "preferencesStatus", "Non puoi modificare in modalità sola lettura", "error");
+  if (isReadOnlyMode) return setStatus("Non puoi modificare in modalità sola lettura", "error");
 
   await updateDoc(doc(db, "users", currentUserId), {
     emailNotifications: emailNotificationsCheckbox.checked,
@@ -341,7 +330,7 @@ savePreferencesBtn.addEventListener("click", async () => {
     publicProfile: publicProfileCheckbox.checked
   });
 
-  setStatus("closePreferencesStatus", "preferencesStatusBox", "preferencesStatus", "Preferenze aggiornate!", "success");
+  setStatus("Preferenze aggiornate!", "success");
 });
 
 async function loadPreferences() {
@@ -374,7 +363,7 @@ async function loadUserBadgesSettings() {
     if (saveBadgeVisibilityBtn) {
       saveBadgeVisibilityBtn.addEventListener("click", async () => {
         if (isReadOnlyMode) {
-          setStatus("closeBadgeVisibilityStatus", "badgeVisibilityStatusBox", "badgeVisibilityStatus", "Non puoi modificare in modalità sola lettura", "error");
+          setStatus("Non puoi modificare in modalità sola lettura", "error");
           return;
         }
 
@@ -382,7 +371,7 @@ async function loadUserBadgesSettings() {
           badgeVisibility: badgeVisibilityCheckbox.checked
         });
 
-        setStatus("closeBadgeVisibilityStatus", "badgeVisibilityStatusBox", "badgeVisibilityStatus", "Visibilità badge aggiornata!", "success");
+        setStatus("Visibilità badge aggiornata!", "success");
       });
     }
   } catch (err) {
@@ -656,18 +645,6 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
     current,
     target: threshold,
     percentage: Math.floor((current / threshold) * 100)
-  };
-}
-
-function setStatus(closeBox, statusBox, statusMsg, message, type = "info") {
-  const classNameBox = document.querySelector(`${"." + statusBox}`);
-  if (!statusMsg) return;
-  document.getElementById(`${statusMsg}`).textContent = message;
-  classNameBox.className = `${"statusBox" + " " + statusBox + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById(closeBox);
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   };
 }
 

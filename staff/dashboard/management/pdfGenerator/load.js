@@ -10,13 +10,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const tableBody = document.getElementById("documentsTableBody");
-const statusMsg = document.getElementById("statusMsg");
-
 console.log("📄 Loading generated documents...");
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -98,16 +97,5 @@ document.addEventListener("click", async (e) => {
     }
   }
 });
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
-}
 
 loadDocuments();

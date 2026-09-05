@@ -374,6 +374,23 @@ h3 {
   color: var(--text);
 }
 
+.card-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card-clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+#statsModalList li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+#statsModalList li:last-child {
+  border-bottom: none;
+}
+
 .card {
   background: var(--bg-panel);
   padding: var(--space-lg);
@@ -1443,6 +1460,36 @@ form button {
   font-weight: 600;
   min-width: 16px;
   text-align: center;
+}
+
+.vote-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+ 
+.vote-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: #7a8fa6;
+  font-weight: 500;
+}
+ 
+.vote-count i {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+ 
+.vote-count:first-child i {
+  color: #00d4e8;
+}
+ 
+.vote-count:last-child i {
+  color: #e84855;
 }
 
 .first-access-modal {

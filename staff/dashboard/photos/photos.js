@@ -3,13 +3,13 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 const photosTableBody = document.getElementById("photosTableBody");
-const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
 const viewAllPhotos = document.getElementById("viewAllPhotos");
 const draftBtnCreate = document.getElementById("draft-btn-create");
@@ -39,17 +39,6 @@ logoutBtn.addEventListener("click", async () => {
 viewAllPhotos.addEventListener("click", () => {
   window.location.href = "/staff/dashboard/photos/all";
 });
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
-}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {

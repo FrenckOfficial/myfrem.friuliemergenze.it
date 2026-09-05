@@ -18,6 +18,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -45,8 +46,6 @@ const reportId = urlParams.get("id");
 
 const reportDetails = document.getElementById("reportDetails");
 const notesContainer = document.getElementById("notesContainer");
-const statusMsg = document.getElementById("statusMsg");
-
 async function loadReport() {
     const ref = doc(db, "expulsionReports", reportId);
     const snap = await getDoc(ref);
@@ -113,15 +112,5 @@ document.getElementById("addNoteForm").addEventListener("submit", async (e) => {
         setStatus("Errore durante l'aggiunta della nota. Riprova.", "error");
     }
 });
-
-function setStatus(msg, type = "info") {
-    statusMsg.textContent = msg;
-    statusMsg.className = `${"statusBox" + " " + type}`;
-    statusMsg.style.display = "block";
-    const closeBtn = document.getElementById("closeSMsg");
-    closeBtn.onclick = () => {
-        statusMsg.style.display = "none";
-    };
-}
 
 loadReport();

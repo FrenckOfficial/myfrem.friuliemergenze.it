@@ -147,13 +147,20 @@ async function initWhatsNewCarousel() {
   try {
     const userRef = doc(db, 'users', currentUser.uid);
     const userDoc = await getDoc(userRef);
-    
+
     if (!userDoc.exists()) {
       console.log('User doc not found');
       return;
     }
 
-    const hasViewed = userDoc.data()?.whatsNewViewed;
+    const userData = userDoc.data();
+    
+    if (userData?.firstAccess === true) {
+      console.log('Primo accesso in corso: rimando il What\'s New');
+      return;
+    }
+
+    const hasViewed = userData?.whatsNewViewed;
 
     if (!hasViewed) {
       console.log('Showing What\'s New carousel');

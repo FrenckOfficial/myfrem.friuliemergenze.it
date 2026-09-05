@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -9,7 +10,6 @@ const userSelect = document.getElementById("userSelect");
 const userNumber = document.getElementById("userNumber");
 const permissionType = document.getElementById("permissionType");
 const notes = document.getElementById("notes");
-const statusMsg = document.getElementById("statusMsg");
 const form = document.getElementById("expulsionReportForm");
 
 let usersMap = {};
@@ -99,16 +99,5 @@ form.addEventListener("submit", async (e) => {
     setStatus("Errore durante il salvataggio", "error");
   }
 });
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
-}
 
 loadUsers();

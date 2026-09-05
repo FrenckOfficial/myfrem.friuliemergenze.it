@@ -17,6 +17,7 @@ import {
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -24,8 +25,6 @@ const db = getFirestore(app);
 
 const recentActivityListEl = document.getElementById("activitiesList");
 const logoutBtn = document.getElementById("logoutBtn");
-const statusMsg = document.getElementById("statusMsg");
-
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
@@ -97,16 +96,5 @@ async function loadStats() {
 
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
-  }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   }
 }

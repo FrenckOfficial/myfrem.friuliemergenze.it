@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
   <script>
@@ -78,19 +80,19 @@
       </section>
 
       <section class="cards">
-        <div class="card">
+        <div class="card card-clickable" data-filter="all">
           <h3>Foto caricate</h3>
           <p id="totalPhotos">0</p>
         </div>
-        <div class="card">
+        <div class="card card-clickable" data-filter="approved">
           <h3>Foto approvate</h3>
           <p id="approvedPhotos">0</p>
         </div>
-        <div class="card">
+        <div class="card card-clickable" data-filter="pending">
           <h3>In attesa</h3>
           <p id="pendingPhotos">0</p>
         </div>
-        <div class="card">
+        <div class="card card-clickable" data-filter="rejected">
           <h3>Foto rifiutate</h3>
           <p id="rejectedPhotos">0</p>
         </div>
@@ -110,6 +112,25 @@
         </ul>
       </section>
     </main>
+  </div>
+
+  <div id="statsModal" class="first-access-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-step active">
+        <div class="modal-header">
+          <h2 id="statsModalTitle">Foto</h2>
+        </div>
+        <div class="modal-content">
+          <ul id="statsModalList" style="list-style:none; padding:0; max-height:400px; overflow-y:auto;">
+            <!-- popolato via JS -->
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal btn-finish" id="closeStatsModalBtn">Chiudi</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="firstAccessModal" class="first-access-modal">

@@ -12,6 +12,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 import { firebaseConfig } from "/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -19,7 +20,6 @@ const db = getFirestore(app);
 
 const surveyList = document.getElementById("surveyTableBody");
 const logoutBtn = document.getElementById("logoutBtn");
-const statusMsg = document.getElementById("statusMsg");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
@@ -98,15 +98,5 @@ async function loadSurveys() {
         console.log("Surveys loaded.");
     } catch (error) {
         console.error("Error loading surveys:", error);
-    }
-}
-
-function setStatus(message, type = "info") {
-    statusMsg.textContent = message;
-    statusMsg.className = `${"statusBox" + " " + type}`;
-    statusMsg.style.display = "block";
-    const closeBtn = document.getElementById("closeSMsg");
-    closeBtn.onclick = () => {
-        statusMsg.style.display = "none";
     }
 }

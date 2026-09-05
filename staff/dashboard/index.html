@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
   <script>
@@ -63,14 +65,18 @@
           <p>Utenti registrati</p>
         </div>
         <div class="stat-box">
+          <h2 id="totalPhotos">0</h2>
+          <p>Foto totali</p>
+        </div>
+        <div class="stat-box stat-box-clickable" data-filter="pending">
           <h2 id="pendingPhotos">0</h2>
           <p>Foto in attesa</p>
         </div>
-        <div class="stat-box">
+        <div class="stat-box stat-box-clickable" data-filter="approved">
           <h2 id="approvedPhotos">0</h2>
           <p>Foto approvate</p>
         </div>
-        <div class="stat-box">
+        <div class="stat-box stat-box-clickable" data-filter="rejected">
           <h2 id="rejectedPhotos">0</h2>
           <p>Foto rifiutate</p>
         </div>
@@ -92,7 +98,22 @@
       </div>
     </div>
   </div>
-    <script>
+  <div id="staffStatsModal" class="first-access-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-step active">
+        <div class="modal-header">
+          <h2 id="staffStatsModalTitle">Dettagli</h2>
+        </div>
+        <div class="modal-content">
+          <ul id="staffStatsModalList" style="list-style:none; padding:0; max-height:400px; overflow-y:auto;">
+            <!-- popolato via JS -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
     (function() {
       const menuToggle = document.querySelector('.menu-toggle');
       const sidebar = document.querySelector('.sidebar');

@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
+
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -17,7 +19,6 @@ const criteriaTypeInput = document.getElementById("criteriaType");
 const criteriaThresholdInput = document.getElementById("criteriaThreshold");
 const badgeEnabledInput = document.getElementById("badgeEnabled");
 const thresholdHint = document.getElementById("thresholdHint");
-const statusMsg = document.getElementById("statusMsg");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -289,16 +290,5 @@ async function toggleBadge(badgeId, currentEnabled) {
   } catch (err) {
     console.error("Errore toggle:", err);
     setStatus(`❌ Errore: ${err.message}`, "error");
-  }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   }
 }

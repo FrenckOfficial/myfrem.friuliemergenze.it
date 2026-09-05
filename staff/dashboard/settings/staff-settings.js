@@ -3,11 +3,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { uploadFile } from "/helpers/uploadFile.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -125,7 +125,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
   const confirm = document.getElementById("confirmPassword").value;
 
   if (newP !== confirm) {
-    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", "Le nuove password non corrispondono.", "error");
+    setStatus("Le nuove password non corrispondono.", "error");
     return;
   }
 
@@ -137,11 +137,11 @@ changePasswordForm.addEventListener("submit", async (e) => {
 
     await updatePassword(user, newP);
 
-    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", "Password aggiornata con successo!", "success");
+    setStatus("Password aggiornata con successo!", "success");
 
     changePasswordForm.reset();
   } catch (err) {
-    setStatus("closePswMsg", "passwordStatusBox", "passwordStatusMsg", `Errore aggiornamento password: ${err.message}`, "error");
+    setStatus(`Errore aggiornamento password: ${err.message}`, "error");
   }
 });
 
@@ -153,7 +153,7 @@ saveBioBtn.addEventListener("click", async () => {
   });
 
   bioText.textContent = newBio;
-  setStatus("closeBioMsg", "bioStatusBox", "bioStatus", "Biografia aggiornata!", "success");
+  setStatus("Biografia aggiornata!", "success");
 });
 
 profilePicForm.addEventListener("submit", async (e) => {
@@ -167,10 +167,8 @@ profilePicForm.addEventListener("submit", async (e) => {
   }
 
   const fileExt = file.name.split(".").pop();
-  const filePath = `${currentUserId}/avatar.${fileExt}`;
 
   try {
-    const fileBuffer = await file.arrayBuffer();
 
     const imageUrl = await uploadFile(file, "profile-pics", currentUserId);
 
@@ -180,10 +178,10 @@ profilePicForm.addEventListener("submit", async (e) => {
 
     profilePreview.src = imageUrl;
 
-    setStatus("closePfpMsg", "pfpStatusBox", "pfpStatus", "Foto profilo aggiornata!", "success");
+    setStatus("Foto profilo aggiornata!", "success");
   } catch (err) {
     console.error(err);
-    setStatus("pfpStatus", `${"Errore upload: " + err.message}`, "error");
+    setStatus(`${"Errore upload: " + err.message}`, "error");
   }
 });
 
@@ -194,15 +192,3 @@ deleteProfPicBtn.addEventListener("click", async (e) => {
     photoURL: "https://myfrem.friuliemergenze.it/assets/profile/defpic.png"
   });
 });
-
-function setStatus(closeBox,statusBox, statusMsg, message, type = "info") {
-  const classNameBox = document.querySelector(`${"." + statusBox}`);
-  if (!statusMsg) return;
-  document.getElementById(`${statusMsg}`).textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById(closeBox);
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  };
-}

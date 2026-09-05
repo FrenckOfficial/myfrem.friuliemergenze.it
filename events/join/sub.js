@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -8,8 +9,6 @@ const db = getFirestore(app);
 const eventsList = document.getElementById("eventsList");
 const titleEvent = document.getElementById("titleEvent");
 const eventIdh = document.getElementById("eventId");
-const statusMsg = document.getElementById("statusMsg");
-
 const idParam = new URLSearchParams(window.location.search);
 const eventId = idParam.get("event");
 
@@ -137,11 +136,6 @@ async function loadPublicEvent() {
     eventsList.innerHTML = "<p class='error'>❌ Errore durante il caricamento dell'evento.</p>";
     console.error(err);
   }
-}
-
-function setStatus(message, type = "info") {
-  statusMsg.textContent = message;
-  statusMsg.className = `show ${type}`;
 }
 
 loadPublicEvent();

@@ -3,29 +3,15 @@ import {
   getAuth,
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs,
-  getDoc,
-  doc,
-  setDoc,
-  deleteDoc,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, getDocs, getDoc, doc, setDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 const photosContainer = document.getElementById("photosContainer");
-const statusMsg = document.getElementById("statusMsg");
-
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
@@ -134,7 +120,7 @@ async function loadAllPhotos() {
       }
 
       const service = getServiceLabel(data.serviceType);
-      
+
       let userName = data.userId;
       const userDocSnap = await getDoc(doc(db, "users", userName));
       if (userDocSnap.exists()) {
@@ -204,8 +190,11 @@ async function loadAllPhotos() {
 
       updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
 
+      // Passiamo sempre (likeBtn, dislikeBtn) nello stesso ordine,
+      // indipendentemente da quale sia stato cliccato, per evitare
+      // che updateVoteButtonStates riceva i bottoni scambiati.
       likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
-      dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", dislikeBtn, likeBtn));
+      dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", likeBtn, dislikeBtn));
     });
 
     console.log(`Caricate ${snapshot.size} foto`);
@@ -253,20 +242,23 @@ async function getUserVote(photoId) {
   }
 }
 
-async function handleVote(photoId, voteType, clickedBtn, otherBtn) {
+// likeBtnEl e dislikeBtnEl sono sempre i bottoni reali like/dislike
+// della card corrente, non "cliccato/altro": in questo modo
+// updateVoteButtonStates riceve sempre i parametri nell'ordine corretto.
+async function handleVote(photoId, voteType, likeBtnEl, dislikeBtnEl) {
   try {
     const voteRef = doc(db, "photos", photoId, "votes", currentUserId);
     const currentVote = await getUserVote(photoId);
 
     if (currentVote === voteType) {
       await deleteDoc(voteRef);
-      updateVoteButtonStates(null, null, null);
+      updateVoteButtonStates(likeBtnEl, dislikeBtnEl, null);
     } else {
-      await setDoc(voteRef, { 
+      await setDoc(voteRef, {
         voteType,
         createdAt: serverTimestamp()
       });
-      updateVoteButtonStates(clickedBtn, otherBtn, voteType);
+      updateVoteButtonStates(likeBtnEl, dislikeBtnEl, voteType);
     }
 
     const voteCounts = await getVoteCounts(photoId);
@@ -347,16 +339,5 @@ function getServiceLabel(service) {
 
     default:
       return service || "N/A";
-  }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   }
 }

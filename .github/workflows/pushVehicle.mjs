@@ -1,7 +1,5 @@
 import admin from "firebase-admin";
 import { Octokit } from "@octokit/rest";
-import fs from "fs";
-import path from "path";
 
 process.on("uncaughtException", (err) => {
   console.error("UNCAUGHT EXCEPTION:", err);
@@ -72,27 +70,18 @@ async function pushVehicleToGithub() {
 
   console.log("✅ Bozza caricata:", draft.fileName);
 
+  const stafferId = draft.updatedBy || draft.createdBy || "github-action";
   const fileName = draft.fileName.replace(/\.[^.]+$/, "");
   const vehicleData = draft.data || {};
   const sourcePhotoId = draft.sourcePhotoId || "";
   const slug = draft.slug || fileName;
+  const photoUrl = draft.photoUrl || "";
 
-  await updateGalleryJson(
-    fileName,
-    vehicleData,
-    slug,
-    draft.photoUrl
-  );
+  await updateGalleryJson(fileName, vehicleData, slug, photoUrl);
 
   console.log("✅ gallery.json aggiornato");
 
-  await createVehicleDetailsPage(
-    fileName,
-    vehicleData,
-    sourcePhotoId,
-    slug,
-    draft.photoUrl
-  );
+  await createVehicleDetailsPage(stafferId, fileName, vehicleData, sourcePhotoId, slug, photoUrl);
 
   console.log("✅ Pagina HTML creata");
 
@@ -114,12 +103,7 @@ async function pushVehicleToGithub() {
   console.log("🎉 Pubblicazione completata");
 }
 
-async function updateGalleryJson(
-  fileName,
-  vehicleData,
-  slug,
-  photoUrl
-) {
+async function updateGalleryJson(vehicleData, slug, photoUrl) {
   console.log("📖 Lettura gallery.json");
 
   const response =
@@ -141,10 +125,6 @@ async function updateGalleryJson(
   }
 
   const service = getServiceLabel(vehicleData.service);
-
-  const imageName = photoUrl
-    ? photoUrl.split("/").pop()
-    : "";
 
   const vehicle = {
     title: vehicleData.title || "",
@@ -178,21 +158,8 @@ async function updateGalleryJson(
   });
 }
 
-async function createVehicleDetailsPage(
-  fileName,
-  vehicleData,
-  sourcePhotoId,
-  slug,
-  photoUrl
-) {
-  const html =
-    await generateVehicleHtml(
-      vehicleData,
-      fileName,
-      sourcePhotoId,
-      slug,
-      photoUrl
-    );
+async function createVehicleDetailsPage(staffId, vehicleData, sourcePhotoId, slug, photoUrl) {
+  const html = await generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, photoUrl);
 
   try {
     const existing =
@@ -262,8 +229,7 @@ function getServiceLabel(service) {
   }
 }
 
-async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, photoUrl) {
-  const imageFileName = vehicleData.imageFileName || `${fileName}.jpg`;
+async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, photoUrl) {
   const pageUrl = `https://friuliemergenze.it/gallery/scheda/${slug}`;
   const service = getServiceLabel(vehicleData.service);
   const imageDoc = await db.collection("photos").doc(sourcePhotoId).get();
@@ -273,9 +239,21 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
   const userData = userDoc.data();
   const author = userData.name + " " + userData.surname || "Utente sconosciuto";
 
+  imageDoc.ref.update({
+    vehicleModel: vehicleData.title,
+    sponsor: vehicleData.builder,
+    licensePlate: vehicleData.plate,
+    service: vehicleData.service,
+    headquarters: vehicleData.location,
+    updater: staffId,
+    updatedAt: admin.firestore.Timestamp.now(),
+  })
+
   return `<!doctype html>
 <html lang="it">
   <head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
     <script src="https://embeds.iubenda.com/widgets/46908651-d6da-462f-b037-e6ef97c84795.js"><\/script>
     <script src="/heading.js"><\/script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -385,7 +363,7 @@ async function generateVehicleHtml(vehicleData, fileName, sourcePhotoId, slug, p
           <p class="footer-links">
             <a href="https://myfrem.friuliemergenze.it/" target="_blank" id="linkFooterBtn">MyFrEM<\/a>
             <span>·<\/span>
-            <a href="/chi-sono" target="_blank" id="linkFooterBtn">Chi sono<\/a>
+            <a href="/mappa-del-sito" target="_blank" id="linkFooterBtn">Mappa del sito<\/a>
             <span>·<\/span>
             <a href="/contact-us" target="_blank" id="linkFooterBtn">Contatti<\/a>
           <\/p>

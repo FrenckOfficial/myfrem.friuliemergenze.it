@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
 import { firebaseConfig } from "../../../../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -50,8 +50,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 const reunionForm = document.getElementById("reunionReportForm");
-const statusMsg = document.getElementById("statusMsg");
-
 reunionForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 

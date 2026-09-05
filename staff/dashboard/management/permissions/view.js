@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -116,8 +118,7 @@ async function deleteFromDatabase(userId) {
 };
 
 function setStatus(message, type = "info") {
-  const statusMsg = document.getElementById("statusMsg");
-  statusMsg.textContent = message;
+    statusMsg.textContent = message;
   statusMsg.className = `${"statusBox" + " " + type}`;
   statusMsg.style.display = "block";
   const closeBtn = document.getElementById("closeSMsg");

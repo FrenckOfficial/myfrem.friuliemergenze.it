@@ -13,6 +13,7 @@ import {
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -24,7 +25,6 @@ const photo = document.getElementById("image");
 const content = document.getElementById("content");
 const link = document.getElementById("link");
 
-const statusMsg = document.getElementById("statusMsg");
 const preview   = document.getElementById("emailPreview");
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
@@ -69,7 +69,6 @@ async function autosave() {
   };
 
   try {
-    setStatus("Salvataggio bozza...", "info");
 
     if (!draftId) {
       const ref = await addDoc(collection(db, "newsletterDrafts"), {
@@ -81,8 +80,6 @@ async function autosave() {
     } else {
       await setDoc(doc(db, "newsletterDrafts", draftId), data, { merge: true });
     }
-
-    setStatus("Bozza salvata", "success");
   } catch (err) {
     setStatus("Errore durante il salvataggio della bozza", "error");
   }
@@ -303,7 +300,7 @@ function buildEmail({ type, title, content, link, image, email, name }) {
                       ${type === "photo"     ? "Apri galleria"       :
                         type === "photobook" ? "Visualizza photobook" :
                         type === "update"    ? "Apri aggiornamento"  :
-                                              "Leggi di più"}
+                                              "Apri link"}
                     </a>
                   ` : ""}
 
@@ -318,17 +315,6 @@ function buildEmail({ type, title, content, link, image, email, name }) {
   `;
 
   return card;
-};
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
 };
 
 updatePreview();

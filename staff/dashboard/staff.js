@@ -4,6 +4,8 @@ import { getFirestore, collection, getDocs, query, where } from "https://www.gst
 import { firebaseConfig } from "../../configFirebase.js"
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import { getUserName } from "../../helpers/getUserName.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11,6 +13,7 @@ const db = getFirestore(app);
 
 const userNameEl = document.getElementById("userName");
 const totalUsersEl = document.getElementById("totalUsers");
+const totalPhotosEl = document.getElementById("totalPhotos");
 const pendingPhotosEl = document.getElementById("pendingPhotos");
 const approvedPhotosEl = document.getElementById("approvedPhotos");
 const rejectedPhotosEl = document.getElementById("rejectedPhotos");
@@ -20,6 +23,127 @@ const recentPageViewedListEl = document.getElementById("recentViewedPagesList");
 const logoutBtn = document.getElementById("logoutBtn");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
+
+const staffStatsModal = document.getElementById("staffStatsModal");
+const staffStatsModalTitle = document.getElementById("staffStatsModalTitle");
+const staffStatsModalList = document.getElementById("staffStatsModalList");
+const closeStaffStatsModal = document.getElementById("closeStaffStatsModal");
+const closeStaffStatsModalBtn = document.getElementById("closeStaffStatsModalBtn");
+const staffStatsOverlay = staffStatsModal ? staffStatsModal.querySelector(".modal-overlay") : null;
+
+let allUsersData = [];
+let pendingPhotosData = [];
+let approvedPhotosData = [];
+let rejectedPhotosData = [];
+
+const userNameCache = new Map();
+
+const staffFilterLabels = {
+  users: "Utenti registrati",
+  pending: "Foto in attesa",
+  approved: "Foto approvate",
+  rejected: "Foto rifiutate",
+};
+
+function getReadableStatus(photo) {
+  if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
+    return "Approvata";
+  } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
+    return "In attesa";
+  } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
+    return "Rifiutata";
+  }
+  return photo.status || "Sconosciuto";
+}
+
+async function getCachedUserName(userId) {
+  if (!userId) return "utente sconosciuto";
+
+  if (userNameCache.has(userId)) {
+    return userNameCache.get(userId);
+  }
+
+  try {
+    const name = await getUserName(userId);
+    userNameCache.set(userId, name || "utente sconosciuto");
+    return name || "utente sconosciuto";
+  } catch (error) {
+    console.error("Errore nel recupero del nome utente:", error);
+    userNameCache.set(userId, "utente sconosciuto");
+    return "utente sconosciuto";
+  }
+}
+
+async function renderPhotoLine(photo) {
+  const userName = await getCachedUserName(photo.userId);
+  return `
+    <p><b>${photo.vehicleModel || "Foto"}</b><br>
+    Caricata da <em>${userName}</em> il <em>${photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"}</em><br>
+    Revisionata il <em>${photo.reviewedAt?.toDate().toLocaleString() || "non ancora revisionata"}</em><br>
+    Stato: <em>${getReadableStatus(photo)}</em></p>
+  `;
+}
+
+async function renderStaffStatsList(filter) {
+  let dataset;
+  let renderItem;
+
+  if (filter === "pending") {
+    dataset = pendingPhotosData;
+    renderItem = renderPhotoLine;
+  } else if (filter === "approved") {
+    dataset = approvedPhotosData;
+    renderItem = renderPhotoLine;
+  } else if (filter === "rejected") {
+    dataset = rejectedPhotosData;
+    renderItem = renderPhotoLine;
+  } else {
+    dataset = [];
+    renderItem = async () => "";
+  }
+
+  if (dataset.length === 0) {
+    staffStatsModalList.innerHTML = "<li>Nessun elemento da mostrare.</li>";
+    return;
+  }
+
+  staffStatsModalList.innerHTML = "<li>Caricamento...</li>";
+
+  const items = [];
+  for (const item of dataset) {
+    const html = await renderItem(item);
+    items.push(html);
+  }
+
+  staffStatsModalList.innerHTML = "";
+  items.forEach((html) => {
+    const li = document.createElement("li");
+    li.innerHTML = html;
+    staffStatsModalList.appendChild(li);
+  });
+}
+
+async function openStaffStatsModal(filter) {
+  staffStatsModalTitle.textContent = staffFilterLabels[filter] || "Dettagli";
+  staffStatsModal.classList.add("active");
+  await renderStaffStatsList(filter);
+}
+
+function closeStaffStatsModalFn() {
+  staffStatsModal.classList.remove("active");
+}
+
+if (staffStatsModal) {
+  document.querySelectorAll(".stat-box-clickable").forEach((box) => {
+    box.addEventListener("click", () => {
+      openStaffStatsModal(box.dataset.filter);
+    });
+  });
+
+  closeStaffStatsModal?.addEventListener("click", closeStaffStatsModalFn);
+  closeStaffStatsModalBtn?.addEventListener("click", closeStaffStatsModalFn);
+  staffStatsOverlay?.addEventListener("click", closeStaffStatsModalFn);
+}
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
@@ -63,6 +187,7 @@ async function loadStats() {
   try {
     const usersSnap = await getDocs(collection(db, "users"));
     totalUsersEl.textContent = usersSnap.size;
+    allUsersData = usersSnap.docs.map((doc) => doc.data());
 
     const currentUser = auth.currentUser;
     const currentUserDoc = await getDocs(
@@ -71,20 +196,32 @@ async function loadStats() {
     const currentUserData = currentUserDoc.docs[0].data();
     userNameEl.textContent = `${currentUserData.name} ${currentUserData.surname}`;
 
+    const photosSnap = await getDocs(collection(db, "photos"));
+    totalPhotosEl.textContent = photosSnap.size;
+
     const pendingSnap = await getDocs(
       query(collection(db, "photos"), where("status", "in", ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"]))
     );
     pendingPhotosEl.textContent = pendingSnap.size;
+    pendingPhotosData = pendingSnap.docs
+      .map((doc) => doc.data())
+      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
     const approvedSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "==", "Approvata ✅"))
+      query(collection(db, "photos"), where("status", "in", ["Approvata ✅", "Approvata"]))
     );
     approvedPhotosEl.textContent = approvedSnap.size;
+    approvedPhotosData = approvedSnap.docs
+      .map((doc) => doc.data())
+      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
     const rejectedSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "==", "Rifiutata ❌"))
+      query(collection(db, "photos"), where("status", "in", ["Rifiutata", "Rifiutata ❌"]))
     );
     rejectedPhotosEl.textContent = rejectedSnap.size;
+    rejectedPhotosData = rejectedSnap.docs
+      .map((doc) => doc.data())
+      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
 
     const activitiesSnap = await getDocs(collection(db, "activities"));
     recentActivityListEl.innerHTML = "";
@@ -169,16 +306,5 @@ async function loadStats() {
     setStatus("❌ Errore caricamento statistiche", "error");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
-  }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   }
 }

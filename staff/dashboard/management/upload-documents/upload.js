@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { uploadFile } from "/helpers/uploadFile.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11,7 +12,6 @@ const db = getFirestore(app);
 const uploadForm = document.getElementById("uploadForm");
 const fileInput = document.getElementById("inp-upl");
 const uploadBtn = document.getElementById("btn-upl");
-const statusMsg = document.getElementById("statusMsg");
 const fileNameSpan = document.getElementById("file-name");
 const titleInput = document.getElementById("title");
 const descInput = document.getElementById("description");
@@ -24,17 +24,6 @@ onAuthStateChanged(auth, (user) => {
   currentUser = user;
   if (!user) setStatus("⚠️ Devi essere loggato");
 });
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
-}
 
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length > 0) {

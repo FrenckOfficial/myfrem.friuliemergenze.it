@@ -2,14 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, query, where, orderBy, getDocs, getDoc, doc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 const photosContainer = document.getElementById("photosContainer");
-const eventsList = document.getElementById("eventsList");
-const statusMsg = document.getElementById("statusMsg");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -91,7 +90,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     await loadPhotos(user.uid);
-    await loadEvents(userData.name, userData.surname);
 
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
@@ -104,6 +102,29 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";
   }
 });
+
+async function getVoteCounts(photoId) {
+  try {
+    const votesQuery = query(
+      collection(db, "photos", photoId, "votes")
+    );
+    const snapshot = await getDocs(votesQuery);
+
+    let likes = 0;
+    let dislikes = 0;
+
+    snapshot.forEach((doc) => {
+      const voteData = doc.data();
+      if (voteData.voteType === "like") likes++;
+      else if (voteData.voteType === "dislike") dislikes++;
+    });
+
+    return { likes, dislikes };
+  } catch (err) {
+    console.error("Errore caricamento conteggio voti:", err);
+    return { likes: 0, dislikes: 0 };
+  }
+}
 
 async function loadPhotos(userId) {
   try {
@@ -123,7 +144,19 @@ async function loadPhotos(userId) {
       return;
     }
 
+    const photoPromises = [];
     snapshot.forEach((docSnap) => {
+      photoPromises.push(
+        getVoteCounts(docSnap.id).then(votes => ({
+          docSnap,
+          votes
+        }))
+      );
+    });
+
+    const photosWithVotes = await Promise.all(photoPromises);
+
+    photosWithVotes.forEach(({ docSnap, votes }) => {
       const data = docSnap.data();
       const card = document.createElement("div");
       card.className = "photo-card";
@@ -154,7 +187,27 @@ async function loadPhotos(userId) {
             <b>Caricata:</b>
             ${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString("it-IT") : "–"}
           </p>
-          ${data.reviewedAt?.toDate ? `<p><b>Revisionata:</b> ${data.reviewedAt.toDate().toLocaleString("it-IT")}</p>` : ""}
+          ${data.updater ? `
+            <p><b>Revisionata da</b> ${data.updater} <b>il:</b> ${
+              data.updatedAt?.toDate
+                ? data.updatedAt.toDate().toLocaleString("it-IT")
+                : data.reviewedAt?.toDate
+                  ? data.reviewedAt.toDate().toLocaleString("it-IT")
+                  : "–"
+            }</p>
+          ` : ""}
+          
+          ${status === "approved" ? `
+            <div class="vote-stats">
+              <span class="vote-count">
+                <i class="fas fa-thumbs-up"></i> ${votes.likes}
+              </span>
+              <span class="vote-count">
+                <i class="fas fa-thumbs-down"></i> ${votes.dislikes}
+              </span>
+            </div>
+          ` : ""}
+
           ${data.vehicleLink ? `<a href="${data.vehicleLink}" target="_blank" class="gallery-link">Vai al mezzo in galleria</a>` : ""}
         </div>
       `;
@@ -169,53 +222,6 @@ async function loadPhotos(userId) {
   }
 }
 
-async function loadEvents(firstName, lastName) {
-  try {
-    console.log("Caricamento eventi...");
-    eventsList.innerHTML = "";
-
-    const eventsQuery = query(
-      collection(db, "events"),
-      where("userId", "==", firstName + " " + lastName)
-    );
-
-    const snapshot = await getDocs(eventsQuery);
-
-    if (snapshot.empty) {
-      eventsList.innerHTML = "<p>Non hai ancora creato nessun evento.</p>";
-      return;
-    }
-
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const div = document.createElement("div");
-      div.className = "photo-card";
-
-      let statusText = "In revisione...";
-      if (data.status === "In approvazione") statusText = "In approvazione.";
-      else if (data.status === "Organizzato") statusText = "Organizzato.";
-      else if (data.status === "Rifiutato") statusText = "L'organizzazione dell'evento è stata rifiutata.";
-
-      div.innerHTML = `
-        <div class="photo-info">
-          <h3>${data.title}</h3>
-          <p><b>Luogo:</b> ${data.location}</p>
-          <p><b>Descrizione:</b> ${data.description.length > 150 ? data.description.slice(0, 150) + "..." : data.description}</p>
-          <span class="status ${data.status || 'pending'}">${statusText}</span>
-        </div>
-        <a href="/events/detail/?id=${docSnap.id}" target="_blank" class="btn-view">Visualizza Evento</a>
-      `;
-
-      eventsList.appendChild(div);
-    });
-
-    console.log(`Caricati ${snapshot.size} eventi`);
-  } catch (err) {
-    console.error("Errore caricamento eventi:", err);
-    setStatus("Errore caricamento eventi", "error");
-  }
-}
-
 function getServiceLabel(service) {
   const services = {
     "emergenza-sanitaria": "Emergenza Sanitaria Territoriale",
@@ -227,17 +233,4 @@ function getServiceLabel(service) {
     "ordine-pubblico": "Ordine Pubblico"
   };
   return services[service] || service || "N/A";
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `statusBox ${type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  if (closeBtn) {
-    closeBtn.onclick = () => {
-      classNameBox.style.display = "none";
-    };
-  }
 }

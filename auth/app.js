@@ -1,6 +1,7 @@
 import { firebaseConfig } from "../configFirebase.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
 
 import {
   getAuth,
@@ -48,7 +49,6 @@ let isRouting = false;
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const googleBtn = document.getElementById("googleLoginBtn");
-const statusMsg = document.getElementById("statusMsg");
 const submitBtn = document.getElementById("submitBtn");
 const btnText = document.getElementById('btnText');
 const btnLoader = document.getElementById('btnLoader');
@@ -71,6 +71,7 @@ function redirectByRole(role) {
 function openChooseDashboardModal() {
   const modal = document.getElementById("chooseDashboardModal");
   const closeBtn = document.getElementById("closeChooseDashboardModal");
+  modal.style.display = "";
   modal.classList.add('active');
   closeBtn.onclick = () => {
     modal.classList.remove('active');
@@ -232,6 +233,7 @@ function start2FAChallenge(user, userData) {
     sendLoginEmailCode();
   }
 
+  twofaLoginModal.style.display = "";
   twofaLoginModal.classList.add("active");
   twofaLoginCodeInput.focus();
 }
@@ -880,11 +882,12 @@ if (registerForm) {
     }
  
     if (currentStep === 3) {
-      if (!registerEmail.value.trim()) {
-        setStatus("Inserisci una email", "error");
+      if (!registerEmail.value.trim() && !registerEmail.value.includes("@")) {
+        setStatus("Inserisci una email valida", "error");
         return false;
       }
     }
+
  
     if (currentStep === 5) {
       if (registerPassword.value !== registerConfirmPassword.value) {
@@ -1051,7 +1054,6 @@ if (registerForm) {
   });
 }
 
-
 resendEmailBtn?.addEventListener("click", async () => {
   const email = localStorage.getItem("email");
   
@@ -1099,17 +1101,6 @@ resendEmailBtn?.addEventListener("click", async () => {
     console.error(error);
   }
 });
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  }
-}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;

@@ -11,6 +11,7 @@ import {
 import { firebaseConfig } from "/configFirebase.js";
 
 import { uploadFile } from "/helpers/uploadFile.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
 
 import {
   buildPDF,
@@ -34,8 +35,6 @@ const dateInput = document.getElementById("date");
 const typeInput = document.getElementById("type");
 const contentInput = document.getElementById("content");
 const authorInput = document.getElementById("author");
-
-const statusMsg = document.getElementById("statusMsg");
 
 const prevTitle = document.getElementById("prevTitle");
 const prevDate = document.getElementById("prevDate");
@@ -69,11 +68,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
-
-function setStatus(msg) {
-  console.log("📢 STATUS:", msg);
-  statusMsg.textContent = msg;
-}
 
 function updatePreview() {
   const title = titleInput.value || "Titolo documento";

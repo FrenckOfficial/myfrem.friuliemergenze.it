@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+
 import { firebaseConfig } from "/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
@@ -9,7 +11,6 @@ const db = getFirestore(app);
 
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
-const statusMsg = document.getElementById("statusMsg");
 const searchInput = document.getElementById("searchInput");
 const filterRole = document.getElementById("filterRole");
 const filterStatus = document.getElementById("filterStatus");
@@ -383,16 +384,5 @@ async function deleteUser(userId) {
       console.error("Errore nell'eliminazione:", error);
       setStatus("Errore nell'eliminazione dell'utente.", "error");
     }
-  }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
   }
 }

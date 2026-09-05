@@ -1,4 +1,5 @@
 import { firebaseConfig } from "../configFirebase.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -8,17 +9,16 @@ console.log("Inizializzo Firebase...");
 
 let currentUser = null;
 let currentUserId = null;
+let allPhotos = [];
 
 const userNameEl = document.getElementById("userName");
 const totalPhotosEl = document.getElementById("totalPhotos");
 const approvedPhotosEl = document.getElementById("approvedPhotos");
 const pendingPhotosEl = document.getElementById("pendingPhotos");
 const rejectedPhotosEl = document.getElementById("rejectedPhotos");
-const eventsListEl = document.getElementById("eventsList");
 const activityListEl = document.getElementById("activityList");
 const newsBannerEl = document.getElementById("newsBanner");
 const newsletterBtn = document.getElementById("newsletterBtn");
-const statusMsg = document.getElementById("statusMsg");
 const logoutBtn = document.getElementById("logoutBtn");
 const btnText = document.getElementById("btnText");
 const btnLoader = document.getElementById("btnLoader");
@@ -30,6 +30,81 @@ const notificationStatusIcon = document.getElementById("notification-status-icon
 const notificationStatusText = document.getElementById("notification-status-text");
 const notificationStatusDesc = document.getElementById("notification-status-desc");
 const goToSurveyBtn = document.getElementById("goToSurveyBtn");
+
+const statsModal = document.getElementById("statsModal");
+const statsModalTitle = document.getElementById("statsModalTitle");
+const statsModalList = document.getElementById("statsModalList");
+const closeStatsModal = document.getElementById("closeStatsModal");
+const closeStatsModalBtn = document.getElementById("closeStatsModalBtn");
+const statsOverlay = statsModal ? statsModal.querySelector(".modal-overlay") : null;
+
+const filterLabels = {
+  all: "Tutte le foto caricate",
+  approved: "Foto approvate",
+  pending: "Foto in attesa",
+  rejected: "Foto rifiutate",
+};
+
+function matchesFilter(photo, filter) {
+  if (filter === "all") return true;
+  if (filter === "approved") return photo.status === "Approvata ✅" || photo.status === "Approvata";
+  if (filter === "pending") return photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛";
+  if (filter === "rejected") return photo.status === "Rifiutata ❌" || photo.status === "Rifiutata";
+  return false;
+}
+
+function getReadableStatus(photo) {
+  if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
+    return "Approvata";
+  } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
+    return "In attesa";
+  } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
+    return "Rifiutata";
+  }
+  return photo.status || "Sconosciuto";
+}
+
+function openStatsModal(filter) {
+  const filtered = allPhotos.filter((photo) => matchesFilter(photo, filter));
+
+  statsModalTitle.textContent = filterLabels[filter] || "Foto";
+  statsModalList.innerHTML = "";
+
+  if (filtered.length === 0) {
+    statsModalList.innerHTML = "<li>Nessuna foto in questa categoria.</li>";
+  } else {
+    filtered.forEach((photo) => {
+      const status = getReadableStatus(photo);
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <p><b>${photo.vehicleModel || "Foto"}</b><br>
+        Caricata il <em>${photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"}</em><br>
+        Revisionata il <em>${photo.reviewedAt?.toDate().toLocaleString() || "non ancora revisionata"}</em><br>
+        Stato: <em>${status}</em></p>
+      `;
+      statsModalList.appendChild(li);
+    });
+  }
+
+  statsModal.classList.add("active");
+}
+
+function closeStatsModalFn() {
+  statsModal.classList.remove("active");
+}
+
+if (statsModal) {
+  document.querySelectorAll(".card-clickable").forEach((card) => {
+    card.addEventListener("click", () => {
+      openStatsModal(card.dataset.filter);
+    });
+  });
+
+  closeStatsModal?.addEventListener("click", closeStatsModalFn);
+  closeStatsModalBtn?.addEventListener("click", closeStatsModalFn);
+  statsOverlay?.addEventListener("click", closeStatsModalFn);
+}
 
 auth.onAuthStateChanged(async (user) => {
   currentUser = user;
@@ -207,6 +282,7 @@ auth.onAuthStateChanged(async (user) => {
       rejected = 0;
     let displayCount = 0;
     activityListEl.innerHTML = "";
+    allPhotos = [];
 
     photosSnap.forEach((doc) => {
       const photo = doc.data();
@@ -225,6 +301,8 @@ auth.onAuthStateChanged(async (user) => {
       } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
         status = "Rifiutata";
       }
+
+      allPhotos.push(photo);
 
       if (displayCount < 5) {
         const li = document.createElement("li");
@@ -379,22 +457,15 @@ async function closeFirstAccessModal(userId) {
 
     const modal = document.getElementById("firstAccessModal");
     modal.classList.remove("active");
+
+    if (typeof window.initWhatsNewCarousel === "function") {
+      window.initWhatsNewCarousel();
+    }
   } catch (error) {
     console.error("❌ Errore nell'aggiornamento del doc:", error);
     const modal = document.getElementById("firstAccessModal");
     modal.classList.remove("active");
   }
-}
-
-function setStatus(message, type = "info") {
-  const classNameBox = document.querySelector(".statusBox");
-  statusMsg.textContent = message;
-  classNameBox.className = `${"statusBox" + " " + type}`;
-  classNameBox.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    classNameBox.style.display = "none";
-  };
 }
 
 logoutBtn.addEventListener("click", async () => {
