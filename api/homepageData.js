@@ -54,7 +54,7 @@ async function getStats() {
     const totalUsers = usersSnapshot.size;
 
     const photosSnapshot = await db.collection('photos')
-      .where('status', 'in' ['Approvata ✅', 'Approvata'])
+      .where('status', 'in', ['Approvata ✅', 'Approvata'])
       .get();
     const approvedPhotos = photosSnapshot.size;
 
@@ -82,7 +82,7 @@ async function getStats() {
     }
 
     const lastPhotoSnapshot = await db.collection('photos')
-      .where('status', 'in' ['Approvata ✅', 'Approvata'])
+      .where('status', 'in', ['Approvata ✅', 'Approvata'])
       .orderBy('reviewedAt', 'desc')
       .limit(1)
       .get();
@@ -128,7 +128,7 @@ async function getRecentPhotos() {
 
   try {
     const photosSnapshot = await db.collection('photos')
-      .where('status', 'in' ['Approvata ✅', 'Approvata'])
+      .where('status', 'in', ['Approvata ✅', 'Approvata'])
       .orderBy('reviewedAt', 'desc')
       .limit(4)
       .get();
