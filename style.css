@@ -646,6 +646,12 @@ footer a:hover {
   color: var(--muted);
   font-size: 2.5rem;
 }
+
+.recent-img img {
+  width: auto;
+  height: auto;
+  object-fit: cover;
+}
  
 .recent-info {
   padding: 12px;
