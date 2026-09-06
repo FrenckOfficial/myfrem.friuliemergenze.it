@@ -63,9 +63,9 @@ async function getStats() {
 
     photosSnapshot.forEach(doc => {
       const data = doc.data();
-      if (data.createdAt && data.approvedAt) {
+      if (data.createdAt && data.reviewedAt) {
         const createdAt = data.createdAt.toDate();
-        const approvedAt = data.approvedAt.toDate();
+        const approvedAt = data.reviewedAt.toDate();
         totalTimeMs += (approvedAt - createdAt);
         count++;
       }
@@ -83,14 +83,14 @@ async function getStats() {
 
     const lastPhotoSnapshot = await db.collection('photos')
       .where('status', '==', 'approved')
-      .orderBy('approvedAt', 'desc')
+      .orderBy('reviewedAt', 'desc')
       .limit(1)
       .get();
 
     let lastUploadTime = 'N/A';
     if (!lastPhotoSnapshot.empty) {
       const lastPhoto = lastPhotoSnapshot.docs[0].data();
-      const approvedAt = lastPhoto.approvedAt.toDate();
+      const approvedAt = lastPhoto.reviewedAt.toDate();
       const now = new Date();
       const diffMinutes = Math.round((now - approvedAt) / 60000);
 
@@ -129,7 +129,7 @@ async function getRecentPhotos() {
   try {
     const photosSnapshot = await db.collection('photos')
       .where('status', '==', 'approved')
-      .orderBy('approvedAt', 'desc')
+      .orderBy('reviewedAt', 'desc')
       .limit(4)
       .get();
 
@@ -149,7 +149,7 @@ async function getRecentPhotos() {
       photos.push({
         userName: sanitizeHtml(userName),
         serviceType: photoData.serviceType || 'unknown',
-        uploadedAt: photoData.approvedAt.toDate().toISOString()
+        uploadedAt: photoData.reviewedAt.toDate().toISOString()
       });
     }
 
