@@ -54,7 +54,7 @@ async function getStats() {
     const totalUsers = usersSnapshot.size;
 
     const photosSnapshot = await db.collection('photos')
-      .where('status', '==', 'approved')
+      .where('status', 'in' ['Approvata ✅', 'Approvata'])
       .get();
     const approvedPhotos = photosSnapshot.size;
 
@@ -65,8 +65,8 @@ async function getStats() {
       const data = doc.data();
       if (data.createdAt && data.reviewedAt) {
         const createdAt = data.createdAt.toDate();
-        const approvedAt = data.reviewedAt.toDate();
-        totalTimeMs += (approvedAt - createdAt);
+        const reviewedAt = data.reviewedAt.toDate();
+        totalTimeMs += (reviewedAt - createdAt);
         count++;
       }
     });
@@ -82,7 +82,7 @@ async function getStats() {
     }
 
     const lastPhotoSnapshot = await db.collection('photos')
-      .where('status', '==', 'approved')
+      .where('status', 'in' ['Approvata ✅', 'Approvata'])
       .orderBy('reviewedAt', 'desc')
       .limit(1)
       .get();
@@ -90,9 +90,9 @@ async function getStats() {
     let lastUploadTime = 'N/A';
     if (!lastPhotoSnapshot.empty) {
       const lastPhoto = lastPhotoSnapshot.docs[0].data();
-      const approvedAt = lastPhoto.reviewedAt.toDate();
+      const reviewedAt = lastPhoto.reviewedAt.toDate();
       const now = new Date();
-      const diffMinutes = Math.round((now - approvedAt) / 60000);
+      const diffMinutes = Math.round((now - reviewedAt) / 60000);
 
       if (diffMinutes < 60) {
         lastUploadTime = `${diffMinutes}m fa`;
@@ -128,7 +128,7 @@ async function getRecentPhotos() {
 
   try {
     const photosSnapshot = await db.collection('photos')
-      .where('status', '==', 'approved')
+      .where('status', 'in' ['Approvata ✅', 'Approvata'])
       .orderBy('reviewedAt', 'desc')
       .limit(4)
       .get();
