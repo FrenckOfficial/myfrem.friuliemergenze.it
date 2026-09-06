@@ -648,8 +648,8 @@ footer a:hover {
 }
 
 .recent-img img {
-  width: auto;
-  height: auto;
+  width: 10%;
+  height: 10%;
   object-fit: cover;
 }
  
