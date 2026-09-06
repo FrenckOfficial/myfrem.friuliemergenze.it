@@ -464,7 +464,7 @@
         return `
           <div class="recent-item">
             <div class="recent-img">
-              <i class="fas ${icon}"></i>
+              <img src="${photo.url}" alt="${photo.vehicleModel}" loading="lazy" />
             </div>
             <div class="recent-info">
               <div class="recent-user">${photo.userName}</div>
@@ -488,7 +488,7 @@
       if (minutes < 60) return `${minutes}m fa`;
       if (hours < 24) return `${hours}h fa`;
       if (days < 7) return `${days}g fa`;
-      if (weeks < 4) return `${weeks}w fa`;
+      if (weeks < 4) return `${weeks}set fa`;
       
       return then.toLocaleDateString('it-IT');
     }
