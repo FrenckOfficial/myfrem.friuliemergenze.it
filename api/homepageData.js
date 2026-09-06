@@ -149,7 +149,9 @@ async function getRecentPhotos() {
       photos.push({
         userName: sanitizeHtml(userName),
         serviceType: photoData.serviceType || 'unknown',
-        uploadedAt: photoData.reviewedAt.toDate().toISOString()
+        uploadedAt: photoData.reviewedAt.toDate().toISOString(),
+        url: photoData.url || photoData.imageUrl || photoData.photoUrl || '',
+        vehicleModel: sanitizeHtml(photoData.vehicleModel || photoData.modello || 'Mezzo di soccorso')
       });
     }
 
