@@ -161,7 +161,6 @@ async function loadAllPhotos() {
       return;
     }
 
-    // Carica tutti i dati in parallelo
     const photoPromises = snapshot.docs.map(async (docSnap) => {
       const photo = docSnap.data();
       const id = docSnap.id;
@@ -216,13 +215,21 @@ async function loadAllPhotos() {
 
       if (photo.serviceType === "ordine-pubblico") {
         serviceType = "Ordine Pubblico";
+      } else if (photo.serviceType === "carabinieri") {
+        serviceType = "Carabinieri";
+      } else if (photo.serviceType === "polizia-locale") {
+        serviceType = "Polizia Locale / Municipale";
+      } else if (photo.serviceType === "polizia-di-stato") {
+        serviceType = "Polizia di Stato";
+      } else if (photo.serviceType === "soccorso-alpino") {
+        serviceType = "Soccorso Alpino e Speleologico";
+      } else if (photo.serviceType === "corpo-forestale-regionale") {
+        serviceType = "Corpo Forestale Regionale";
+      } else if (photo.serviceType === "guardia-di-finanza") {
+        serviceType = "Guardia di Finanza";
       } else if (photo.serviceType === "emergenza-sanitaria") {
-        serviceType = "Emergenza Sanitaria";
-      } else if (photo.serviceType === "trasporti-secondari") {
-        serviceType = "Automezzo adibito a trasporti secondari";
+        serviceType = "Soccorso Sanitario";
       } else if (photo.serviceType === "pompieri") {
-        serviceType = "Vigili del Fuoco";
-      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
         serviceType = "Vigili del Fuoco";
       } else if (photo.serviceType === "guardia-costiera") {
         serviceType = "Guardia Costiera";

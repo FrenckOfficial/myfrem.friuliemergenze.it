@@ -87,7 +87,6 @@ async function pushPhotobookToGithub() {
   await createPhotobookDetailsPage(
     slug,
     photobookData,
-    draft.coverUrl
   );
 
   console.log("✅ Pagina HTML photobook creata");
@@ -192,13 +191,11 @@ async function updatePhotobooksJson(
 
 async function createPhotobookDetailsPage(
   slug,
-  photobookData,
-  coverUrl
+  photobookData
 ) {
   const html = await generatePhotobookHtml(
     slug,
-    photobookData,
-    coverUrl
+    photobookData
   );
 
   try {
@@ -271,9 +268,8 @@ function getServiceLabel(service) {
   }
 }
 
-async function generatePhotobookHtml(slug, photobookData, coverUrl) {
+async function generatePhotobookHtml(slug, photobookData) {
   const pageUrl = `https://friuliemergenze.it/photobook/${slug}`;
-  const service = getServiceLabel(photobookData.service);
   const vehiclesHtml = await generateVehiclesSection(photobookData.vehicles || []);
 
   return `<!doctype html>

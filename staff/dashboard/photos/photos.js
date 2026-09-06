@@ -105,10 +105,20 @@ async function loadPendingPhotos() {
 
       if (photo.serviceType === "ordine-pubblico") {
         serviceType = "Ordine Pubblico";
+      } else if (photo.serviceType === "carabinieri") {
+        serviceType = "Carabinieri";
+      } else if (photo.serviceType === "polizia-locale") {
+        serviceType = "Polizia Locale / Municipale";
+      } else if (photo.serviceType === "polizia-di-stato") {
+        serviceType = "Polizia di Stato";
+      } else if (photo.serviceType === "soccorso-alpino") {
+        serviceType = "Soccorso Alpino e Speleologico";
+      } else if (photo.serviceType === "corpo-forestale-regionale") {
+        serviceType = "Corpo Forestale Regionale";
+      } else if (photo.serviceType === "guardia-di-finanza") {
+        serviceType = "Guardia di Finanza";
       } else if (photo.serviceType === "emergenza-sanitaria") {
-        serviceType = "Emergenza Sanitaria";
-      } else if (photo.serviceType === "trasporti-secondari") {
-        serviceType = "Automezzo adibito a trasporti secondari";
+        serviceType = "Soccorso Sanitario";
       } else if (photo.serviceType === "pompieri") {
         serviceType = "Vigili del Fuoco";
       } else if (photo.serviceType === "guardia-costiera") {
@@ -275,11 +285,6 @@ async function createVehicleDraft() {
   try {
     setStatus('⏳ Creazione bozza...');
  
-    const fileName = (currentPhotoForDraft.vehicleModel || 'veicolo')
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w-]/g, '');
- 
     const draftRef = await addDoc(collection(db, 'vehiclesDraft'), {
       fileName: extractFileName(currentPhotoForDraft.url),
       photoUrl: currentPhotoForDraft.url,
@@ -381,9 +386,10 @@ function extractFileName(url) {
 
 function mapServiceType(serviceType) {
   const map = {
-    'ordine-pubblico': 'polizia',
+    'polizia-di-stato': 'polizia_di_stato',
+    'carabinieri': 'carabinieri',
+    'guardia-di-finanza': 'guardia_di_finanza',
     'emergenza-sanitaria': 'ambulanza',
-    'trasporti-secondari': 'trasporti',
     'soccorso-tecnico-urgente': 'pompieri',
     'guardia-costiera': 'guardia_costiera',
     'protezione-civile': 'protezione_civile'

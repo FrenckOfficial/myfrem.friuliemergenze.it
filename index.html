@@ -28,6 +28,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/homepage-dynamic.css" />
   <link rel="manifest" href="/manifest.json">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
   <meta property="og:title" content="Home | MyFrEM - Piattaforma ufficiale di Friuli Emergenze" />
@@ -75,16 +76,216 @@
     </p>
   </header>
 
+  <section class="gallery-preview">
+    <h2 style="grid-column: 1/-1; text-align: center; padding: 0; margin-bottom: 20px;">Galleria della community</h2>
+    <div class="gallery-item">
+      <img src="https://cdn.friuliemergenze.it/J1eRe4W2edgovr1sgUw8fqJv76E2/1788431043070-IMG_3916.jpeg" alt="Vigili del Fuoco">
+    </div>
+    <div class="gallery-item">
+      <img src="https://www.friuliemergenze.it/assets/mezzi/cc401-ccgrado.jpeg" alt="Carabinieri">
+    </div>
+    <div class="gallery-item">
+      <img src="https://cdn.friuliemergenze.it/7FnRs5UUV8Zm4EaKvHxns9BaoeO2/1785234703254-IMG_2583.jpeg" alt="Ambulanza">
+    </div>
+    <div class="gallery-item">
+      <img src="https://cdn.friuliemergenze.it/7FnRs5UUV8Zm4EaKvHxns9BaoeO2/1784746540907-WhatsApp%20Image%202026-07-22%20at%2018.57.11%20(6).jpeg" alt="Polizia Locale">
+    </div>
+    <div class="gallery-item">
+      <img src="https://cdn.friuliemergenze.it/BLaBHSKMjjTmPzv0AqrTCmGPJc93/1786106274194-1000054182.jpg" alt="Polizia di Stato">
+    </div>
+    <div class="gallery-item">
+      <img src="https://cdn.friuliemergenze.it/7FnRs5UUV8Zm4EaKvHxns9BaoeO2/1784742229370-WhatsApp%20Image%202026-07-22%20at%2018.57.09%20(2).jpeg" alt="Guardia Costiera">
+    </div>
+  </section>
+
   <section class="stats">
     <h2>Dati della community</h2>
-    <div class="grid">
-      <div class="card stat-card">
-        <span class="stat-number">70+</span>
-        <span class="stat-label">Membri della community</span>
+    <div class="grid" id="statsGrid">
+      <div class="card stat-card loading-skeleton" style="min-height: 120px;"></div>
+      <div class="card stat-card loading-skeleton" style="min-height: 120px;"></div>
+      <div class="card stat-card loading-skeleton" style="min-height: 120px;"></div>
+      <div class="card stat-card loading-skeleton" style="min-height: 120px;"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Come funziona il processo</h2>
+    <p>Semplice e trasparente: dalla registrazione alla pubblicazione in pochi passi</p>
+    <div class="approval-process">
+      <div class="process-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Registrati gratis</h4>
+          <p>Crea il tuo account in pochi secondi. Nessuna app da installare, tutto dal browser.</p>
+        </div>
       </div>
-      <div class="card stat-card">
-        <span class="stat-number">40+</span>
-        <span class="stat-label">Foto caricate</span>
+      <div class="process-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Carica le tue foto</h4>
+          <p>Seleziona il servizio, aggiungi titolo e descrizione. Puoi caricare più foto alla volta.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Revisione dello staff</h4>
+          <p>Il nostro team verifica la qualità e la conformità. Tempo medio: 24-48 ore.</p>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Pubblicazione</h4>
+          <p>Approvata! La tua foto è ora parte della galleria ufficiale di Friuli Emergenze.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ultime foto approvate</h2>
+    <p>Scopri i contributi più recenti della community</p>
+    <div class="recent-uploads" id="recentUploads">
+      <div class="recent-item">
+        <div class="recent-img loading-skeleton" style="height: 120px;"></div>
+        <div class="recent-info loading-skeleton" style="height: 50px;"></div>
+      </div>
+      <div class="recent-item">
+        <div class="recent-img loading-skeleton" style="height: 120px;"></div>
+        <div class="recent-info loading-skeleton" style="height: 50px;"></div>
+      </div>
+      <div class="recent-item">
+        <div class="recent-img loading-skeleton" style="height: 120px;"></div>
+        <div class="recent-info loading-skeleton" style="height: 50px;"></div>
+      </div>
+      <div class="recent-item">
+        <div class="recent-img loading-skeleton" style="height: 120px;"></div>
+        <div class="recent-info loading-skeleton" style="height: 50px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Domande frequenti</h2>
+    <div class="faq-section">
+      <div class="faq-item">
+        <input type="checkbox" class="faq-toggle" id="faq1">
+        <label class="faq-question" for="faq1">
+          Quali foto posso caricare?
+          <span class="faq-icon">▼</span>
+        </label>
+        <div class="faq-answer">
+          Puoi caricare foto di qualsiasi mezzo di soccorso (Vigili del Fuoco, Carabinieri, Polizia, ambulanze, Soccorso Alpino, ecc.) nel territorio della Friuli-Venezia Giulia. Le foto devono essere di qualità decente, con la targa visibile quando possibile. Non sono ammesse foto coperte di fango o illeggibili.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <input type="checkbox" class="faq-toggle" id="faq2">
+        <label class="faq-question" for="faq2">
+          Quanto tempo impiega l'approvazione?
+          <span class="faq-icon">▼</span>
+        </label>
+        <div class="faq-answer">
+          Il nostro team lavora per approvare le foto entro 24-48 ore dal caricamento. Durante periodi di alto carico, potrebbero volerci fino a 72 ore. Riceverai una notifica quando la foto sarà pubblicata.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <input type="checkbox" class="faq-toggle" id="faq3">
+        <label class="faq-question" for="faq3">
+          Devo essere un volontario di soccorso?
+          <span class="faq-icon">▼</span>
+        </label>
+        <div class="faq-answer">
+          No! MyFrEM è aperta a chiunque. Basta avere la passione per documentare i mezzi di emergenza del territorio. Che tu sia un appassionato, un fotografo amatoriale o un volontario, sei il benvenuto.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <input type="checkbox" class="faq-toggle" id="faq4">
+        <label class="faq-question" for="faq4">
+          I miei dati sono al sicuro?
+          <span class="faq-icon">▼</span>
+        </label>
+        <div class="faq-answer">
+          Sì. Utilizziamo crittografia end-to-end e le migliori pratiche di sicurezza. I tuoi dati non vengono mai condivisi con terze parti. Consulta la nostra Privacy Policy per dettagli completi.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <input type="checkbox" class="faq-toggle" id="faq5">
+        <label class="faq-question" for="faq5">
+          Posso usare MyFrEM offline?
+          <span class="faq-icon">▼</span>
+        </label>
+        <div class="faq-answer">
+          MyFrEM è una Progressive Web App (PWA). Una volta caricata, puoi aggiungerla alla schermata home del tuo dispositivo. Dati come foto e statistiche sono sincronizzati quando sei online e poi cacheati; quando offline, vedrai l'ultima versione cachata.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Perché scegliere MyFrEM</h2>
+    <div class="trust-badges">
+      <div class="badge">
+        <div class="badge-icon"><i class="fas fa-lock"></i></div>
+        <p>100% Gratuito<br>e Sicuro</p>
+      </div>
+      <div class="badge">
+        <div class="badge-icon"><i class="fas fa-mobile-screen"></i></div>
+        <p>PWA<br>Funziona con cache</p>
+      </div>
+      <div class="badge">
+        <div class="badge-icon"><i class="fas fa-clock"></i></div>
+        <p>Approvazione<br>rapida</p>
+      </div>
+      <div class="badge">
+        <div class="badge-icon"><i class="fas fa-users"></i></div>
+        <p>Community<br>attiva</p>
+      </div>
+    </div>
+
+    <div class="pwa-banner">
+      <h4><i class="fas fa-download"></i> Installa MyFrEM</h4>
+      <p>Aggiungi MyFrEM alla schermata home del tuo dispositivo per un accesso veloce.</p>
+      <p style="font-size: 0.8rem; color: var(--muted);">Chrome / Edge: tocca il menu e seleziona "Installa app" | Safari: condividi e seleziona "Aggiungi a schermata home"</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cosa dice la community</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="testimonial-text">"MyFrEM è fantastica! Finalmente un posto dove condividere la mia passione per i mezzi di soccorso. Lo staff è velocissimo nell'approvare le foto."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MR</div>
+          <div class="testimonial-info">
+            <h5>Marco R.</h5>
+            <p>Fotografo appassionato</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-text">"Come volontario, mi piace vedere documentato il lavoro che facciamo. È bellissimo essere parte di un progetto così ben organizzato."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AR</div>
+          <div class="testimonial-info">
+            <h5>Andrea R.</h5>
+            <p>Vigile del Fuoco</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-text">"L'interfaccia è intuitiva e il processo di caricamento è semplicissimo. Consiglio MyFrEM a tutti gli appassionati di emergenze!"</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">LE</div>
+          <div class="testimonial-info">
+            <h5>Luca E.</h5>
+            <p>Membro da 3 mesi</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -118,24 +319,6 @@
       <div class="card">
         <h3>Restare in contatto</h3>
         <p>Comunica con lo staff e ricevi aggiornamenti sulle attività di Friuli Emergenze.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="how-it-works">
-    <h2>Come funziona</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>1. Registrati</h3>
-        <p>Crea il tuo account gratuitamente in pochi secondi. Nessuna app da installare, funziona dal browser.</p>
-      </div>
-      <div class="card">
-        <h3>2. Carica i tuoi scatti</h3>
-        <p>Fotografa i mezzi di emergenza sul territorio e caricali sulla piattaforma. Lo staff li revisiona e pubblica rapidamente.</p>
-      </div>
-      <div class="card">
-        <h3>3. Partecipa alla community</h3>
-        <p>Segui gli eventi, resta aggiornato sulle novità e contribuisci alla crescita della galleria di Friuli Emergenze.</p>
       </div>
     </div>
   </section>
@@ -175,11 +358,141 @@
     </p>
   </footer>
 
+  <div class="offline-indicator" id="offlineIndicator">
+    <i class="fas fa-wifi-slash"></i> OFFLINE — Mostrando dati in cache
+  </div>
+
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
-  
+
+  <script>
+    const CACHE_HOMEPAGE = 'homepageCache';
+    const CACHE_DURATION = 3600000;
+
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    
+    window.addEventListener('online', () => {
+      offlineIndicator.classList.remove('show');
+      loadHomepageData();
+    });
+    
+    window.addEventListener('offline', () => {
+      offlineIndicator.classList.add('show');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHomepageData();
+      if (!navigator.onLine) {
+        offlineIndicator.classList.add('show');
+      }
+    });
+
+    async function loadHomepageData() {
+      try {
+        const response = await fetch('/api/homepageData');
+        const data = await response.json();
+        
+        localStorage.setItem(CACHE_HOMEPAGE, JSON.stringify({
+          data: data,
+          timestamp: Date.now()
+        }));
+        
+        renderStats(data.stats);
+        renderRecentUploads(data.recentPhotos);
+      } catch (error) {
+        console.error('Errore caricamento dati homepage:', error);
+        loadHomepageDataFromCache();
+      }
+    }
+
+    function loadHomepageDataFromCache() {
+      const cached = localStorage.getItem(CACHE_HOMEPAGE);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        renderStats(data.stats);
+        renderRecentUploads(data.recentPhotos);
+      }
+    }
+
+    function renderStats(stats) {
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="card stat-card">
+          <span class="stat-number">${stats.totalUsers}+</span>
+          <span class="stat-label">Membri attivi</span>
+        </div>
+        <div class="card stat-card">
+          <span class="stat-number">${stats.approvedPhotos}+</span>
+          <span class="stat-label">Foto approvate</span>
+        </div>
+        <div class="card stat-card">
+          <span class="stat-number">${stats.avgApprovalTime}</span>
+          <span class="stat-label">Tempo medio di approvazione</span>
+        </div>
+        <div class="card stat-card">
+          <span class="stat-number">${stats.lastUploadTime}</span>
+          <span class="stat-label">Ultimo caricamento</span>
+        </div>
+      `;
+    }
+
+    function renderRecentUploads(photos) {
+      const recentUploads = document.getElementById('recentUploads');
+      
+      const serviceIcons = {
+        'pompieri': 'fa-fire',
+        'ambulanza': 'fa-ambulance',
+        'carabinieri': 'fa-shield-halved',
+        'polizia-di-stato': 'fa-police',
+        'polizia-locale': 'fa-gavel',
+        'soccorso-alpino': 'fa-mountain-sun',
+        'guardia-costiera': 'fa-water',
+        'guardia-di-finanza': 'fa-briefcase',
+        'protezione-civile': 'fa-shield',
+        'corpo-forestale-regionale': 'fa-tree',
+        'ordine-pubblico': 'fa-bullhorn',
+        'emergenza-sanitaria': 'fa-heart',
+        'corpo-forestale-regionale': 'fa-tree'
+      };
+
+      recentUploads.innerHTML = photos.slice(0, 4).map(photo => {
+        const icon = serviceIcons[photo.serviceType] || 'fa-camera';
+        const date = formatTimeAgo(photo.uploadedAt);
+        
+        return `
+          <div class="recent-item">
+            <div class="recent-img">
+              <i class="fas ${icon}"></i>
+            </div>
+            <div class="recent-info">
+              <div class="recent-user">${photo.userName}</div>
+              <div class="recent-date">${date}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function formatTimeAgo(timestamp) {
+      const now = new Date();
+      const then = new Date(timestamp);
+      const diff = now - then;
+      
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      const weeks = Math.floor(diff / 604800000);
+      
+      if (minutes < 60) return `${minutes}m fa`;
+      if (hours < 24) return `${hours}h fa`;
+      if (days < 7) return `${days}g fa`;
+      if (weeks < 4) return `${weeks}w fa`;
+      
+      return then.toLocaleDateString('it-IT');
+    }
+  </script>
 </body>
 </html>
