@@ -238,6 +238,13 @@ body {
   letter-spacing: 0.04em;
 }
 
+.page-subtitle a {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--primary);
+  transition: color 0.2s;
+}
+
 .content {
   line-height: 1.85;
 }
