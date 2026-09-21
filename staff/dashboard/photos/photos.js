@@ -4,6 +4,7 @@ import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc
 import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -61,7 +62,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);
@@ -83,71 +84,83 @@ async function loadUsersMap() {
 
 async function loadPendingPhotos() {
   try {
-    setStatus("⏳ Caricamento foto...");
-
+    setStatus("Caricamento foto...");
+ 
     const q = query(
       collection(db, "photos"),
       where("status", "in", ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"])
     );
-
+ 
     const snapshot = await getDocs(q);
     photosTableBody.innerHTML = "";
-
+ 
     if (snapshot.empty) {
-      setStatus("✅ Nessuna foto da moderare");
+      setStatus("Nessuna foto da moderare");
       return;
     }
-
-    snapshot.forEach(async (docSnap) => {
-      const photo = docSnap.data();
-
-      let serviceType = "Non inserito"
-
-      if (photo.serviceType === "ordine-pubblico") {
-        serviceType = "Ordine Pubblico";
-      } else if (photo.serviceType === "carabinieri") {
-        serviceType = "Carabinieri";
-      } else if (photo.serviceType === "polizia-locale") {
-        serviceType = "Polizia Locale / Municipale";
-      } else if (photo.serviceType === "polizia-di-stato") {
-        serviceType = "Polizia di Stato";
-      } else if (photo.serviceType === "soccorso-alpino") {
-        serviceType = "Soccorso Alpino e Speleologico";
-      } else if (photo.serviceType === "corpo-forestale-regionale") {
-        serviceType = "Corpo Forestale Regionale";
-      } else if (photo.serviceType === "guardia-di-finanza") {
-        serviceType = "Guardia di Finanza";
-      } else if (photo.serviceType === "emergenza-sanitaria") {
-        serviceType = "Soccorso Sanitario";
-      } else if (photo.serviceType === "pompieri") {
-        serviceType = "Vigili del Fuoco";
-      } else if (photo.serviceType === "guardia-costiera") {
-        serviceType = "Guardia Costiera";
-      } else if (photo.serviceType === "protezione-civile") {
-        serviceType = "Protezione Civile";
-      } else serviceType;
-
-      const tr = document.createElement("tr");
-      const userName = await getUserName(photo.userId) || "Sconosciuto";
-      tr.innerHTML = `
-        <td><img src="${photo.url}" class="preview" loading="lazy" /></td>
-        <td>${photo.vehicleModel || "Non inserito"}</td>
-        <td>${photo.sponsor || "Non inserito"}</td>
-        <td>${photo.licensePlate || "Non inserita"}</td>
-        <td>${serviceType}</td>
-        <td>${photo.location || "Non inserita"}</td>
-        <td>${userName}</td>
-        <td>${photo.createdAt?.toDate().toLocaleString() || "-"}</td>
-        <td>${photo.notes || "Non inserite"}</td>
-        <td>
-          <button class="approve" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>✅ Approva</button>
-          <button class="reject" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>❌ Rifiuta</button>
-        </td>
-      `;
-      photosTableBody.appendChild(tr);
+ 
+    const photoPromises = [];
+ 
+    snapshot.forEach((docSnap) => {
+      const photoPromise = (async () => {
+        const photo = docSnap.data();
+ 
+        let serviceType = "Non inserito"
+ 
+        if (photo.serviceType === "ordine-pubblico") {
+          serviceType = "Ordine Pubblico";
+        } else if (photo.serviceType === "carabinieri") {
+          serviceType = "Carabinieri";
+        } else if (photo.serviceType === "polizia-locale") {
+          serviceType = "Polizia Locale / Municipale";
+        } else if (photo.serviceType === "polizia-di-stato") {
+          serviceType = "Polizia di Stato";
+        } else if (photo.serviceType === "soccorso-alpino") {
+          serviceType = "Soccorso Alpino e Speleologico";
+        } else if (photo.serviceType === "corpo-forestale-regionale") {
+          serviceType = "Corpo Forestale Regionale";
+        } else if (photo.serviceType === "guardia-di-finanza") {
+          serviceType = "Guardia di Finanza";
+        } else if (photo.serviceType === "emergenza-sanitaria") {
+          serviceType = "Soccorso Sanitario";
+        } else if (photo.serviceType === "pompieri") {
+          serviceType = "Vigili del Fuoco";
+        } else if (photo.serviceType === "guardia-costiera") {
+          serviceType = "Guardia Costiera";
+        } else if (photo.serviceType === "protezione-civile") {
+          serviceType = "Protezione Civile";
+        } else serviceType;
+ 
+        const tr = document.createElement("tr");
+        const userName = await getUserName(photo.userId) || "Sconosciuto";
+        tr.innerHTML = `
+          <td><img src="${photo.url}" class="preview" loading="lazy" /></td>
+          <td>${photo.vehicleModel || "Non inserito"}</td>
+          <td>${photo.sponsor || "Non inserito"}</td>
+          <td>${photo.licensePlate || "Non inserita"}</td>
+          <td>${serviceType}</td>
+          <td>${photo.location || "Non inserita"}</td>
+          <td>${userName}</td>
+          <td>${photo.createdAt?.toDate().toLocaleString() || "-"}</td>
+          <td>${photo.notes || "Non inserite"}</td>
+          <td>
+            <button class="approve" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>Approva</button>
+            <button class="reject" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>Rifiuta</button>
+          </td>
+        `;
+        const img = tr.querySelector('img');
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => openLightbox(img, photo.vehicleModel || 'Foto'));
+        photosTableBody.appendChild(tr);
+      })();
+ 
+      photoPromises.push(photoPromise);
     });
+ 
+    await Promise.all(photoPromises);
 
-    setStatus(`📸 Caricate ${snapshot.size} foto`);
+    setStatus(undefined);
+ 
   } catch (err) {
     console.error("Errore caricamento foto:", err);
     setStatus("Errore caricamento foto", "error");
@@ -201,14 +214,14 @@ photosTableBody.addEventListener("click", async (e) => {
 
 async function updatePhotoStatus(photoId, status) {
   try {
-    setStatus("⏳ Aggiornamento...");
+    setStatus("Aggiornamento...");
 
     await updateDoc(doc(db, "photos", photoId), {
       status: status,
       reviewedAt: serverTimestamp()
     });
 
-    setStatus(`✅ Foto ${status}`);
+    setStatus(`Foto ${status}`, "success");
     loadPendingPhotos();
   } catch (err) {
     console.error("Errore aggiornamento:", err);
@@ -283,7 +296,7 @@ async function createVehicleDraft() {
   }
  
   try {
-    setStatus('⏳ Creazione bozza...');
+    setStatus('Creazione bozza...');
  
     const draftRef = await addDoc(collection(db, 'vehiclesDraft'), {
       fileName: extractFileName(currentPhotoForDraft.url),
@@ -312,7 +325,7 @@ async function createVehicleDraft() {
       timestamp: serverTimestamp()
     });
  
-    setStatus(`✅ Bozza veicolo creata (ID: ${draftRef.id})`);
+    setStatus(`Bozza veicolo creata (ID: ${draftRef.id})`);
     closeDraftModal();
  
   } catch (error) {
@@ -337,12 +350,12 @@ async function sendNotificationApprovement(userName, userEmail, photoName) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Errore ${response.status}:`, errorText);
+      console.error(`Errore ${response.status}:`, errorText);
       setStatus(`Errore notifica: ${response.status}`, 'error');
       return;
     }
 
-    console.log('✅ Notifica inviata');
+    console.log('Notifica inviata');
   } catch (error) {
     console.error('Errore fetch:', error);
     setStatus('Errore invio notifica', 'error');
@@ -366,12 +379,12 @@ async function sendNotificationRejection(userName, userEmail, photoName, reason)
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Errore ${response.status}:`, errorText);
+      console.error(`Errore ${response.status}:`, errorText);
       setStatus(`Errore notifica: ${response.status}`, 'error');
       return;
     }
 
-    console.log('✅ Notifica inviata');
+    console.log('Notifica inviata');
   } catch (error) {
     console.error('Errore fetch:', error);
     setStatus('Errore invio notifica', 'error');

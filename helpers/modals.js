@@ -87,7 +87,16 @@ export function showInfo(title, description = '') {
   showModal('info', title, description, false);
 }
 
+/**
+ * @param {string|undefined} message
+ * @param {string} type
+ */
 export function setStatus(message, type = 'info') {
+  if (message === undefined) {
+    closeModal();
+    return;
+  }
+
   if (!message) return;
 
   let title = message;

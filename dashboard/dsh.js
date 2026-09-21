@@ -1,5 +1,6 @@
 import { firebaseConfig } from "../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -120,7 +121,7 @@ auth.onAuthStateChanged(async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 5000);
@@ -130,6 +131,10 @@ auth.onAuthStateChanged(async (user) => {
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     userId: user.uid,
     page: window.location.pathname
+  });
+
+  await db.collection("users").doc(user.uid).update({
+    lastDashSelected: "user",
   });
 
   try {

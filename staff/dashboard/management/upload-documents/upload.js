@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.g
 import { firebaseConfig } from "/configFirebase.js";
 import { uploadFile } from "/helpers/uploadFile.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

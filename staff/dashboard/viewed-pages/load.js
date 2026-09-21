@@ -18,6 +18,7 @@ import {
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -4,6 +4,7 @@ import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, updateD
 import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11,7 +12,6 @@ const db = getFirestore(app);
 
 const photosTableBody = document.getElementById("photosTbody");
 const logoutBtn = document.getElementById("logoutBtn");
-const messageBox = document.getElementById("messageBox");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
@@ -43,7 +43,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);
@@ -100,11 +100,11 @@ async function openVotesModal(photoId) {
     console.table(snapshot.docs.map(doc => doc.data()));
 
     const votesTitle = document.getElementById("votesModalTitle");
-    console.log("📊 PhotoId:", photoId);
+    console.log("PhotoId:", photoId);
     votesTitle.textContent = "Voti foto: " + photoId;
 
     const votesModal = document.getElementById("votesModal");
-    console.log("📊 Modal:", votesModal);
+    console.log("Modal:", votesModal);
     votesModal.classList.add("active");
 
     const votesCount = document.getElementById("votesCount");
@@ -112,7 +112,7 @@ async function openVotesModal(photoId) {
     votesCount.textContent = `${"Voti totali: " + (likes + dislikes)}`;
 
     const votesTableBody = document.getElementById("votesTableBody");
-    console.log("📊 TableBody:", votesTableBody);
+    console.log("TableBody:", votesTableBody);
     votesTableBody.innerHTML = "";
 
     snapshot.forEach(async (doc) => {
@@ -146,7 +146,7 @@ async function openVotesModal(photoId) {
 
 async function loadAllPhotos() {
   try {
-    console.log("⏳ Caricamento tutte le foto...");
+    console.log("Caricamento tutte le foto...");
 
     const q = query(
       collection(db, "photos"),
@@ -231,6 +231,8 @@ async function loadAllPhotos() {
         serviceType = "Soccorso Sanitario";
       } else if (photo.serviceType === "pompieri") {
         serviceType = "Vigili del Fuoco";
+      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
+        serviceType = "Vigili del Fuoco";
       } else if (photo.serviceType === "guardia-costiera") {
         serviceType = "Guardia Costiera";
       } else if (photo.serviceType === "protezione-civile") {
@@ -245,22 +247,11 @@ async function loadAllPhotos() {
         status = "Foto in attesa di approvazione";
       }
 
-      return {
-        id,
-        photo,
-        statusColor,
-        status,
-        serviceType,
-        userName,
-        voteCounts,
-        linkBox
-      };
+      return { id, photo, statusColor, status, serviceType, userName, voteCounts, linkBox };
     });
 
-    // Aspetta tutte le promise
     const allPhotos = await Promise.all(photoPromises);
 
-    // Renderizza tutte le foto in ordine
     allPhotos.forEach((photoData) => {
       const { id, photo, statusColor, status, serviceType, userName, voteCounts, linkBox } = photoData;
 
@@ -290,6 +281,9 @@ async function loadAllPhotos() {
         </td>
       `;
 
+      const img = tr.querySelector('img');
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', () => openLightbox(img, photo.vehicleModel || 'Foto'));
       photosTableBody.appendChild(tr);
 
       const votesCell = document.getElementById(`votes-cell-${id}`);
@@ -298,7 +292,7 @@ async function loadAllPhotos() {
       });
     });
 
-    console.log(`📸 Totale foto: ${snapshot.size}`);
+    console.log(`Totale foto: ${snapshot.size}`);
   } catch (err) {
     console.error("Errore caricamento:", err);
     setStatus("Errore caricamento foto", "error");
@@ -363,7 +357,7 @@ window.saveVehicleLink = async (photoId) => {
     if (editBtn) editBtn.classList.remove("hidden");
     if (input) input.setAttribute("value", link);
 
-    setStatus("✅ Link salvato con successo", "success");
+    setStatus("Link salvato con successo.", "success");
 
     if (userData.emailNotifications === true) {
       sendNotificationEmail(userEmail, userName, photoName, `https://www.friuliemergenze.it/gallery/scheda/${link}`);
@@ -371,7 +365,7 @@ window.saveVehicleLink = async (photoId) => {
 
   } catch (err) {
     console.error("Errore salvataggio link:", err);
-    setStatus("❌ Errore salvataggio link", "error");
+    setStatus("Errore salvataggio link", "error");
   } finally {
     const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
     if (saveBtn) saveBtn.disabled = false;
@@ -392,11 +386,11 @@ window.deletePhoto = async (photoId) => {
         timestamp: serverTimestamp()
       });
 
-      setStatus("✅ Foto eliminata con successo", "success");
+      setStatus("Foto eliminata con successo", "success");
       loadAllPhotos();
     } catch (err) {
       console.error("Errore eliminazione foto:", err);
-      setStatus("❌ Errore eliminazione foto", "error");
+      setStatus("Errore eliminazione foto", "error");
     }
   }
 }
@@ -413,5 +407,14 @@ async function sendNotificationEmail(userEmail, userName, photoName, link) {
       photoName,
       link
     })
-  })
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Errore ${response.status}:`, errorText);
+    setStatus(`Errore notifica: ${response.status}`, 'error');
+    return;
+  }
+  
+  console.log('Notifica inviata');
 }

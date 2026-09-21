@@ -3,6 +3,7 @@ import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc, onSn
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -36,7 +37,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);

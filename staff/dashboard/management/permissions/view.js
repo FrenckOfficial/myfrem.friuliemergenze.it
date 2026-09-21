@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -43,7 +44,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);
@@ -86,11 +87,11 @@ async function loadPermissions() {
     let permissionType = [];
 
     if (u.permissionType === "photovideo_extra_fvg") {
-      permissionType.push("📸 Extra Regionali");
+      permissionType.push("Extra Regionali");
     } else if (u.permissionType === "photovideo_extra_ita") {
-      permissionType.push("🎥 Extra Italiani");
+      permissionType.push("Extra Italiani");
     } else if (u.permissionType === "all_media") {
-      permissionType.push("📸🎥 Tutti i tipi");
+      permissionType.push("Tutti i tipi");
     } else {
       permissionType.push("N/A");
     }
@@ -108,21 +109,4 @@ async function loadPermissions() {
 
     permissionsTableBody.appendChild(tr);
   });
-};
-
-async function deleteFromDatabase(userId) {
-  if (confirm("Sei sicuro di voler eliminare definitivamente questo permesso dal database? Questa azione è irreversibile.")) {
-    await deleteDoc(doc(db, "groupPermissions", userId));
-    loadPermissions();
-  }
-};
-
-function setStatus(message, type = "info") {
-    statusMsg.textContent = message;
-  statusMsg.className = `${"statusBox" + " " + type}`;
-  statusMsg.style.display = "block";
-  const closeBtn = document.getElementById("closeSMsg");
-  closeBtn.onclick = () => {
-    statusMsg.style.display = "none";
-  };
 };

@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "
 import { uploadFile } from "/helpers/uploadFile.js"
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -45,7 +46,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";;
   }, 5000);

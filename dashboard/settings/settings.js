@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, Emai
 import { uploadFile } from "/helpers/uploadFile.js";
 import { firebaseConfig } from "../../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

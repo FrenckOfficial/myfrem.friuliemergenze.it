@@ -1,11 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, getDocs, getDoc, doc, setDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -131,14 +129,9 @@ async function loadAllPhotos() {
       const voteCounts = await getVoteCounts(photoId);
       const userVote = await getUserVote(photoId);
 
-      return {
-        photoId,
-        data,
-        service,
-        userName,
-        voteCounts,
-        userVote
-      };
+      const isOwnPhoto = data.userId === currentUserId;
+
+      return { photoId, data, service, userName, voteCounts, userVote, isOwnPhoto };
     });
 
     const allPhotos = await Promise.all(photoPromises);
@@ -146,7 +139,7 @@ async function loadAllPhotos() {
     allPhotos.forEach((photoData) => {
       if (!photoData) return;
 
-      const { photoId, data, service, userName, voteCounts, userVote } = photoData;
+      const { photoId, data, service, userName, voteCounts, userVote, isOwnPhoto } = photoData;
       const card = document.createElement("div");
       card.className = "photo-card";
 
@@ -160,16 +153,22 @@ async function loadAllPhotos() {
           <p><b>Note:</b> ${data.notes || "–"}</p>
           <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank" style="font-size: var(--text-sm);color: var(--muted);margin: 0 0 var(--space-md) 0;line-height: 1.5;">${userName || "–"}</a></p>
 
-          <div class="vote-container">
-            <button class="vote-btn like-btn" data-photo-id="${photoId}" data-vote-type="like" data-user-vote="${userVote}">
-              <i class="fas fa-thumbs-up"></i>
-              <span class="vote-count">${voteCounts.likes}</span>
-            </button>
-            <button class="vote-btn dislike-btn" data-photo-id="${photoId}" data-vote-type="dislike" data-user-vote="${userVote}">
-              <i class="fas fa-thumbs-down"></i>
-              <span class="vote-count">${voteCounts.dislikes}</span>
-            </button>
-          </div>
+          ${isOwnPhoto ? `
+            <div class="vote-container disabled">
+              <p class="own-photo-notice">Non puoi votare la tua foto</p>
+            </div>
+          ` : `
+            <div class="vote-container">
+              <button class="vote-btn like-btn" data-photo-id="${photoId}" data-vote-type="like" data-user-vote="${userVote}">
+                <i class="fas fa-thumbs-up"></i>
+                <span class="vote-count">${voteCounts.likes}</span>
+              </button>
+              <button class="vote-btn dislike-btn" data-photo-id="${photoId}" data-vote-type="dislike" data-user-vote="${userVote}">
+                <i class="fas fa-thumbs-down"></i>
+                <span class="vote-count">${voteCounts.dislikes}</span>
+              </button>
+            </div>
+          `}
 
           ${
             data.vehicleLink
@@ -185,16 +184,15 @@ async function loadAllPhotos() {
 
       photosContainer.appendChild(card);
 
-      const likeBtn = card.querySelector(".like-btn");
-      const dislikeBtn = card.querySelector(".dislike-btn");
+      if (!isOwnPhoto) {
+        const likeBtn = card.querySelector(".like-btn");
+        const dislikeBtn = card.querySelector(".dislike-btn");
 
-      updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
+        updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
 
-      // Passiamo sempre (likeBtn, dislikeBtn) nello stesso ordine,
-      // indipendentemente da quale sia stato cliccato, per evitare
-      // che updateVoteButtonStates riceva i bottoni scambiati.
-      likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
-      dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", likeBtn, dislikeBtn));
+        likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
+        dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", likeBtn, dislikeBtn));
+      }
     });
 
     console.log(`Caricate ${snapshot.size} foto`);

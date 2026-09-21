@@ -1,33 +1,9 @@
 import { firebaseConfig } from "../configFirebase.js";
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
-
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  limit,
-  getDocs,
-  getDoc,
-  setDoc,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import "/helpers/loadIcons.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -60,8 +36,19 @@ const resetError = document.getElementById("error");
 const resetSuccess = document.getElementById("success");
 const resetButton = document.getElementById("resetEmailButton");
 
-function redirectByRole(role) {
+async function redirectByRole(role, userData) {
   if (allowedRoles.includes(role)) {
+    if (userData?.lastDashSelected) {
+      const dashboardMap = {
+        "admin": "/staff/dashboard",
+        "user": "/dashboard"
+      };
+      const dashboard = dashboardMap[userData.lastDashSelected];
+      if (dashboard) {
+        window.location.href = dashboard;
+        return;
+      }
+    }
     openChooseDashboardModal();
   } else {
     window.location.href = "/dashboard";
@@ -79,8 +66,21 @@ function openChooseDashboardModal() {
 
   const dashboardBtns = document.querySelectorAll('.dashboard-btn');
   dashboardBtns.forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       const dashboard = btn.getAttribute('data-dashboard');
+      const dashboardType = btn.getAttribute('data-type');
+      
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          await updateDoc(doc(db, "users", user.uid), {
+            lastDashSelected: dashboardType
+          });
+        }
+      } catch (error) {
+        console.error("Errore aggiornamento lastDashSelected:", error);
+      }
+      
       window.location.href = dashboard;
     };
   });
@@ -376,7 +376,7 @@ async function completeLogin(user, userData) {
 
   await createLoginLog(user);
 
-  redirectByRole(userData.role);
+  redirectByRole(userData.role, userData);
 }
 
 if (loginForm) {
@@ -403,7 +403,7 @@ if (loginForm) {
 
       if (!identifier.includes("@")) {
         const userData = await getUserByUsername(identifier);
-        if (!userData) throw new Error("Username non trovato.");
+        if (!userData) throw new Error("Credenziali errate.");
         email = userData.email;
       }
 
@@ -445,18 +445,19 @@ if (loginForm) {
       btnText.textContent = "Accedi";
       switch (err.code) {
         case "auth/user-not-found":
-          setStatus("Username non trovato.", "error");
+          setStatus("Credenziali errate.", "error");
           break;
         case "auth/wrong-password":
           setStatus("Password errata.", "error");
           break;
         case "auth/invalid-credential":
-          setStatus("Username o password errati.", "error");
+          setStatus("Credenziali errate.", "error");
           break;
         default:
           setStatus(err.message, "error");
           break;
       }
+      document.getElementById("loginPassword").value = "";
       console.error(err);
     } finally {
       submitBtn.disabled = false;
@@ -858,7 +859,7 @@ if (registerForm) {
   async function validateStep() {
     if (currentStep === 1) {
       if (!registerName.value.trim() || !registerSurname.value.trim()) {
-        setStatus("Inserisci nome e cognome", "error");
+        setStatus("Per poter iniziare la registrazione, devi inserire il tuo nome e il tuo cognome.", "error");
         return false;
       }
     }
@@ -866,7 +867,7 @@ if (registerForm) {
     if (currentStep === 2) {
       const username = registerUsername.value.trim();
       if (!username) {
-        setStatus("Inserisci un username", "error");
+        setStatus("Per poter continuare la registrazione, devi inserire uno username.", "error");
         return false;
       }
       if (/[^\w.-]/.test(username) || /\s/.test(username)) {
@@ -876,14 +877,20 @@ if (registerForm) {
       const usernameQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
       const usernameSnap = await getDocs(usernameQuery);
       if (!usernameSnap.empty) {
-        setStatus("Username già utilizzato", "error");
+        setStatus("Lo username inserito è già in uso.", "error");
         return false;
       }
     }
  
     if (currentStep === 3) {
       if (!registerEmail.value.trim() && !registerEmail.value.includes("@")) {
-        setStatus("Inserisci una email valida", "error");
+        setStatus("Per poter continuare la registrazione, devi inserire una email.", "error");
+        return false;
+      }
+
+      if (!registerEmail.value.includes("@")) {
+        console.log("Email non valida:", registerEmail.value);
+        setStatus("L'email inserita non è valida.", "error");
         return false;
       }
     }
@@ -891,7 +898,32 @@ if (registerForm) {
  
     if (currentStep === 5) {
       if (registerPassword.value !== registerConfirmPassword.value) {
-        setStatus("Le password non coincidono", "error");
+        setStatus("Le password inserite non corrispondono", "error");
+        return false;
+      }
+
+      if (registerPassword.value.length < 6) {
+        setStatus("La password deve essere lunga almeno 6 caratteri!", "error");
+        return false;
+      }
+
+      if (!/[A-Z]/.test(registerPassword.value)) {
+        setStatus("La password deve contenere almeno una lettera maiuscola!", "error");
+        return false;
+      }
+
+      if (!/[a-z]/.test(registerPassword.value)) {
+        setStatus("La password deve contenere almeno una lettera minuscola!", "error");
+        return false;
+      }
+
+      if (!/[0-9]/.test(registerPassword.value)) {
+        setStatus("La password deve contenere almeno un numero!", "error");
+        return false;
+      }
+
+      if (!registerPassword.value && !registerConfirmPassword.value) {
+        setStatus("Devi scegliere una password.", "error");
         return false;
       }
     }
@@ -900,17 +932,17 @@ if (registerForm) {
       const method = twoFASetup.method;
  
       if (method === "email" && !twoFASetup.emailVerified) {
-        setStatus("Verifica l'email per continuare", "error");
+        setStatus("Per continuare, devi verificare il tuo indirizzo email attraverso il messaggio inviato all'indirizzo fornito.", "error");
         return false;
       }
  
       if (method === "totp" && !twoFASetup.totpVerified) {
-        setStatus("Verifica l'app di autenticazione per continuare", "error");
+        setStatus("Per continuare, devi verificare l'app di autenticazione (Authy, Google Authenticator) attraverso il codice fornito.", "error");
         return false;
       }
  
       if ((method === "email" || method === "totp") && !document.getElementById("recovery-confirmed").checked) {
-        setStatus("Conferma di aver salvato i recovery codes", "error");
+        setStatus("Per continuare, devi confermare di aver copiato/salvato i codici di recupero.", "error");
         return false;
       }
     }
@@ -1020,7 +1052,7 @@ if (registerForm) {
         console.log("❌ Errore invio email staff:", newUserStaffResponse.status);
       }
  
-      setStatus("Email di verifica inviata.", "success");
+      setStatus("L'email di verifica è stata inviata con successo all'indirizzo fornito!", "success");
  
       await signOut(auth);
       localStorage.setItem("email", email);
@@ -1030,19 +1062,19 @@ if (registerForm) {
       btnText.textContent = "Registrazione fallita";
       switch (err.code) {
         case "auth/email-already-in-use":
-          setStatus("Email già in uso.", "error");
+          setStatus("L'email inserita è già in uso da un altro account.", "error");
           break;
         case "auth/invalid-email":
-          setStatus("Email non valida.", "error");
+          setStatus("L'email inserita non risulta valida.", "error");
           break;
         case "auth/weak-password":
-          setStatus("Password debole.", "error");
+          setStatus("La password inserita non risulta sufficientemente sicura.", "error");
           break;
         case "auth/missing-password":
-          setStatus("Compila prima tutti i campi.", "error");
+          setStatus("Per poter registrarti devi inserire una password per il tuo account.", "error");
           break;
         default:
-          setStatus("Errore durante la registrazione.", "error");
+          setStatus("C'è stato un errore durante la registrazione.", "error");
       }
       console.error(err);
     } finally {
@@ -1058,7 +1090,7 @@ resendEmailBtn?.addEventListener("click", async () => {
   const email = localStorage.getItem("email");
   
   if (!email) {
-    setStatus("Email non trovata. Ricarica la pagina.", "error");
+    setStatus("Dati utente incompleti.", "error");
     return;
   }
 
@@ -1094,7 +1126,7 @@ resendEmailBtn?.addEventListener("click", async () => {
       return;
     }
 
-    setStatus("Email reinviata! Controlla la tua casella.", "success");
+    setStatus("Email reinviata! Controlla la tua casella di posta elettronica.", "success");
 
   } catch (error) {
     setStatus("Errore durante il reinvio.", "error");
@@ -1103,46 +1135,45 @@ resendEmailBtn?.addEventListener("click", async () => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
+  if (!user) {
+    if (loginForm) document.getElementsByTagName("main")[0].style.display = "block";
+    if (registerForm) document.getElementsByTagName("main")[0].style.display = "block";
+    if (resetForm) document.getElementsByTagName("main")[0].style.display = "block";
 
-  if (isRegistering || isLoggingIn || isRouting) {
-    return;
-  }
+    return
+  };
 
-  if (pendingLogin) {
-    return;
-  }
+  if (isRegistering || isLoggingIn || isRouting) return
+
+  if (pendingLogin) return
 
   const path = window.location.pathname;
 
   const blockedPaths = [
-    "/login/signin/",
-    "/login/signup",
-    "/login/reset-your-password"
+    "/auth/signin/",
+    "/auth/signup",
+    "/auth/reset-your-password"
   ];
 
-  if (blockedPaths.some((p) => path.startsWith(p))) {
-    return;
-  }
+  const isInLoginPage = blockedPaths.some((p) => path.startsWith(p));
+  
+  if (isInLoginPage) {
+    try {
+      isRouting = true;
+      const userSnap = await getUserDoc(user.uid);
 
-  try {
-    isRouting = true;
+      if (!userSnap.exists()) {
+        return;
+      }
 
-    const userSnap = await getUserDoc(user.uid);
-
-    if (!userSnap.exists()) {
-      return;
+      const userData = userSnap.data();
+      redirectByRole(userData.role, userData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      isRouting = false;
     }
-
-    const userData = userSnap.data();
-
-    redirectByRole(userData.role);
-
-  } catch (err) {
-    console.error(err);
-
-  } finally {
-    isRouting = false;
+    return;
   }
 });
 

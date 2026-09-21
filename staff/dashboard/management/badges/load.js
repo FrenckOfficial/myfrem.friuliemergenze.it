@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, where, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -89,7 +90,7 @@ function setupSearch() {
     try {
       usersListEl.innerHTML = '<div style="color: var(--muted); text-align: center; padding: 2rem;">Ricerca in corso...</div>';
 
-      const q = query(collection(db, "users"), where("role", "=", "user"));
+      const q = query(collection(db, "users"), where("role", "==", "user"));
       const usersSnap = await getDocs(q);
 
       const results = [];
@@ -125,7 +126,7 @@ function setupSearch() {
             <div class="user-email">${user.email}</div>
           </div>
         `;
-        userItem.addEventListener("click", () => selectUser(user));
+        userItem.addEventListener("click", () => selectUser(user, userItem));
         usersListEl.appendChild(userItem);
       });
 
@@ -136,11 +137,13 @@ function setupSearch() {
   });
 }
 
-async function selectUser(user) {
+async function selectUser(user, userItemEl) {
   currentSelectedUser = user;
 
   document.querySelectorAll(".user-item").forEach(el => el.classList.remove("active"));
-  event.currentTarget.classList.add("active");
+  if (userItemEl) {
+    userItemEl.classList.add("active");
+  }
 
   badgesContentEl.style.display = "none";
   earnedBadgesContainerEl.style.display = "block";
@@ -199,13 +202,12 @@ function createBadgeCard(badgeMeta, badgeId, badgeData, isEarned) {
 
   card.innerHTML = `
     <div class="badge-info">
-      <img src="${badgeMeta.icon || '/assets/badges/default.svg'}" alt="${badgeMeta.name}" class="badge-icon">
       <div class="badge-details">
         <div class="badge-name">${badgeMeta.name}</div>
-        ${isEarned ? `<div class="badge-earned">📅 ${earnedDateStr}</div>` : `<div class="badge-earned">${badgeMeta.description || ""}</div>`}
+        ${isEarned ? `<div class="badge-earned">${earnedDateStr}</div>` : `<div class="badge-earned">${badgeMeta.description || ""}</div>`}
       </div>
     </div>
-    <button class="btn-${isEarned ? 'remove' : 'add'}">${isEarned ? '❌ Rimuovi' : '✅ Aggiungi'}</button>
+    <button class="btn-${isEarned ? 'remove' : 'add'}">${isEarned ? 'Rimuovi' : 'Aggiungi'}</button>
   `;
 
   const button = card.querySelector("button");
@@ -222,39 +224,10 @@ function createBadgeCard(badgeMeta, badgeId, badgeData, isEarned) {
 
 async function addBadge(userId, badgeId, badgeName) {
   try {
-    const badgeDocRef = doc(db, "users", userId, "badges", badgeId);
-    await updateDoc(badgeDocRef, {
+    await setDoc(doc(db, "users", userId, "badges", badgeId), {
       earnedAt: serverTimestamp(),
       notificationSent: false
-    }).catch(async (err) => {
-      if (err.code === "not-found") {
-        await updateDoc(doc(db, "users", userId, "badges", badgeId), {
-          earnedAt: serverTimestamp(),
-          notificationSent: false
-        });
-      }
-    });
-
-    await addDoc(collection(db, "users", userId, "badges"), {
-      badgeId: badgeId,
-      earnedAt: serverTimestamp(),
-      notificationSent: false
-    }).catch(() => {
-      
-    });
-
-    const badgeRef = doc(db, "users", userId, "badges", badgeId);
-    const badgeSnap = await getDoc(badgeRef);
-    if (!badgeSnap.exists()) {
-      await setDoc(badgeRef, {
-        earnedAt: serverTimestamp(),
-        notificationSent: false
-      });
-    } else {
-      await updateDoc(badgeRef, {
-        earnedAt: serverTimestamp()
-      });
-    }
+    }, { merge: true });
 
     await addDoc(collection(db, "activities"), {
       userId: userId,
@@ -264,12 +237,12 @@ async function addBadge(userId, badgeId, badgeName) {
       timestamp: serverTimestamp()
     });
 
-    setStatus(`✅ Badge "${badgeName}" assegnato con successo`, "success");
+    setStatus(`Badge "${badgeName}" assegnato con successo`, "success");
     await loadUserBadges(userId);
 
   } catch (err) {
     console.error("Errore aggiunta badge:", err);
-    setStatus(`❌ Errore nell'assegnazione del badge: ${err.message}`, "error");
+    setStatus(`Errore nell'assegnazione del badge: ${err.message}`, "error");
   }
 }
 
@@ -289,11 +262,11 @@ async function removeBadge(userId, badgeId, badgeName) {
       timestamp: serverTimestamp()
     });
 
-    setStatus(`✅ Badge "${badgeName}" rimosso con successo`, "success");
+    setStatus(`Badge "${badgeName}" rimosso con successo`, "success");
     await loadUserBadges(userId);
 
   } catch (err) {
     console.error("Errore rimozione badge:", err);
-    setStatus(`❌ Errore nella rimozione del badge: ${err.message}`, "error");
+    setStatus(`Errore nella rimozione del badge: ${err.message}`, "error");
   }
 }

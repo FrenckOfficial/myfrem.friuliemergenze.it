@@ -121,6 +121,13 @@
       </div>
     </main>
   </div>
+  <div id="lightboxOverlay" class="lightbox-overlay">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <div class="lightbox-content">
+      <img id="lightboxImg" class="lightbox-image" src="" alt="">
+      <div class="lightbox-info" id="lightboxInfo"></div>
+    </div>
+  </div>
   <script>
     (function() {
       const menuToggle = document.querySelector('.menu-toggle');
@@ -185,6 +192,39 @@
         }, 250);
       });
     })();
+    
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxInfo = document.getElementById('lightboxInfo');
+  
+    /**
+     * @param {HTMLElement} imgElement - Elemento img da visualizzare
+     * @param {string} title - Titolo opzionale da mostrare sotto
+     */
+    function openLightbox(imgElement, title = '') {
+      lightboxImg.src = imgElement.src;
+      lightboxImg.alt = imgElement.alt || 'Foto';
+      lightboxInfo.textContent = title || imgElement.alt || '';
+      lightboxOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightboxOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+  
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightboxOverlay.classList.contains('active')) {
+        closeLightbox();
+      }
+    });
+  
+    lightboxOverlay.addEventListener('click', (e) => {
+      if (e.target === lightboxOverlay) {
+        closeLightbox();
+      }
+    });
   </script>
 </body>
 </html>

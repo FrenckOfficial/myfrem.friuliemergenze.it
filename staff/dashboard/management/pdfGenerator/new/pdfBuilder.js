@@ -12,6 +12,7 @@ import { firebaseConfig } from "/configFirebase.js";
 
 import { uploadFile } from "/helpers/uploadFile.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 import {
   buildPDF,

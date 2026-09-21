@@ -1492,6 +1492,19 @@ form button {
   color: #e84855;
 }
 
+.vote-container.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.own-photo-notice {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0;
+  padding: 8px 0;
+}
+
 .first-access-modal {
   display: none;
   position: fixed;

@@ -1,21 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    query,
-    where,
-    orderBy,
-    getDoc,
-    updateDoc,
-    deleteDoc,
-    doc,
-    Timestamp,
-    addDoc
-} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, query, where, orderBy, updateDoc, deleteDoc, doc, Timestamp, addDoc } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { firebaseConfig } from '/configFirebase.js';
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -53,13 +41,13 @@ onAuthStateChanged(auth, async (user) => {
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
-    this.setStatus("Accesso negato: non sei staff!", "error");
+    setStatus("Accesso negato: non sei staff!", "error");
     window.location.href = "/dashboard";
     return;
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);
@@ -69,7 +57,7 @@ onAuthStateChanged(auth, async (user) => {
   contentEl.style.display = "block";
 });
 
-console.log('✅ Firebase inizializzato');
+console.log('Firebase inizializzato');
 
 class VehicleDraftsManager {
     constructor() {
@@ -78,19 +66,19 @@ class VehicleDraftsManager {
         this.isSaving = false;
         this.selectedPhoto = null;
         this.selectedPhotoBase64 = null;
-        console.log('🔧 VehicleDraftsManager - Costruttore inizializzato');
+        console.log('VehicleDraftsManager - Costruttore inizializzato');
         this.init();
     }
 
     init() {
-        console.log('🔧 VehicleDraftsManager - init() avviato');
+        console.log('VehicleDraftsManager - init() avviato');
         this.setupEventListeners();
         this.setupCreateDraftListeners();
         this.loadDrafts();
     }
 
     setupEventListeners() {
-        console.log('🔧 setupEventListeners - Configurazione event listener');
+        console.log('setupEventListeners - Configurazione event listener');
         const modal = document.getElementById('editDraftModal');
         if (modal) {
             modal.addEventListener('click', (e) => {
@@ -112,9 +100,8 @@ class VehicleDraftsManager {
     }
 
     setupCreateDraftListeners() {
-        console.log('🔧 setupCreateDraftListeners - Configurazione modal creazione');
+        console.log('setupCreateDraftListeners - Configurazione modal creazione');
         
-        // Bottone apertura modal creazione
         const newDraftBtn = document.getElementById('newDraftBtn');
         if (newDraftBtn) {
             newDraftBtn.addEventListener('click', () => {
@@ -122,7 +109,6 @@ class VehicleDraftsManager {
             });
         }
 
-        // Modal click per chiudere
         const createModal = document.getElementById('createDraftModal');
         if (createModal) {
             createModal.addEventListener('click', (e) => {
@@ -130,13 +116,11 @@ class VehicleDraftsManager {
             });
         }
 
-        // Form creazione
         const createForm = document.getElementById('createVehicleForm');
         if (createForm) {
             createForm.addEventListener('submit', (e) => this.createDraft(e));
         }
 
-        // Upload foto - file input click
         const photoBrowseBtn = document.getElementById('photoBrowseBtn');
         const photoInput = document.getElementById('vehiclePhotoInput');
         if (photoBrowseBtn && photoInput) {
@@ -146,14 +130,12 @@ class VehicleDraftsManager {
             });
         }
 
-        // Upload foto - file change
         if (photoInput) {
             photoInput.addEventListener('change', (e) => {
                 this.handlePhotoSelect(e.target.files[0]);
             });
         }
 
-        // Drag & drop area
         const dropZone = document.getElementById('photoDropZone');
         if (dropZone) {
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -183,7 +165,6 @@ class VehicleDraftsManager {
             });
         }
 
-        // Bottone rimozione foto
         const removePhotoBtn = document.getElementById('removePhotoBtn');
         if (removePhotoBtn) {
             removePhotoBtn.addEventListener('click', (e) => {
@@ -192,7 +173,6 @@ class VehicleDraftsManager {
             });
         }
 
-        // Input plate uppercase
         const createPlateInput = document.getElementById('createVehiclePlate');
         if (createPlateInput) {
             createPlateInput.addEventListener('input', (e) => {
@@ -202,24 +182,23 @@ class VehicleDraftsManager {
     }
 
     handlePhotoSelect(file) {
-        console.log('📷 handlePhotoSelect - File selezionato:', file?.name);
+        console.log('handlePhotoSelect - File selezionato:', file?.name);
 
         if (!file) {
-            console.warn('⚠️ Nessun file selezionato');
+            console.warn('Nessun file selezionato');
             return;
         }
 
-        // Validazione file
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
         if (!allowedTypes.includes(file.type)) {
-            this.showError('Formato file non supportato. Usa JPG, PNG o WebP');
+            setStatus('Formato file non supportato. Usa JPG, PNG o WebP', 'error');
             return;
         }
 
         if (file.size > maxSize) {
-            this.showError('File troppo grande. Massimo 5MB');
+            setStatus('File troppo grande. Massimo 5MB', 'error');
             return;
         }
 
@@ -228,11 +207,11 @@ class VehicleDraftsManager {
             this.selectedPhoto = file;
             this.selectedPhotoBase64 = e.target.result;
             this.showPhotoPreviewCreate(file.name);
-            console.log('✅ Foto caricata in memoria');
+            console.log('Foto caricata in memoria');
         };
 
         reader.onerror = () => {
-            this.showError('Errore durante la lettura del file');
+            setStatus('Errore durante la lettura del file', 'error');
         };
 
         reader.readAsDataURL(file);
@@ -249,11 +228,11 @@ class VehicleDraftsManager {
         if (previewImg) previewImg.src = this.selectedPhotoBase64;
         if (photoFileName) photoFileName.textContent = this.escapeHtml(fileName);
 
-        console.log('🖼️ Anteprima foto mostrata');
+        console.log('Anteprima foto mostrata');
     }
 
     removeSelectedPhoto() {
-        console.log('❌ removeSelectedPhoto');
+        console.log('removeSelectedPhoto');
         this.selectedPhoto = null;
         this.selectedPhotoBase64 = null;
 
@@ -267,17 +246,17 @@ class VehicleDraftsManager {
     }
 
     openCreateModal() {
-        console.log('🆕 openCreateModal');
+        console.log('openCreateModal');
         const modal = document.getElementById('createDraftModal');
         if (modal) {
             modal.classList.add('active');
-            this.removeSelectedPhoto(); // Reset foto
+            this.removeSelectedPhoto();
             document.getElementById('createVehicleForm')?.reset();
         }
     }
 
     closeCreateModal() {
-        console.log('🔒 closeCreateModal');
+        console.log('closeCreateModal');
         const modal = document.getElementById('createDraftModal');
         if (modal) {
             modal.classList.remove('active');
@@ -290,8 +269,8 @@ class VehicleDraftsManager {
     }
 
     async uploadPhotoToStorage(photoBase64, fileName) {
-        console.log('☁️ uploadPhotoToStorage - Upload foto su Supabase');
-        console.log('☁️ File:', fileName);
+        console.log('uploadPhotoToStorage - Upload foto su Supabase');
+        console.log('File:', fileName);
         
         try {
             const base64Data = photoBase64.split(',')[1];
@@ -309,7 +288,7 @@ class VehicleDraftsManager {
             const fileExt = fileName.split('.').pop().toLowerCase();
             const filePath = `vehicles/${timestamp}-${fileName.replace(/\.[^/.]+$/, "")}.${fileExt}`;
  
-            console.log('☁️ Upload file a:', filePath);
+            console.log('Upload file a:', filePath);
  
             const { data, error } = await supabase.storage
                 .from('vehicles')
@@ -319,25 +298,23 @@ class VehicleDraftsManager {
                 });
  
             if (error) {
-                console.error('❌ Errore Supabase upload:', error);
+                console.error('Errore Supabase upload:', error);
                 throw new Error(`Upload Supabase fallito: ${error.message}`);
             }
  
-            console.log('✅ File caricato:', data);
+            console.log('File caricato:', data);
  
-            const { data: publicUrlData } = supabase.storage
-                .from('vehicles')
-                .getPublicUrl(filePath);
+            const { data: publicUrlData } = supabase.storage.from('vehicles').getPublicUrl(filePath);
  
             const photoUrl = publicUrlData.publicUrl;
-            console.log('✅ Foto caricata su Supabase:', photoUrl);
+            console.log('Foto caricata su Supabase:', photoUrl);
             
             return photoUrl;
  
         } catch (error) {
-            console.error('❌ uploadPhotoToStorage - Errore:', error);
-            console.error('❌ Messaggio:', error.message);
-            this.showError(`Errore upload foto: ${error.message}`);
+            console.error('uploadPhotoToStorage - Errore:', error);
+            console.error('Messaggio:', error.message);
+            setStatus(`Errore upload foto: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -346,41 +323,37 @@ class VehicleDraftsManager {
         event.preventDefault();
 
         if (this.isSaving) {
-            console.warn('⚠️ Creazione già in corso.');
+            console.warn('Creazione già in corso.');
             return;
         }
 
         this.isSaving = true;
 
         console.log('\n═════════════════════════════════════════════');
-        console.log('✨ CREATE DRAFT - INIZIO CREAZIONE');
+        console.log('CREATE DRAFT - INIZIO CREAZIONE');
         console.log('═════════════════════════════════════════════');
 
         try {
             if (!this.selectedPhoto) {
-                this.showError('Seleziona una foto del veicolo');
+                setStatus('Seleziona una foto del veicolo', 'error');
                 this.isSaving = false;
                 return;
             }
 
             if (!this.validateCreateForm()) {
                 console.warn('⚠️ Validazione form fallita');
-                this.showError('Completa tutti i campi obbligatori');
+                setStatus('Completa tutti i campi obbligatori', 'error');
                 this.isSaving = false;
                 return;
             }
 
-            this.showLoading('Caricamento foto in corso...');
+            setStatus('Caricamento foto in corso...');
 
-            // Upload foto
-            const photoUrl = await this.uploadPhotoToStorage(
-                this.selectedPhotoBase64,
-                this.selectedPhoto.name
-            );
+            const photoUrl = await this.uploadPhotoToStorage( this.selectedPhotoBase64, this.selectedPhoto.name);
 
-            console.log('✅ Foto caricata');
+            console.log('Foto caricata');
 
-            this.showLoading('Creazione bozza in corso...');
+            setStatus('Creazione bozza in corso...');
 
             const vehicleData = this.collectCreateFormData();
             const currentUser = this.getCurrentUser();
@@ -397,10 +370,10 @@ class VehicleDraftsManager {
                 updatedBy: currentUser
             });
 
-            console.log('✅ Bozza creata con ID:', newDraftRef.id);
+            console.log('Bozza creata con ID:', newDraftRef.id);
             console.log('═════════════════════════════════════════════');
 
-            this.showSuccess('✅ Bozza creata con successo!');
+            setStatus('Bozza creata con successo!', 'success');
             this.closeCreateModal();
             
             setTimeout(() => this.loadDrafts(), 1000);
@@ -408,14 +381,14 @@ class VehicleDraftsManager {
         } catch (error) {
             console.error('❌ ERRORE NELLA CREAZIONE:', error);
             console.error('❌ Messaggio:', error.message);
-            this.showError(`Errore: ${error.message}`);
+            setStatus(`Errore: ${error.message}`, 'error');
         } finally {
             this.isSaving = false;
         }
     }
 
     validateCreateForm() {
-        console.log('✔️ validateCreateForm');
+        console.log('validateCreateForm');
         const requiredFields = [
             'createVehicleTitle',
             'createVehicleBrand',
@@ -429,7 +402,7 @@ class VehicleDraftsManager {
         for (const fieldId of requiredFields) {
             const element = document.getElementById(fieldId);
             const hasValue = element && element.value.trim();
-            console.log(`✔️ ${fieldId}:`, hasValue ? '✅' : '❌');
+            console.log(`${fieldId}:`, hasValue ? '✅' : '❌');
             if (!hasValue) return false;
         }
 
@@ -452,7 +425,7 @@ class VehicleDraftsManager {
 
     async loadDrafts() {
         try {
-            console.log('📥 loadDrafts - Caricamento bozze da Firestore...');
+            console.log('loadDrafts - Caricamento bozze da Firestore...');
             
             const q = query(
                 collection(db, 'vehiclesDraft'),
@@ -460,30 +433,30 @@ class VehicleDraftsManager {
             );
 
             const querySnapshot = await getDocs(q);
-            console.log('📥 loadDrafts - Numero bozze caricate:', querySnapshot.size);
+            console.log('loadDrafts - Numero bozze caricate:', querySnapshot.size);
 
             this.drafts = querySnapshot.docs.map(docSnap => {
                 const data = {
                     id: docSnap.id,
                     ...docSnap.data()
                 };
-                console.log('📥 Bozza trovata - ID:', docSnap.id, 'FileName:', docSnap.data().fileName, 'Status:', docSnap.data().status);
+                console.log('Bozza trovata - ID:', docSnap.id, 'FileName:', docSnap.data().fileName, 'Status:', docSnap.data().status);
                 return data;
             });
 
-            console.log('📥 loadDrafts - Array drafts aggiornato, lunghezza:', this.drafts.length);
-            console.log('📥 Drafts disponibili:', this.drafts.map(d => ({ id: d.id, fileName: d.fileName })));
+            console.log('loadDrafts - Array drafts aggiornato, lunghezza:', this.drafts.length);
+            console.log('Drafts disponibili:', this.drafts.map(d => ({ id: d.id, fileName: d.fileName })));
             this.renderDrafts();
 
         } catch (error) {
-            console.error('❌ loadDrafts - Errore:', error);
-            this.showError('Errore nel caricamento delle bozze');
+            console.error('loadDrafts - Errore:', error);
+            setStatus('Errore nel caricamento delle bozze', 'error');
             this.renderEmptyState();
         }
     }
 
     renderDrafts() {
-        console.log('🎨 renderDrafts - Rendering lista bozze, numero bozze:', this.drafts.length);
+        console.log('renderDrafts - Rendering lista bozze, numero bozze:', this.drafts.length);
         const draftsList = document.getElementById('draftsList');
         const emptyState = document.getElementById('emptyState');
         const draftCount = document.getElementById('draftCount');
@@ -491,52 +464,48 @@ class VehicleDraftsManager {
         const publishedDraftCount = document.getElementById('publishedDraftsCount');
 
         if (!draftsList) {
-            console.error('❌ renderDrafts - Elemento draftsList non trovato');
+            console.error('renderDrafts - Elemento draftsList non trovato');
             return;
         }
 
         if (this.drafts.length === 0) {
-            console.log('🎨 renderDrafts - Nessuna bozza, mostra empty state');
+            console.log('renderDrafts - Nessuna bozza, mostra empty state');
             this.renderEmptyState();
             return;
         }
 
         emptyState.style.display = 'none';
-        draftCount.textContent = this.drafts.filter(
-            d => d.status !== "published"
-        ).length;
+        draftCount.textContent = this.drafts.filter(d => d.status !== "published").length;
         totalDraftCount.textContent = this.drafts.length;
-        publishedDraftCount.textContent = this.drafts.filter(
-            d => d.status === "published"
-        ).length;
+        publishedDraftCount.textContent = this.drafts.filter(d => d.status === "published").length;
 
         draftsList.innerHTML = this.drafts.map(draft => this.renderDraftRow(draft)).join('');
 
-        console.log('🎨 renderDrafts - Aggiunta event listener ai pulsanti (btn-open e btn-delete)');
+        console.log('renderDrafts - Aggiunta event listener ai pulsanti (btn-open e btn-delete)');
         
         document.querySelectorAll('.btn-open').forEach((btn, idx) => {
             const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante open #${idx} - data-draft-id="${draftId}"`);
+            console.log(`renderDrafts - Pulsante open #${idx} - data-draft-id="${draftId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante open cliccato! draftId:', draftId);
+                console.log('EVENT: Pulsante open cliccato! draftId:', draftId);
                 this.openDraftModal(draftId);
             });
         });
 
         document.querySelectorAll('.btn-delete').forEach((btn, idx) => {
             const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante delete #${idx} - data-draft-id="${draftId}"`);
+            console.log(`renderDrafts - Pulsante delete #${idx} - data-draft-id="${draftId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante delete cliccato! draftId:', draftId);
+                console.log('EVENT: Pulsante delete cliccato! draftId:', draftId);
                 this.deleteDraft(draftId);
             });
         });
 
         document.querySelectorAll('.btn-view').forEach((btn, idx) => {
             const draftId = btn.dataset.draftId;
-            console.log(`🎨 renderDrafts - Pulsante view #${idx} - data-draft-id="${draftId}"`);
+            console.log(`renderDrafts - Pulsante view #${idx} - data-draft-id="${draftId}"`);
             btn.addEventListener('click', (e) => {
-                console.log('🎨 EVENT: Pulsante view cliccato! draftId:', draftId);
+                console.log('EVENT: Pulsante view cliccato! draftId:', draftId);
                 this.openDraftViewer(draftId);
             })
         })
@@ -545,16 +514,16 @@ class VehicleDraftsManager {
     renderDraftRow(draft) {
         let statusClass = 'status-pending'
         const createdAtFormatted = this.formatDate(draft.createdAt);
-        let statusText = '⏳ In attesa';
+        let statusText = 'In attesa';
 
         if (draft.status === "pending") {
             statusClass = 'status-pending';
         } else if (draft.status === "in_progress") {
             statusClass = 'status-in-progress';
-            statusText = '📝 In lavorazione';
+            statusText = 'In lavorazione';
         } else if (draft.status === "published") {
             statusClass = 'status-published';
-            statusText = '✅ Pubblicata';
+            statusText = 'Pubblicata';
         }
 
         return `
@@ -580,7 +549,7 @@ class VehicleDraftsManager {
     }
 
     renderEmptyState() {
-        console.log('🎨 renderEmptyState - Mostra stato vuoto');
+        console.log('renderEmptyState - Mostra stato vuoto');
         const draftsList = document.getElementById('draftsList');
         const emptyState = document.getElementById('emptyState');
         const draftCount = document.getElementById('draftCount');
@@ -591,10 +560,10 @@ class VehicleDraftsManager {
     }
 
     openDraftModal(draftId) {
-        console.log('🔓 openDraftModal - INIZIO');
-        console.log('🔓 draftId ricevuto:', draftId, '| Tipo:', typeof draftId);
-        console.log('🔓 this.drafts.length:', this.drafts.length);
-        console.log('🔓 Drafts IDs disponibili:', this.drafts.map(d => d.id));
+        console.log('openDraftModal - INIZIO');
+        console.log('draftId ricevuto:', draftId, '| Tipo:', typeof draftId);
+        console.log('this.drafts.length:', this.drafts.length);
+        console.log('Drafts IDs disponibili:', this.drafts.map(d => d.id));
         
         const draft = this.drafts.find(d => {
             const match = d.id === draftId;
@@ -605,15 +574,15 @@ class VehicleDraftsManager {
         if (!draft) {
             console.error('❌ openDraftModal - Draft NON trovato!');
             console.error('❌ Cercavo ID:', draftId);
-            console.error('❌ IDs disponibili:', this.drafts.map(d => d.id));
-            this.showError('Bozza non trovata');
+            console.error('IDs disponibili:', this.drafts.map(d => d.id));
+            setStatus('Bozza non trovata', 'error');
             return;
         }
 
-        console.log('✅ openDraftModal - Draft TROVATO:', draft.fileName);
+        console.log('openDraftModal - Draft TROVATO:', draft.fileName);
         
         this.currentDraftId = draftId;
-        console.log('🔓 currentDraftId = ' + this.currentDraftId);
+        console.log('currentDraftId = ' + this.currentDraftId);
 
         this.populateForm(draft);
         this.showPhotoPreview(draft);
@@ -621,12 +590,12 @@ class VehicleDraftsManager {
         const modal = document.getElementById('editDraftModal');
         if (modal) {
             modal.classList.add('active');
-            console.log('✅ openDraftModal - Modal aperto');
+            console.log('openDraftModal - Modal aperto');
         }
     }
 
     populateForm(draft) {
-        console.log('📝 populateForm - Compilazione form');
+        console.log('populateForm - Compilazione form');
         const formFields = {
             vehicleTitle: 'title',
             vehicleBrand: 'brand',
@@ -662,7 +631,7 @@ class VehicleDraftsManager {
     }
 
     closeDraftModal() {
-        console.log('🔒 closeDraftModal');
+        console.log('closeDraftModal');
         const modal = document.getElementById('editDraftModal');
         if (modal) {
             modal.classList.remove('active');
@@ -679,52 +648,52 @@ class VehicleDraftsManager {
         event.preventDefault();
 
         if (this.isSaving) {
-            console.warn('⚠️ Salvataggio già in corso.');
+            console.warn('Salvataggio già in corso.');
             return;
         }
 
         this.isSaving = true;
         
         console.log('\n═════════════════════════════════════════════');
-        console.log('💾 SAVE DRAFT - INIZIO SALVATAGGIO');
+        console.log('SAVE DRAFT - INIZIO SALVATAGGIO');
         console.log('═════════════════════════════════════════════');
-        console.log('💾 this.currentDraftId:', this.currentDraftId);
-        console.log('💾 typeof this.currentDraftId:', typeof this.currentDraftId);
-        console.log('💾 this.drafts.length:', this.drafts.length);
+        console.log('this.currentDraftId:', this.currentDraftId);
+        console.log('typeof this.currentDraftId:', typeof this.currentDraftId);
+        console.log('this.drafts.length:', this.drafts.length);
 
         const draft = this.drafts.find(d => d.id === this.currentDraftId);
         
-        console.log('💾 Draft trovato nel array?', draft ? 'SÌ' : 'NO');
+        console.log('Draft trovato nel array?', draft ? 'SÌ' : 'NO');
         
         if (!draft) {
-            console.error('❌ ERRORE: Draft non trovato!');
-            console.error('❌ Cercavo ID:', this.currentDraftId);
-            console.error('❌ IDs disponibili:', this.drafts.map(d => d.id));
-            this.showError('Bozza non trovata');
+            console.error('ERRORE: Draft non trovato!');
+            console.error('Cercavo ID:', this.currentDraftId);
+            console.error('IDs disponibili:', this.drafts.map(d => d.id));
+            setStatus('Bozza non trovata', 'error');
             this.isSaving = false;
             return;
         }
 
         if (!this.validateForm()) {
-            console.warn('⚠️ Validazione form fallita');
-            this.showError('Completa tutti i campi obbligatori');
+            console.warn('Validazione form fallita');
+            setStatus('Completa tutti i campi obbligatori', 'error');
             this.isSaving = false;
             return;
         }
 
         const vehicleData = this.collectFormData();
-        console.log('💾 Vehicle data raccolto:', vehicleData);
+        console.log('Vehicle data raccolto:', vehicleData);
 
         try {
-            this.showLoading('Salvataggio in corso...');
+            setStatus('Salvataggio in corso...');
 
             const draftRef = doc(db, 'vehiclesDraft', this.currentDraftId);
-            console.log('💾 Doc reference creato per ID:', this.currentDraftId);
+            console.log('Doc reference creato per ID:', this.currentDraftId);
 
             const currentUser = this.getCurrentUser();
-            console.log('💾 Utente corrente:', currentUser);
+            console.log('Utente corrente:', currentUser);
 
-            console.log('💾 → Esecuzione updateDoc...');
+            console.log('Esecuzione updateDoc...');
             
             await updateDoc(draftRef, {
                 status: 'in_progress',
@@ -734,7 +703,7 @@ class VehicleDraftsManager {
                 updatedBy: currentUser || 'Staff User'
             });
 
-            console.log('✅ updateDoc completato!');
+            console.log('updateDoc completato!');
 
             await this.triggerGithubWorkflow(this.currentDraftId);
 
@@ -747,9 +716,9 @@ class VehicleDraftsManager {
             draft.slug = vehicleData.slug;
             draft.updatedAt = new Date().toISOString();
 
-            console.log('✅ Stato locale aggiornato');
+            console.log('Stato locale aggiornato');
             console.log('═════════════════════════════════════════════');
-            this.showSuccess('✅ Bozza in pubblicazione!');
+            setStatus('Bozza in pubblicazione!', 'success');
             console.log('═════════════════════════════════════════════\n');
 
             this.closeDraftModal();
@@ -759,21 +728,19 @@ class VehicleDraftsManager {
             console.error('❌ ERRORE NEL SALVATAGGIO:', error);
             console.error('❌ Messaggio:', error.message);
             console.error('❌ Stack:', error.stack);
-            this.showError(`Errore: ${error.message}`);
+            setStatus(`Errore: ${error.message}`, 'error');
         } finally {
             this.isSaving = false;
         }
     }
 
     async triggerGithubWorkflow(draftId) {
-        console.log("🚀 Trigger workflow GitHub");
-        console.log("🚀 Draft ID:", draftId);
-        console.log("🚀 Body che verrà inviato:", JSON.stringify({ draftId }));
+        console.log("Trigger workflow GitHub");
+        console.log("Draft ID:", draftId);
+        console.log("Body che verrà inviato:", JSON.stringify({ draftId }));
 
         try {
-            const response = await fetch(
-                "/api/triggerVehicleWorkflow",
-                {
+            const response = await fetch("/api/triggerVehicleWorkflow", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -784,15 +751,15 @@ class VehicleDraftsManager {
                 }
             );
 
-            console.log("🚀 Status risposta:", response.status);
-            console.log("🚀 OK:", response.ok);
+            console.log("Status risposta:", response.status);
+            console.log("OK:", response.ok);
 
             const text = await response.text();
-            console.log("🚀 Response body:", text);
+            console.log("Response body:", text);
 
             if (!response.ok) {
-                console.error("❌ Errore GitHub workflow:", response.status);
-                console.error("❌ Response:", text);
+                console.error("Errore GitHub workflow:", response.status);
+                console.error("Response:", text);
                 
                 try {
                     const errorJson = JSON.parse(text);
@@ -802,21 +769,21 @@ class VehicleDraftsManager {
                 }
             }
 
-            console.log("✅ Workflow avviato correttamente");
+            console.log("Workflow avviato correttamente");
         } catch (error) {
-            console.error("❌ triggerGithubWorkflow - Errore:", error);
+            console.error("triggerGithubWorkflow - Errore:", error);
             throw error;
         }
     }
 
     validateForm() {
-        console.log('✔️ validateForm');
+        console.log('validateForm');
         const requiredFields = ['vehicleTitle', 'vehicleBrand', 'vehicleModel', 'vehiclePlate', 'vehicleService', 'vehicleSlug', 'vehicleHQ'];
         
         for (const fieldId of requiredFields) {
             const element = document.getElementById(fieldId);
             const hasValue = element && element.value.trim();
-            console.log(`✔️ ${fieldId}:`, hasValue ? '✅' : '❌');
+            console.log(`${fieldId}:`, hasValue ? '✅' : '❌');
             if (!hasValue) return false;
         }
 
@@ -838,21 +805,21 @@ class VehicleDraftsManager {
     }
 
     async deleteDraft(draftId) {
-        console.log('🗑️ deleteDraft:', draftId);
+        console.log('deleteDraft:', draftId);
         
         if (confirm('Sei sicuro di voler eliminare questo veicolo dal sistema?')) {
             try {
-                this.showLoading('Eliminazione in corso...');
+                setStatus('Eliminazione in corso...');
                 const draftRef = doc(db, 'vehiclesDraft', draftId);
                 await deleteDoc(draftRef);
     
                 this.drafts = this.drafts.filter(d => d.id !== draftId);
                 this.renderDrafts();
-                this.showSuccess('✅ Bozza eliminata');
+                setStatus('Bozza eliminata', 'success');
     
             } catch (error) {
                 console.error('❌ deleteDraft - Errore:', error);
-                this.showError(`Errore: ${error.message}`);
+                setStatus(`Errore: ${error.message}`, 'error');
             }
         } else {
             alert('Operazione annullata.');
@@ -894,49 +861,13 @@ class VehicleDraftsManager {
         return div.innerHTML;
     }
 
-    showError(message) {
-        console.error('❌', message);
-        if (window.showNotification) {
-            window.showNotification(message, 'error');
-        } else {
-            this.setStatus(message, "error");
-        }
-    }
-
-    showSuccess(message) {
-        console.log('✅', message);
-        if (window.showNotification) {
-            window.showNotification(message, 'success');
-        } else {
-            this.setStatus(message, "success");
-        }
-    }
-
-    showLoading(message) {
-        console.log('⏳', message);
-        if (window.showNotification) {
-            window.showNotification(message, 'loading');
-        }
-    }
-
-    setStatus(message, type) {
-        if (!statusMsg) return;
-        statusMsg.textContent = message;
-        statusMsg.className = `${"statusBox" + " " + type}`;
-        statusMsg.style.display = "block";
-        const closeBtn = document.getElementById("closeSMsg");
-        closeBtn.onclick = () => {
-            statusMsg.style.display = "none";
-        }
-    }
-
     openDraftViewer(draftId) {
-        console.log('👁️ openDraftViewer - Visualizzazione bozza');
+        console.log('openDraftViewer - Visualizzazione bozza');
         
         const draft = this.drafts.find(d => d.id === draftId);
         
         if (!draft) {
-            this.showError('Bozza non trovata');
+            setStatus('Bozza non trovata', 'error');
             return;
         }
 
@@ -950,7 +881,7 @@ class VehicleDraftsManager {
     }
 
     populateViewerForm(draft) {
-        console.log('📖 populateViewerForm - Compilazione form lettura');
+        console.log('populateViewerForm - Compilazione form lettura');
         const photoImg = document.getElementById('viewerPhotoImg');
         if (photoImg && draft.photoUrl) {
             photoImg.src = draft.photoUrl;
@@ -996,4 +927,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteDraft = (draftId) => window.vehicleDraftsManager.deleteDraft(draftId);
 });
 
-console.log('✅ Script vehiclesDraft caricato - DEBUG ABILITATO');
+console.log('Script vehiclesDraft caricato - DEBUG ABILITATO');

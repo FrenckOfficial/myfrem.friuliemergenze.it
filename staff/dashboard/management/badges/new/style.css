@@ -47,7 +47,7 @@ select {
 }
 
 .sidebar {
-  width: 210px;
+  width: 250px;
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   color: var(--text);

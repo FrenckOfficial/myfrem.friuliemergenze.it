@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -22,7 +23,6 @@ const thresholdHint = document.getElementById("thresholdHint");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 const logoutBtn = document.getElementById("logoutBtn");
-const iconPreview = document.getElementById("iconPreview");
 const previewImg = document.getElementById("previewImg");
 
 const criteriaHints = {
@@ -107,11 +107,14 @@ async function createBadge() {
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
+  const defaultIcon = '/assets/badges/default.svg';
+
   const badgeData = {
     id: badgeId,
     name: badgeNameInput.value,
     description: badgeDescriptionInput.value,
     color: badgeColorInput.value,
+    icon: defaultIcon,
     criteria: {
       type: criteriaTypeInput.value,
       threshold: parseInt(criteriaThresholdInput.value) || 0
@@ -120,28 +123,27 @@ async function createBadge() {
     createdAt: serverTimestamp()
   };
 
-  if (!badgeData.name || !badgeData.description || !badgeData.icon || !badgeData.criteria.type) {
-    setStatus("❌ Compila tutti i campi obbligatori", "error");
+  if (!badgeData.name || !badgeData.description || !badgeData.criteria.type) {
+    setStatus("Compila tutti i campi obbligatori", "error");
     return;
   }
 
   try {
     await setDoc(doc(db, "badges", badgeId), badgeData);
-    setStatus(`✅ Badge "${badgeData.name}" creato con successo!`, "success");
+    setStatus(`Badge "${badgeData.name}" creato con successo!`, "success");
     badgeForm.reset();
     badgeColorInput.value = "#ff7b00";
     badgeColorHexInput.value = "#ff7b00";
-    iconPreview.style.display = "none";
     await loadBadges();
   } catch (err) {
     console.error("Errore creazione badge:", err);
-    setStatus(`❌ Errore: ${err.message}`, "error");
+    setStatus(`Errore: ${err.message}`, "error");
   }
 }
 
 async function loadBadges() {
   try {
-    const badgesSnap = await getDocs(collection(db, "badges"));
+    const badgesSnap = await getDocs(collection(db, "badges"), orderBy("createdAt", "desc"));
     badgesListEl.innerHTML = "";
 
     if (badgesSnap.empty) {
@@ -162,14 +164,20 @@ async function loadBadges() {
 }
 
 function createBadgeCard(badge, badgeId) {
+  let type = badge.criteria.type;
   const card = document.createElement("div");
   card.className = "badge-card";
+
+  if (badge.criteria.type === "photos") {
+    type = `Foto`;
+  } else if (badge.criteria.type === "surveys") {
+    type = `Sondaggi`;
+  }
 
   const statusClass = badge.enabled ? "enabled" : "disabled";
 
   card.innerHTML = `
     <div class="badge-card-header">
-      <img src="${badge.icon}" alt="${badge.name}" class="badge-card-icon">
       <div class="badge-card-info">
         <div class="badge-card-name">${badge.name}</div>
         <div class="badge-card-desc">${badge.description}</div>
@@ -180,7 +188,7 @@ function createBadgeCard(badge, badgeId) {
     <div class="badge-card-details">
       <div class="detail-row">
         <span class="detail-label">Criterio:</span>
-        <span class="detail-value">${badge.criteria.type}</span>
+        <span class="detail-value">${type}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Soglia:</span>
@@ -196,9 +204,9 @@ function createBadgeCard(badge, badgeId) {
     </div>
 
     <div class="badge-card-actions">
-      <button class="btn-edit" data-badge-id="${badgeId}">✏️ Modifica</button>
-      <button class="btn-delete" data-badge-id="${badgeId}">🗑️ Elimina</button>
-      <button class="btn-toggle" data-badge-id="${badgeId}">${badge.enabled ? '⏸️ Disattiva' : '▶️ Attiva'}</button>
+      <button class="btn-edit" data-badge-id="${badgeId}">Modifica</button>
+      <button class="btn-delete" data-badge-id="${badgeId}">Elimina</button>
+      <button class="btn-toggle" data-badge-id="${badgeId}">${badge.enabled ? 'Disattiva' : 'Attiva'}</button>
     </div>
   `;
 
@@ -223,11 +231,10 @@ function editBadge(badgeId, badge) {
   badgeEnabledInput.checked = badge.enabled;
   
   previewImg.src = badge.icon;
-  iconPreview.style.display = "block";
   thresholdHint.textContent = criteriaHints[badge.criteria.type] || "";
 
   const submitBtn = badgeForm.querySelector("button[type='submit']");
-  submitBtn.textContent = "💾 Aggiorna Badge";
+  submitBtn.textContent = "Aggiorna Badge";
 
   badgeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -251,17 +258,16 @@ async function updateBadge(badgeId) {
 
   try {
     await updateDoc(doc(db, "badges", badgeId), badgeData);
-    setStatus(`✅ Badge aggiornato con successo!`, "success");
+    setStatus(`Badge aggiornato con successo!`, "success");
     badgeForm.reset();
     badgeColorInput.value = "#ff7b00";
     badgeColorHexInput.value = "#ff7b00";
-    iconPreview.style.display = "none";
     const submitBtn = badgeForm.querySelector("button[type='submit']");
-    submitBtn.textContent = "✅ Crea Badge";
+    submitBtn.textContent = "Crea Badge";
     await loadBadges();
   } catch (err) {
     console.error("Errore aggiornamento:", err);
-    setStatus(`❌ Errore: ${err.message}`, "error");
+    setStatus(`Errore: ${err.message}`, "error");
   }
 }
 
@@ -272,11 +278,11 @@ async function deleteBadge(badgeId, badgeName) {
 
   try {
     await deleteDoc(doc(db, "badges", badgeId));
-    setStatus(`✅ Badge eliminato con successo`, "success");
+    setStatus(`Badge eliminato con successo`, "success");
     await loadBadges();
   } catch (err) {
     console.error("Errore eliminazione:", err);
-    setStatus(`❌ Errore: ${err.message}`, "error");
+    setStatus(`Errore: ${err.message}`, "error");
   }
 }
 
@@ -285,10 +291,10 @@ async function toggleBadge(badgeId, currentEnabled) {
     await updateDoc(doc(db, "badges", badgeId), {
       enabled: !currentEnabled
     });
-    setStatus(`✅ Badge ${!currentEnabled ? 'attivato' : 'disattivato'} con successo`, "success");
+    setStatus(`Badge ${!currentEnabled ? 'attivato' : 'disattivato'} con successo`, "success");
     await loadBadges();
   } catch (err) {
     console.error("Errore toggle:", err);
-    setStatus(`❌ Errore: ${err.message}`, "error");
+    setStatus(`Errore: ${err.message}`, "error");
   }
 }

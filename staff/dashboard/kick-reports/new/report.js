@@ -1,9 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDoc, doc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { uploadFile } from "/helpers/uploadFile.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11,19 +12,22 @@ const db = getFirestore(app);
 let currentUserId = null;
 
 const logoutBtn = document.getElementById("logoutBtn");
-onAuthStateChanged(auth, (user) => {
+
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "/login";
+    return;
   }
 
-  currentUserId = user.uid;
+  const userDoc = await getDocs(
+    query(collection(db, "users"), where("__name__", "==", user.uid))
+  );
 
-  const allowedRoles = ["advstaff", "advstaffplus", "superadmin"];
+  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
-  if (!user || !allowedRoles.includes(user.role)) {
-    setStatus("Accesso negato: solo staff autorizzato.", "error");
-    window.location.href = "/staff/dashboard/";
-    auth.keptSignIn = true;
+  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
+    setStatus("Accesso negato: non sei staff!", "error");
+    window.location.href = "/dashboard";
     return;
   }
 });

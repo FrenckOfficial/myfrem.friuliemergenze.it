@@ -1,10 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "../../configFirebase.js"
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import "/helpers/loadIcons.js";
 import { getUserName } from "../../helpers/getUserName.js";
 
 const app = initializeApp(firebaseConfig);
@@ -160,6 +161,10 @@ onAuthStateChanged(auth, async (user) => {
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
 
+  await updateDoc(doc(db, "users", user.uid), {
+    lastDashSelected: "admin",
+  });
+
   const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
@@ -171,7 +176,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const timeoutId = setTimeout(() => {
-    console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+    console.warn("Timeout caricamento, forzo visualizzazione");
     loadingEl.style.display = "none";
     contentEl.style.display = "block";
   }, 7000);

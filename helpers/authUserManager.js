@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, collection, doc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "./helpers/modals.js";
+import "/helpers/loadIcons.js";
 
 class AuthManager {
   constructor() {
@@ -39,7 +40,7 @@ class AuthManager {
    */
   init(callback) {
     const timeoutId = setTimeout(() => {
-      console.warn("⏱️ Timeout caricamento, forzo visualizzazione");
+      console.warn("Timeout caricamento, forzo visualizzazione");
       this.showContent();
     }, this.loadingTimeout);
 

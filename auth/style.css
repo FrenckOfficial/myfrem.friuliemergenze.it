@@ -153,6 +153,10 @@ body {
   max-width: 280px;
 }
 
+main {
+  display: none !important;
+}
+
 .feature-list {
   margin-top: 32px;
   list-style: none;
