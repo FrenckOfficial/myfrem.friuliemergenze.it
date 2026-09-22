@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { firebaseConfig } from '/configFirebase.js';
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { uploadFile } from "/helpers/uploadFile.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -268,48 +269,16 @@ class VehicleDraftsManager {
         }
     }
 
-    async uploadPhotoToStorage(photoBase64, fileName) {
+    async uploadPhotoToStorage(fileName, currentUserId) {
         console.log('uploadPhotoToStorage - Upload foto su Supabase');
         console.log('File:', fileName);
         
         try {
-            const base64Data = photoBase64.split(',')[1];
-            const byteCharacters = atob(base64Data);
-            const byteNumbers = new Array(byteCharacters.length);
+            const imageUrl = await uploadFile(fileName, "myfrem-photos", currentUserId);
+ 
+            console.log('Foto caricata su Cloduflare R2:', imageUrl);
             
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'image/jpeg' });
- 
-            const timestamp = Date.now();
-            const fileExt = fileName.split('.').pop().toLowerCase();
-            const filePath = `vehicles/${timestamp}-${fileName.replace(/\.[^/.]+$/, "")}.${fileExt}`;
- 
-            console.log('Upload file a:', filePath);
- 
-            const { data, error } = await supabase.storage
-                .from('vehicles')
-                .upload(filePath, blob, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
- 
-            if (error) {
-                console.error('Errore Supabase upload:', error);
-                throw new Error(`Upload Supabase fallito: ${error.message}`);
-            }
- 
-            console.log('File caricato:', data);
- 
-            const { data: publicUrlData } = supabase.storage.from('vehicles').getPublicUrl(filePath);
- 
-            const photoUrl = publicUrlData.publicUrl;
-            console.log('Foto caricata su Supabase:', photoUrl);
-            
-            return photoUrl;
+            return imageUrl;
  
         } catch (error) {
             console.error('uploadPhotoToStorage - Errore:', error);
@@ -349,7 +318,9 @@ class VehicleDraftsManager {
 
             setStatus('Caricamento foto in corso...');
 
-            const photoUrl = await this.uploadPhotoToStorage( this.selectedPhotoBase64, this.selectedPhoto.name);
+            const currentUserId = this.getCurrentUser().uid;
+
+            const photoUrl = await this.uploadPhotoToStorage(this.selectedPhoto.name, currentUserId);
 
             console.log('Foto caricata');
 

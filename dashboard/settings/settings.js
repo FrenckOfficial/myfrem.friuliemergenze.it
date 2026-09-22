@@ -218,7 +218,7 @@ profilePicForm.addEventListener("submit", async (e) => {
 });
 
 copyProfileLinkBtn.addEventListener("click", () => {
-  const profileLink = `https://myfrem.friuliemergenze.it/profile/?userid=${currentUserId}`;
+  const profileLink = `https://account.friuliemergenze.it/?usp=${currentUserId}`;
   navigator.clipboard.writeText(profileLink);
   setStatus("closePStatus", "profileStatusBox", "profileStatus", "Link copiato!", "success");
 })
