@@ -233,35 +233,41 @@ async function createPhotobookDetailsPage(
 
 function getServiceLabel(service) {
   switch (service) {
+    case "ordine-pubblico":
+      return "Ordine Pubblico";
+
+    case "carabinieri":
+      return "Carabinieri";
+
+    case "polizia-locale":
+      return "Polizia Locale / Municipale";
+
+    case "polizia-di-stato":
+      return "Polizia di Stato";
+
+    case "soccorso-alpino":
+      return "Soccorso Alpino e Speleologico";
+
+    case "corpo-forestale-regionale":
+      return "Corpo Forestale Regionale";
+
+    case "guardia-di-finanza":
+      return "Guardia di Finanza";
+
+    case "emergenza-sanitaria":
+      return "Soccorso Sanitario";
+
     case "ambulanza":
       return "Soccorso Sanitario";
 
     case "pompieri":
       return "Vigili del Fuoco";
 
-    case "protezione_civile":
-      return "Protezione Civile";
-
-    case "soccorso_alpino":
-      return "Soccorso Alpino";
-
-    case "guardia_costiera":
+    case "guardia-costiera":
       return "Guardia Costiera";
 
-    case "polizia_di_stato":
-      return "Polizia di Stato";
-
-    case "carabinieri":
-      return "Carabinieri";
-
-    case "guardia_di_finanza":
-      return "Guardia di Finanza";
-      
-    case "polizia_locale":
-      return "Polizia Locale";
-
-    case "soccorso_sanitario":
-      return "Soccorso Sanitario";
+    case "protezione-civile":
+      return "Protezione Civile";
 
     default:
       return service || "N/A";

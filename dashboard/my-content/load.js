@@ -225,13 +225,19 @@ async function loadPhotos(userId) {
 
 function getServiceLabel(service) {
   const services = {
-    "emergenza-sanitaria": "Emergenza Sanitaria Territoriale",
-    "soccorso-tecnico-urgente": "Vigili del Fuoco",
+    "ordine-pubblico": "Ordine Pubblico",
+    "carabinieri": "Carabinieri",
+    "polizia-locale": "Polizia Locale / Municipale",
+    "polizia-di-stato": "Polizia di Stato",
+    "soccorso-alpino": "Soccorso Alpino e Speleologico",
+    "corpo-forestale-regionale": "Corpo Forestale Regionale",
+    "guardia-di-finanza": "Guardia di Finanza",
+    "emergenza-sanitaria": "Soccorso Sanitario",
+    "ambulanza": "Soccorso Sanitario",
     "pompieri": "Vigili del Fuoco",
-    "protezione-civile": "Protezione Civile",
-    "soccorso-alpino": "Soccorso Alpino",
     "guardia-costiera": "Guardia Costiera",
-    "ordine-pubblico": "Ordine Pubblico"
+    "protezione-civile": "Protezione Civile"
   };
+
   return services[service] || service || "N/A";
 }

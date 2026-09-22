@@ -311,29 +311,41 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 
 function getServiceLabel(service) {
   switch (service) {
-    case "emergenza-sanitaria":
-      return "Emergenza Sanitaria Territoriale";
+    case "ordine-pubblico":
+      return "Ordine Pubblico";
 
-    case "soccorso-tecnico-urgente":
-      return "Vigili del Fuoco";
+    case "carabinieri":
+      return "Carabinieri";
+
+    case "polizia-locale":
+      return "Polizia Locale / Municipale";
+
+    case "polizia-di-stato":
+      return "Polizia di Stato";
+
+    case "soccorso-alpino":
+      return "Soccorso Alpino e Speleologico";
+
+    case "corpo-forestale-regionale":
+      return "Corpo Forestale Regionale";
+
+    case "guardia-di-finanza":
+      return "Guardia di Finanza";
+
+    case "emergenza-sanitaria":
+      return "Soccorso Sanitario";
+
+    case "ambulanza":
+      return "Soccorso Sanitario";
 
     case "pompieri":
       return "Vigili del Fuoco";
 
-    case "protezione-civile":
-      return "Protezione Civile";
-
-    case "soccorso-alpino":
-      return "Soccorso Alpino";
-
     case "guardia-costiera":
       return "Guardia Costiera";
 
-    case "ordine-pubblico":
-      return "Ordine Pubblico";
-
-    case "trasporti-secondari":
-      return "Trasporti Sanitari Secondari";
+    case "protezione-civile":
+      return "Protezione Civile";
 
     default:
       return service || "N/A";
