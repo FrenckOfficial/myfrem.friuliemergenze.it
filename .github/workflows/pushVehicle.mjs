@@ -9,7 +9,7 @@ process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
 });
 
-console.log("🚀 Avvio pushVehicle.mjs");
+console.log("Avvio pushVehicle.mjs");
 
 console.log("FIREBASE_PROJECT_ID:", !!process.env.FIREBASE_PROJECT_ID);
 console.log("FIREBASE_CLIENT_EMAIL:", !!process.env.FIREBASE_CLIENT_EMAIL);
@@ -39,7 +39,7 @@ const GITHUB_OWNER = "FrenckOfficial";
 const GITHUB_REPO = "friuliemergenze.it";
 const GITHUB_BRANCH = "main";
 
-console.log("🔍 Verifica repository...");
+console.log("Verifica repository...");
 
 const repoInfo = await octokit.repos.get({
   owner: GITHUB_OWNER,
@@ -55,7 +55,7 @@ async function pushVehicleToGithub() {
     throw new Error("DRAFT_ID non fornito");
   }
 
-  console.log("📦 Draft:", draftId);
+  console.log("Draft:", draftId);
 
   const draftSnapshot = await db
     .collection("vehiclesDraft")
@@ -68,43 +68,57 @@ async function pushVehicleToGithub() {
 
   const draft = draftSnapshot.data();
 
-  console.log("✅ Bozza caricata:", draft.fileName);
+  console.log("Bozza caricata:", draft.fileName);
 
   const stafferId = draft.updatedBy || draft.createdBy || "github-action";
-  const fileName = draft.fileName.replace(/\.[^.]+$/, "");
   const vehicleData = draft.data || {};
   const sourcePhotoId = draft.sourcePhotoId || "";
-  const slug = draft.slug || fileName;
+  const slug = draft.slug || vehicleData.slug || "";
+
+  if (!slug) {
+    throw new Error("Slug mancante: impossibile pubblicare il veicolo senza uno slug valido");
+  }
+
   const photoUrl = draft.photoUrl || "";
 
-  await updateGalleryJson(fileName, vehicleData, slug, photoUrl);
+  await updateGalleryJson(vehicleData, slug, photoUrl);
 
-  console.log("✅ gallery.json aggiornato");
+  console.log("gallery.json aggiornato");
 
-  await createVehicleDetailsPage(stafferId, fileName, vehicleData, sourcePhotoId, slug, photoUrl);
+  await createVehicleDetailsPage(stafferId, vehicleData, sourcePhotoId, slug, photoUrl);
 
-  console.log("✅ Pagina HTML creata");
+  console.log("Pagina HTML creata");
 
-  const vehicleRef = db.collection("vehiclesDraft").doc(draftId).get();
-  const sourcePhotoRef = db.collection("photos").doc(sourcePhotoId).get();
+  const vehicleRef = db.collection("vehiclesDraft").doc(draftId);
 
-  vehicleRef.ref.update({
+  await vehicleRef.update({
     status: "published",
     publishedAt: admin.firestore.Timestamp.now(),
-    publishedBy: "github-action"
+    publishedBy: "github-action",
   });
 
-  sourcePhotoRef.ref.update({
-    published: true,
-    publishedAt: admin.firestore.Timestamp.now(),
-    publishedBy: "github-action"
-  });
+  if (sourcePhotoId) {
+    const sourcePhotoRef = db.collection("photos").doc(sourcePhotoId);
+    const sourcePhotoSnap = await sourcePhotoRef.get();
 
-  console.log("🎉 Pubblicazione completata");
+    if (sourcePhotoSnap.exists) {
+      await sourcePhotoRef.update({
+        published: true,
+        publishedAt: admin.firestore.Timestamp.now(),
+        publishedBy: "github-action",
+      });
+    } else {
+      console.warn(`sourcePhotoId "${sourcePhotoId}" non trovato in "photos", salto l'aggiornamento`);
+    }
+  } else {
+    console.warn("Nessun sourcePhotoId presente sulla bozza, salto l'aggiornamento della foto sorgente");
+  }
+
+  console.log("Pubblicazione completata");
 }
 
 async function updateGalleryJson(vehicleData, slug, photoUrl) {
-  console.log("📖 Lettura gallery.json");
+  console.log("Lettura gallery.json");
 
   const response =
     await octokit.repos.getContent({
@@ -142,7 +156,7 @@ async function updateGalleryJson(vehicleData, slug, photoUrl) {
     content.push(vehicle);
   }
 
-  console.log("💾 Salvataggio gallery.json");
+  console.log("Salvataggio gallery.json");
   console.log(JSON.stringify(content, null, 2));
 
   await octokit.repos.createOrUpdateFileContents({
@@ -173,7 +187,7 @@ async function createVehicleDetailsPage(staffId, vehicleData, sourcePhotoId, slu
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: `gallery/scheda/${slug}/index.html`,
-      message: `📄 Update vehicle ${vehicleData.title}`,
+      message: `Update vehicle ${vehicleData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -186,7 +200,7 @@ async function createVehicleDetailsPage(staffId, vehicleData, sourcePhotoId, slu
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: `gallery/scheda/${slug}/index.html`,
-      message: `📄 Add vehicle ${vehicleData.title}`,
+      message: `Add vehicle ${vehicleData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -238,22 +252,40 @@ function getServiceLabel(service) {
 async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, photoUrl) {
   const pageUrl = `https://friuliemergenze.it/gallery/scheda/${slug}`;
   const service = getServiceLabel(vehicleData.service);
-  const imageDoc = await db.collection("photos").doc(sourcePhotoId).get();
-  const imageDocData = imageDoc.data();
-  const userId = imageDocData.userId;
-  const userDoc = await db.collection("users").doc(userId).get();
-  const userData = userDoc.data();
-  const author = userData.name + " " + userData.surname || "Utente sconosciuto";
+  let author = "Utente sconosciuto";
 
-  imageDoc.ref.update({
-    vehicleModel: vehicleData.title,
-    sponsor: vehicleData.builder,
-    licensePlate: vehicleData.plate,
-    service: vehicleData.service,
-    headquarters: vehicleData.location,
-    updater: staffId,
-    updatedAt: admin.firestore.Timestamp.now(),
-  })
+  if (sourcePhotoId && typeof sourcePhotoId === "string") {
+    const imageDoc = await db.collection("photos").doc(sourcePhotoId).get();
+
+    if (imageDoc.exists) {
+      const imageDocData = imageDoc.data();
+      const userId = imageDocData.userId;
+
+      if (userId) {
+        const userDoc = await db.collection("users").doc(userId).get();
+
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          const fullName = `${userData.name || ""} ${userData.surname || ""}`.trim();
+          author = fullName || author;
+        }
+      }
+
+      await imageDoc.ref.update({
+        vehicleModel: vehicleData.title,
+        sponsor: vehicleData.builder,
+        licensePlate: vehicleData.plate,
+        service: vehicleData.service,
+        headquarters: vehicleData.headquarters,
+        updater: staffId,
+        updatedAt: admin.firestore.Timestamp.now(),
+      });
+    } else {
+      console.warn(`Foto sorgente "${sourcePhotoId}" non trovata, salto l'aggiornamento e uso autore di default`);
+    }
+  } else {
+    console.warn("Nessun sourcePhotoId valido fornito, salto la lettura della foto sorgente");
+  }
 
   return `<!doctype html>
 <html lang="it">
@@ -456,7 +488,7 @@ function escapeHtml(text) {
 
 pushVehicleToGithub()
   .then(() => {
-    console.log("✅ Fine workflow");
+    console.log("Fine workflow");
     process.exit(0);
   })
   .catch(async (error) => {
