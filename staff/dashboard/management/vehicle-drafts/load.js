@@ -10,17 +10,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const logoutBtn = document.getElementById('logoutBtn');
-const modalClose = document.querySelector('.modal-close');
-const btnCancel = document.querySelector('.btn-cancel');
 const loadingEl = document.querySelector('.loading');
 const contentEl = document.querySelector('.content');
-
-modalClose?.addEventListener('click', () => {
-    closeDraftModal();
-})
-btnCancel?.addEventListener('click', () => {
-    closeDraftModal();
-})
 
 logoutBtn?.addEventListener('click', async () => {
     await signOut(auth);
@@ -80,11 +71,29 @@ class VehicleDraftsManager {
 
     setupEventListeners() {
         console.log('setupEventListeners - Configurazione event listener');
+
         const modal = document.getElementById('editDraftModal');
+
         if (modal) {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) this.closeDraftModal();
+                if (e.target === modal) {
+                    this.closeDraftModal();
+                }
             });
+
+            const modalClose = modal.querySelector('.modal-close');
+            if (modalClose) {
+                modalClose.addEventListener('click', () => {
+                    this.closeDraftModal();
+                });
+            }
+
+            const btnCancel = modal.querySelector('.btn-cancel');
+            if (btnCancel) {
+                btnCancel.addEventListener('click', () => {
+                    this.closeDraftModal();
+                });
+            }
         }
 
         const form = document.getElementById('vehicleForm');
@@ -115,6 +124,21 @@ class VehicleDraftsManager {
             createModal.addEventListener('click', (e) => {
                 if (e.target === createModal) this.closeCreateModal();
             });
+
+            const modalClose = createModal.querySelector('.modal-close');
+            const btnCancel = createModal.querySelector('.btn-cancel');
+
+            if (modalClose) {
+                modalClose.addEventListener('click', () => {
+                    this.closeCreateModal();
+                });
+            }
+
+            if (btnCancel) {
+                btnCancel.addEventListener('click', () => {
+                    this.closeCreateModal();
+                });
+            }
         }
 
         const createForm = document.getElementById('createVehicleForm');

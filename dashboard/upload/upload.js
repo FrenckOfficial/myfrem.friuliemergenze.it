@@ -160,7 +160,7 @@ uploadBtn.addEventListener("click", async (e) => {
   const files = fileInput.files;
   if (files.length === 0) return setStatus("Seleziona almeno una foto");
 
-  setStatus("⏳ Upload foto in corso...");
+  setStatus("Upload foto in corso...");
   progressBar.style.display = "block";
   progressText.style.display = "block";
   progressBar.value = 0;
