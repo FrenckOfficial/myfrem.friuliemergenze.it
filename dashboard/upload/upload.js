@@ -256,7 +256,7 @@ uploadBtn.addEventListener("click", async (e) => {
         body: JSON.stringify({
           userEmail: userEmail,
           userName: userName,
-          photoName: titleInput.value,
+          photoName: titleInput.value + (licensePlateInput.value ? ` - ${licensePlateInput.value}` : "") + (locationInput.value ? ` - ${locationInput.value}` : ""),
           uploadedAt: uploadedAt
         })
       })

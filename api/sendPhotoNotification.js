@@ -48,9 +48,8 @@ export default async function handler(req, res) {
 
     const htmlContent = generateMailHtml({
       name: sanitizedName,
-      email: sanitizedEmail,
       photoName: sanitizedPhotoName,
-      updatedAt: formattedDate
+      uploadedAt: formattedDate
     });
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -68,7 +67,7 @@ export default async function handler(req, res) {
         subject: `${photoName}: Foto caricata correttamente!`,
         htmlContent,
         replyTo: { 
-          name: "Friuli Emergenze",
+          name: "Info - Friuli Emergenze",
           email: "info@friuliemergenze.it" 
         }
       })
@@ -107,7 +106,7 @@ function sanitizeHtml(str) {
     .substring(0, 5000);
 }
 
-function generateMailHtml({ name, email, photoName, uploadedAt }) {
+function generateMailHtml({ name, photoName, uploadedAt }) {
   return `
 <!DOCTYPE html>
 <html lang="it">

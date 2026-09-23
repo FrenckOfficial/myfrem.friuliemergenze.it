@@ -81,7 +81,7 @@ async function pushVehicleToGithub() {
 
   const photoUrl = draft.photoUrl || "";
 
-  await updateGalleryJson(vehicleData, slug, photoUrl);
+  await updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId);
 
   console.log("gallery.json aggiornato");
 
@@ -117,7 +117,7 @@ async function pushVehicleToGithub() {
   console.log("Pubblicazione completata");
 }
 
-async function updateGalleryJson(vehicleData, slug, photoUrl) {
+async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
   console.log("Lettura gallery.json");
 
   const response =
@@ -140,11 +140,19 @@ async function updateGalleryJson(vehicleData, slug, photoUrl) {
 
   const service = getServiceLabel(vehicleData.service);
 
+  const sourcePhotoId = sourcePhotoId || "";
+  const photoDoc = await db.collection("photos").doc(sourcePhotoId).get();
+  const photoData = photoDoc.data();
+  const userId = photoData.userId || "";
+  const userDoc = await db.collection("users").doc(userId).get();
+  const userData = userDoc.data();
+  const userName = userData.name + " " + userData.surname || "";
+
   const vehicle = {
     title: vehicleData.title || "",
     image: photoUrl || "",
     category: service || "",
-    spotter: "",
+    spotter: userName || "",
     link: `/gallery/scheda/${slug}/`,
   };
 
@@ -163,7 +171,7 @@ async function updateGalleryJson(vehicleData, slug, photoUrl) {
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
     path: "gallery.json",
-    message: `🚗 Add vehicle ${vehicleData.title}`,
+    message: `Add vehicle ${vehicleData.title}`,
     content: Buffer
       .from(JSON.stringify(content, null, 2))
       .toString("base64"),
