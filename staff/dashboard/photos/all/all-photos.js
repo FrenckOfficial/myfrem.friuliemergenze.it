@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, updateDoc, addDoc, deleteDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
+import { setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
 
 const app = initializeApp(firebaseConfig);
@@ -15,11 +15,288 @@ const logoutBtn = document.getElementById("logoutBtn");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
-let usersMap = {};
+const votesModal = document.getElementById("votesModal");
+const votesTitle = document.getElementById("votesModalTitle");
+const votesCount = document.getElementById("votesCount");
+const votesTableBody = document.getElementById("votesTableBody");
+const closeVotesModalBtn = document.getElementById("closeVotesModal");
+
+const TABLE_COLUMNS = 12;
+const ALLOWED_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
+const SERVICE_LABELS = {
+  "ordine-pubblico": "Ordine Pubblico",
+  "carabinieri": "Carabinieri",
+  "polizia-locale": "Polizia Locale / Municipale",
+  "polizia-di-stato": "Polizia di Stato",
+  "soccorso-alpino": "Soccorso Alpino e Speleologico",
+  "corpo-forestale-regionale": "Corpo Forestale Regionale",
+  "guardia-di-finanza": "Guardia di Finanza",
+  "emergenza-sanitaria": "Soccorso Sanitario",
+  "pompieri": "Vigili del Fuoco",
+  "soccorso-tecnico-urgente": "Vigili del Fuoco",
+  "guardia-costiera": "Guardia Costiera",
+  "protezione-civile": "Protezione Civile"
+};
+
+const STATUS_STYLES = [
+  { match: "Approvata", label: "Approvata", color: "green" },
+  { match: "Rifiutata", label: "Rifiutata", color: "red" },
+  { match: "Foto in attesa di approvazione", label: "Foto in attesa di approvazione", color: "orange" }
+];
+const STATUS_UNKNOWN = { label: "Sconosciuto", color: "blue" };
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatDate(timestamp, fallback = "-") {
+  const date = timestamp?.toDate?.();
+  return date ? date.toLocaleString("it-IT") : fallback;
+}
+
+function toMillis(timestamp) {
+  return timestamp?.toMillis?.() ?? 0;
+}
+
+function resolveStatus(photo) {
+  return STATUS_STYLES.find(s => photo.status?.includes(s.match)) ?? STATUS_UNKNOWN;
+}
+
+const userNameCache = new Map();
+
+function getCachedUserName(userId) {
+  if (!userId) return Promise.resolve("Sconosciuto");
+
+  if (!userNameCache.has(userId)) {
+    userNameCache.set(
+      userId,
+      Promise.resolve(getUserName(userId))
+        .then(name => name || "Sconosciuto")
+        .catch(() => "Sconosciuto")
+    );
+  }
+  return userNameCache.get(userId);
+}
+
+function showContent() {
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
+}
+
+async function fetchVotes(photoId) {
+  const snapshot = await getDocs(collection(db, "photos", photoId, "votes"));
+  return snapshot.docs.map(d => ({ ...d.data(), userId: d.id }));
+}
+
+function countVotes(votes) {
+  let likes = 0;
+  let dislikes = 0;
+
+  for (const vote of votes) {
+    if (vote.voteType === "like") likes++;
+    else if (vote.voteType === "dislike") dislikes++;
+  }
+  return { likes, dislikes };
+}
+
+let votesRequestId = 0;
+
+async function openVotesModal(photoId) {
+  const requestId = ++votesRequestId;
+
+  votesTitle.textContent = "Voti foto: " + photoId;
+  votesCount.textContent = "Caricamento...";
+  votesTableBody.replaceChildren();
+  votesModal.classList.add("active");
+
+  try {
+    const votes = await fetchVotes(photoId);
+    votes.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+
+    const userNames = await Promise.all(votes.map(v => getCachedUserName(v.userId)));
+
+    if (requestId !== votesRequestId) return;
+
+    const { likes, dislikes } = countVotes(votes);
+    votesCount.textContent = "Voti totali: " + (likes + dislikes);
+
+    if (votes.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 3;
+      td.textContent = "Nessun voto";
+      tr.appendChild(td);
+      votesTableBody.appendChild(tr);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    votes.forEach((vote, i) => {
+      const voteLabel =
+        vote.voteType === "like" ? "Like" :
+        vote.voteType === "dislike" ? "Dislike" : "-";
+
+      const tr = document.createElement("tr");
+      [userNames[i], voteLabel, formatDate(vote.createdAt, "Non disponibile")].forEach(text => {
+        const td = document.createElement("td");
+        td.textContent = text;
+        tr.appendChild(td);
+      });
+      fragment.appendChild(tr);
+    });
+
+    votesTableBody.appendChild(fragment);
+  } catch (err) {
+    console.error("Errore caricamento voti:", err);
+    if (requestId === votesRequestId) {
+      votesCount.textContent = "Errore nel caricamento dei voti";
+    }
+  }
+}
+
+function closeVotesModal() {
+  votesRequestId++;
+  votesModal.classList.remove("active");
+}
+
+closeVotesModalBtn.addEventListener("click", closeVotesModal);
+votesModal.querySelector(".modal-overlay")?.addEventListener("click", closeVotesModal);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && votesModal.classList.contains("active")) {
+    closeVotesModal();
+  }
+});
+
+function buildRow({ id, photo, userName, votes }) {
+  const status = resolveStatus(photo);
+  const serviceType = SERVICE_LABELS[photo.serviceType] ?? "Non inserito";
+  const { likes, dislikes } = countVotes(votes);
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td><span class="status-indicator" style="color: ${status.color};"></span> <b style="color: ${status.color};">${escapeHtml(status.label)}</b></td>
+    <td><img src="${escapeHtml(photo.url)}" class="preview" alt="Preview della foto caricata tramite i sistemi Friuli Emergenze" loading="lazy" /></td>
+    <td><b>${escapeHtml(photo.vehicleModel || "Non inserito")}</b></td>
+    <td><b>${escapeHtml(photo.sponsor || "Non inserito")}</b></td>
+    <td><b>${escapeHtml(photo.licensePlate || "Non inserita")}</b></td>
+    <td><b>${escapeHtml(serviceType)}</b></td>
+    <td><b>${escapeHtml(photo.location || "Non inserita")}</b></td>
+    <td><b>${escapeHtml(userName)}</b></td>
+    <td><b>${escapeHtml(formatDate(photo.createdAt))}</b></td>
+    <td><b>${escapeHtml(photo.notes || "Non inserite")}</b></td>
+    <td class="votes-cell">
+      <span class="vote-badge like-badge" title="Mi piace">
+        <i class="fas fa-thumbs-up"></i> ${likes}
+      </span>
+      <span class="vote-badge dislike-badge" title="Non mi piace">
+        <i class="fas fa-thumbs-down"></i> ${dislikes}
+      </span>
+    </td>
+    <td>
+      <button class="delete-btn" type="button">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy" /></button>
+    </td>
+  `;
+
+  const previewImg = tr.querySelector("img.preview");
+  previewImg.style.cursor = "pointer";
+  previewImg.addEventListener("click", () => {
+    window.openLightbox?.(previewImg, photo.vehicleModel || "Foto");
+  });
+
+  tr.querySelector(".votes-cell").addEventListener("click", () => openVotesModal(id));
+  tr.querySelector(".delete-btn").addEventListener("click", () => deletePhoto(id, tr));
+
+  return tr;
+}
+
+function showEmptyRow() {
+  photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Nessuna foto trovata</td></tr>`;
+}
+
+async function loadAllPhotos() {
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, "photos"), orderBy("createdAt", "desc"))
+    );
+
+    if (snapshot.empty) {
+      showEmptyRow();
+      setStatus("Nessuna foto trovata");
+      return;
+    }
+
+    const rows = await Promise.all(
+      snapshot.docs.map(async (docSnap) => {
+        const photo = docSnap.data();
+        const id = docSnap.id;
+
+        const [votes, userName] = await Promise.all([
+          fetchVotes(id).catch((err) => {
+            console.error("Errore caricamento voti foto " + id + ":", err);
+            return [];
+          }),
+          getCachedUserName(photo.userId)
+        ]);
+
+        return { id, photo, userName, votes };
+      })
+    );
+
+    const fragment = document.createDocumentFragment();
+    rows.forEach(row => fragment.appendChild(buildRow(row)));
+    photosTableBody.replaceChildren(fragment);
+  } catch (err) {
+    console.error("Errore caricamento foto:", err);
+    photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Errore nel caricamento delle foto</td></tr>`;
+    setStatus("Errore caricamento foto", "error");
+  }
+}
+
+async function deletePhoto(photoId, rowElement) {
+  if (!confirm("Sei sicuro di voler eliminare questa foto? Questa azione è irreversibile.")) {
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, "photos", photoId));
+  } catch (err) {
+    console.error("Errore eliminazione foto:", err);
+    setStatus("Errore eliminazione foto", "error");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "activities"), {
+      type: "photo_delete",
+      photoId,
+      editStaffer: auth.currentUser?.email || "-",
+      timestamp: serverTimestamp()
+    });
+  } catch (err) {
+    console.error("Errore registrazione attività:", err);
+  }
+
+  rowElement.remove();
+  if (photosTableBody.children.length === 0) showEmptyRow();
+
+  setStatus("Foto eliminata con successo", "success");
+}
 
 logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "/login";
+  try {
+    await signOut(auth);
+  } catch (err) {
+    console.error("Errore logout:", err);
+  } finally {
+    window.location.href = "/login";
+  }
 });
 
 onAuthStateChanged(auth, async (user) => {
@@ -28,393 +305,29 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userDoc = await getDocs(
-    query(collection(db, "users"), where("__name__", "==", user.uid))
-  );
+  let isStaff = false;
 
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+  try {
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    isStaff = userSnap.exists() && ALLOWED_ROLES.includes(userSnap.data().role);
+  } catch (err) {
+    console.error("Errore verifica ruolo:", err);
+  }
 
-  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
-    setStatus("Accesso negato: non sei staff!", "error");
+  if (!isStaff) {
     window.location.href = "/dashboard";
     return;
   }
 
   const timeoutId = setTimeout(() => {
     console.warn("Timeout caricamento, forzo visualizzazione");
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+    showContent();
   }, 7000);
 
-  await loadUsersMap();
-  await loadAllPhotos();
-
-  clearTimeout(timeoutId);
-  loadingEl.style.display = "none";
-  contentEl.style.display = "block";
-});
-
-async function loadUsersMap() {
   try {
-    const snap = await getDocs(collection(db, "users"));
-    snap.forEach(docSnap => {
-      usersMap[docSnap.id] = docSnap.data().username || "Sconosciuto";
-    });
-  } catch (err) {
-    console.error("Errore caricamento utenti:", err);
-  }
-}
-
-async function getVoteCounts(photoId) {
-  try {
-    const votesQuery = query(
-      collection(db, "photos", photoId, "votes")
-    );
-    const snapshot = await getDocs(votesQuery);
-
-    let likes = 0;
-    let dislikes = 0;
-
-    snapshot.forEach((doc) => {
-      const voteData = doc.data();
-      if (voteData.voteType === "like") likes++;
-      else if (voteData.voteType === "dislike") dislikes++;
-    });
-
-    return { likes, dislikes };
-  } catch (err) {
-    console.error("Errore caricamento conteggio voti:", err);
-    return { likes: 0, dislikes: 0 };
-  }
-}
-
-async function openVotesModal(photoId) {
-  try {
-    const votesQuery = query(
-      collection(db, "photos", photoId, "votes"),
-      orderBy("createdAt", "desc")
-    );
-    const snapshot = await getDocs(votesQuery);
-    console.table(snapshot.docs.map(doc => doc.data()));
-
-    const votesTitle = document.getElementById("votesModalTitle");
-    console.log("PhotoId:", photoId);
-    votesTitle.textContent = "Voti foto: " + photoId;
-
-    const votesModal = document.getElementById("votesModal");
-    console.log("Modal:", votesModal);
-    votesModal.classList.add("active");
-
-    const votesCount = document.getElementById("votesCount");
-    const { likes, dislikes } = await getVoteCounts(photoId);
-    votesCount.textContent = `${"Voti totali: " + (likes + dislikes)}`;
-
-    const votesTableBody = document.getElementById("votesTableBody");
-    console.log("TableBody:", votesTableBody);
-    votesTableBody.innerHTML = "";
-
-    snapshot.forEach(async (doc) => {
-      const voteData = doc.data();
-      const userId = doc.id;
-      const userName = await getUserName(userId) || "Sconosciuto";
-      let voteType;
-
-      if (voteData.voteType === "like") voteType = "Like";
-      else if (voteData.voteType === "dislike") voteType = "Dislike";
-
-      votesTableBody.innerHTML += `
-        <tr>
-          <td>${userName}</td>
-          <td>${voteType}</td>
-          <td>${voteData.createdAt.toDate().toLocaleString("it-IT") || "Non disponibile"}</td>
-        </tr>
-      `;
-    });
-
-    const closeVotesModal = document.getElementById("closeVotesModal");
-
-    closeVotesModal.addEventListener("click", () => {
-      votesModal.classList.remove("active");
-    });
-
-  } catch (err) {
-    console.error("Errore caricamento conteggio voti:", err);
-  }
-}
-
-async function loadAllPhotos() {
-  try {
-    console.log("Caricamento tutte le foto...");
-
-    const q = query(
-      collection(db, "photos"),
-      orderBy("createdAt", "desc")
-    );
-
-    const snapshot = await getDocs(q);
-    photosTableBody.innerHTML = "";
-
-    if (snapshot.empty) {
-      setStatus("Nessuna foto trovata");
-      return;
-    }
-
-    const photoPromises = snapshot.docs.map(async (docSnap) => {
-      const photo = docSnap.data();
-      const id = docSnap.id;
-      const voteCounts = await getVoteCounts(id);
-      const userName = await getUserName(photo.userId) || "Sconosciuto";
-
-      const statusColor =
-        photo.status?.includes("Approvata") ? "green" :
-        photo.status?.includes("Rifiutata") ? "red" : 
-        photo.status?.includes("Foto in attesa di approvazione") ? "orange" : "blue";
-
-      let linkBox = "Non disponibile in quanto foto in attesa o rifiutata";
-      let serviceType = "Non inserito";
-      let status;
-
-      if (photo.status?.includes("Approvata")) {
-        const hasLink = photo.vehicleLink && photo.vehicleLink.trim().length > 0;
-        const link = hasLink ? photo.vehicleLink.split("https://www.friuliemergenze.it/gallery/scheda/")[1] : "";
-        linkBox = `
-          <div class="photo-link-box" id="box-${id}">
-            <a
-              href="https://www.friuliemergenze.it/gallery/scheda/${link}"
-              target="_blank"
-              id="link-view-${id}"
-              style="text-decoration: underline; font-size: 1em; word-break: break-all;"
-              class="photo-link-static ${hasLink ? "" : "hidden"}"
-            >
-              ${link}
-            </a>
-
-            <div id="link-input-wrapper-${id}" class="link-input-wrapper ${hasLink ? "hidden" : ""}">
-              <input
-                type="url"
-                id="link-input-${id}"
-                class="photo-link-input"
-                placeholder="Es: peugeoute2008-vvfgorizia"
-                value="${hasLink ? photo.vehicleLink : ""}"
-              />
-              <div class="link-input-buttons">
-                <button class="edit-link-btn save-btn" onclick="saveVehicleLink('${id}')" title="Salva">
-                  <img src="/assets/icons/floppy-disk-regular-full.svg" alt="Salva" loading="lazy" />
-                </button>
-              </div>
-            </div>
-
-            <button class="edit-link-btn edit-btn ${hasLink ? "" : "hidden"}" onclick="editLink('${id}', event)" title="Modifica">
-              <img src="/assets/icons/pen-solid-full.svg" alt="Modifica" loading="lazy" />
-            </button>
-          </div>
-        `;
-      }
-
-      if (photo.serviceType === "ordine-pubblico") {
-        serviceType = "Ordine Pubblico";
-      } else if (photo.serviceType === "carabinieri") {
-        serviceType = "Carabinieri";
-      } else if (photo.serviceType === "polizia-locale") {
-        serviceType = "Polizia Locale / Municipale";
-      } else if (photo.serviceType === "polizia-di-stato") {
-        serviceType = "Polizia di Stato";
-      } else if (photo.serviceType === "soccorso-alpino") {
-        serviceType = "Soccorso Alpino e Speleologico";
-      } else if (photo.serviceType === "corpo-forestale-regionale") {
-        serviceType = "Corpo Forestale Regionale";
-      } else if (photo.serviceType === "guardia-di-finanza") {
-        serviceType = "Guardia di Finanza";
-      } else if (photo.serviceType === "emergenza-sanitaria") {
-        serviceType = "Soccorso Sanitario";
-      } else if (photo.serviceType === "pompieri") {
-        serviceType = "Vigili del Fuoco";
-      } else if (photo.serviceType === "soccorso-tecnico-urgente") {
-        serviceType = "Vigili del Fuoco";
-      } else if (photo.serviceType === "guardia-costiera") {
-        serviceType = "Guardia Costiera";
-      } else if (photo.serviceType === "protezione-civile") {
-        serviceType = "Protezione Civile";
-      } else serviceType;
-
-      if (photo.status?.includes("Approvata")) {
-        status = "Approvata";
-      } else if (photo.status?.includes("Rifiutata")) {
-        status = "Rifiutata";
-      } else if (photo.status?.includes("Foto in attesa di approvazione")) {
-        status = "Foto in attesa di approvazione";
-      }
-
-      return { id, photo, statusColor, status, serviceType, userName, voteCounts, linkBox };
-    });
-
-    const allPhotos = await Promise.all(photoPromises);
-
-    allPhotos.forEach((photoData) => {
-      const { id, photo, statusColor, status, serviceType, userName, voteCounts, linkBox } = photoData;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><span class="status-indicator" style="color: ${statusColor};"></span> <b style="color:${statusColor};">${status || "Sconosciuto"}</b></td>  
-        <td><img src="${photo.url}" class="preview" alt="Preview della foto caricata tramite i sistemi Friuli Emergenze" loading="lazy" /></td>
-        <td><b>${photo.vehicleModel || "Non inserito"}</b></td>
-        <td><b>${photo.sponsor || "Non inserito"}</b></td>
-        <td><b>${photo.licensePlate || "Non inserita"}</b></td>
-        <td><b>${serviceType}</b></td>
-        <td><b>${photo.location || "Non inserita"}</b></td>
-        <td><b>${userName}</b></td>
-        <td><b>${photo.createdAt?.toDate().toLocaleString() || "-"}</b></td>
-        <td><b>${photo.notes || "Non inserite"}</b></td>
-        <td><b>${linkBox}</b></td>
-        <td class="votes-cell" id="votes-cell-${id}">
-          <span class="vote-badge like-badge" title="Mi piace">
-            <i class="fas fa-thumbs-up"></i> ${voteCounts.likes}
-          </span>
-          <span class="vote-badge dislike-badge" title="Non mi piace">
-            <i class="fas fa-thumbs-down"></i> ${voteCounts.dislikes}
-          </span>
-        </td>
-        <td>
-          <button class="delete-btn" onclick="deletePhoto('${id}')">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy"/></button>
-        </td>
-      `;
-
-      const img = tr.querySelector('img');
-      img.style.cursor = 'pointer';
-      img.addEventListener('click', () => openLightbox(img, photo.vehicleModel || 'Foto'));
-      photosTableBody.appendChild(tr);
-
-      const votesCell = document.getElementById(`votes-cell-${id}`);
-      votesCell.addEventListener("click", () => {
-        openVotesModal(id);
-      });
-    });
-
-    console.log(`Totale foto: ${snapshot.size}`);
-  } catch (err) {
-    console.error("Errore caricamento:", err);
-    setStatus("Errore caricamento foto", "error");
-  }
-}
-
-window.editLink = (photoId, event) => {
-  const view = document.getElementById(`link-view-${photoId}`);
-  const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
-  const input = document.getElementById(`link-input-${photoId}`);
-  const editBtn = event.target.closest(".edit-btn");
-
-  if (view) view.classList.add("hidden");
-  if (inputWrapper) inputWrapper.classList.remove("hidden");
-  if (editBtn) editBtn.classList.add("hidden");
-  if (input) input.focus();
-};
-
-window.saveVehicleLink = async (photoId) => {
-  const input = document.getElementById(`link-input-${photoId}`);
-  const link = input?.value?.trim();
-
-  if (!link) {
-    setStatus("Inserisci un link valido", "error");
-    return;
-  }
-
-  try {
-    const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
-    if (saveBtn) saveBtn.disabled = true;
-
-    const photoRef = doc(db, "photos", photoId);
-    const photoSnap = await getDoc(photoRef);
-    const photoData = photoSnap.data() || {};
-    const photoName = photoData.vehicleModel;
-    const userDoc = doc(db, "users", photoData.userId);
-    const userData = (await getDoc(userDoc)).data();
-    const userName = userData.name + " " + userData.surname;
-    const userEmail = userData.email;
-
-    await updateDoc(photoRef, {
-      vehicleLink: `https://www.friuliemergenze.it/gallery/scheda/${link}`,
-      updatedAt: serverTimestamp()
-    });
-
-    await addDoc(collection(db, "activities"), {
-      type: "photo_edit",
-      editStaffer: auth.currentUser?.email || "-",
-      timestamp: serverTimestamp()
-    });
-
-    const view = document.getElementById(`link-view-${photoId}`);
-    const inputWrapper = document.getElementById(`link-input-wrapper-${photoId}`);
-    const editBtn = document.querySelector(`#box-${photoId} .edit-btn`);
-
-    if (view) {
-      view.href = link;
-      view.textContent = link;
-      view.classList.remove("hidden");
-    }
-    if (inputWrapper) inputWrapper.classList.add("hidden");
-    if (editBtn) editBtn.classList.remove("hidden");
-    if (input) input.setAttribute("value", link);
-
-    setStatus("Link salvato con successo.", "success");
-
-    if (userData.emailNotifications === true) {
-      sendNotificationEmail(userEmail, userName, photoName, `https://www.friuliemergenze.it/gallery/scheda/${link}`);
-    }
-
-  } catch (err) {
-    console.error("Errore salvataggio link:", err);
-    setStatus("Errore salvataggio link", "error");
+    await loadAllPhotos();
   } finally {
-    const saveBtn = document.querySelector(`#box-${photoId} .save-btn`);
-    if (saveBtn) saveBtn.disabled = false;
-    loadAllPhotos();
+    clearTimeout(timeoutId);
+    showContent();
   }
-};
-
-window.deletePhoto = async (photoId) => {
-  if (!confirm("Sei sicuro di voler eliminare questa foto? Questa azione è irreversibile.")) {
-    return;
-  } else {
-    try {
-      await deleteDoc(doc(db, "photos", photoId));
-
-      await addDoc(collection(db, "activities"), {
-        type: "photo_delete",
-        editStaffer: auth.currentUser?.email || "-",
-        timestamp: serverTimestamp()
-      });
-
-      setStatus("Foto eliminata con successo", "success");
-      loadAllPhotos();
-    } catch (err) {
-      console.error("Errore eliminazione foto:", err);
-      setStatus("Errore eliminazione foto", "error");
-    }
-  }
-}
-
-async function sendNotificationEmail(userEmail, userName, photoName, link) {
-  const response = await fetch('/api/sendNotificationPhotoLink', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      userEmail,
-      userName,
-      photoName,
-      link
-    })
-  });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`Errore ${response.status}:`, errorText);
-    setStatus(`Errore notifica: ${response.status}`, 'error');
-    return;
-  }
-  
-  console.log('Notifica inviata');
-}
+});
