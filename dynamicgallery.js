@@ -9,26 +9,13 @@ async function loadGallery(containerId = 'gallery', refreshInterval = 5 * 60 * 1
         
         const photos = await response.json();
 
-        const categoriesMap = {};
+        const lastByCategory = {};
         photos.forEach(photo => {
             const category = photo.category || 'Varie';
-            if (!categoriesMap[category]) {
-                categoriesMap[category] = [];
-            }
-            categoriesMap[category].push(photo);
+            lastByCategory[category] = photo;
         });
 
-        const latestPhotos = [];
-        Object.entries(categoriesMap).forEach(([category, categoryPhotos]) => {
-            const sorted = categoryPhotos.sort((a, b) => {
-                const dateA = new Date(a.image.match(/\d+/)?.[0] || 0);
-                const dateB = new Date(b.image.match(/\d+/)?.[0] || 0);
-                return dateB - dateA;
-            });
-            latestPhotos.push(sorted[0]);
-        });
-
-        latestPhotos.sort((a, b) => 
+        const latestPhotos = Object.values(lastByCategory).sort((a, b) =>
             (a.category || 'Varie').localeCompare(b.category || 'Varie', 'it')
         );
 
