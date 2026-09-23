@@ -20,7 +20,12 @@ async function loadGallery(containerId = 'gallery', refreshInterval = 5 * 60 * 1
 
         const latestPhotos = [];
         Object.entries(categoriesMap).forEach(([category, categoryPhotos]) => {
-            latestPhotos.push(categoryPhotos[0]);
+            const sorted = categoryPhotos.sort((a, b) => {
+                const dateA = new Date(a.image.match(/\d+/)?.[0] || 0);
+                const dateB = new Date(b.image.match(/\d+/)?.[0] || 0);
+                return dateB - dateA;
+            });
+            latestPhotos.push(sorted[0]);
         });
 
         latestPhotos.sort((a, b) => 
@@ -48,7 +53,7 @@ async function loadGallery(containerId = 'gallery', refreshInterval = 5 * 60 * 1
                 <div class="gallery-overlay">
                     <div class="gallery-title">${photo.title}</div>
                     <div class="gallery-category">${photo.category || 'Varie'}</div>
-                    ${photo.spotter ? `<div class="category-badge">${photo.spotter}</div>` : ''}
+                    ${photo.spotter !== "" && photo.spotter !== null && photo.spotter !== undefined ? `<div class="category-badge">${photo.spotter}</div>` : ''}
                 </div>
             `;
             
