@@ -140,7 +140,6 @@ async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
 
   const service = getServiceLabel(vehicleData.service);
 
-  const sourcePhotoId = sourcePhotoId || "";
   const photoDoc = await db.collection("photos").doc(sourcePhotoId).get();
   const photoData = photoDoc.data();
   const userId = photoData.userId || "";
