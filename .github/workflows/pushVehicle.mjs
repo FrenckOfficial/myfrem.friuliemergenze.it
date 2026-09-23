@@ -156,6 +156,10 @@ async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
     link: `/gallery/scheda/${slug}/`,
   };
 
+  await db.collection("photos").doc(sourcePhotoId).update({
+    vehicleLink: `https://www.friuliemergenze.it/gallery/scheda/${slug}/`
+  });
+
   const existingIndex = content.findIndex((v) => v.link === `/gallery/scheda/${slug}/`);
 
   if (existingIndex >= 0) {
