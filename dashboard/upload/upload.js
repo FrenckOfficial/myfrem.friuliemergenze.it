@@ -189,13 +189,9 @@ uploadBtn.addEventListener("click", async (e) => {
 
     progressBar.value = 40;
     progressText.textContent = "40%";
-    
-    const path = `${currentUser.uid}/${Date.now()}-${file.name}`;
 
     progressBar.value = 50;
     progressText.textContent = "50%";
-
-    const fileBuffer = await file.arrayBuffer();
 
     progressBar.value = 60;
     progressText.textContent = "60%";

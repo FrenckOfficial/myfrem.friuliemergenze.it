@@ -269,6 +269,9 @@ function getServiceLabel(service) {
     case "protezione-civile":
       return "Protezione Civile";
 
+    case "ausiliari":
+      return "Soccorso Autostradale (Ausiliari Viabilità)";
+
     default:
       return service || "N/A";
   }

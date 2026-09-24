@@ -236,7 +236,8 @@ function getServiceLabel(service) {
     "ambulanza": "Soccorso Sanitario",
     "pompieri": "Vigili del Fuoco",
     "guardia-costiera": "Guardia Costiera",
-    "protezione-civile": "Protezione Civile"
+    "protezione-civile": "Protezione Civile",
+    "ausiliari": "Soccorso Autostradale (Ausiliari Viabilità)"
   };
 
   return services[service] || service || "N/A";
