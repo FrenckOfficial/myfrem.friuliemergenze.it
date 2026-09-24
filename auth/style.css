@@ -154,7 +154,7 @@ body {
 }
 
 main {
-  display: none !important;
+  display: none;
 }
 
 .feature-list {

@@ -605,7 +605,6 @@ function showTwoFASection() {
   if (twoFASetup.method === "email") {
     document.getElementById("twofa-email-section").style.display = "block";
   } else if (twoFASetup.method === "totp") {
-    // Apri il modal invece di mostrare inline
     initTOTPSetup();
     document.getElementById("totp-modal").style.display = "flex";
   }
@@ -1136,9 +1135,9 @@ resendEmailBtn?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    if (loginForm) document.getElementsByTagName("main")[0].style.display = "block";
-    if (registerForm) document.getElementsByTagName("main")[0].style.display = "block";
-    if (resetForm) document.getElementsByTagName("main")[0].style.display = "block";
+    if (loginForm) document.getElementsByTagName("main")[0].style.display = "grid";
+    if (registerForm) document.getElementsByTagName("main")[0].style.display = "grid";
+    if (resetForm) document.getElementsByTagName("main")[0].style.display = "grid";
 
     return
   };
