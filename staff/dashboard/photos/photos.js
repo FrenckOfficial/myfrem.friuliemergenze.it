@@ -129,6 +129,8 @@ async function loadPendingPhotos() {
           serviceType = "Guardia Costiera";
         } else if (photo.serviceType === "protezione-civile") {
           serviceType = "Protezione Civile";
+        } else if (photo.serviceType === "ausiliari") {
+          serviceType = "Soccorso Stradale / Autostradale (Ausiliari Viabilità)";
         } else serviceType;
  
         const tr = document.createElement("tr");
