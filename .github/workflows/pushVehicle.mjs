@@ -321,7 +321,7 @@ async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, ph
         target="_blank" 
         rel="noopener noreferrer"
         class="donate-btn"
-        style="display: flex !important; align-items: center !important; gap: 0.5rem; padding: 0.875rem 1.5rem; background: #ff7b00 !important; color: white; border: none; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; font-family: Lexend, sans-serif;">
+        style="display: flex !important; align-items: center !important; gap: 0.5rem; padding: 0.875rem 1.5rem; background: var(--accent) !important; color: white; border: none; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; font-family: Lexend, sans-serif;">
         Sostieni
       <\/a>
     <\/div>
