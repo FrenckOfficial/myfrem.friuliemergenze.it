@@ -130,7 +130,7 @@ async function loadPendingPhotos() {
         } else if (photo.serviceType === "protezione-civile") {
           serviceType = "Protezione Civile";
         } else if (photo.serviceType === "ausiliari") {
-          serviceType = "Soccorso Stradale / Autostradale (Ausiliari Viabilità)";
+          serviceType = "Soccorso Stradale / Autostradale";
         } else serviceType;
  
         const tr = document.createElement("tr");

@@ -37,7 +37,7 @@ const SERVICE_LABELS = {
   "soccorso-tecnico-urgente": "Vigili del Fuoco",
   "guardia-costiera": "Guardia Costiera",
   "protezione-civile": "Protezione Civile",
-  "ausiliari": "Soccorso Stradale / Autostradale (Ausiliari Viabilità)"
+  "ausiliari": "Soccorso Stradale / Autostradale"
 };
 
 const STATUS_STYLES = [
