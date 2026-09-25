@@ -147,11 +147,11 @@ async function loadAllPhotos() {
         <div class="photo-info">
           <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
           <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
-          <p><b>Targa:</b> ${data.licensePlate || "–"}</p>
-          <p><b>Posizione:</b> ${data.location || "–"}</p>
-          <p><b>Servizio:</b> ${service || "–"}</p>
-          <p><b>Note:</b> ${data.notes || "–"}</p>
-          <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank" style="font-size: var(--text-sm);color: var(--muted);margin: 0 0 var(--space-md) 0;line-height: 1.5;">${userName || "–"}</a></p>
+          <p><b>Targa:</b> ${data.licensePlate || "Non disponibile / Non inserito"}</p>
+          <p><b>Posizione:</b> ${data.location || "Non disponibile / Non inserito"}</p>
+          <p><b>Servizio:</b> ${service || "Non disponibile / Non inserito"}</p>
+          <p><b>Note:</b> ${data.notes || "Non disponibile / Non inserito"}</p>
+          <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank" style="font-size: var(--text-sm);color: var(--muted);margin: 0 0 var(--space-md) 0;line-height: 1.5;">${userName || "Non disponibile / Non inserito"}</a></p>
 
           ${isOwnPhoto ? `
             <div class="vote-container disabled">

@@ -241,8 +241,6 @@ select {
   }
 }
 
-/* BADGE SYSTEM SPECIFIC STYLES */
-
 .badge-system-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -256,6 +254,9 @@ select {
   padding: 2rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+  height: 660px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .form-group {

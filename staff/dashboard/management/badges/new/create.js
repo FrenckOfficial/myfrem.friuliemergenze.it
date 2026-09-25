@@ -164,15 +164,21 @@ async function loadBadges() {
 }
 
 function createBadgeCard(badge, badgeId) {
-  let type = badge.criteria.type;
   const card = document.createElement("div");
   card.className = "badge-card";
 
-  if (badge.criteria.type === "photos") {
-    type = `Foto`;
-  } else if (badge.criteria.type === "surveys") {
-    type = `Sondaggi`;
-  }
+  const typeLabels = {
+    photos: "Foto",
+    surveys: "Sondaggi",
+    exploration: "Esplorazione Servizi",
+    time: "Durata account",
+    "votes-received": "Voti Ricevuti",
+    "votes-given": "Voti Dati",
+    interactions: "Interazioni Totali",
+    manual: "Manuale"
+  };
+
+  const type = typeLabels[badge.criteria.type] || "Sconosciuto";
 
   const statusClass = badge.enabled ? "enabled" : "disabled";
 
@@ -182,7 +188,7 @@ function createBadgeCard(badge, badgeId) {
         <div class="badge-card-name">${badge.name}</div>
         <div class="badge-card-desc">${badge.description}</div>
       </div>
-      <div class="badge-card-status ${statusClass}">${badge.enabled ? "🟢 Attivo" : "🔴 Inattivo"}</div>
+      <div class="badge-card-status ${statusClass}">${badge.enabled ? "Attivo" : "Inattivo"}</div>
     </div>
 
     <div class="badge-card-details">

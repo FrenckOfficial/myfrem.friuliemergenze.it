@@ -10,6 +10,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const createBrandNewBadge = document.getElementById("createBrandNewBadge");
 const userSearchInput = document.getElementById("userSearch");
 const usersListEl = document.getElementById("usersList");
 const badgesContentEl = document.getElementById("badgesContent");
@@ -69,6 +70,9 @@ onAuthStateChanged(auth, async (user) => {
 
 async function loadBadges() {
   try {
+    createBrandNewBadge.addEventListener("click", () => {
+      window.location.href = "/staff/dashboard/management/badges/new/";
+    })
     const badgesSnap = await getDocs(collection(db, "badges"));
     badgesSnap.forEach(doc => {
       allBadges[doc.id] = doc.data();
@@ -226,7 +230,8 @@ async function addBadge(userId, badgeId, badgeName) {
   try {
     await setDoc(doc(db, "users", userId, "badges", badgeId), {
       earnedAt: serverTimestamp(),
-      notificationSent: false
+      notificationSent: false,
+      from: "manual"
     }, { merge: true });
 
     await addDoc(collection(db, "activities"), {
