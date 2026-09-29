@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../configFirebase.js"
+import { getFirestore, collection, getDocs, getDoc, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { firebaseConfig } from "../../configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
@@ -27,10 +27,10 @@ const contentEl = document.querySelector(".content");
 
 const staffStatsModal = document.getElementById("staffStatsModal");
 const staffStatsModalTitle = document.getElementById("staffStatsModalTitle");
+const staffStatsModalCount = document.getElementById("staffStatsModalCount");
 const staffStatsModalList = document.getElementById("staffStatsModalList");
-const closeStaffStatsModal = document.getElementById("closeStaffStatsModal");
 const closeStaffStatsModalBtn = document.getElementById("closeStaffStatsModalBtn");
-const staffStatsOverlay = staffStatsModal ? staffStatsModal.querySelector(".modal-overlay") : null;
+const staffStatsOverlay = document.getElementById("staffStatsOverlay");
 
 let allUsersData = [];
 let pendingPhotosData = [];
@@ -46,28 +46,62 @@ const staffFilterLabels = {
   rejected: "Foto rifiutate",
 };
 
-function getReadableStatus(photo) {
-  if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
-    return "Approvata";
-  } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
-    return "In attesa";
-  } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
-    return "Rifiutata";
-  }
-  return photo.status || "Sconosciuto";
+const PENDING_STATUSES = ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"];
+const APPROVED_STATUSES = ["Approvata ✅", "Approvata"];
+const REJECTED_STATUSES = ["Rifiutata", "Rifiutata ❌"];
+const ALLOWED_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+}
+
+function formatDate(ts, fallback = "data sconosciuta") {
+  return ts?.toDate
+    ? ts.toDate().toLocaleString("it-IT", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : fallback;
+}
+
+function byCreatedAtDesc(a, b) {
+  return (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0);
+}
+
+function byTimestampDesc(a, b) {
+  return (b.data().timestamp?.toMillis?.() || 0) - (a.data().timestamp?.toMillis?.() || 0);
+}
+
+function getStatusInfo(photo) {
+  const s = photo.status || "";
+  if (s.startsWith("Approvata")) return { label: "Approvata", cls: "is-approved" };
+  if (s.startsWith("Foto in attesa")) return { label: "In attesa", cls: "is-pending" };
+  if (s.startsWith("Rifiutata")) return { label: "Rifiutata", cls: "is-rejected" };
+  return { label: s || "Sconosciuto", cls: "" };
+}
+
+function showDashboard() {
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
 }
 
 async function getCachedUserName(userId) {
   if (!userId) return "utente sconosciuto";
-
-  if (userNameCache.has(userId)) {
-    return userNameCache.get(userId);
-  }
+  if (userNameCache.has(userId)) return userNameCache.get(userId);
 
   try {
-    const name = await getUserName(userId);
-    userNameCache.set(userId, name || "utente sconosciuto");
-    return name || "utente sconosciuto";
+    const name = (await getUserName(userId)) || "utente sconosciuto";
+    userNameCache.set(userId, name);
+    return name;
   } catch (error) {
     console.error("Errore nel recupero del nome utente:", error);
     userNameCache.set(userId, "utente sconosciuto");
@@ -75,46 +109,66 @@ async function getCachedUserName(userId) {
   }
 }
 
+function appendEmptyItem(listEl, text) {
+  const li = document.createElement("li");
+  li.textContent = text;
+  listEl.appendChild(li);
+}
+
 async function renderPhotoLine(photo) {
   const userName = await getCachedUserName(photo.userId);
+  const status = getStatusInfo(photo);
+
   return `
-    <p><b>${photo.vehicleModel || "Foto"}</b><br>
-    Caricata da <em>${userName}</em> il <em>${photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"}</em><br>
-    Revisionata il <em>${photo.reviewedAt?.toDate().toLocaleString() || "non ancora revisionata"}</em><br>
-    Stato: <em>${getReadableStatus(photo)}</em></p>
-  `;
+    <div class="photo-card ${status.cls}">
+      <div class="photo-card-top">
+        <span class="photo-card-title">${escapeHtml(photo.vehicleModel || "Foto")}</span>
+        <span class="status-pill">${escapeHtml(status.label)}</span>
+      </div>
+      <dl class="photo-card-meta">
+        <dt>Caricata da</dt><dd>${escapeHtml(userName)}</dd>
+        <dt>Il</dt><dd>${formatDate(photo.createdAt)}</dd>
+        <dt>Revisionata</dt><dd>${formatDate(photo.reviewedAt, "non ancora revisionata")}</dd>
+      </dl>
+    </div>`;
+}
+
+async function renderUserLine(user) {
+  const fullName = [user.name, user.surname].filter(Boolean).join(" ") || "Senza nome";
+
+  return `
+    <div class="photo-card">
+      <div class="photo-card-top">
+        <span class="photo-card-title">${escapeHtml(fullName)}</span>
+        <span class="status-pill">${escapeHtml(user.role || "utente")}</span>
+      </div>
+      <dl class="photo-card-meta">
+        <dt>Email</dt><dd>${escapeHtml(user.email || "non disponibile")}</dd>
+        <dt>Registrato</dt><dd>${formatDate(user.createdAt, "data sconosciuta")}</dd>
+      </dl>
+    </div>`;
 }
 
 async function renderStaffStatsList(filter) {
-  let dataset;
-  let renderItem;
+  const sources = {
+    users: { dataset: allUsersData, renderItem: renderUserLine },
+    pending: { dataset: pendingPhotosData, renderItem: renderPhotoLine },
+    approved: { dataset: approvedPhotosData, renderItem: renderPhotoLine },
+    rejected: { dataset: rejectedPhotosData, renderItem: renderPhotoLine },
+  };
 
-  if (filter === "pending") {
-    dataset = pendingPhotosData;
-    renderItem = renderPhotoLine;
-  } else if (filter === "approved") {
-    dataset = approvedPhotosData;
-    renderItem = renderPhotoLine;
-  } else if (filter === "rejected") {
-    dataset = rejectedPhotosData;
-    renderItem = renderPhotoLine;
-  } else {
-    dataset = [];
-    renderItem = async () => "";
-  }
+  const { dataset = [], renderItem } = sources[filter] || {};
+
+  staffStatsModalCount.textContent = dataset.length;
 
   if (dataset.length === 0) {
-    staffStatsModalList.innerHTML = "<li>Nessun elemento da mostrare.</li>";
+    staffStatsModalList.innerHTML = '<li class="staff-empty">Nessun elemento da mostrare</li>';
     return;
   }
 
-  staffStatsModalList.innerHTML = "<li>Caricamento...</li>";
+  staffStatsModalList.innerHTML = '<li class="staff-empty">Caricamento…</li>';
 
-  const items = [];
-  for (const item of dataset) {
-    const html = await renderItem(item);
-    items.push(html);
-  }
+  const items = await Promise.all(dataset.map(renderItem));
 
   staffStatsModalList.innerHTML = "";
   items.forEach((html) => {
@@ -126,24 +180,29 @@ async function renderStaffStatsList(filter) {
 
 async function openStaffStatsModal(filter) {
   staffStatsModalTitle.textContent = staffFilterLabels[filter] || "Dettagli";
+  staffStatsModalCount.textContent = "";
   staffStatsModal.classList.add("active");
+  document.body.style.overflow = "hidden";
   await renderStaffStatsList(filter);
 }
 
 function closeStaffStatsModalFn() {
   staffStatsModal.classList.remove("active");
+  document.body.style.overflow = "";
 }
 
 if (staffStatsModal) {
   document.querySelectorAll(".stat-box-clickable").forEach((box) => {
-    box.addEventListener("click", () => {
-      openStaffStatsModal(box.dataset.filter);
-    });
+    box.addEventListener("click", () => openStaffStatsModal(box.dataset.filter));
   });
 
-  closeStaffStatsModal?.addEventListener("click", closeStaffStatsModalFn);
   closeStaffStatsModalBtn?.addEventListener("click", closeStaffStatsModalFn);
   staffStatsOverlay?.addEventListener("click", closeStaffStatsModalFn);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && staffStatsModal.classList.contains("active")) {
+      closeStaffStatsModalFn();
+    }
+  });
 }
 
 logoutBtn.addEventListener("click", async () => {
@@ -157,159 +216,135 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userDoc = await getDocs(
-    query(collection(db, "users"), where("__name__", "==", user.uid))
-  );
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  const userData = userSnap.exists() ? userSnap.data() : null;
 
-  await updateDoc(doc(db, "users", user.uid), {
-    lastDashSelected: "admin",
-  });
-
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
-
-  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+  if (!userData || !ALLOWED_ROLES.includes(userData.role)) {
+    showDashboard();
     setStatus("Accesso negato: non sei staff!", "error");
     window.location.href = "/dashboard";
     return;
   }
 
+  await updateDoc(doc(db, "users", user.uid), {
+    lastDashSelected: "admin",
+  });
+
   const timeoutId = setTimeout(() => {
     console.warn("Timeout caricamento, forzo visualizzazione");
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+    showDashboard();
   }, 7000);
 
-  await loadStats();
+  await loadStats(userData);
 
   clearTimeout(timeoutId);
-  loadingEl.style.display = "none";
-  contentEl.style.display = "block";
+  showDashboard();
 });
 
-async function loadStats() {
+async function loadPhotoStats() {
+  const photosRef = collection(db, "photos");
+
+  const [photosSnap, pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
+    getDocs(photosRef),
+    getDocs(query(photosRef, where("status", "in", PENDING_STATUSES))),
+    getDocs(query(photosRef, where("status", "in", APPROVED_STATUSES))),
+    getDocs(query(photosRef, where("status", "in", REJECTED_STATUSES))),
+  ]);
+
+  totalPhotosEl.textContent = photosSnap.size;
+  pendingPhotosEl.textContent = pendingSnap.size;
+  approvedPhotosEl.textContent = approvedSnap.size;
+  rejectedPhotosEl.textContent = rejectedSnap.size;
+
+  pendingPhotosData = pendingSnap.docs.map((d) => d.data()).sort(byCreatedAtDesc);
+  approvedPhotosData = approvedSnap.docs.map((d) => d.data()).sort(byCreatedAtDesc);
+  rejectedPhotosData = rejectedSnap.docs.map((d) => d.data()).sort(byCreatedAtDesc);
+}
+
+async function renderRecentActivities() {
+  const snap = await getDocs(collection(db, "activities"));
+  recentActivityListEl.innerHTML = "";
+
+  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+
+  const rows = await Promise.all(
+    latest.map((docSnap) => {
+      const activity = docSnap.data();
+      const date = activity.timestamp.toDate().toLocaleString("it-IT");
+      return parseActivity(activity, date);
+    })
+  );
+
+  rows.forEach((html) => {
+    const li = document.createElement("li");
+    li.innerHTML = html;
+    recentActivityListEl.appendChild(li);
+  });
+
+  if (rows.length === 0) appendEmptyItem(recentActivityListEl, "Nessuna attività recente.");
+}
+
+async function renderRecentLogins() {
+  const snap = await getDocs(collection(db, "logins"));
+  recentLoginsListEl.innerHTML = "";
+
+  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+
+  latest.forEach((docSnap) => {
+    const login = docSnap.data();
+    const email = escapeHtml(login.email);
+    const date = login.timestamp.toDate().toLocaleString("it-IT");
+    const ip = escapeHtml(login.ipAddress ?? "IP sconosciuto");
+    const ua = escapeHtml(login.userAgent ?? "Browser sconosciuto");
+
+    const li = document.createElement("li");
+    li.innerHTML = `Accesso di <a href="mailto:${email}">${email}</a> in data ${date} (${ip} - ${ua})`;
+    recentLoginsListEl.appendChild(li);
+  });
+
+  if (latest.length === 0) appendEmptyItem(recentLoginsListEl, "Nessuna attività recente.");
+}
+
+async function renderRecentViewedPages() {
+  const snap = await getDocs(collection(db, "viewedPages"));
+  recentPageViewedListEl.innerHTML = "";
+
+  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+
+  const rows = await Promise.all(
+    latest.map((docSnap) => {
+      const activity = docSnap.data();
+      const date = activity.timestamp.toDate().toLocaleString("it-IT");
+      return parseViewedPage(activity, date);
+    })
+  );
+
+  rows.forEach((html) => {
+    const li = document.createElement("li");
+    li.innerHTML = html;
+    recentPageViewedListEl.appendChild(li);
+  });
+
+  if (rows.length === 0) appendEmptyItem(recentPageViewedListEl, "Nessuna pagina visualizzata di recente.");
+}
+
+async function loadStats(currentUserData) {
   try {
+    userNameEl.textContent = `${currentUserData.name ?? ""} ${currentUserData.surname ?? ""}`.trim();
+
     const usersSnap = await getDocs(collection(db, "users"));
     totalUsersEl.textContent = usersSnap.size;
-    allUsersData = usersSnap.docs.map((doc) => doc.data());
+    allUsersData = usersSnap.docs.map((d) => d.data());
 
-    const currentUser = auth.currentUser;
-    const currentUserDoc = await getDocs(
-      query(collection(db, "users"), where("__name__", "==", currentUser.uid))
-    );
-    const currentUserData = currentUserDoc.docs[0].data();
-    userNameEl.textContent = `${currentUserData.name} ${currentUserData.surname}`;
-
-    const photosSnap = await getDocs(collection(db, "photos"));
-    totalPhotosEl.textContent = photosSnap.size;
-
-    const pendingSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "in", ["Foto in attesa di approvazione ⌛", "Foto in attesa di approvazione"]))
-    );
-    pendingPhotosEl.textContent = pendingSnap.size;
-    pendingPhotosData = pendingSnap.docs
-      .map((doc) => doc.data())
-      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-
-    const approvedSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "in", ["Approvata ✅", "Approvata"]))
-    );
-    approvedPhotosEl.textContent = approvedSnap.size;
-    approvedPhotosData = approvedSnap.docs
-      .map((doc) => doc.data())
-      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-
-    const rejectedSnap = await getDocs(
-      query(collection(db, "photos"), where("status", "in", ["Rifiutata", "Rifiutata ❌"]))
-    );
-    rejectedPhotosEl.textContent = rejectedSnap.size;
-    rejectedPhotosData = rejectedSnap.docs
-      .map((doc) => doc.data())
-      .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
-
-    const activitiesSnap = await getDocs(collection(db, "activities"));
-    recentActivityListEl.innerHTML = "";
-
-    const sortedActivities = activitiesSnap.docs
-      .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
-      .slice(0, 5);
-
-    for (const docSnap of sortedActivities) {
-      const activity = docSnap.data();
-      const li = document.createElement("li");
-      const date = activity.timestamp.toDate().toLocaleString();
-
-      const text = await parseActivity(activity, date);
-      li.innerHTML = text;
-
-      recentActivityListEl.appendChild(li);
-    }
-
-    if (recentActivityListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentActivityListEl.appendChild(li);
-    }
-
-    if (recentActivityListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentActivityListEl.appendChild(li);
-    }
-
-    const loginsSnap = await getDocs(collection(db, "logins"));
-    recentLoginsListEl.innerHTML = "";
-
-    const sortedLogins = loginsSnap.docs
-      .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
-      .slice(0, 5);
-
-    for (const docSnap of sortedLogins) {
-      const activity = docSnap.data();
-      const li = document.createElement("li");
-      const date = activity.timestamp.toDate().toLocaleString();
-      const email = activity.email;
-
-      li.innerHTML = `Accesso di <a mailto:${email}>${email}</a> in data ${date} (${activity.ipAddress ?? "IP sconosciuto"} - ${activity.userAgent ?? "Browser sconosciuto"})`;
-
-      recentLoginsListEl.appendChild(li);
-    }
-
-    if (recentLoginsListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentLoginsListEl.appendChild(li);
-    }
-
-    const pageViewedSnap = await getDocs(collection(db, "viewedPages"));
-    recentPageViewedListEl.innerHTML = "";
-
-    const sortedPageViewed = pageViewedSnap.docs
-      .sort((a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis())
-      .slice(0, 5);
-    
-    for (const docSnap of sortedPageViewed) {
-      const activity = docSnap.data();
-      const li = document.createElement("li");
-      const date = activity.timestamp.toDate().toLocaleString();
-
-      const text = await parseViewedPage(activity, date);
-      li.innerHTML = text;
-
-      recentPageViewedListEl.appendChild(li);
-    }
-
-    if (recentPageViewedListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna pagina visualizzata di recente.";
-      recentPageViewedListEl.appendChild(li);
-    }
-
+    await Promise.all([
+      loadPhotoStats(),
+      renderRecentActivities(),
+      renderRecentLogins(),
+      renderRecentViewedPages(),
+    ]);
   } catch (err) {
     console.error("❌ Errore caricamento statistiche:", err);
     setStatus("❌ Errore caricamento statistiche", "error");
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+    showDashboard();
   }
 }

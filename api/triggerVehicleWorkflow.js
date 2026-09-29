@@ -1,6 +1,6 @@
 export default async (request, response) => {
   try {
-    console.log("🚀 Function triggerWorkflow avviata");
+    console.log("Function triggerWorkflow avviata");
     console.log("METHOD:", request.method);
     console.log("URL:", request.url);
 
@@ -16,7 +16,7 @@ export default async (request, response) => {
       try {
         rawBody = await request.text();
       } catch (e) {
-        console.error("❌ Non riesco a leggere il body:", e);
+        console.error("Non riesco a leggere il body:", e);
         return response.status(400).json({ error: "Body non valido" });
       }
     }
@@ -42,14 +42,14 @@ export default async (request, response) => {
     }
 
     if (!draftId) {
-      console.error("❌ draftId mancante");
+      console.error("draftId mancante");
       return response.status(400).json({ error: "draftId mancante" });
     }
 
-    console.log("📦 Draft ID:", draftId);
+    console.log("Draft ID:", draftId);
 
     if (!token) {
-      console.error("❌ GITHUB_PAT non configurato");
+      console.error("GITHUB_PAT non configurato");
       return response.status(500).json({ error: "Token GitHub non configurato" });
     }
 
@@ -73,16 +73,16 @@ export default async (request, response) => {
 
     const body = await githubResponse.text();
 
-    console.log("📨 GitHub status:", githubResponse.status);
-    console.log("📨 GitHub body:", body);
+    console.log("GitHub status:", githubResponse.status);
+    console.log("GitHub body:", body);
 
     if (githubResponse.status === 204) {
-      console.log("✅ Workflow triggered successfully");
+      console.log("Workflow triggered successfully");
       return response.status(204).send("");
     }
 
     if (!githubResponse.ok) {
-      console.error("❌ GitHub API Error:", githubResponse.status, body);
+      console.error("GitHub API Error:", githubResponse.status, body);
       return response.status(githubResponse.status).json({
         error: `GitHub API error: ${githubResponse.status}`,
         details: body
@@ -92,7 +92,7 @@ export default async (request, response) => {
     return response.status(githubResponse.status).json(body);
 
   } catch (error) {
-    console.error("❌ Errore non gestito:", error.message);
+    console.error("Errore non gestito:", error.message);
     console.error("Stack:", error.stack);
     return response.status(500).json({
       error: "Errore interno della funzione",

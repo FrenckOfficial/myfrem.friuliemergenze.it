@@ -87,18 +87,18 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("❌ Brevo API error:", errorData);
+      console.error("Brevo API error", errorData);
       return res.status(response.status).json({ 
         error: "Errore nell'invio della notifica" 
       });
     }
 
-    console.log("✅ Login notification inviata a:", sanitizedEmail);
+    console.log("2FA code inviato a:", sanitizedEmail);
 
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error("❌ Server error:", error.message);
+    console.error("Server error:", error.message);
     return res.status(500).json({ 
       success: false,
       error: "Errore interno del server"
@@ -269,7 +269,7 @@ body {
     </div>
 
     <div class="security-note">
-      <b>⚠️ Nota di Sicurezza:</b> Se non hai richiesto tu il codice di accesso ti consigliamo di cambiare subito la tua password. Se hai dubbi sulla sicurezza del tuo account, contattaci.
+      <b>Nota di Sicurezza:</b> Se non hai richiesto tu il codice di accesso ti consigliamo di cambiare subito la tua password. Se hai dubbi sulla sicurezza del tuo account, contattaci.
     </div>
 
     <div class="cta-link">

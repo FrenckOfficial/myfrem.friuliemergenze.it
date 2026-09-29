@@ -2,8 +2,8 @@ import { firebaseConfig } from "../configFirebase.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
 import "/helpers/loadIcons.js";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -582,413 +582,183 @@ if (resetForm) {
   });
 }
 
-let twoFASetup = {
-  method: "none",
-  emailVerified: false,
-  totpVerified: false,
-  totpSecret: null,
-  recoveryCodes: [],
-  emailCode: null,
-  emailCodeTimestamp: null
-};
- 
-document.querySelectorAll('input[name="twofa-method"]').forEach(radio => {
-  radio.addEventListener("change", (e) => {
-    twoFASetup.method = e.target.value;
-    showTwoFASection();
-  });
-});
- 
-function showTwoFASection() {
-  document.getElementById("twofa-email-section").style.display = "none";
-  
-  if (twoFASetup.method === "email") {
-    document.getElementById("twofa-email-section").style.display = "block";
-  } else if (twoFASetup.method === "totp") {
-    initTOTPSetup();
-    document.getElementById("totp-modal").style.display = "flex";
-  }
-}
-
- 
-document.getElementById("twofa-email-send")?.addEventListener("click", async () => {
-  const btn = document.getElementById("twofa-email-send");
-  const status = document.getElementById("email-send-status");
-  const codeForm = document.getElementById("email-code-form");
- 
-  btn.disabled = true;
-  status.textContent = "Invio codice...";
-  status.className = "";
- 
-  try {
-    twoFASetup.emailCode = String(Math.floor(100000 + Math.random() * 900000));
-    twoFASetup.emailCodeTimestamp = Date.now();
- 
-    const response = await fetch("/api/send2FACode", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
-        email: registerEmail.value,
-        ip: await getIpAddress(),
-        code: twoFASetup.emailCode
-      })
-    });
- 
-    status.textContent = "Codice inviato!";
-    status.className = "success";
-    codeForm.style.display = "block";
-  } catch (error) {
-    console.error("Errore invio email:", error);
-    status.textContent = "Errore nell'invio del codice";
-    status.className = "error";
-  } finally {
-    btn.disabled = false;
-  }
-});
- 
-document.getElementById("twofa-email-verify")?.addEventListener("click", () => {
-  const inputCode = document.getElementById("twofa-email-code").value.trim();
-  const status = document.getElementById("email-send-status");
- 
-  if (inputCode === twoFASetup.emailCode) {
-    twoFASetup.emailVerified = true;
-    document.getElementById("email-verified-message").style.display = "block";
-    document.getElementById("email-code-form").style.display = "none";
-    document.getElementById("twofa-email-send").style.display = "none";
-    
-    generateRecoveryCodes();
-    showRecoveryCodes();
-  } else {
-    status.textContent = "Codice errato";
-    status.className = "error";
-  }
-});
- 
-function initTOTPSetup() {
-  if (twoFASetup.totpSecret) return;
- 
-  const secret = generateTOTPSecret();
-  twoFASetup.totpSecret = secret;
- 
-  document.getElementById("totp-secret").textContent = secret;
- 
-  const accountName = registerEmail.value || "MyFrEM";
-  const otpauthUrl = `otpauth://totp/MyFrEM:${accountName}?secret=${secret}&issuer=MyFrEM`;
- 
-  document.getElementById("qrcode").innerHTML = "";
- 
-  new QRCode(document.getElementById("qrcode"), {
-    text: otpauthUrl,
-    width: 200,
-    height: 200,
-    colorDark: "#00d4e8",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
-  });
-}
-
-async function verifyTOTPCode(secret, code) {
-  try {
-    const result = await otplib.verify({ secret, token: code });
-    return result.valid;
-  } catch (e) {
-    console.error("Errore verifica TOTP:", e);
-    return false;
-  }
-}
-
-document.getElementById("twofa-totp-verify")?.addEventListener("click", async () => {
-  const inputCode = document.getElementById("twofa-totp-code").value.trim();
-  const status = document.getElementById("totp-verify-status");
- 
-  if (inputCode.length !== 6 || !/^\d{6}$/.test(inputCode)) {
-    status.textContent = "Inserisci 6 cifre";
-    status.className = "error";
-    return;
-  }
- 
-  if (await verifyTOTPCode(twoFASetup.totpSecret, inputCode)) {
-    twoFASetup.totpVerified = true;
-    status.textContent = "Codice verificato!";
-    status.className = "success";
-    
-    setTimeout(() => {
-      document.getElementById("totp-step-verify").style.display = "none";
-      document.getElementById("totp-step-success").style.display = "block";
-    }, 500);
- 
-    generateRecoveryCodes();
-    
-    setTimeout(() => {
-      document.getElementById("totp-modal").style.display = "none";
-      showRecoveryCodes();
-      
-      document.getElementById("totp-step-qr").style.display = "block";
-      document.getElementById("totp-step-verify").style.display = "none";
-      document.getElementById("totp-step-success").style.display = "none";
-      document.getElementById("totp-verify-status").textContent = "";
-      document.getElementById("twofa-totp-code").value = "";
-    }, 2000);
-  } else {
-    status.textContent = "Codice errato";
-    status.className = "error";
-  }
-});
- 
-function generateTOTPSecret() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  let secret = "";
-  for (let i = 0; i < 32; i++) {
-    secret += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return secret;
-}
- 
-function generateRecoveryCodes() {
-  const codes = [];
-  for (let i = 0; i < 5; i++) {
-    const code = Array(8)
-      .fill(0)
-      .map(() => Math.floor(Math.random() * 10))
-      .join("");
-    codes.push(code);
-  }
-  twoFASetup.recoveryCodes = codes;
-}
- 
-function showRecoveryCodes() {
-  const container = document.getElementById("recovery-codes-display");
-  container.innerHTML = twoFASetup.recoveryCodes
-    .map(code => `<div>${code}</div>`)
-    .join("");
- 
-  document.getElementById("recovery-codes-section").style.display = "block";
-}
- 
-document.getElementById("recovery-download")?.addEventListener("click", () => {
-  const content = `Recovery Codes - MyFrEM\n${"=".repeat(40)}\n\nSalva questi codici in un luogo sicuro!\n\n${twoFASetup.recoveryCodes.join("\n")}\n\nGenerato il: ${new Date().toLocaleString()}`;
-  
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `myfrem-recovery-codes-${Date.now()}.txt`;
-  a.click();
-});
- 
-document.getElementById("recovery-copy")?.addEventListener("click", () => {
-  const text = twoFASetup.recoveryCodes.join("\n");
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById("recovery-copy");
-    const original = btn.textContent;
-    btn.textContent = "✓ Copiato!";
-    setTimeout(() => {
-      btn.textContent = original;
-    }, 2000);
-  });
-});
- 
-function getTwoFADataForFirestore() {
-  if (twoFASetup.method === "none") {
-    return {
-      twoFactorEnabled: false,
-      twoFactorMethod: null
-    };
-  }
- 
-  const data = {
-    twoFactorEnabled: true,
-    twoFactorMethod: twoFASetup.method,
-    recoveryCodes: twoFASetup.recoveryCodes,
-    usedRecoveryCodes: []
-  };
- 
-  if (twoFASetup.method === "totp") {
-    data.totpSecret = twoFASetup.totpSecret;
-  }
- 
-  return data;
-}
-
 if (registerForm) {
-  let currentStep = 1;
-  const totalSteps = 7;
+  const USERNAME_RE = /^[a-z0-9._-]{3,20}$/;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const el = (id) => document.getElementById(id);
   const steps = document.querySelectorAll(".step");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const submitBtn = document.getElementById("submitBtn");
- 
+  const totalSteps = steps.length;
+  const prevBtn = el("prevBtn");
+  const nextBtn = el("nextBtn");
+
+  let currentStep = 1;
+
   function showStep(step) {
-    steps.forEach(s => {
-      s.style.display = "none";
+    currentStep = step;
+
+    steps.forEach((s) => {
+      const active = Number(s.dataset.step) === step;
+      s.style.display = active ? "block" : "none";
+      s.classList.toggle("active", active);
     });
- 
-    document.querySelector(`[data-step="${step}"]`).style.display = "block";
-    document.getElementById("stepCounter").textContent = `Passo ${step} di ${totalSteps}`;
+
+    el("stepCounter").textContent = `Passo ${step} di ${totalSteps}`;
     document.querySelector(".step-progress").style.width = `${(step / totalSteps) * 100}%`;
-    const reviewContainer = document.getElementById("reviewContainer");
- 
+
     prevBtn.style.display = step === 1 ? "none" : "block";
- 
-    if (step === totalSteps) {
-      nextBtn.style.display = "none";
-      submitBtn.style.display = "block";
- 
-      let twoFAStatus = "Non abilitato";
-      if (twoFASetup.method === "email") twoFAStatus = "Email ✓";
-      if (twoFASetup.method === "totp") twoFAStatus = "App Authenticator ✓";
- 
-      reviewContainer.innerHTML = `
-        <div><b>Nome:</b> ${registerName.value} ${registerSurname.value}</div>
-        <div><b>Username:</b> ${registerUsername.value}</div>
-        <div><b>Email:</b> ${registerEmail.value}</div>
-        <div><b>Telefono:</b> ${registerPhone?.value || "Non inserito"}</div>
-        <div><b>2FA:</b> ${twoFAStatus}</div>
-      `;
-    } else {
-      nextBtn.style.display = "block";
-      submitBtn.style.display = "none";
-    }
+    nextBtn.style.display = step === totalSteps ? "none" : "block";
+    submitBtn.style.display = step === totalSteps ? "block" : "none";
   }
- 
-  async function validateStep() {
-    if (currentStep === 1) {
-      if (!registerName.value.trim() || !registerSurname.value.trim()) {
-        setStatus("Per poter iniziare la registrazione, devi inserire il tuo nome e il tuo cognome.", "error");
-        return false;
-      }
-    }
- 
-    if (currentStep === 2) {
-      const username = registerUsername.value.trim();
-      if (!username) {
-        setStatus("Per poter continuare la registrazione, devi inserire uno username.", "error");
-        return false;
-      }
-      if (/[^\w.-]/.test(username) || /\s/.test(username)) {
-        setStatus("Lo username può contenere solo lettere, numeri, trattini e underscore", "error");
-        return false;
-      }
-      const usernameQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
-      const usernameSnap = await getDocs(usernameQuery);
-      if (!usernameSnap.empty) {
-        setStatus("Lo username inserito è già in uso.", "error");
-        return false;
-      }
-    }
- 
-    if (currentStep === 3) {
-      if (!registerEmail.value.trim() && !registerEmail.value.includes("@")) {
-        setStatus("Per poter continuare la registrazione, devi inserire una email.", "error");
+
+  async function isUsernameTaken(username) {
+    const snap = await getDocs(
+      query(collection(db, "users"), where("username", "==", username), limit(1))
+    );
+    return !snap.empty;
+  }
+
+  async function validateStep(step) {
+    if (step === 1) {
+      if (!el("registerName").value.trim() || !el("registerSurname").value.trim()) {
+        setStatus("Per iniziare la registrazione devi inserire nome e cognome.", "error");
         return false;
       }
 
-      if (!registerEmail.value.includes("@")) {
-        console.log("Email non valida:", registerEmail.value);
+      const username = el("registerUsername").value.trim().toLowerCase();
+
+      if (!username) {
+        setStatus("Devi scegliere uno username.", "error");
+        return false;
+      }
+
+      if (!USERNAME_RE.test(username)) {
+        setStatus("Lo username deve avere da 3 a 20 caratteri: lettere minuscole, numeri, punto, trattino o underscore.", "error");
+        return false;
+      }
+
+      try {
+        if (await isUsernameTaken(username)) {
+          setStatus("Lo username inserito è già in uso.", "error");
+          return false;
+        }
+      } catch (err) {
+        console.error("Errore controllo username:", err);
+        setStatus("Impossibile verificare lo username, riprova.", "error");
+        return false;
+      }
+    }
+
+    if (step === 2) {
+      const email = el("registerEmail").value.trim();
+      const password = el("registerPassword").value;
+      const confirm = el("registerConfirmPassword").value;
+
+      if (!email) {
+        setStatus("Devi inserire un indirizzo email.", "error");
+        return false;
+      }
+
+      if (!EMAIL_RE.test(email)) {
         setStatus("L'email inserita non è valida.", "error");
         return false;
       }
-    }
 
- 
-    if (currentStep === 5) {
-      if (registerPassword.value !== registerConfirmPassword.value) {
-        setStatus("Le password inserite non corrispondono", "error");
-        return false;
-      }
-
-      if (registerPassword.value.length < 6) {
-        setStatus("La password deve essere lunga almeno 6 caratteri!", "error");
-        return false;
-      }
-
-      if (!/[A-Z]/.test(registerPassword.value)) {
-        setStatus("La password deve contenere almeno una lettera maiuscola!", "error");
-        return false;
-      }
-
-      if (!/[a-z]/.test(registerPassword.value)) {
-        setStatus("La password deve contenere almeno una lettera minuscola!", "error");
-        return false;
-      }
-
-      if (!/[0-9]/.test(registerPassword.value)) {
-        setStatus("La password deve contenere almeno un numero!", "error");
-        return false;
-      }
-
-      if (!registerPassword.value && !registerConfirmPassword.value) {
+      if (!password) {
         setStatus("Devi scegliere una password.", "error");
         return false;
       }
+
+      if (password.length < 8) {
+        setStatus("La password deve essere lunga almeno 8 caratteri.", "error");
+        return false;
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        setStatus("La password deve contenere almeno una lettera maiuscola.", "error");
+        return false;
+      }
+
+      if (!/[a-z]/.test(password)) {
+        setStatus("La password deve contenere almeno una lettera minuscola.", "error");
+        return false;
+      }
+
+      if (!/[0-9]/.test(password)) {
+        setStatus("La password deve contenere almeno un numero.", "error");
+        return false;
+      }
+
+      if (password !== confirm) {
+        setStatus("Le password inserite non corrispondono.", "error");
+        return false;
+      }
     }
- 
-    if (currentStep === 6) {
-      const method = twoFASetup.method;
- 
-      if (method === "email" && !twoFASetup.emailVerified) {
-        setStatus("Per continuare, devi verificare il tuo indirizzo email attraverso il messaggio inviato all'indirizzo fornito.", "error");
-        return false;
-      }
- 
-      if (method === "totp" && !twoFASetup.totpVerified) {
-        setStatus("Per continuare, devi verificare l'app di autenticazione (Authy, Google Authenticator) attraverso il codice fornito.", "error");
-        return false;
-      }
- 
-      if ((method === "email" || method === "totp") && !document.getElementById("recovery-confirmed").checked) {
-        setStatus("Per continuare, devi confermare di aver copiato/salvato i codici di recupero.", "error");
-        return false;
-      }
-    }
- 
+
     return true;
   }
- 
+
   nextBtn.addEventListener("click", async () => {
-    const valid = await validateStep();
-    if (!valid) return;
-    currentStep++;
-    showStep(currentStep);
+    nextBtn.disabled = true;
+    try {
+      if (await validateStep(currentStep)) showStep(currentStep + 1);
+    } finally {
+      nextBtn.disabled = false;
+    }
   });
- 
-  prevBtn.addEventListener("click", () => {
-    currentStep--;
-    showStep(currentStep);
+
+  prevBtn.addEventListener("click", () => showStep(currentStep - 1));
+
+  document.querySelectorAll(".toggle-password[data-target]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = el(btn.dataset.target);
+      const icon = btn.querySelector("i");
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      icon.classList.toggle("fa-eye", !show);
+      icon.classList.toggle("fa-eye-slash", show);
+    });
   });
- 
+
   showStep(1);
- 
+
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
- 
+
+    if (currentStep < totalSteps) {
+      nextBtn.click();
+      return;
+    }
+
+    if (isRegistering) return;
+    if (!(await validateStep(1)) || !(await validateStep(2))) return;
+
+    isRegistering = true;
     submitBtn.disabled = true;
     btnText.textContent = "Registrazione in corso...";
     btnLoader.style.display = "inline-block";
- 
-    if (isRegistering) return;
-    isRegistering = true;
- 
+
+    let createdUser = null;
+    let committed = false;
+
     try {
-      const name = registerName.value.trim();
-      const surname = registerSurname.value.trim();
-      const email = registerEmail.value.trim();
-      const username = registerUsername.value.trim();
-      const password = registerPassword.value;
-      const phone = registerPhone?.value.trim() || "";
- 
+      const name = el("registerName").value.trim();
+      const surname = el("registerSurname").value.trim();
+      const username = el("registerUsername").value.trim().toLowerCase();
+      const email = el("registerEmail").value.trim();
+      const password = el("registerPassword").value;
+      const phone = "";
+
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      const user = cred.user;
+      createdUser = cred.user;
+      const uid = createdUser.uid;
+
       const token = crypto.randomUUID();
       const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
- 
-      const twoFAData = getTwoFADataForFirestore();
- 
-      await setDoc(doc(db, "users", user.uid), {
+
+      const batch = writeBatch(db);
+
+      batch.set(doc(db, "users", uid), {
         email,
         name,
         surname,
@@ -1001,25 +771,29 @@ if (registerForm) {
         verifyLink: verifyLink,
         createdAt: serverTimestamp(),
         firstAccess: true,
-        ...twoFAData
+        twoFactorEnabled: false,
+        twoFactorMethod: null
       });
- 
-      await setDoc(doc(db, "emailVerifications", token), {
+
+      batch.set(doc(db, "emailVerifications", token), {
         email,
-        userId: user.uid,
+        userId: uid,
         expiresAt: Date.now() + 86400000,
         used: false
       });
- 
-      await addDoc(collection(db, "activities"), {
+
+      batch.set(doc(collection(db, "activities")), {
         type: "user_creation",
         userName: `${name} ${surname}`,
         timestamp: serverTimestamp()
       });
- 
+
+      await batch.commit();
+      committed = true;
+
       const htmlContent = buildEmail({ verifyLink, email, name });
       const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
- 
+
       const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
         method: "POST",
         headers: {
@@ -1031,8 +805,8 @@ if (registerForm) {
           htmlContent
         })
       });
- 
-      const newUserStaffResponse = await fetch("/api/sendStaffNewUserEmail", {
+
+      fetch("/api/sendStaffNewUserEmail", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1041,23 +815,37 @@ if (registerForm) {
           userName: `${name} ${surname}`,
           staffContent
         })
-      });
- 
-      if (!response.ok) {
-        throw new Error("Errore invio email di verifica.");
-      }
- 
-      if (!newUserStaffResponse.ok) {
-        console.log("❌ Errore invio email staff:", newUserStaffResponse.status);
-      }
- 
-      setStatus("L'email di verifica è stata inviata con successo all'indirizzo fornito!", "success");
- 
+      })
+        .then((r) => {
+          if (!r.ok) console.error("❌ Errore invio email staff:", r.status);
+        })
+        .catch((err) => console.error("❌ Errore invio email staff:", err));
+
       await signOut(auth);
       localStorage.setItem("email", email);
+
+      if (!response.ok) {
+        setStatus("Account creato, ma l'invio dell'email di verifica non è riuscito. Nella prossima pagina potrai richiederne un nuovo invio.", "error");
+        setTimeout(() => {
+          window.location.href = "/auth/confirm-email";
+        }, 3000);
+        return;
+      }
+
+      setStatus("L'email di verifica è stata inviata con successo all'indirizzo fornito!", "success");
       window.location.href = "/auth/confirm-email";
- 
+
     } catch (err) {
+      console.error(err);
+
+      if (createdUser && !committed) {
+        try {
+          await deleteUser(createdUser);
+        } catch (cleanupErr) {
+          console.error("Pulizia utente non riuscita:", cleanupErr);
+        }
+      }
+
       btnText.textContent = "Registrazione fallita";
       switch (err.code) {
         case "auth/email-already-in-use":
@@ -1072,14 +860,16 @@ if (registerForm) {
         case "auth/missing-password":
           setStatus("Per poter registrarti devi inserire una password per il tuo account.", "error");
           break;
+        case "permission-denied":
+          setStatus("Non è stato possibile completare la registrazione (permessi insufficienti). Riprova più tardi.", "error");
+          break;
         default:
           setStatus("C'è stato un errore durante la registrazione.", "error");
       }
-      console.error(err);
     } finally {
       isRegistering = false;
       submitBtn.disabled = false;
-      btnText.textContent = "Crea account";
+      btnText.textContent = "Registrati";
       btnLoader.style.display = "none";
     }
   });
@@ -1150,6 +940,9 @@ onAuthStateChanged(auth, async (user) => {
 
   const blockedPaths = [
     "/auth/signin/",
+    "/auth/signup/",
+    "/auth/reset-your-password/",
+    "/auth/signin",
     "/auth/signup",
     "/auth/reset-your-password"
   ];

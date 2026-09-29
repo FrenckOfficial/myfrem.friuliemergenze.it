@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   try {
     await admin.auth().verifyIdToken(token);
   } catch (error) {
-    console.error("❌ Token verification failed:", error);
+    console.error("Token verification failed:", error);
     return res.status(401).json({ error: "Invalid token" });
   }
 
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
           email: "autosystem@friuliemergenze.it"
         },
         to: [{ email: sanitizedEmail, name: sanitizedName }],
-        subject: `🔐 Accesso effettuato a MyFrEM - ${formattedDate}`,
+        subject: `Accesso effettuato a MyFrEM - ${formattedDate}`,
         htmlContent,
         replyTo: { 
           name: "Friuli Emergenze",
@@ -99,18 +99,18 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("❌ Brevo API error:", errorData);
+      console.error("Brevo API error", errorData);
       return res.status(response.status).json({ 
         error: "Errore nell'invio della notifica" 
       });
     }
 
-    console.log("✅ Login notification inviata a:", sanitizedEmail);
+    console.log("Login notification inviata a:", sanitizedEmail);
 
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error("❌ Server error:", error.message);
+    console.error("Server error:", error.message);
     return res.status(500).json({ 
       success: false,
       error: "Errore interno del server"

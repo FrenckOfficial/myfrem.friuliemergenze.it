@@ -14,6 +14,18 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  const oraRoma = Number(
+    new Intl.DateTimeFormat('it-IT', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: 'Europe/Rome',
+    }).format(new Date())
+  );
+
+  if (oraRoma !== 15) {
+    return res.status(200).json({ skipped: true, message: `Ora locale ${oraRoma}, non eseguo` });
+  }
+
   try {
     const utentiSnapshot = await db.collection('users').get();
 

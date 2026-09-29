@@ -190,31 +190,29 @@ auth.onAuthStateChanged(async (user) => {
             await db.collection("users").doc(currentUserId).update({ notificationsEnabled: true, notificationsEnabledAt: new Date() });
           }
 
-          notificationStatusIcon.textContent = "✅";
-          notificationStatusText.textContent = "Notifiche: Abilitate";
+          notificationStatusText.textContent = "Notifiche abilitate!";
           notificationStatusDesc.textContent = "Riceverai notifiche in tempo reale";
           notificationStatus.classList.remove("denied");
           notificationStatus.classList.add("enabled");
 
-          enableNotificationsBtn.textContent = "✅ Notifiche Abilitate";
+          enableNotificationsBtn.textContent = "Notifiche abilitate!";
           enableNotificationsBtn.disabled = true;
 
-          new Notification("MyFrEM", {
+          new Notification("Piattaforma MyFrEM", {
             icon: "https://www.friuliemergenze.it/assets/logo.png",
             body: "Notifiche abilitate con successo! Riceverai aggiornamenti in tempo reale.",
             tag: "friuliemergenze-welcome",
             requireInteraction: false,
           });
 
-          console.log("✅ Notifiche abilitate");
+          console.log("Notifiche abilitate");
         } else if (permission === "denied") {
-          notificationStatusIcon.textContent = "❌";
-          notificationStatusText.textContent = "Notifiche: Negate";
-          notificationStatusDesc.textContent = "Puoi abilitarle dalle impostazioni del browser";
+          notificationStatusText.textContent = "Notifiche negate";
+          notificationStatusDesc.textContent = "Puoi abilitarle dalle impostazioni del browser!";
           notificationStatus.classList.add("denied");
-          enableNotificationsBtn.textContent = "❌ Non Disponibili";
+          enableNotificationsBtn.textContent = "Non Disponibili";
           enableNotificationsBtn.disabled = true;
-          console.log("❌ Notifiche negate");
+          console.log("Notifiche negate");
         }
       } catch (error) {
         console.error("Errore nell'abilitazione delle notifiche:", error);
@@ -400,21 +398,29 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 let currentStep = 1;
-const totalSteps = 5;
+const PHONE_STEP = 5;
+let firstAccessBound = false;
+
+function getFirstAccessModal() {
+  return document.getElementById("firstAccessModal");
+}
+
+function getTotalSteps() {
+  return getFirstAccessModal().querySelectorAll(".modal-step").length;
+}
 
 function showFirstAccessModal(userId) {
-  const modal = document.getElementById("firstAccessModal");
-  modal.classList.add("active");
-  currentStep = 1;
+  getFirstAccessModal().classList.add("active");
   showStep(1);
   setupModalListeners(userId);
 }
 
 function showStep(step) {
-  const steps = document.querySelectorAll(".modal-step");
-  steps.forEach((el) => el.classList.remove("active"));
+  const modal = getFirstAccessModal();
 
-  const activeStep = document.querySelector(`.modal-step[data-step="${step}"]`);
+  modal.querySelectorAll(".modal-step").forEach((el) => el.classList.remove("active"));
+
+  const activeStep = modal.querySelector(`.modal-step[data-step="${step}"]`);
   if (activeStep) {
     activeStep.classList.add("active");
   }
@@ -422,45 +428,84 @@ function showStep(step) {
   currentStep = step;
 }
 
+async function savePhoneIfPresent(userId) {
+  const input = document.getElementById("firstAccessPhone");
+  const status = document.getElementById("firstAccessPhoneStatus");
+  if (!input || !status) return true;
+
+  const phone = input.value.trim();
+  status.textContent = "";
+
+  if (!phone) return true;
+
+  const digits = phone.replace(/[\s.-]/g, "");
+  if (!/^\+?[0-9]{6,15}$/.test(digits)) {
+    status.textContent = "Numero non valido.";
+    status.style.color = "var(--signal-red)";
+    return false;
+  }
+
+  try {
+    await db.collection("users").doc(userId).update({ phone });
+    return true;
+  } catch (error) {
+    console.error("Errore salvataggio telefono:", error);
+    status.textContent = "Non è stato possibile salvare il numero.";
+    status.style.color = "var(--signal-red)";
+    return false;
+  }
+}
+
 function setupModalListeners(userId) {
-  const nextButtons = document.querySelectorAll("[data-action='next']");
-  const backButtons = document.querySelectorAll("[data-action='back']");
-  const finishButton = document.querySelector("[data-action='finish']");
+  if (firstAccessBound) return;
+  firstAccessBound = true;
 
-  nextButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (currentStep < totalSteps) {
-        showStep(currentStep + 1);
+  const modal = getFirstAccessModal();
+
+  modal.addEventListener(
+    "click",
+    async (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn || !modal.contains(btn)) return;
+
+      e.stopPropagation();
+
+      const action = btn.dataset.action;
+
+      if (action === "next") {
+        if (currentStep === PHONE_STEP) {
+          btn.disabled = true;
+          const ok = await savePhoneIfPresent(userId);
+          btn.disabled = false;
+          if (!ok) return;
+        }
+
+        if (currentStep < getTotalSteps()) {
+          showStep(currentStep + 1);
+        }
+      } else if (action === "back") {
+        if (currentStep > 1) {
+          showStep(currentStep - 1);
+        }
+      } else if (action === "finish") {
+        closeFirstAccessModal(userId);
       }
-    });
-  });
+    },
+    true
+  );
 
-  backButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (currentStep > 1) {
-        showStep(currentStep - 1);
-      }
-    });
-  });
-
-  finishButton.addEventListener("click", async () => {
-    closeFirstAccessModal(userId);
-  });
-
-  const modal = document.getElementById("firstAccessModal");
-  const overlay = modal.querySelector(".modal-overlay");
-
-  overlay.addEventListener("click", async () => {
+  modal.querySelector(".modal-overlay").addEventListener("click", () => {
     closeFirstAccessModal(userId);
   });
 }
 
 async function closeFirstAccessModal(userId) {
+  const modal = getFirstAccessModal();
+
   try {
     await db.collection("users").doc(userId).update({ firstAccess: false });
-    console.log("✅ firstAccess settato a false");
+    console.log("firstAccess settato a false");
 
-    const modal = document.getElementById("firstAccessModal");
     modal.classList.remove("active");
 
     if (typeof window.initWhatsNewCarousel === "function") {
@@ -468,14 +513,13 @@ async function closeFirstAccessModal(userId) {
     }
   } catch (error) {
     console.error("❌ Errore nell'aggiornamento del doc:", error);
-    const modal = document.getElementById("firstAccessModal");
     modal.classList.remove("active");
   }
 }
 
 logoutBtn.addEventListener("click", async () => {
-  console.log("🚪 Logout in corso...");
+  console.log("Logout in corso...");
   await auth.signOut();
-  console.log("✅ Logout completato, redirect...");
+  console.log("Logout completato, redirect...");
   window.location.href = "/login/";
 });

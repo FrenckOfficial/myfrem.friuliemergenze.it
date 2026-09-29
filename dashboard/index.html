@@ -73,8 +73,8 @@
           </button>
 
           <div class="statusBox" style="display:none;">
-            <span id="statusMsg"></span>
-            <button id="closeSMsg">&times;</button>
+            
+            
           </div>
         </div>
       </section>
@@ -136,6 +136,8 @@
   <div id="firstAccessModal" class="first-access-modal">
     <div class="modal-overlay"></div>
     <div class="modal-container">
+
+      <!-- STEP 1 -->
       <div class="modal-step active" data-step="1">
         <div class="modal-header">
           <h2>Benvenuto/a su MyFrEM!</h2>
@@ -151,11 +153,13 @@
             <span class="step-dot" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
             <span class="step-dot" data-step="5"></span>
+            <span class="step-dot" data-step="6"></span>
           </div>
           <button class="btn-modal btn-next" data-action="next">Continua</button>
         </div>
       </div>
 
+      <!-- STEP 2 -->
       <div class="modal-step" data-step="2">
         <div class="modal-header">
           <h2>Cos'è MyFrEM?</h2>
@@ -176,6 +180,7 @@
             <span class="step-dot" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
             <span class="step-dot" data-step="5"></span>
+            <span class="step-dot" data-step="6"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -184,6 +189,7 @@
         </div>
       </div>
 
+      <!-- STEP 3 -->
       <div class="modal-step" data-step="3">
         <div class="modal-header">
           <h2>Inizia a Contribuire</h2>
@@ -212,6 +218,7 @@
             <span class="step-dot active" data-step="3"></span>
             <span class="step-dot" data-step="4"></span>
             <span class="step-dot" data-step="5"></span>
+            <span class="step-dot" data-step="6"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -220,13 +227,14 @@
         </div>
       </div>
 
+      <!-- STEP 4: notifiche -->
       <div class="modal-step" data-step="4">
         <div class="modal-header">
           <h2>Abilita le notifiche</h2>
         </div>
         <div class="modal-content">
           <p>Ricevi aggiornamenti in tempo reale direttamente nel tuo browser:</p>
-          
+
           <div class="notification-status" id="notification-status" style="
             background: rgba(79, 202, 122, 0.1);
             border: 1px solid rgba(79, 202, 122, 0.3);
@@ -235,14 +243,13 @@
             margin: 1.5rem 0;
           ">
             <p style="margin: 0; font-weight: 600; color: #4fca7a;">
-              <span id="notification-status-icon">🔔</span>
               <span id="notification-status-text">Notifiche: Non abilitate</span>
             </p>
             <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; opacity: 0.8;">
               <span id="notification-status-desc">Clicca il pulsante qui sotto per abilitarle</span>
             </p>
           </div>
-      
+
           <button type="button" id="enable-notifications-btn" class="btn-enable-notifications" style="
             width: 100%;
             padding: 0.75rem;
@@ -261,10 +268,10 @@
           ">
             Abilita Notifiche
           </button>
-      
+
           <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; opacity: 0.8;">Continua con o senza notifiche!</p>
         </div>
-        
+
         <div class="modal-footer">
           <div class="step-indicator">
             <span class="step-dot active" data-step="1"></span>
@@ -272,6 +279,7 @@
             <span class="step-dot active" data-step="3"></span>
             <span class="step-dot active" data-step="4"></span>
             <span class="step-dot" data-step="5"></span>
+            <span class="step-dot" data-step="6"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -280,7 +288,71 @@
         </div>
       </div>
 
+      <!-- STEP 5: sicurezza account (NUOVO) -->
       <div class="modal-step" data-step="5">
+        <div class="modal-header">
+          <h2>Proteggi il tuo account</h2>
+        </div>
+        <div class="modal-content">
+          <p>Due cose facoltative che rendono il tuo account più sicuro e più facile da recuperare.</p>
+
+          <div style="margin: 1.5rem 0 1rem;">
+            <label for="firstAccessPhone" style="
+              display: block;
+              margin-bottom: 6px;
+              font-size: 0.7rem;
+              font-weight: 700;
+              letter-spacing: 0.1em;
+              text-transform: uppercase;
+              opacity: 0.8;
+            ">Numero di telefono</label>
+            <input type="tel" id="firstAccessPhone" name="phone" placeholder="+39 333 1234567" autocomplete="tel" style="
+              width: 100%;
+              padding: 10px 12px;
+              border-radius: 4px;
+              border: 1px solid var(--border);
+              background: var(--bg-surface);
+              color: var(--text);
+              font-family: inherit;
+              font-size: 0.9rem;
+              outline: none;
+            ">
+            <p id="firstAccessPhoneStatus" style="margin: 6px 0 0; font-size: 0.8rem; min-height: 1.2em;"></p>
+            <p style="margin: 4px 0 0; font-size: 0.8rem; opacity: 0.7;">Serve solo per il recupero dell'account. Puoi saltare questo campo.</p>
+          </div>
+
+          <div style="
+            background: var(--accent-dim);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.25rem;
+          ">
+            <p style="margin: 0; font-weight: 600;">Autenticazione a due fattori</p>
+            <p style="margin: 0.5rem 0 0; font-size: 0.85rem; opacity: 0.85;">
+              Aggiunge un codice di verifica ad ogni accesso. Puoi attivarla quando vuoi dalle impostazioni del tuo profilo.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+            <span class="step-dot active" data-step="4"></span>
+            <span class="step-dot active" data-step="5"></span>
+            <span class="step-dot" data-step="6"></span>
+          </div>
+          <div class="button-group">
+            <button class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button class="btn-modal btn-next" data-action="next">Continua</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: aiuto -->
+      <div class="modal-step" data-step="6">
         <div class="modal-header">
           <h2>Hai Bisogno di Aiuto?</h2>
         </div>
@@ -300,6 +372,7 @@
             <span class="step-dot active" data-step="3"></span>
             <span class="step-dot active" data-step="4"></span>
             <span class="step-dot active" data-step="5"></span>
+            <span class="step-dot active" data-step="6"></span>
           </div>
           <div class="button-group">
             <button class="btn-modal btn-back" data-action="back">Indietro</button>
@@ -307,6 +380,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 

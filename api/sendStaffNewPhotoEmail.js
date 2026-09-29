@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    console.log("📨 Inviata allo staff!");
+    console.log("Inviata allo staff!");
 
     return res.status(200).json({ success: true, data });
 

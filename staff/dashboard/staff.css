@@ -254,12 +254,199 @@ textarea {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
-#staffStatsModalList li {
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+.staff-modal {
+  max-width: 620px;
+  width: 92%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  border-color: var(--border-hard);
 }
-#staffStatsModalList li:last-child {
-  border-bottom: none;
+
+.staff-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.staff-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.staff-modal-count {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.staff-modal-close {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+
+.staff-modal-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  transform: rotate(90deg);
+}
+
+.staff-list {
+  list-style: none;
+  padding: 16px 20px 20px;
+  margin: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.staff-list::-webkit-scrollbar {
+  width: 6px;
+}
+.staff-list::-webkit-scrollbar-thumb {
+  background: var(--faint);
+  border-radius: var(--radius-sm);
+}
+
+.staff-list .staff-empty {
+  text-align: center;
+  padding: 36px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.photo-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-panel);
+  border-left: 3px solid var(--faint);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.15s;
+}
+
+.photo-card:hover {
+  background: var(--bg-hover);
+  transform: translateX(2px);
+}
+
+.photo-card.is-approved {
+  border-left-color: var(--signal-green);
+}
+.photo-card.is-pending {
+  border-left-color: var(--signal-amber);
+}
+.photo-card.is-rejected {
+  border-left-color: var(--signal-red);
+}
+
+.photo-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.photo-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.is-approved .status-pill {
+  color: var(--signal-green);
+  background: rgba(82, 183, 136, 0.1);
+}
+.is-pending .status-pill {
+  color: var(--signal-amber);
+  background: rgba(255, 183, 3, 0.1);
+}
+.is-rejected .status-pill {
+  color: var(--signal-red);
+  background: rgba(255, 77, 109, 0.1);
+}
+
+.photo-card-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  font-size: 0.8rem;
+}
+
+.photo-card-meta dt {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  align-self: center;
+}
+
+.photo-card-meta dd {
+  color: var(--muted);
+  margin: 0;
 }
 
 .stat-box {
@@ -2057,6 +2244,20 @@ button {
   #draft-btn-skip {
     padding: 9px 16px;
     font-size: 0.65rem;
+  }
+
+  .staff-modal-header {
+    padding: 16px;
+  }
+  .staff-list {
+    padding: 12px;
+  }
+  .photo-card-meta {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .photo-card-meta dd {
+    margin-bottom: 6px;
   }
 }
 

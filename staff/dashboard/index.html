@@ -52,8 +52,8 @@
   
     <div class="main-content">
       <div class="statusBox" style="display:none;">
-        <span id="statusMsg"></span>
-        <button id="closeSMsg">&times;</button>
+        
+        
       </div>
       <header class="header">
         <h1>Ciao, <span id="userName"></span></h1>
@@ -99,18 +99,16 @@
     </div>
   </div>
   <div id="staffStatsModal" class="first-access-modal">
-    <div class="modal-overlay"></div>
-    <div class="modal-container">
-      <div class="modal-step active">
-        <div class="modal-header">
+    <div class="modal-overlay" id="staffStatsOverlay"></div>
+    <div class="modal-container staff-modal" role="dialog" aria-modal="true" aria-labelledby="staffStatsModalTitle">
+      <header class="staff-modal-header">
+        <div class="staff-modal-heading">
           <h2 id="staffStatsModalTitle">Dettagli</h2>
+          <span id="staffStatsModalCount" class="staff-modal-count"></span>
         </div>
-        <div class="modal-content">
-          <ul id="staffStatsModalList" style="list-style:none; padding:0; max-height:400px; overflow-y:auto;">
-            <!-- popolato via JS -->
-          </ul>
-        </div>
-      </div>
+        <button type="button" id="closeStaffStatsModalBtn" class="staff-modal-close" aria-label="Chiudi">&times;</button>
+      </header>
+      <ul id="staffStatsModalList" class="staff-list"></ul>
     </div>
   </div>
   <script>

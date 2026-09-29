@@ -52,7 +52,7 @@ export default async function handler(req, res) {
           email: "autosystem@friuliemergenze.it"
         },
         to: [{ email: sanitizedEmail, name: sanitizedName }],
-        subject: `C'è un aggiornamento sullo stato di una foto MyFrEM!`,
+        subject: `[${sanitizedPhotoName}] - C'è un aggiornamento sullo stato di una foto MyFrEM!`,
         htmlContent,
         replyTo: { 
           name: "Friuli Emergenze",
@@ -63,18 +63,18 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("❌ Brevo API error:", errorData);
+      console.error("Brevo API error:", errorData);
       return res.status(response.status).json({ 
         error: "Errore nell'invio della notifica" 
       });
     }
 
-    console.log("✅ Login notification inviata a:", sanitizedEmail);
+    console.log("Aprrovement notification inviata a:", sanitizedEmail);
 
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error("❌ Server error:", error.message);
+    console.error("Server error:", error.message);
     return res.status(500).json({ 
       success: false,
       error: "Errore interno del server"
@@ -245,7 +245,7 @@ body {
     </div>
 
     <div class="security-note">
-      <b>⚠️ Nota di Sicurezza:</b> Se hai ricevuto questa mail per errore inoltrala a info@friuliemergenze.it spiegando l'errore, grazie!
+      <b>Nota di Sicurezza:</b> Se hai ricevuto questa mail per errore inoltrala a info@friuliemergenze.it spiegando l'errore, grazie!
     </div>
 
     <div class="cta-link">
