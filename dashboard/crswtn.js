@@ -1,12 +1,15 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { getDoc, doc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { getDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 import { firebaseConfig } from '/configFirebase.js';
 import { db } from '/helpers/getDB.js';
 
-const app = initializeApp(firebaseConfig);
+const SURVEY_URL = 'https://go.friuliemergenze.it/sondaggiosezvol/';
+
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 let currentUser = null;
+let carouselInstance = null;
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -21,14 +24,10 @@ class WhatsNewCarousel {
     this.slides = this.modal.querySelectorAll('.modal-step');
     this.currentSlide = 0;
     this.totalSlides = this.slides.length;
-    
-    this.prevBtn = document.getElementById('prevSlideBtn');
-    this.nextBtn = document.getElementById('nextSlideBtn');
-    this.dontReadBtn = document.getElementById('doNotReadWhatsNewBtn');
-    this.finishBtn = document.getElementById('finishWhatsNewBtn');
+
     this.closeBtn = document.getElementById('closeWhatsNewModal');
     this.dontShowAgainCheckbox = document.getElementById('dontShowAgainCheckbox');
-    this.enableTwoFABtn = document.getElementById('enableTwoFABtn');
+    this.surveyBtn = document.getElementById('goToSurveyBtn');
     this.progressDots = this.modal.querySelectorAll('.step-dot');
 
     this.init();
@@ -52,30 +51,27 @@ class WhatsNewCarousel {
       }
     });
 
-    this.closeBtn.addEventListener('click', () => this.close());
-    this.dontShowAgainCheckbox.addEventListener('change', () => this.saveDontShowAgain());
-    this.enableTwoFABtn.addEventListener('click', () => this.goTo2FASettings());
+    this.closeBtn?.addEventListener('click', () => this.close());
+    this.dontShowAgainCheckbox?.addEventListener('change', () => this.saveDontShowAgain());
+    this.surveyBtn?.addEventListener('click', () => this.goToSurvey());
 
     this.progressDots.forEach(dot => {
       dot.addEventListener('click', (e) => {
-        const slideIndex = parseInt(e.target.dataset.step) - 1;
+        const slideIndex = parseInt(e.currentTarget.dataset.step, 10) - 1;
         this.goToSlide(slideIndex);
       });
     });
 
-    this.markAsViewed();
     this.updateSlide();
   }
 
   updateSlide() {
     this.modal.classList.add('active');
     this.slides.forEach(slide => slide.classList.remove('active'));
-    this.progressDots.forEach(dot => dot.classList.remove('active'));
-
     this.slides[this.currentSlide].classList.add('active');
-    
-    const activeDots = this.slides[this.currentSlide].querySelectorAll('.step-dot');
-    activeDots.forEach((dot, i) => {
+
+    // Ogni slide ha il proprio indicatore: accendo i pallini fino alla slide corrente
+    this.slides[this.currentSlide].querySelectorAll('.step-dot').forEach((dot, i) => {
       dot.classList.toggle('active', i <= this.currentSlide);
     });
   }
@@ -112,20 +108,12 @@ class WhatsNewCarousel {
 
   async saveDontShowAgain() {
     if (this.dontShowAgainCheckbox.checked) {
-      try {
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
-          whatsNewViewed: true,
-          whatsNewViewedAt: new Date()
-        });
-        console.log('Marked as "don\'t show again"');
-      } catch (error) {
-        console.error('Error saving preference:', error);
-      }
+      await this.markAsViewed();
     }
   }
 
   async markAsViewed() {
+    if (!currentUser) return;
     try {
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
@@ -138,12 +126,21 @@ class WhatsNewCarousel {
     }
   }
 
-  goTo2FASettings() {
-    window.location.href = '/dashboard/settings/';
+  goToSurvey() {
+    if (!SURVEY_URL) {
+      console.warn('SURVEY_URL non impostato');
+      return;
+    }
+    window.location.href = SURVEY_URL;
   }
 }
 
 async function initWhatsNewCarousel() {
+  if (!currentUser || carouselInstance) return;
+
+  const modalEl = document.getElementById('whats-new-modal');
+  if (!modalEl) return;
+
   try {
     const userRef = doc(db, 'users', currentUser.uid);
     const userDoc = await getDoc(userRef);
@@ -154,18 +151,16 @@ async function initWhatsNewCarousel() {
     }
 
     const userData = userDoc.data();
-    
+
     if (userData?.firstAccess === true) {
       console.log('Primo accesso in corso: rimando il What\'s New');
       return;
     }
 
-    const hasViewed = userData?.whatsNewViewed;
-
-    if (!hasViewed) {
+    if (!userData?.whatsNewViewed) {
       console.log('Showing What\'s New carousel');
-      new WhatsNewCarousel();
-      document.getElementById('whats-new-modal').style.display = 'flex';
+      carouselInstance = new WhatsNewCarousel();
+      modalEl.style.display = 'flex';
     }
   } catch (error) {
     console.error('Error checking What\'s New status:', error);
