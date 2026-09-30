@@ -1,0 +1,105 @@
+.bottom-nav {
+  --bn-accent: #00d4e8;
+  --bn-bg: rgba(28, 30, 33, 0.92);
+  --bn-border: rgba(255, 255, 255, 0.08);
+  --bn-active-bg: rgba(255, 255, 255, 0.10);
+  --bn-icon: #e4e6eb;
+  display: none;
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 1000;
+  padding: 8px;
+  gap: 4px;
+  border-radius: 999px;
+  background: var(--bn-bg);
+  border: 1px solid var(--bn-border);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.bottom-nav.is-hidden {
+  transform: translateY(calc(100% + 12px + env(safe-area-inset-bottom, 0px)));
+}
+
+.bottom-nav[data-role="staff"] {
+  --bn-accent: #ff7b00;
+}
+
+.bottom-nav__item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  border-radius: 999px;
+  color: var(--bn-icon);
+  text-decoration: none;
+  font-size: 22px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav__item:active {
+  background: var(--bn-active-bg);
+}
+
+.bottom-nav__item.is-active {
+  background: var(--bn-active-bg);
+  color: var(--bn-accent);
+}
+
+.bottom-nav__badge {
+  position: absolute;
+  top: 2px;
+  right: calc(50% - 26px);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e0353f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.bottom-nav__badge[hidden] {
+  display: none;
+}
+
+.bottom-nav__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bn-icon);
+  box-sizing: border-box;
+}
+
+.bottom-nav__item.is-active .bottom-nav__avatar {
+  border-color: var(--bn-accent);
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+  }
+
+  body.has-bottom-nav {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav {
+    transition: none;
+  }
+}

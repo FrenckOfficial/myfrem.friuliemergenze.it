@@ -5,6 +5,7 @@ import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -193,12 +194,14 @@ function buildRow({ id, photo, userName, votes }) {
     <td><b>${escapeHtml(formatDate(photo.createdAt))}</b></td>
     <td><b>${escapeHtml(photo.notes || "Non inserite")}</b></td>
     <td class="votes-cell">
-      <span class="vote-badge like-badge" title="Mi piace">
-        <i class="fas fa-thumbs-up"></i> ${likes}
-      </span>
-      <span class="vote-badge dislike-badge" title="Non mi piace">
-        <i class="fas fa-thumbs-down"></i> ${dislikes}
-      </span>
+      <div class="votes-wrapper">
+        <span class="vote-badge like-badge" title="Mi piace">
+          <i class="fas fa-thumbs-up"></i> ${likes}
+        </span>
+        <span class="vote-badge dislike-badge" title="Non mi piace">
+          <i class="fas fa-thumbs-down"></i> ${dislikes}
+        </span>
+      </div>
     </td>
     <td>
       <button class="delete-btn" type="button">Elimina foto <img src="/assets/icons/trash-solid-full.svg" alt="Elimina" loading="lazy" /></button>
@@ -310,6 +313,7 @@ onAuthStateChanged(auth, async (user) => {
 
   try {
     const userSnap = await getDoc(doc(db, "users", user.uid));
+    initBottomNav(userSnap.data(), user, "staff");
     isStaff = userSnap.exists() && ALLOWED_ROLES.includes(userSnap.data().role);
   } catch (err) {
     console.error("Errore verifica ruolo:", err);

@@ -6,6 +6,7 @@ import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 import { getUserName } from "../../helpers/getUserName.js";
 
 const app = initializeApp(firebaseConfig);
@@ -218,6 +219,8 @@ onAuthStateChanged(auth, async (user) => {
 
   const userSnap = await getDoc(doc(db, "users", user.uid));
   const userData = userSnap.exists() ? userSnap.data() : null;
+
+  initBottomNav(userData, user, "staff");
 
   if (!userData || !ALLOWED_ROLES.includes(userData.role)) {
     showDashboard();

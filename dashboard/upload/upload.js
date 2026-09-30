@@ -5,6 +5,7 @@ import { uploadFile } from "/helpers/uploadFile.js"
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -92,6 +93,8 @@ onAuthStateChanged(auth, async (user) => {
         staffLinkEl.appendChild(br);
         staffLinkEl.appendChild(link);
       }
+
+      initBottomNav(userData, user);
     }
 
     clearTimeout(timeoutId);

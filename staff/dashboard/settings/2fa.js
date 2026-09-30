@@ -4,6 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebas
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -21,7 +22,7 @@ onAuthStateChanged(auth, (user) => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", load2FAStatus);
     } else {
-      load2FAStatus();
+      load2FAStatus(user);
     }
   }
 });
@@ -46,7 +47,7 @@ let settings2FASetup = {
   emailCode: null
 };
 
-async function load2FAStatus() {
+async function load2FAStatus(user) {
   try {
     console.log("🔐 load2FAStatus() chiamato");
 
@@ -64,6 +65,8 @@ async function load2FAStatus() {
     const userRef = doc(db, "users", currentUserId);
     const userSnap = await getDoc(userRef);
     const userData = userSnap.data();
+
+    initBottomNav(userData, user, "staff");
 
     console.log("📊 userData from Firestore:", userData);
 

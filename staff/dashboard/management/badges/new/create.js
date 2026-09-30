@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -46,6 +47,8 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const userDocSnap = await getDoc(doc(db, "users", user.uid));
+
+  initBottomNav(userDocSnap.data(), user, "staff");
 
   if (!userDocSnap.exists()) {
     setStatus("Errore: utente non trovato", "error");

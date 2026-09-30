@@ -449,6 +449,12 @@ textarea {
   margin: 0;
 }
 
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
 .stat-box {
   background: var(--bg-panel);
   padding: 20px;
@@ -1700,22 +1706,37 @@ button {
 }
 
 .votes-cell {
-  display: flex;
+  display: table-cell;
   gap: 8px;
   align-items: center;
   justify-content: center;
   padding: 8px !important;
+  vertical-align: middle;
+}
+
+.votes-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
 }
 
 .vote-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  justify-content: center;
+  gap: 6px;
+  min-width: 60px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+.vote-badge i {
+  font-size: 18px;
 }
 
 .like-badge {
@@ -1738,10 +1759,6 @@ button {
 .dislike-badge:hover {
   background-color: rgba(239, 68, 68, 0.25);
   border-color: rgba(239, 68, 68, 0.5);
-}
-
-.vote-badge i {
-  font-size: 11px;
 }
 
 .first-access-modal {
@@ -2026,6 +2043,7 @@ button {
 
 @media (max-width: 768px) {
   .sidebar {
+    display: none !important;
     position: relative;
     width: 100%;
     height: auto;

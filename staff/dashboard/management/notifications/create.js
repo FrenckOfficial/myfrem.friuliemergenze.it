@@ -1,82 +1,74 @@
-import { collection, query, where, getDocs, orderBy, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { firebaseConfig } from '/configFirebase.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { db } from '/helpers/getDB.js';
+import { initBottomNav } from '/helpers/initBottomNav.js';
 
-const loadingEl = document.querySelector(".loading");
-const contentEl = document.querySelector(".content");
-const auth = getAuth();
+const loadingEl = document.querySelector('.loading');
+const contentEl = document.querySelector('.content');
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const LOGIN_URL = '/login/';
+const STAFF_ROLES = ['simplestaff', 'modstaff', 'advstaff', 'advstaffplus', 'superadmin'];
+const READ_ONLY_ROLES = ['testacc'];
+const USERS_CACHE_KEY = 'staffNotif:users';
+const USERS_CACHE_TTL = 10 * 60 * 1000;
+const HISTORY_LIMIT = 20;
+
 let currentUser = null;
-let staffManager = null;
+
+function showContent() {
+  loadingEl.style.display = 'none';
+  contentEl.style.display = 'block';
+}
+
+function showLoadError(message) {
+  loadingEl.textContent = message;
+}
 
 onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = LOGIN_URL;
+    return;
+  }
   currentUser = user;
 
-  const timeoutId = setTimeout(() => {
-      loadingEl.style.display = "none";
-      contentEl.style.display = "block";
-    }, 5000);
-  
-    try {
-      if (user) {
-        try {
-          const userDocSnap = await getDoc(doc(db, "users", user.uid));
-          const userData = userDocSnap.exists() ? userDocSnap.data() : null;
+  try {
+    const userSnap = await getDoc(doc(db, 'users', user.uid));
+    initBottomNav(userSnap.data(), user);
+    const role = userSnap.exists() ? userSnap.data().role : null;
+    const readOnly = READ_ONLY_ROLES.includes(role);
 
-          const staffRoles = [
-            "simplestaff",
-            "modstaff",
-            "advstaff",
-            "advstaffplus",
-            "superadmin"
-          ];
-
-          if (
-            !staffRoles.includes(userData.role)
-          ) {
-            setStatus("Accesso negato: ruolo non riconosciuto.", "error");
-            clearTimeout(timeoutId);
-            loadingEl.style.display = "none";
-            contentEl.style.display = "block";
-            window.location.href = "/login/";
-            return;
-          }
-
-          const isReadOnlyMode = userData.role === "testacc";
-
-          if (isReadOnlyMode) {
-            console.log("Modalità sola lettura attivata");
-            document.body.classList.add("read-only-mode");
-          }
-        } catch (err) {
-          console.error("❌ Errore:", err);
-          clearTimeout(timeoutId);
-          loadingEl.style.display = "none";
-          contentEl.style.display = "block";
-        }
-  
-        staffManager = new StaffNotificationsManager();
-      }
-  
-      clearTimeout(timeoutId);
-      loadingEl.style.display = "none";
-      contentEl.style.display = "block";
-    } catch (err) {
-      console.error("❌ Errore:", err);
-      clearTimeout(timeoutId);
-      loadingEl.style.display = "none";
-      contentEl.style.display = "block";
+    if (!STAFF_ROLES.includes(role) && !readOnly) {
+      window.location.href = LOGIN_URL;
+      return;
     }
+
+    if (readOnly) {
+      console.log('Modalità sola lettura attivata');
+      document.body.classList.add('read-only-mode');
+    }
+
+    const manager = new StaffNotificationsManager({ readOnly });
+    await manager.ready;
+    showContent();
+  } catch (err) {
+    console.error('❌ Errore:', err);
+    showLoadError('Errore di caricamento. Ricarica la pagina.');
+  }
 });
 
 class StaffNotificationsManager {
-  constructor() {
+  constructor({ readOnly = false } = {}) {
+    this.readOnly = readOnly;
     this.selectedUserId = null;
     this.selectedUserData = null;
     this.allUsers = [];
     this.history = [];
     this.templates = this.getDefaultTemplates();
 
-    // Form elements
     this.form = document.getElementById('notificationForm');
     this.userSearch = document.getElementById('userSearch');
     this.userDropdown = document.getElementById('userDropdown');
@@ -94,23 +86,19 @@ class StaffNotificationsManager {
     this.historySearch = document.getElementById('historySearch');
     this.sendToAllCheckbox = document.getElementById('sendToAll');
 
-    this.init();
+    this.ready = this.init();
   }
 
   async init() {
-    console.log('StaffNotificationsManager init');
-    
-    // Setup event listeners
     this.setupUserSearch();
     this.setupFormListeners();
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     this.historySearch.addEventListener('input', () => this.filterHistory());
     this.sendToAllCheckbox.addEventListener('change', () => this.toggleSendToAll());
 
-    // Load data
-    await this.loadAllUsers();
-    await this.loadHistory();
     this.renderTemplates();
+    await Promise.all([this.loadAllUsers(), this.loadHistory()]);
+    this.renderHistory();
   }
 
   getDefaultTemplates() {
@@ -119,7 +107,7 @@ class StaffNotificationsManager {
         id: 'photo_approved',
         name: 'Foto Approvata',
         type: 'activity',
-        title: 'Foto approvata! 🎉',
+        title: 'Foto approvata!',
         message: 'La tua foto è stata approvata e aggiunta alla galleria.',
         icon: '📸'
       },
@@ -132,18 +120,10 @@ class StaffNotificationsManager {
         icon: '❌'
       },
       {
-        id: 'event_created',
-        name: 'Evento Creato',
-        type: 'activity',
-        title: 'Nuovo evento! 📅',
-        message: 'Un nuovo evento è stato creato e necessita moderazione.',
-        icon: '📅'
-      },
-      {
         id: 'badge_earned',
         name: 'Badge Ottenuto',
         type: 'activity',
-        title: 'Hai ottenuto un badge! ⭐',
+        title: 'Hai ottenuto un badge!',
         message: 'Complimenti! Hai sbloccato un nuovo badge nella comunità.',
         icon: '⭐'
       },
@@ -160,7 +140,7 @@ class StaffNotificationsManager {
 
   setupUserSearch() {
     this.userSearch.addEventListener('input', (e) => this.handleUserSearch(e.target.value));
-    
+
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.user-search-container')) {
         this.userDropdown.style.display = 'none';
@@ -168,16 +148,24 @@ class StaffNotificationsManager {
     });
   }
 
-  async handleUserSearch(query) {
-    if (query.length < 2) {
+  fullName(user) {
+    const name = [user.name, user.surname].filter(Boolean).join(' ');
+    return name || user.displayName || 'Utente';
+  }
+
+  handleUserSearch(term) {
+    const t = term.trim().toLowerCase();
+    if (t.length < 2) {
       this.userDropdown.style.display = 'none';
       return;
     }
 
-    const filtered = this.allUsers.filter(u => 
-      u.email.toLowerCase().includes(query.toLowerCase()) ||
-      (u.displayName && u.displayName.toLowerCase().includes(query.toLowerCase()))
-    );
+    const filtered = this.allUsers
+      .filter(u =>
+        u.email.toLowerCase().includes(t) ||
+        `${u.name} ${u.surname} ${u.displayName}`.toLowerCase().includes(t)
+      )
+      .slice(0, 20);
 
     if (filtered.length === 0) {
       this.userDropdown.innerHTML = '<div class="user-item" style="color: var(--muted);">Nessun utente trovato</div>';
@@ -186,15 +174,14 @@ class StaffNotificationsManager {
     }
 
     this.userDropdown.innerHTML = filtered.map(user => `
-      <div class="user-item" data-uid="${user.uid}" data-email="${this.escapeHtml(user.email)}">
-        <span class="user-item-name">${user.name + " " + user.surname || 'Utente'}</span>
-        <span class="user-item-email">${user.email}</span>
+      <div class="user-item" data-uid="${this.escapeHtml(user.uid)}" data-email="${this.escapeHtml(user.email)}">
+        <span class="user-item-name">${this.escapeHtml(this.fullName(user))}</span>
+        <span class="user-item-email">${this.escapeHtml(user.email)}</span>
       </div>
     `).join('');
 
     this.userDropdown.style.display = 'block';
-    
-    // Event delegation
+
     this.userDropdown.querySelectorAll('.user-item').forEach(item => {
       item.addEventListener('click', () => {
         this.selectUser(item.dataset.uid, item.dataset.email);
@@ -220,9 +207,9 @@ class StaffNotificationsManager {
   }
 
   updatePreview() {
-    const icon = this.notificationIcon.value || '📬';
-    const type = this.notificationType.value || 'activity';
-    
+    const icon = this.escapeHtml(this.notificationIcon.value) || '📬';
+    const type = this.escapeHtml(this.notificationType.value || 'activity');
+
     this.previewNotification.innerHTML = `
       <div class="notif-icon-lg">${icon}</div>
       <div class="notif-card-content">
@@ -244,11 +231,8 @@ class StaffNotificationsManager {
       </div>
     `).join('');
 
-    // Event delegation
     this.templatesGrid.querySelectorAll('.template-card').forEach(card => {
-      card.addEventListener('click', () => {
-        this.applyTemplate(card.dataset.templateId);
-      });
+      card.addEventListener('click', () => this.applyTemplate(card.dataset.templateId));
     });
   }
 
@@ -262,17 +246,18 @@ class StaffNotificationsManager {
     this.notificationIcon.value = template.icon;
     this.actionUrl.value = '';
     this.actionLabel.value = '';
-    
+
     this.updatePreview();
   }
 
   toggleSendToAll() {
     const isChecked = this.sendToAllCheckbox.checked;
-    
+
     if (isChecked) {
       this.userSearch.disabled = true;
       this.userSearch.style.opacity = '0.5';
       this.userSearch.style.pointerEvents = 'none';
+      this.selectedUserId = null;
       this.selectedUserInput.value = 'ALL';
       this.selectedUserDisplay.textContent = '✓ Invio a TUTTI gli utenti';
       this.selectedUserDisplay.style.color = 'var(--signal-amber)';
@@ -286,53 +271,78 @@ class StaffNotificationsManager {
     }
   }
 
+  isSafeActionUrl(url) {
+    return url.startsWith('/') && !url.startsWith('//') || /^https:\/\//i.test(url);
+  }
+
   async handleSubmit(e) {
     e.preventDefault();
 
+    if (this.readOnly) {
+      alert('Il tuo account è in sola lettura: non puoi inviare notifiche.');
+      return;
+    }
+
     const sendToAll = this.sendToAllCheckbox.checked;
-    const userIds = [];
+    const actionUrl = this.actionUrl.value.trim();
+    let userIds;
+
+    if (actionUrl && !this.isSafeActionUrl(actionUrl)) {
+      alert('Il link deve iniziare con / oppure con https://');
+      return;
+    }
 
     if (sendToAll) {
-      userIds.push(...this.allUsers.map(u => u.uid));
+      userIds = this.allUsers.map(u => u.uid);
+      if (!confirm(`Stai per inviare questa notifica a ${userIds.length} utenti. Continuare?`)) return;
     } else {
       if (!this.selectedUserId) {
         alert('Seleziona un utente!');
         return;
       }
-      userIds.push(this.selectedUserId);
+      userIds = [this.selectedUserId];
     }
 
+    const plural = userIds.length > 1;
     const submitBtn = this.form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = `Invio a ${userIds.length} utente${userIds.length > 1 ? 'i' : ''}...`;
+    submitBtn.textContent = `Invio a ${userIds.length} utent${plural ? 'i' : 'e'}...`;
 
     try {
-      const promises = userIds.map(userId =>
-        addDoc(collection(db, 'notifications'), {
-          userId,
-          type: this.notificationType.value,
-          title: this.notificationTitle.value,
-          message: this.notificationMessage.value,
-          icon: this.notificationIcon.value || null,
-          actionUrl: this.actionUrl.value || null,
-          actionLabel: this.actionLabel.value || null,
-          createdAt: serverTimestamp(),
-          readAt: null,
-          read: false,
-          data: {
-            createdByStaff: currentUser.uid,
-            createdByEmail: currentUser.email,
-            sentToAll: sendToAll
-          },
-          archived: false
-        })
-      );
+      const payload = {
+        type: this.notificationType.value,
+        title: this.notificationTitle.value,
+        message: this.notificationMessage.value,
+        icon: this.notificationIcon.value || null,
+        actionUrl: actionUrl || null,
+        actionLabel: this.actionLabel.value || null,
+        readAt: null,
+        read: false,
+        archived: false,
+        data: {
+          createdByStaff: currentUser.uid,
+          createdByEmail: currentUser.email,
+          sentToAll: sendToAll
+        }
+      };
 
-      await Promise.all(promises);
+      let sent = 0;
+      for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
+        const batch = writeBatch(db);
+        userIds.slice(i, i + BATCH_SIZE).forEach(userId => {
+          batch.set(doc(collection(db, 'notifications')), {
+            ...payload,
+            userId,
+            createdAt: serverTimestamp()
+          });
+        });
+        await batch.commit();
+        sent += Math.min(BATCH_SIZE, userIds.length - i);
+        submitBtn.textContent = `Inviate ${sent}/${userIds.length}...`;
+      }
 
-      alert(`✅ Notifica${userIds.length > 1 ? 'e' : ''} inviata${userIds.length > 1 ? 'e' : ''} a ${userIds.length} utente${userIds.length > 1 ? 'i' : ''}!`);
-      
-      // Reset form
+      alert(`Notific${plural ? 'he inviate' : 'a inviata'} a ${userIds.length} utent${plural ? 'i' : 'e'}!`);
+
       this.form.reset();
       this.sendToAllCheckbox.checked = false;
       this.toggleSendToAll();
@@ -341,9 +351,8 @@ class StaffNotificationsManager {
       this.userSearch.value = '';
       this.updatePreview();
 
-      // Reload history
       await this.loadHistory();
-
+      this.renderHistory();
     } catch (error) {
       console.error('Error sending notification:', error);
       alert('❌ Errore: ' + error.message);
@@ -353,15 +362,40 @@ class StaffNotificationsManager {
     }
   }
 
-  async loadAllUsers() {
+  readUsersCache() {
     try {
-      const q = query(collection(db, 'users'), orderBy('email'));
-      const snapshot = await getDocs(q);
-      this.allUsers = snapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      }));
-      console.log('Loaded users:', this.allUsers.length);
+      const raw = sessionStorage.getItem(USERS_CACHE_KEY);
+      if (!raw) return null;
+      const { savedAt, users } = JSON.parse(raw);
+      return Date.now() - savedAt < USERS_CACHE_TTL ? users : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async loadAllUsers() {
+    const cached = this.readUsersCache();
+    if (cached) {
+      this.allUsers = cached;
+      return;
+    }
+
+    try {
+      const snapshot = await getDocs(query(collection(db, 'users'), orderBy('email')));
+      this.allUsers = snapshot.docs.map(d => {
+        const u = d.data();
+        return {
+          uid: d.id,
+          email: u.email || '',
+          name: u.name || '',
+          surname: u.surname || '',
+          displayName: u.displayName || ''
+        };
+      });
+
+      try {
+        sessionStorage.setItem(USERS_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), users: this.allUsers }));
+      } catch { }
     } catch (error) {
       console.error('Error loading users:', error);
     }
@@ -372,17 +406,16 @@ class StaffNotificationsManager {
       const q = query(
         collection(db, 'notifications'),
         where('data.createdByStaff', '==', currentUser.uid),
-        orderBy('createdAt', 'desc')
+        orderBy('createdAt', 'desc'),
+        limit(HISTORY_LIMIT)
       );
 
       const snapshot = await getDocs(q);
-      this.history = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date()
-      })).slice(0, 20);
-
-      this.renderHistory();
+      this.history = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate() || new Date()
+      }));
     } catch (error) {
       console.error('Error loading history:', error);
       this.historyList.innerHTML = '<div class="history-empty">Errore caricamento storico</div>';
@@ -390,10 +423,10 @@ class StaffNotificationsManager {
   }
 
   filterHistory() {
-    const query = this.historySearch.value.toLowerCase();
+    const term = this.historySearch.value.toLowerCase();
     const filtered = this.history.filter(n =>
-      n.title.toLowerCase().includes(query) ||
-      n.message.toLowerCase().includes(query)
+      (n.title || '').toLowerCase().includes(term) ||
+      (n.message || '').toLowerCase().includes(term)
     );
     this.renderHistoryItems(filtered);
   }
@@ -413,13 +446,15 @@ class StaffNotificationsManager {
           <div class="history-item-title">${this.escapeHtml(notif.title)}</div>
           <div class="history-item-time">${this.timeAgo(notif.createdAt)}</div>
         </div>
-        ${notif.data.sentToAll ? 
-          '<div class="history-item-recipient">→ Inviato a TUTTI</div>' : 
-          `<div class="history-item-recipient">→ Utente: ${this.getUserEmail(notif.userId)}</div>`
+        ${notif.data?.sentToAll
+          ? '<div class="history-item-recipient">→ Inviato a TUTTI</div>'
+          : `<div class="history-item-recipient">→ Utente: ${this.escapeHtml(this.getUserEmail(notif.userId))}</div>`
         }
         <div>
-          <span class="history-item-type">${notif.type}</span>
-          ${notif.read ? '<span style="color: var(--muted); font-size: var(--text-xs); margin-left: var(--space-md);">✓ Letto</span>' : '<span style="color: var(--accent); font-size: var(--text-xs); margin-left: var(--space-md);">● Non letto</span>'}
+          <span class="history-item-type">${this.escapeHtml(notif.type)}</span>
+          ${notif.read
+            ? '<span style="color: var(--muted); font-size: var(--text-xs); margin-left: var(--space-md);">✓ Letto</span>'
+            : '<span style="color: var(--accent); font-size: var(--text-xs); margin-left: var(--space-md);">● Non letto</span>'}
         </div>
       </div>
     `).join('');
@@ -440,15 +475,7 @@ class StaffNotificationsManager {
 
   escapeHtml(text) {
     if (!text) return '';
-    const map = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
   }
 }
-
-window.staffManager = null;

@@ -55,10 +55,6 @@
       <div id="viewAllPhotos">Visualizza tutte le foto</div>
   
       <table class="photos-table">
-        
-          
-          
-        </p>
         <thead>
           <tr>
             <th>Anteprima</th>
@@ -77,6 +73,10 @@
           <!-- JS inserirà le foto qui -->
         </tbody>
       </table>
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <p style="font-size: 3rem; margin: 20px 0;">📭</p>
+        <p>Nessuna foto veicolo in attesa</p>
+      </div>
   
       <div id="draftModal" class="draft-modal">
         <div class="draft-modal-content">
@@ -128,6 +128,8 @@
       <div class="lightbox-info" id="lightboxInfo"></div>
     </div>
   </div>
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
   <script>
     (function() {
       const menuToggle = document.querySelector('.menu-toggle');

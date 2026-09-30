@@ -5,6 +5,7 @@ import { uploadFile } from "/helpers/uploadFile.js";
 import { firebaseConfig } from "../../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -112,6 +113,7 @@ async function loadUserData(uid) {
   ];
 
   const data = snap.data();
+  initBottomNav(data, currentUser);
 
   if (data.role === "testacc") {
     isReadOnlyMode = true;

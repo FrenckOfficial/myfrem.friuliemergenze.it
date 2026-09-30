@@ -1,6 +1,7 @@
 import { firebaseConfig } from "../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -141,6 +142,8 @@ auth.onAuthStateChanged(async (user) => {
     const userDoc = await db.collection("users").doc(user.uid).get();
     const userData = userDoc.exists ? userDoc.data() : null;
 
+    initBottomNav(userData, user);
+
     if (userData.firstAccess === true) {
       showFirstAccessModal(user.uid);
     }
@@ -265,6 +268,16 @@ auth.onAuthStateChanged(async (user) => {
       userNameEl.textContent = `${userData.name} (${userData.username})`;
     } else {
       userNameEl.textContent = "Utente";
+    }
+
+    try {
+      BottomNav.init({
+        role: "user",
+        avatarUrl: userData.photoURL || user.photoURL || null,
+      });
+      BottomNav.setBadge("notifiche", 0);
+    } catch (err) {
+      console.error("Errore inizializzazione BottomNav:", err);
     }
 
     if (userData.newsSubbed === false) {

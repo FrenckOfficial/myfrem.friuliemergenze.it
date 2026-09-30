@@ -5,6 +5,7 @@ import { getUserName } from "/helpers/getUserName.js";
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -51,6 +52,8 @@ onAuthStateChanged(auth, async (user) => {
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
 
+  initBottomNav(userDoc.docs[0].data(), user, "staff");
+
   const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
   if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
@@ -95,7 +98,8 @@ async function loadPendingPhotos() {
     photosTableBody.innerHTML = "";
  
     if (snapshot.empty) {
-      setStatus("Nessuna foto da moderare");
+      setStatus(undefined);
+      document.getElementById("emptyState").style.display = "block";
       return;
     }
  

@@ -14,6 +14,7 @@ import {
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -38,6 +39,8 @@ onAuthStateChanged(auth, async (user) => {
   const userDoc = await getDocs(
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
+
+  initBottomNav(userDoc.docs[0].data(), user, "staff");
 
   const allowedRoles = ["advstaffplus", "superadmin"];
 

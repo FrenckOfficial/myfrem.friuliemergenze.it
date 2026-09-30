@@ -794,6 +794,7 @@ button:nth-child(3):hover {
 
 @media (max-width: 768px) {
   .sidebar {
+    display: none !important;
     position: relative;
     width: 100%;
     height: auto;

@@ -4,6 +4,7 @@ import { getFirestore, collection, query, where, orderBy, getDocs, getDoc, doc, 
 import { firebaseConfig } from "../../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -90,6 +91,7 @@ onAuthStateChanged(auth, async (user) => {
       staffLinkEl.appendChild(link);
     }
 
+    initBottomNav(userData, user);
     await loadPhotos(user.uid);
 
     clearTimeout(timeoutId);

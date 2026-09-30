@@ -3,6 +3,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 import { firebaseConfig } from "../../../../configFirebase.js"
 
@@ -32,6 +33,8 @@ onAuthStateChanged(auth, async (user) => {
   const userDoc = await getDocs(
     query(collection(db, "users"), where("__name__", "==", user.uid))
   );
+
+  initBottomNav(userDoc.docs[0].data(), user, "staff");
 
   const allowedRoles = ["advstaffplus", "superadmin"];
 

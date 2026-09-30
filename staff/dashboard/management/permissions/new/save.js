@@ -3,6 +3,7 @@ import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.c
 import { firebaseConfig } from "/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

@@ -59,7 +59,7 @@ textarea {
 }
 
 .sidebar {
-  width: 210px;
+  width: 250px;
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   color: var(--text);
@@ -69,7 +69,7 @@ textarea {
   position: fixed;
   top: 0;
   left: 0;
-  height: 97vh;
+  height: 100vh;
   overflow-y: auto;
   z-index: 1000;
 }
@@ -1303,6 +1303,7 @@ hr {
 
 @media (max-width: 768px) {
   .sidebar {
+    display: none !important;
     position: relative;
     width: 100%;
     height: auto;

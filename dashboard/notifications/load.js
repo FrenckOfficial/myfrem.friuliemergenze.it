@@ -3,6 +3,9 @@ import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { firebaseConfig } from '/configFirebase.js';
 import { db } from '/helpers/getDB.js';
+import { showSuccess, showError, showWarning, showInfo, setStatus } from '/helpers/modals.js';
+import '/helpers/loadIcons.js';
+import { initBottomNav } from '/helpers/initBottomNav.js';
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
@@ -32,7 +35,7 @@ onAuthStateChanged(auth, async (user) => {
           const userDocSnap = await getDoc(doc(db, "users", user.uid));
           const userData = userDocSnap.exists() ? userDocSnap.data() : null;
 
-          const staffRoles = [
+          const staffRoles = [  
             "simplestaff",
             "modstaff",
             "advstaff",
@@ -69,6 +72,7 @@ onAuthStateChanged(auth, async (user) => {
             staffLinkEl.appendChild(br);
             staffLinkEl.appendChild(link);
           }
+          initBottomNav(userData, user);
         } catch (err) {
           console.error("❌ Errore:", err);
           clearTimeout(timeoutId);
@@ -171,6 +175,7 @@ class NotificationsPage {
   }
 
   applyFilter() {
+    BottomNav.setBadge('notifiche', this.allNotifications.filter(n => !n.read).length);
     if (this.currentFilter === 'all') {
       this.filteredNotifications = [...this.allNotifications];
     } else if (this.currentFilter === 'unread') {

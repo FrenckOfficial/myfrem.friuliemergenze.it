@@ -30,9 +30,6 @@
   </div>
   <div class="content" style="display:none;">
     <aside class="sidebar">
-      <button class="menu-toggle" aria-label="Toggle navigation menu">
-        <i class="fas fa-bars"></i>
-      </button>
       <div class="logo">
         <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
         <h2>MyFrEM</h2>
@@ -50,8 +47,6 @@
     <div class="main-content">
         <h1>Carica una Foto</h1>
         <div class="statusBox" style="display:none;">
-          
-          
         </div>
         <form id="uploadForm">
           <div class="form-group" style="display:flex;flex-direction:row;gap:20px;">
@@ -125,77 +120,15 @@
 
   <script type="module" src="/dashboard/upload/upload.js"></script>
   <script type="module" src="/dashboard/ntf.js"></script>
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-55951055-66dfb" alt="Statistiche web" style="border:0px" /></a>
   </noscript>
   
-  <script>
-    (function() {
-      const menuToggle = document.querySelector('.menu-toggle');
-      const sidebar = document.querySelector('.sidebar');
-      const body = document.body;
-
-      if (!menuToggle || !sidebar) {
-        console.warn('Menu toggle or sidebar not found');
-        return;
-      }
-      
-      function toggleSidebar() {
-        sidebar.classList.toggle('active');
-        body.classList.toggle('sidebar-open');
-      }
-
-      function closeSidebar() {
-        sidebar.classList.remove('active');
-        body.classList.remove('sidebar-open');
-      }
-      function openSidebar() {
-        sidebar.classList.add('active');
-        body.classList.add('sidebar-open');
-      }
-
-      menuToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleSidebar();
-      });
-
-      const navLinks = sidebar.querySelectorAll('nav a');
-      navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          closeSidebar();
-        });
-      });
-
-      document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('active')) {
-          if (e.target === menuToggle || menuToggle.contains(e.target)) {
-            return;
-          }
-          if (!sidebar.contains(e.target)) {
-            closeSidebar();
-          }
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-          closeSidebar();
-        }
-      });
-
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          if (window.innerWidth > 768) {
-            closeSidebar();
-          }
-        }, 250);
-      });
-    })();
-  </script>
+  
   <div class="notification-bell-floating">
     <button class="bell-button" id="bellButton" aria-label="Notifiche">
       <svg class="bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

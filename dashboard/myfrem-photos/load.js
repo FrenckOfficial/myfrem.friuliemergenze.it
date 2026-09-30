@@ -4,6 +4,7 @@ import { getFirestore, collection, query, orderBy, getDocs, getDoc, doc, setDoc,
 import { firebaseConfig } from "../../configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -80,6 +81,7 @@ async function checkUserRole(uid) {
         staffLinkEl.appendChild(br);
         staffLinkEl.appendChild(link);
       }
+      initBottomNav(userData, auth.currentUser);
     }
   } catch (err) {
     console.error("Errore verifica ruolo:", err);
