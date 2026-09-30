@@ -1505,7 +1505,7 @@ form button {
   padding: 8px 0;
 }
 
-.first-access-modal {
+.modal {
   display: none;
   position: fixed;
   top: 0;
@@ -1515,7 +1515,7 @@ form button {
   z-index: 10000;
 }
  
-.first-access-modal.active {
+.modal.active {
   display: flex;
   align-items: center;
   justify-content: center;

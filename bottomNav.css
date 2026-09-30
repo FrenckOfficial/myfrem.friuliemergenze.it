@@ -54,6 +54,8 @@
   color: var(--bn-accent);
 }
 
+.bottom-nav__item--logout { color: #e5484d; }
+
 .bottom-nav__badge {
   position: absolute;
   top: 2px;

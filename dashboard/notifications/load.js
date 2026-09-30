@@ -72,7 +72,7 @@ onAuthStateChanged(auth, async (user) => {
             staffLinkEl.appendChild(br);
             staffLinkEl.appendChild(link);
           }
-          initBottomNav(userData, user);
+          initBottomNav(userData, user, "user");
         } catch (err) {
           console.error("❌ Errore:", err);
           clearTimeout(timeoutId);

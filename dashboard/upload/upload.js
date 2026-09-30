@@ -94,7 +94,7 @@ onAuthStateChanged(auth, async (user) => {
         staffLinkEl.appendChild(link);
       }
 
-      initBottomNav(userData, user);
+      initBottomNav(userData, user, "user");
     }
 
     clearTimeout(timeoutId);

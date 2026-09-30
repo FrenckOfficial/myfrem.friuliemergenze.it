@@ -113,7 +113,7 @@ async function loadUserData(uid) {
   ];
 
   const data = snap.data();
-  initBottomNav(data, currentUser);
+  initBottomNav(data, currentUser, "user");
 
   if (data.role === "testacc") {
     isReadOnlyMode = true;

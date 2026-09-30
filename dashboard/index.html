@@ -111,7 +111,7 @@
     </main>
   </div>
 
-  <div id="statsModal" class="first-access-modal">
+  <div id="statsModal" class="modal">
     <div class="modal-overlay"></div>
     <div class="modal-container">
       <div class="modal-step active">
@@ -130,7 +130,7 @@
     </div>
   </div>
 
-  <div id="firstAccessModal" class="first-access-modal">
+  <div id="firstAccessModal" class="modal">
     <div class="modal-overlay"></div>
     <div class="modal-container">
 
@@ -381,7 +381,7 @@
     </div>
   </div>
 
-  <div id="whats-new-modal" class="first-access-modal">
+  <div id="whats-new-modal" class="modal">
     <div class="modal-overlay"></div>
     <div class="modal-container whats-new-content">
 
@@ -396,47 +396,46 @@
           <p>La nostra piattaforma e il nostro sito sono stati aggiornati con nuove funzionalità e miglioramenti.</p>
 
           <h4>Scopri tutte le novità cliccando sul pulsante "Avanti", altrimenti clicca su "Non leggere".</h4>
+        </div>
 
-          <div class="modal-footer">
-            <div class="step-indicator">
-              <span class="step-dot active" data-step="1"></span>
-              <span class="step-dot" data-step="2"></span>
-              <span class="step-dot" data-step="3"></span>
-              <span class="step-dot" data-step="4"></span>
-            </div>
-            <div class="button-group">
-              <button type="button" class="btn-modal btn-finish" id="doNotReadWhatsNewBtn" data-action="finish" style="display:block !important; width: 50%">Non leggere</button>
-              <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
-            </div>
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot" data-step="2"></span>
+            <span class="step-dot" data-step="3"></span>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn-modal btn-finish" id="doNotReadWhatsNewBtn" data-action="finish" style="display:block !important; width: 50%">Non leggere</button>
+            <button type="button" class="btn-modal btn-next" data-action="next">Avanti</button>
           </div>
         </div>
       </div>
 
-      <!-- Slide 2: Notifiche -->
+      <!-- Slide 2: Nuova barra di navigazione -->
       <div class="modal-step" data-step="2">
         <div class="modal-header">
-          <h2>Sistema di Notifiche</h2>
+          <h2>Nuova barra di navigazione</h2>
         </div>
         <div class="modal-content">
-          <p>Ricevi aggiornamenti in tempo reale su foto approvate, badge ottenuti e attività della community.</p>
+          <p>Da smartphone, muoverti tra le sezioni è ora più semplice grazie alla nuova barra in basso.</p>
 
           <div class="slide-features">
             <div class="feature">
               <div>
-                <strong>Notifiche Personali</strong>
-                <p>Tutti i tuoi aggiornamenti in un unico posto</p>
+                <strong>Sempre a portata di pollice</strong>
+                <p>Home, Carica, Galleria, Foto MyFrEM, Notifiche e Profilo con un solo tocco</p>
               </div>
             </div>
             <div class="feature">
               <div>
-                <strong>Real-time</strong>
-                <p>Ricevi avvisi istantanei</p>
+                <strong>Si nasconde mentre scorri</strong>
+                <p>Scorri verso il basso per avere più spazio, scorri verso l'alto per farla ricomparire</p>
               </div>
             </div>
             <div class="feature">
               <div>
-                <strong>Gestione Semplice</strong>
-                <p>Segna come letto, archivia o elimina</p>
+                <strong>Sezione evidenziata</strong>
+                <p>Vedi sempre a colpo d'occhio in quale pagina ti trovi</p>
               </div>
             </div>
           </div>
@@ -447,102 +446,39 @@
             <span class="step-dot active" data-step="1"></span>
             <span class="step-dot active" data-step="2"></span>
             <span class="step-dot" data-step="3"></span>
-            <span class="step-dot" data-step="4"></span>
           </div>
           <div class="button-group">
-            <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
-            <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
+            <button type="button" class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button type="button" class="btn-modal btn-next" data-action="next">Avanti</button>
           </div>
         </div>
       </div>
 
-      <!-- Slide 3: 2FA -->
+      <!-- Slide 3: Nuova sezione in arrivo -->
       <div class="modal-step" data-step="3">
         <div class="modal-header">
-          <h2>Autenticazione a Due Fattori</h2>
+          <h2>Nuova sezione in arrivo!</h2>
         </div>
         <div class="modal-content">
-          <p>Proteggi il tuo account con un ulteriore livello di sicurezza.</p>
+          <p>Stiamo pensando ad una nuova sezione per tutti i volontari!</p>
 
           <div class="slide-features">
             <div class="feature">
               <div>
-                <strong>Email OTP</strong>
-                <p>Ricevi codici via email</p>
+                <strong>Perché?</strong>
+                <p>Vogliamo dare la possibilità ai volontari (e anche alle associazioni), di avere uno spazio tutto loro dove poter caricare tutto ciò che vogliono. I volontari ovviamente potranno associarsi alla loro associazione / ente di riferimento.</p>
               </div>
             </div>
             <div class="feature">
               <div>
-                <strong>Authenticator App</strong>
-                <p>Usa app come Google Authenticator o Authy</p>
+                <strong>Cosa conterrà?</strong>
+                <p>Ancora non lo sappiamo, per questo ti chiediamo di darci la tua opinione compilando un piccolo sondaggio che ci permette di capire cosa i volontari veri preferiscono avere in questa sezione!</p>
               </div>
             </div>
             <div class="feature">
               <div>
-                <strong>Recovery Codes</strong>
-                <p>Codici di backup in caso di emergenza</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="slide-action">
-            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">Vuoi abilitare 2FA adesso?</p>
-            <button type="button" class="btn-enable-2fa" id="enableTwoFABtn">Abilita 2FA</button>
-            <p style="font-size: 0.75rem; color: var(--faint); margin-top: 10px; text-align: center;">Potrai sempre cambiarla nelle impostazioni</p>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <div class="step-indicator">
-            <span class="step-dot active" data-step="1"></span>
-            <span class="step-dot active" data-step="2"></span>
-            <span class="step-dot active" data-step="3"></span>
-            <span class="step-dot" data-step="4"></span>
-          </div>
-          <div class="button-group">
-            <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
-            <button type="button" class="btn-modal btn-next" id="nextSlideBtn" data-action="next">Avanti</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 4: Sondaggio nuove funzioni -->
-      <div class="modal-step" data-step="4">
-        <div class="modal-header">
-          <h2>Sondaggio Nuove Funzioni</h2>
-        </div>
-        <div class="modal-content">
-          <p>Resta attivo il sondaggio per proporre nuove funzioni.</p>
-
-          <div class="slide-features">
-            <div class="features">
-              <div>
-                <strong>Profilazione</strong>
-                <p>È necessario inserire nome e email per una corretta profilazione ed eventuale risposta.</p>
-              </div>
-            </div>
-            <div class="features">
-              <div>
-                <strong>Scelta della piattaforma</strong>
-                <p>È possibile scegliere la piattaforma sulla quale si riferisce il sondaggio (FriuliEmergenze.it o MyFrEM).</p>
-              </div>
-            </div>
-            <div class="features">
-              <div>
-                <strong>Compilazione</strong>
-                <p>È necessario scrivere il consiglio di aggiunta. Si prega di essere il più dettagliati possibile.</p>
-              </div>
-            </div>
-            <div class="features">
-              <div>
-                <strong>Grado di importanza</strong>
-                <p>È necessario segnalare il grado secondo il quale l'utente crede sia importante l'aggiunta della funzione.</p>
-              </div>
-            </div>
-            <div class="features">
-              <div>
-                <strong>Note facoltative</strong>
-                <p>Lo staff rende possibile l'aggiunta di note.</p>
+                <strong>E se non trovo la mia associazione?</strong>
+                <p>Richiedendo un account associazione (contattandoci via <a href="mailto:info@friuliemergenze.it">mail</a> o su <a href="https://wa.me/390431055638/" target="_blank">WhatsApp</a>) potrai fare un setup della pagina della tua associazione e aggiungerla alla sezione e farla vedere agli altri volontari per poterli associare.</p>
               </div>
             </div>
           </div>
@@ -552,31 +488,31 @@
             <button type="button" class="btn-enable-2fa" id="goToSurveyBtn">Vai al sondaggio</button>
           </div>
 
-          <div class="modal-footer">
-            <div class="step-indicator">
-              <span class="step-dot active" data-step="1"></span>
-              <span class="step-dot active" data-step="2"></span>
-              <span class="step-dot active" data-step="3"></span>
-              <span class="step-dot active" data-step="4"></span>
-            </div>
-            <div class="button-group">
-              <button type="button" class="btn-modal btn-back" id="prevSlideBtn" data-action="back">Indietro</button>
-              <button type="button" class="btn-modal btn-finish" id="finishWhatsNewBtn" data-action="finish">Ho capito!</button>
-            </div>
-          </div>
-
           <label style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; margin-top: 12px; cursor: pointer;">
             <input type="checkbox" id="dontShowAgainCheckbox" style="width: 16px; height: 16px; cursor: pointer;">
             <span style="color: var(--muted);">Non mostrare più</span>
           </label>
         </div>
+
+        <div class="modal-footer">
+          <div class="step-indicator">
+            <span class="step-dot active" data-step="1"></span>
+            <span class="step-dot active" data-step="2"></span>
+            <span class="step-dot active" data-step="3"></span>
+          </div>
+          <div class="button-group">
+            <button type="button" class="btn-modal btn-back" data-action="back">Indietro</button>
+            <button type="button" class="btn-modal btn-finish" id="finishWhatsNewBtn" data-action="finish">Ho capito!</button>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 
-  <script type="module" src="/dashboard/dsh.js"></script>
-  <script type="module" src="/dashboard/ntf.js"></script>
-  <script type="module" src="/dashboard/crswtn.js"></script>
+  <script defer type="module" src="/dashboard/dsh.js"></script>
+  <script defer type="module" src="/dashboard/ntf.js"></script>
+  <script defer type="module" src="/dashboard/crswtn.js"></script>
   <script src="/scripts/shinystat.js?USER=SS-55951055-66dfb" style="display:none;"></script>
   <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">

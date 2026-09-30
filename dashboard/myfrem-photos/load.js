@@ -81,7 +81,7 @@ async function checkUserRole(uid) {
         staffLinkEl.appendChild(br);
         staffLinkEl.appendChild(link);
       }
-      initBottomNav(userData, auth.currentUser);
+      initBottomNav(userData, auth.currentuser, "user");
     }
   } catch (err) {
     console.error("Errore verifica ruolo:", err);
