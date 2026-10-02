@@ -10,10 +10,6 @@ class NotificationBell {
     this.unreadBadge = document.getElementById('unreadBadge');
     this.closeBtn = document.getElementById('closeDropdownBtn');
     
-    console.log('Bell Button:', this.bellButton);
-    console.log('Dropdown:', this.dropdown);
-    console.log('Close Btn:', this.closeBtn);
-    
     this.unsubscribe = null;
     this.init();
   }
@@ -41,7 +37,6 @@ class NotificationBell {
     const user = getCurrentUser();
     
     if (!user?.uid) {
-      console.warn('Waiting for user to be ready...');
       setTimeout(() => this.waitForUserAndSetupListener(), 300);
       return;
     }
