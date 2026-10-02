@@ -317,7 +317,7 @@ async function updateRole(userId, currentRole) {
     const newRole = roleHierarchy[newIndex];
 
     const currentUserEmail = auth.currentUser.email;
-    const currentUserName = auth.currentUser.displayName || "Staff";
+    const currentUserName = userId || "Staff";
 
     await addDoc(collection(db, "activities"), {
       type: "user_role_change",

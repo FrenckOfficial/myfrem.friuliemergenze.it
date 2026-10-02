@@ -191,6 +191,7 @@ photosTableBody.addEventListener("click", async (e) => {
 
     addDoc(collection(db, "activities"), {
       type: isApprove ? "photo_approval" : "photo_rejection",
+      photoId,
       staffMember: auth.currentUser.email || "-",
       timestamp: serverTimestamp()
     });
