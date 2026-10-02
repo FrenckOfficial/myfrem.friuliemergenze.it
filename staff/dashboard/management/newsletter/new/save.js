@@ -177,8 +177,6 @@ document.getElementById("sendSubscribers").addEventListener("click", async () =>
     name:  d.data().name  || ""
   }));
 
-  await console.log(recipients)
-
   await sendTo(recipients, "Iscritti alla newsletter");
 });
 
@@ -189,8 +187,6 @@ document.getElementById("sendStaffers").addEventListener("click", async () => {
     email: "GruppoMembriStaff@gruppi.friuliemergenze.it",
     name: "GruppoMembriStaff@gruppi.friuliemergenze.it"
   }
-
-  await console.log(recipients)
 
   await sendTo(recipients, "Membri dello staff di Friuli Emergenze");
 });
@@ -208,8 +204,6 @@ document.getElementById("sendMyfremUsers").addEventListener("click", async () =>
       email: d.data().email || "",
       name:  d.data().displayName || d.data().name || ""
     }));
-
-  await console.log(recipients)
   
   await sendTo(recipients, "Utenze MyFrEM");
 });
@@ -245,8 +239,6 @@ document.getElementById("sendOthers").addEventListener("click", async () => {
     email,
     name: names[i] || ""
   }));
-
-  console.log(recipients)
 
   await sendTo(recipients, "Destinatari personalizzati");
 });

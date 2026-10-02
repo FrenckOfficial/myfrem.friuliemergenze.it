@@ -82,7 +82,7 @@ class AuthManager {
         }
 
       } catch (err) {
-        console.error("❌ Errore Auth:", err);
+        console.error("Errore Auth:", err);
         clearTimeout(timeoutId);
         setStatus("Errore durante il caricamento.", "error");
         this.showContent();
@@ -102,10 +102,8 @@ class AuthManager {
       this.isReadOnlyMode = this.userData.role === "testacc";
       this.isStaff = this.staffRoles.includes(this.userData.role);
 
-      console.log(`✅ User data loaded: ${this.userData.username} (${this.userData.role})`);
-
     } catch (err) {
-      console.error("❌ Errore caricamento user data:", err);
+      console.error("Errore caricamento user data:", err);
       throw err;
     }
   }
@@ -119,13 +117,12 @@ class AuthManager {
         page: window.location.pathname
       });
     } catch (err) {
-      console.warn("⚠️ Errore logging page view:", err);
+      console.warn("Errore logging page view:", err);
     }
   }
 
   setupReadOnlyMode() {
     if (this.isReadOnlyMode) {
-      console.log("📖 Modalità sola lettura attivata");
       document.body.classList.add("read-only-mode");
       
       const banner = document.createElement("div");
@@ -171,7 +168,7 @@ class AuthManager {
     const resetTimeout = () => {
       clearTimeout(this.sessionTimeoutId);
       this.sessionTimeoutId = setTimeout(() => {
-        console.warn("⏱️ Session timeout - logging out");
+        console.warn("Session timeout - logging out");
         setStatus("Sessione scaduta per inattività. Effettua di nuovo il login.", "warning");
         this.logout();
       }, this.sessionTimeout);
@@ -209,7 +206,7 @@ class AuthManager {
   }
 
   handleNotAuthenticated() {
-    console.warn("❌ Utente non autenticato, redirect al login");
+    console.warn("Utente non autenticato, redirect al login");
     window.location.href = "/login/";
   }
 
@@ -226,12 +223,10 @@ class AuthManager {
 
       await signOut(this.auth);
       
-      console.log("✅ Logout completato");
-      
       window.location.href = "/login/";
       
     } catch (err) {
-      console.error("❌ Errore durante logout:", err);
+      console.error("Errore durante logout:", err);
       setStatus("Errore durante il logout.", "error");
     }
   }

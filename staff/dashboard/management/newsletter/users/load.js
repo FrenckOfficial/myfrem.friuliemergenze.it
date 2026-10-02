@@ -16,8 +16,6 @@ const totalUsersCountEl = document.getElementById("totalUsersCount");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
-console.log("📡 Loading newsletter users...");
-
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
@@ -101,7 +99,7 @@ async function loadUsers() {
         <td>${isEnabled}</td>
         <td>
           <button class="deleteBtn" data-id="${docSnap.id}">
-            ❌ Rimuovi
+            Rimuovi
           </button>
         </td>
       `;
@@ -109,10 +107,8 @@ async function loadUsers() {
       tableBody.appendChild(row);
     });
 
-    console.log("✅ Utenti caricati:", snap.size);
-
   } catch (err) {
-    console.error("❌ Errore caricamento utenti:", err);
+    console.error("Errore caricamento utenti:", err);
     messageBox.textContent = "Errore nel caricamento utenti";
   }
 }
@@ -124,8 +120,6 @@ document.addEventListener("click", async (e) => {
     if (!confirm("Vuoi eliminare questo utente?")) return;
 
     await deleteDoc(doc(db, "newsletterSubs", id));
-
-    console.log("🗑️ Eliminato:", id);
 
     loadUsers();
   }

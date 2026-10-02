@@ -131,7 +131,6 @@ async function getVoteCounts(photoId) {
 
 async function loadPhotos(userId) {
   try {
-    console.log("Caricamento foto...");
     photosContainer.innerHTML = "";
 
     const photosQuery = query(
@@ -218,8 +217,6 @@ async function loadPhotos(userId) {
 
       photosContainer.appendChild(card);
     });
-
-    console.log(`Caricate ${snapshot.size} foto`);
   } catch (err) {
     console.error("Errore caricamento foto:", err);
     setStatus("Errore caricamento foto", "error");

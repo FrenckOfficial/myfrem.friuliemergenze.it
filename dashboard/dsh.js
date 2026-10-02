@@ -7,8 +7,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-console.log("Inizializzo Firebase...");
-
 let currentUser = null;
 let currentUserId = null;
 let allPhotos = [];
@@ -148,7 +146,6 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     goToSurveyBtn.addEventListener("click", () => {
-      console.log("Vai al sondaggio");
       window.open("https://www.friuliemergenze.it/sondaggi/aggiunta-servizi-funzioni/", "_blank");
     });
 
@@ -162,18 +159,16 @@ auth.onAuthStateChanged(async (user) => {
       }
 
       if (Notification.permission === "granted") {
-        notificationStatusIcon.textContent = "✅";
         notificationStatusText.textContent = "Notifiche: Abilitate";
         notificationStatusDesc.textContent = "Riceverai notifiche in tempo reale";
         notificationStatus.classList.add("enabled");
-        enableNotificationsBtn.textContent = "✅ Notifiche Abilitate";
+        enableNotificationsBtn.textContent = "Notifiche Abilitate";
         enableNotificationsBtn.disabled = true;
       } else if (Notification.permission === "denied") {
-        notificationStatusIcon.textContent = "❌";
         notificationStatusText.textContent = "Notifiche: Negate";
         notificationStatusDesc.textContent = "Abilita le notifiche nelle impostazioni del browser";
         notificationStatus.classList.add("denied");
-        enableNotificationsBtn.textContent = "❌ Non Disponibili";
+        enableNotificationsBtn.textContent = "Non Disponibili";
         enableNotificationsBtn.disabled = true;
       }
     }
@@ -207,14 +202,12 @@ auth.onAuthStateChanged(async (user) => {
             requireInteraction: false,
           });
 
-          console.log("Notifiche abilitate");
         } else if (permission === "denied") {
           notificationStatusText.textContent = "Notifiche negate";
           notificationStatusDesc.textContent = "Puoi abilitarle dalle impostazioni del browser!";
           notificationStatus.classList.add("denied");
           enableNotificationsBtn.textContent = "Non Disponibili";
           enableNotificationsBtn.disabled = true;
-          console.log("Notifiche negate");
         }
       } catch (error) {
         console.error("Errore nell'abilitazione delle notifiche:", error);
@@ -249,7 +242,6 @@ auth.onAuthStateChanged(async (user) => {
     const isReadOnlyMode = userData.role === "testacc";
 
     if (isReadOnlyMode) {
-      console.log("Modalità sola lettura attivata");
       document.body.classList.add("read-only-mode");
     }
 
@@ -505,7 +497,6 @@ async function closeFirstAccessModal(userId) {
 
   try {
     await db.collection("users").doc(userId).update({ firstAccess: false });
-    console.log("firstAccess settato a false");
 
     modal.classList.remove("active");
 
@@ -513,14 +504,12 @@ async function closeFirstAccessModal(userId) {
       window.initWhatsNewCarousel();
     }
   } catch (error) {
-    console.error("❌ Errore nell'aggiornamento del doc:", error);
+    console.error("Errore nell'aggiornamento del doc:", error);
     modal.classList.remove("active");
   }
 }
 
 logoutBtn.addEventListener("click", async () => {
-  console.log("Logout in corso...");
   await auth.signOut();
-  console.log("Logout completato, redirect...");
   window.location.href = "/login/";
 });

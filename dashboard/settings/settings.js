@@ -91,7 +91,7 @@ onAuthStateChanged(auth, async user => {
     loadingEl.style.display = "none";
     contentEl.style.display = "block";;
   } catch (err) {
-    console.error("❌ Errore:", err);
+    console.error("Errore:", err);
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";
     contentEl.style.display = "block";;

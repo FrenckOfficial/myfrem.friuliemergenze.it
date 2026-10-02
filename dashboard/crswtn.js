@@ -120,7 +120,6 @@ class WhatsNewCarousel {
         whatsNewViewed: true,
         whatsNewViewedAt: new Date()
       });
-      console.log('What\'s New marked as viewed');
     } catch (error) {
       console.error('Error marking as viewed:', error);
     }
@@ -146,19 +145,16 @@ async function initWhatsNewCarousel() {
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      console.log('User doc not found');
       return;
     }
 
     const userData = userDoc.data();
 
     if (userData?.firstAccess === true) {
-      console.log('Primo accesso in corso: rimando il What\'s New');
       return;
     }
 
     if (!userData?.whatsNewViewed) {
-      console.log('Showing What\'s New carousel');
       carouselInstance = new WhatsNewCarousel();
       modalEl.style.display = 'flex';
     }

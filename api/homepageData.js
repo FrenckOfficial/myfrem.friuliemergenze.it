@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("❌ Errore /api/homepage-data:", error.message);
+    console.error("Errore /api/homepageData:", error.message);
     return res.status(500).json({
       error: "Errore caricamento dati homepage"
     });
@@ -113,7 +113,7 @@ async function getStats() {
     };
 
   } catch (error) {
-    console.error("❌ Errore getStats:", error);
+    console.error("Errore getStats:", error);
     return {
       count: 0,
       approvedCount: 0,
@@ -158,7 +158,7 @@ async function getRecentPhotos() {
     return photos;
 
   } catch (error) {
-    console.error("❌ Errore getRecentPhotos:", error);
+    console.error("Errore getRecentPhotos:", error);
     return [];
   }
 }

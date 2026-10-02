@@ -18,7 +18,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const tableBody = document.getElementById("documentsTableBody");
-console.log("📄 Loading generated documents...");
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
@@ -63,7 +62,7 @@ async function loadDocuments() {
           </a>
 
           <button class="deleteBtn" data-id="${docSnap.id}">
-            ❌ Elimina
+            Elimina
           </button>
         </td>
       `;
@@ -71,11 +70,10 @@ async function loadDocuments() {
       tableBody.appendChild(row);
     });
 
-    console.log("✅ Documenti caricati:", snap.size);
     setStatus("Documenti caricati", "success");
 
   } catch (err) {
-    console.error("❌ Errore caricamento documenti:", err);
+    console.error("Errore caricamento documenti:", err);
     setStatus("Errore nel caricamento documenti", "error");
   }
 }
@@ -90,12 +88,10 @@ document.addEventListener("click", async (e) => {
     try {
       await deleteDoc(doc(db, "generatedDocuments", id));
 
-      console.log("🗑️ Documento eliminato:", id);
-
       loadDocuments();
 
     } catch (err) {
-      console.error("❌ Errore eliminazione:", err);
+      console.error("Errore eliminazione:", err);
     }
   }
 });

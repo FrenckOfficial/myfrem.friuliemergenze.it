@@ -32,9 +32,7 @@ const modalClose = document.getElementById("modalClose");
 const modalOverlay = document.getElementById("modalOverlay");
 
 logoutBtn.addEventListener("click", async () => {
-  console.log("Logout in corso...");
   await signOut(auth);
-  console.log("Logout completato, redirect...");
   window.location.href = "/login/";
 });
 
@@ -387,7 +385,6 @@ async function deleteUser(userId) {
           
           if (userDocSnap.exists() && userDocSnap.data().status === "eliminato") {
             await deleteDoc(userDocRef);
-            console.log(`✅ Utente ${userId} eliminato permanentemente.`);
           }
         } catch (error) {
           console.error("Errore nella cancellazione permanente:", error);

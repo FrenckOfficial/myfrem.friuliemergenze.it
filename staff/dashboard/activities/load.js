@@ -92,10 +92,9 @@ async function loadStats() {
 
           li.remove();
           setStatus("Attività eliminata!", "success");
-          console.log("🗑️ Eliminata activity:", docSnap.id);
 
         } catch (err) {
-          console.error("❌ Errore eliminazione:", err);
+          console.error("Errore eliminazione:", err);
         }
       });
 
@@ -109,6 +108,6 @@ async function loadStats() {
     }
 
   } catch (err) {
-    console.error("❌ Errore caricamento statistiche:", err);
+    console.error("Errore caricamento statistiche:", err);
   }
 }

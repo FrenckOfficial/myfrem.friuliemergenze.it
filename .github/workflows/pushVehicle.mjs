@@ -9,25 +9,15 @@ process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
 });
 
-console.log("Avvio pushVehicle.mjs");
-
-console.log("FIREBASE_PROJECT_ID:", !!process.env.FIREBASE_PROJECT_ID);
-console.log("FIREBASE_CLIENT_EMAIL:", !!process.env.FIREBASE_CLIENT_EMAIL);
-console.log("FIREBASE_PRIVATE_KEY:", !!process.env.FIREBASE_PRIVATE_KEY);
-console.log("GITHUB_TOKEN:", !!process.env.GITHUB_TOKEN);
-console.log("DRAFT_ID:", process.env.DRAFT_ID);
-
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 };
 
-console.log("Inizializzazione Firebase");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-console.log("Firebase inizializzato");
 
 const db = admin.firestore();
 
@@ -39,14 +29,10 @@ const GITHUB_OWNER = "FrenckOfficial";
 const GITHUB_REPO = "friuliemergenze.it";
 const GITHUB_BRANCH = "main";
 
-console.log("Verifica repository...");
-
 const repoInfo = await octokit.repos.get({
   owner: GITHUB_OWNER,
   repo: GITHUB_REPO,
 });
-
-console.log("Repository trovato:", repoInfo.data.full_name);
 
 async function pushVehicleToGithub() {
   const draftId = process.env.DRAFT_ID;
@@ -54,8 +40,6 @@ async function pushVehicleToGithub() {
   if (!draftId) {
     throw new Error("DRAFT_ID non fornito");
   }
-
-  console.log("Draft:", draftId);
 
   const draftSnapshot = await db
     .collection("vehiclesDraft")
@@ -68,8 +52,6 @@ async function pushVehicleToGithub() {
 
   const draft = draftSnapshot.data();
 
-  console.log("Bozza caricata:", draft.fileName);
-
   const stafferId = draft.updatedBy || draft.createdBy || "github-action";
   const vehicleData = draft.data || {};
   const sourcePhotoId = draft.sourcePhotoId || "";
@@ -80,15 +62,8 @@ async function pushVehicleToGithub() {
   }
 
   const photoUrl = draft.photoUrl || "";
-
   await updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId);
-
-  console.log("gallery.json aggiornato");
-
   await createVehicleDetailsPage(stafferId, vehicleData, sourcePhotoId, slug, photoUrl);
-
-  console.log("Pagina HTML creata");
-
   const vehicleRef = db.collection("vehiclesDraft").doc(draftId);
 
   await vehicleRef.update({
@@ -113,13 +88,9 @@ async function pushVehicleToGithub() {
   } else {
     console.warn("Nessun sourcePhotoId presente sulla bozza, salto l'aggiornamento della foto sorgente");
   }
-
-  console.log("Pubblicazione completata");
 }
 
 async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
-  console.log("Lettura gallery.json");
-
   const response =
     await octokit.repos.getContent({
       owner: GITHUB_OWNER,
@@ -166,9 +137,6 @@ async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
   } else {
     content.push(vehicle);
   }
-
-  console.log("Salvataggio gallery.json");
-  console.log(JSON.stringify(content, null, 2));
 
   await octokit.repos.createOrUpdateFileContents({
     owner: GITHUB_OWNER,
@@ -471,7 +439,6 @@ async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, ph
         const liMyFrEM = document.querySelector(".nav-links a[href='/piattaforma-myfrem']");
 
         if(liMyFrEM) {
-          console.log("MyFrEM link found, updating innerHTML.");
           liMyFrEM.innerHTML = ${`<a href="/piattaforma-myfrem" target="_blank" class="nav-icon" aria-label="MyFrEM" style="margin-left:0;">MyFrEM</a>`}
         }
       });
@@ -505,11 +472,10 @@ function escapeHtml(text) {
 
 pushVehicleToGithub()
   .then(() => {
-    console.log("Fine workflow");
     process.exit(0);
   })
   .catch(async (error) => {
-    console.error("❌ ERRORE:", error);
+    console.error("ERRORE:", error);
 
     try {
       const draftId = process.env.DRAFT_ID;

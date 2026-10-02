@@ -18,9 +18,7 @@ const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
 logoutBtn.addEventListener("click", async () => {
-  console.log("🚪 Logout in corso...");
   await auth.signOut();
-  console.log("✅ Logout completato, redirect...");
   window.location.href = "/login/";
 });
 

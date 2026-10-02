@@ -14,7 +14,7 @@ const idParam = new URLSearchParams(window.location.search);
 const eventId = idParam.get("event");
 
 if (!eventId) {
-  eventsList.innerHTML = "<p class='error'>❌ Nessun ID evento fornito nell'URL.</p>";
+  eventsList.innerHTML = "<p class='error'>Nessun ID evento fornito nell'URL.</p>";
   throw new Error("Missing event ID");
 }
 
@@ -24,7 +24,7 @@ async function loadPublicEvent() {
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      eventsList.innerHTML = "<p class='info'>❌ Questo ID evento non esiste nel database.</p>";
+      eventsList.innerHTML = "<p class='info'>Questo ID evento non esiste nel database.</p>";
       return;
     }
 
@@ -134,7 +134,7 @@ async function loadPublicEvent() {
     });
 
   } catch (err) {
-    eventsList.innerHTML = "<p class='error'>❌ Errore durante il caricamento dell'evento.</p>";
+    eventsList.innerHTML = "<p class='error'>Errore durante il caricamento dell'evento.</p>";
     console.error(err);
   }
 }

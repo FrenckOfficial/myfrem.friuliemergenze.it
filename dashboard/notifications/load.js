@@ -59,7 +59,6 @@ onAuthStateChanged(auth, async (user) => {
           const isReadOnlyMode = userData.role === "testacc";
 
           if (isReadOnlyMode) {
-            console.log("Modalità sola lettura attivata");
             document.body.classList.add("read-only-mode");
           }
   
@@ -74,7 +73,7 @@ onAuthStateChanged(auth, async (user) => {
           }
           initBottomNav(userData, user, "user");
         } catch (err) {
-          console.error("❌ Errore:", err);
+          console.error("Errore:", err);
           clearTimeout(timeoutId);
           loadingEl.style.display = "none";
           contentEl.style.display = "block";
@@ -88,7 +87,7 @@ onAuthStateChanged(auth, async (user) => {
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
     } catch (err) {
-      console.error("❌ Errore:", err);
+      console.error("Errore:", err);
       clearTimeout(timeoutId);
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
@@ -116,8 +115,6 @@ class NotificationsPage {
       console.error('No user found');
       return;
     }
-
-    console.log('NotificationsPage init for user:', this.user.uid);
 
     this.setupFilterTabs();
     this.markAllReadBtn.addEventListener('click', () => this.markAllAsRead());
@@ -154,8 +151,6 @@ class NotificationsPage {
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date()
       }));
-
-      console.log('Loaded notifications:', this.allNotifications.length);
 
       if (this.allNotifications.length === 0) {
         this.notificationsList.innerHTML = `
@@ -344,7 +339,7 @@ class NotificationsPage {
       });
 
       this.applyFilter();
-      alert('✅ Tutte le notifiche segnate come lette!');
+      alert('Tutte le notifiche segnate come lette!');
     } catch (error) {
       console.error('Error marking all as read:', error);
       alert('Errore: ' + error.message);

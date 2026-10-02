@@ -1,8 +1,5 @@
 export default async (request, response) => {
   try {
-    console.log("Function triggerWorkflow avviata");
-    console.log("METHOD:", request.method);
-    console.log("URL:", request.url);
 
     let rawBody;
     
@@ -21,17 +18,12 @@ export default async (request, response) => {
       }
     }
 
-    console.log("RAW BODY:", rawBody);
-
     if (!rawBody) {
       return response.status(400).json({ error: "Body vuoto" });
     }
 
     let draftId;
     const token = process.env.GT_TOKEN;
-
-    console.log("TOKEN ESISTE:", !!token);
-    console.log("TOKEN LENGTH:", token?.length);
 
     try {
       const parsed = JSON.parse(rawBody);
@@ -45,8 +37,6 @@ export default async (request, response) => {
       console.error("draftId mancante");
       return response.status(400).json({ error: "draftId mancante" });
     }
-
-    console.log("Draft ID:", draftId);
 
     if (!token) {
       console.error("GITHUB_PAT non configurato");
@@ -73,11 +63,7 @@ export default async (request, response) => {
 
     const body = await githubResponse.text();
 
-    console.log("GitHub status:", githubResponse.status);
-    console.log("GitHub body:", body);
-
     if (githubResponse.status === 204) {
-      console.log("Workflow triggered successfully");
       return response.status(204).send("");
     }
 

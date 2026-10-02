@@ -11,25 +11,15 @@ process.on("unhandledRejection", (err) => {
   console.error("UNHANDLED REJECTION:", err);
 });
 
-console.log("🚀 Avvio pushPhotobook.mjs");
-
-console.log("FIREBASE_PROJECT_ID:", !!process.env.FIREBASE_PROJECT_ID);
-console.log("FIREBASE_CLIENT_EMAIL:", !!process.env.FIREBASE_CLIENT_EMAIL);
-console.log("FIREBASE_PRIVATE_KEY:", !!process.env.FIREBASE_PRIVATE_KEY);
-console.log("GITHUB_TOKEN:", !!process.env.GITHUB_TOKEN);
-console.log("DRAFT_ID:", process.env.DRAFT_ID);
-
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 };
 
-console.log("Inizializzazione Firebase");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-console.log("Firebase inizializzato");
 
 const db = admin.firestore();
 
@@ -41,14 +31,10 @@ const GITHUB_OWNER = "FrenckOfficial";
 const GITHUB_REPO = "friuliemergenze.it";
 const GITHUB_BRANCH = "main";
 
-console.log("🔍 Verifica repository...");
-
 const repoInfo = await octokit.repos.get({
   owner: GITHUB_OWNER,
   repo: GITHUB_REPO,
 });
-
-console.log("Repository trovato:", repoInfo.data.full_name);
 
 async function pushPhotobookToGithub() {
   const draftId = process.env.DRAFT_ID;
@@ -56,8 +42,6 @@ async function pushPhotobookToGithub() {
   if (!draftId) {
     throw new Error("DRAFT_ID non fornito");
   }
-
-  console.log("📖 Photobook Draft:", draftId);
 
   const draftSnapshot = await db
     .collection("photobooksDraft")
@@ -70,8 +54,6 @@ async function pushPhotobookToGithub() {
 
   const draft = draftSnapshot.data();
 
-  console.log("✅ Bozza photobook caricata:", draft.fileName);
-
   const fileName = draft.fileName.replace(/\.[^.]+$/, "");
   const photobookData = draft.data || {};
   const slug = draft.slug || fileName;
@@ -82,14 +64,10 @@ async function pushPhotobookToGithub() {
     draft.coverUrl
   );
 
-  console.log("✅ photobooks.json aggiornato");
-
   await createPhotobookDetailsPage(
     slug,
     photobookData,
   );
-
-  console.log("✅ Pagina HTML photobook creata");
 
   await db.collection("photobooksDraft")
     .doc(draftId)
@@ -98,8 +76,6 @@ async function pushPhotobookToGithub() {
       publishedAt: admin.firestore.Timestamp.now(),
       publishedBy: "github-action"
     });
-
-  console.log("🎉 Pubblicazione photobook completata");
 }
 
 async function updatePhotobooksJson(
@@ -107,8 +83,6 @@ async function updatePhotobooksJson(
   photobookData,
   coverUrl
 ) {
-  console.log("📖 Lettura photobooks.json");
-
   let content = [];
   let sha = null;
 
@@ -128,7 +102,6 @@ async function updatePhotobooksJson(
     sha = response.data.sha;
   } catch (error) {
     if (error.status === 404) {
-      console.log("⚠️ photobooks.json non esiste, creazione nuovo file");
       content = [];
       sha = null;
     } else {
@@ -160,15 +133,12 @@ async function updatePhotobooksJson(
     content.push(photobook);
   }
 
-  console.log("💾 Salvataggio photobooks.json");
-  console.log(JSON.stringify(content, null, 2));
-
   if (sha) {
     await octokit.repos.createOrUpdateFileContents({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: "photobooks.json",
-      message: `📖 Update photobook ${photobookData.title}`,
+      message: `Update photobook ${photobookData.title}`,
       content: Buffer
         .from(JSON.stringify(content, null, 2))
         .toString("base64"),
@@ -180,7 +150,7 @@ async function updatePhotobooksJson(
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: "photobooks.json",
-      message: `📖 Add photobook ${photobookData.title}`,
+      message: `Add photobook ${photobookData.title}`,
       content: Buffer
         .from(JSON.stringify(content, null, 2))
         .toString("base64"),
@@ -209,7 +179,7 @@ async function createPhotobookDetailsPage(
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: `photobook/${slug}/index.html`,
-      message: `📄 Update photobook ${photobookData.title}`,
+      message: `Update photobook ${photobookData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -222,7 +192,7 @@ async function createPhotobookDetailsPage(
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: `photobook/${slug}/index.html`,
-      message: `📄 Add photobook ${photobookData.title}`,
+      message: `Add photobook ${photobookData.title}`,
       content: Buffer
         .from(html)
         .toString("base64"),
@@ -460,8 +430,6 @@ async function generateVehiclesSection(vehicleIds) {
     return '';
   }
 
-  console.log(`🚗 Recupero ${vehicleIds.length} veicoli associati...`);
-
   const vehiclePromises = vehicleIds.map(async (vehicleId) => {
     try {
       const vehicleDoc = await db.collection("vehiclesDraft").doc(vehicleId).get();
@@ -474,7 +442,7 @@ async function generateVehiclesSection(vehicleIds) {
         };
       }
     } catch (error) {
-      console.warn(`⚠️ Errore caricamento veicolo ${vehicleId}:`, error.message);
+      console.warn(`Errore caricamento veicolo ${vehicleId}:`, error.message);
     }
     return null;
   });
@@ -530,11 +498,10 @@ function escapeHtml(text) {
 
 pushPhotobookToGithub()
   .then(() => {
-    console.log("✅ Fine workflow photobook");
     process.exit(0);
   })
   .catch(async (error) => {
-    console.error("❌ ERRORE:", error);
+    console.error("ERRORE:", error);
 
     try {
       const draftId = process.env.DRAFT_ID;

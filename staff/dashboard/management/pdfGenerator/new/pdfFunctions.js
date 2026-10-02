@@ -158,8 +158,6 @@ export function buildPDF(data) {
     );
   }
   
-  console.log("📄 PDF creato con layout migliorato");
-  
   return pdf;
 }
 

@@ -886,9 +886,9 @@ if (registerForm) {
         })
       })
         .then((r) => {
-          if (!r.ok) console.error("❌ Errore invio email staff:", r.status);
+          if (!r.ok) console.error("Errore invio email staff:", r.status);
         })
-        .catch((err) => console.error("❌ Errore invio email staff:", err));
+        .catch((err) => console.error("Errore invio email staff:", err));
 
       await signOut(auth);
       localStorage.setItem("email", email);

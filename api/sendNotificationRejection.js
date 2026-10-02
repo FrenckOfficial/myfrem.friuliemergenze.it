@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
 
     if (!process.env.BREVO_API_KEY) {
-      console.error("❌ BREVO_API_KEY not configured");
+      console.error("BREVO_API_KEY not configured");
       return res.status(500).json({ error: "Configurazione server errata" });
     }
 
@@ -70,12 +70,10 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log("Rejection notification inviata a:", sanitizedEmail);
-
     return res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error("❌ Server error:", error.message);
+    console.error("Server error:", error.message);
     return res.status(500).json({ 
       success: false,
       error: "Errore interno del server"

@@ -44,19 +44,6 @@ const prevContent = document.getElementById("prevContent");
 const prevAuthor = document.getElementById("prevAuthor");
 const prevType = document.getElementById("prevType");
 
-console.log({
-  titleInput,
-  dateInput,
-  typeInput,
-  contentInput,
-  authorInput,
-  prevTitle,
-  prevDate,
-  prevContent,
-  prevAuthor,
-  prevType
-});
-
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 
@@ -121,11 +108,11 @@ authorInput.addEventListener("input", updatePreview);
 generateBtn.addEventListener("click", async () => {
 
   if (!currentUser) {
-    return setStatus("❌ Devi essere loggato");
+    return setStatus("Devi essere loggato");
   }
 
   if (!titleInput.value.trim()) {
-    return setStatus("❌ Inserisci un titolo");
+    return setStatus("Inserisci un titolo");
   }
 
   setStatus("📄 Generazione PDF...");
@@ -156,8 +143,6 @@ generateBtn.addEventListener("click", async () => {
     setStatus("⬆️ Upload PDF...");
 
     const pdfUrl = await uploadFile(pdfBlob, "myfrem-staff-docs", currentUser.uid);
-
-    console.log("📄 PDF URL:", pdfUrl);
 
     setStatus("💾 Salvataggio database...");
 
@@ -207,15 +192,13 @@ generateBtn.addEventListener("click", async () => {
       type: typeInput.value
     });
 
-    setStatus("✅ PDF generato!");
+    setStatus("PDF generato!");
 
   } catch (err) {
 
-    console.error("❌ ERRORE:", err);
+    console.error("ERRORE:", err);
 
-    setStatus(
-      "❌ Errore generazione PDF"
-    );
+    setStatus("Errore generazione PDF", "error");
   }
 });
 

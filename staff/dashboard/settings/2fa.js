@@ -17,7 +17,6 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
     currentUserId = user.uid;
-    console.log("✅ Utente autenticato:", currentUserId);
     
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", load2FAStatus);
@@ -49,16 +48,15 @@ let settings2FASetup = {
 
 async function load2FAStatus(user) {
   try {
-    console.log("🔐 load2FAStatus() chiamato");
 
     if (!currentUserId) {
-      console.error("❌ currentUserId non definito");
+      console.error("currentUserId non definito");
       return;
     }
 
     const statusEl = document.getElementById("twofa-current-status");
     if (!statusEl) {
-      console.error("❌ Element #twofa-current-status non trovato nel DOM");
+      console.error("Element #twofa-current-status non trovato nel DOM");
       return;
     }
 
@@ -67,8 +65,6 @@ async function load2FAStatus(user) {
     const userData = userSnap.data();
 
     initBottomNav(userData, user, "staff");
-
-    console.log("📊 userData from Firestore:", userData);
 
     const methodEl = document.getElementById("twofa-method-display");
     const enableBtn = document.getElementById("enable-twofa-btn");
@@ -89,8 +85,6 @@ async function load2FAStatus(user) {
       enableBtn.style.display = "none";
       disableBtn.style.display = "block";
       regenerateBtn.style.display = "block";
-      
-      console.log("✅ 2FA abilitato:", userData.twoFactorMethod);
     } else {
       statusEl.innerHTML = `<span style="color: var(--muted, #7a8fa6);">Non abilitato</span>`;
       methodEl.innerHTML = "";
@@ -98,11 +92,9 @@ async function load2FAStatus(user) {
       enableBtn.style.display = "block";
       disableBtn.style.display = "none";
       regenerateBtn.style.display = "none";
-      
-      console.log("✅ 2FA non abilitato");
     }
   } catch (error) {
-    console.error("❌ Errore caricamento stato 2FA:", error);
+    console.error("Errore caricamento stato 2FA:", error);
     const statusEl = document.getElementById("twofa-current-status");
     if (statusEl) {
       statusEl.innerHTML = `<span style="color: #e84855;">Errore caricamento</span>`;
@@ -175,6 +167,14 @@ document.addEventListener("DOMContentLoaded", () => {
             code: settings2FASetup.emailCode
           })
         });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`Errore ${response.status}:`, errorText);
+          status.textContent = `Errore invio codice: ${response.status}`;
+          status.style.color = "#e84855";
+          return;
+        }
 
         status.textContent = "Codice inviato!";
         status.style.color = "#4fca7a";
@@ -558,14 +558,10 @@ function generateTOTPSecret() {
 
 async function verifyTOTPCode(secret, code) {
   try {
-    console.log("🔐 Verifying TOTP - otplib disponibile?", typeof otplib);
-
     const result = await otplib.verify({ secret, token: code });
-
-    console.log("✅ Inserito:", code, "Match:", result.valid);
     return result.valid;
   } catch (e) {
-    console.error("❌ Errore verifica TOTP:", e);
+    console.error("Errore verifica TOTP:", e);
     return false;
   }
 }

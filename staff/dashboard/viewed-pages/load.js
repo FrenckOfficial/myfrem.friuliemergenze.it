@@ -85,6 +85,6 @@ async function loadStats() {
     }
 
   } catch (err) {
-    console.error("❌ Errore caricamento statistiche:", err);
+    console.error("Errore caricamento statistiche:", err);
   }
 }

@@ -54,8 +54,8 @@ jobs:
 
       - name: Notify on Success
         if: success()
-        run: echo "✅ Vehicle published successfully!"
+        run: echo "Vehicle published successfully!"
 
       - name: Notify on Failure
         if: failure()
-        run: echo "❌ Failed to publish vehicle"
+        run: echo "Failed to publish vehicle"

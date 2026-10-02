@@ -37,10 +37,10 @@ fileInput.addEventListener("change", () => {
 
 uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
-  if (!currentUser) return setStatus("❌ Devi essere loggato");
+  if (!currentUser) return setStatus("Devi essere loggato");
 
   const files = fileInput.files;
-  if (files.length === 0) return setStatus("❌ Seleziona almeno un file");
+  if (files.length === 0) return setStatus("Seleziona almeno un file");
 
   setStatus("⏳ Upload file in corso...", "info");
 
@@ -67,17 +67,17 @@ uploadBtn.addEventListener("click", async (e) => {
       progressBar.value = percent;
       progressText.textContent = percent + "%";
     } catch (error) {
-      console.error("❌ Errore upload:", error);
+      console.error("Errore upload:", error);
     }
   }
 
-  setStatus(`✅ Caricati ${uploadedCount}/${files.length} file!`, "success");
+  setStatus(`Caricati ${uploadedCount}/${files.length} file!`, "success");
   fileInput.value = "";
   fileNameSpan.textContent = "Nessun file";
   uploadForm.reset();
   window.history.back();
 
-  progressText.textContent = "Completato ✅";
+  progressText.textContent = "Completato";
   progressBar.value = 100;
 });
 

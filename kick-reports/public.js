@@ -12,7 +12,7 @@ const titleReport = document.getElementById("titleReport")
 
 async function loadPublicReport() {
   if (!reportId) {
-    reportBox.innerHTML = "<p>❌ Inserisci un id report valido.</p>";
+    reportBox.innerHTML = "<p>Inserisci un id report valido.</p>";
     return;
   }
 
@@ -22,7 +22,7 @@ async function loadPublicReport() {
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {
-    reportBox.innerHTML = "<p>❌ Report inesistente.</p>";
+    reportBox.innerHTML = "<p>Report inesistente.</p>";
     return;
   }
 

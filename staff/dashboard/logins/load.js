@@ -58,7 +58,7 @@ async function loadUsers() {
   const snap = await getDocs(q);
 
   if (snap.empty) {
-    loginTable.innerHTML = "<p>❌ Nessun login trovato.</p>";
+    loginTable.innerHTML = "<p>Nessun login trovato.</p>";
     return;
   }
 

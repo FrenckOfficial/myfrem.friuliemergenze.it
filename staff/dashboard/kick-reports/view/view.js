@@ -31,7 +31,7 @@ const params = new URLSearchParams(window.location.search);
 const reportId = params.get("id");
 
 if (!reportId) {
-  reportDetails.innerHTML = "<p class='error'>❌ ID report non specificato.</p>";
+  reportDetails.innerHTML = "<p class='error'>ID report non specificato.</p>";
 } else {
   loadReport(reportId);
 }
@@ -41,7 +41,7 @@ async function loadReport(id) {
   const snapshot = await getDoc(docRef);
 
   if (!snapshot.exists()) {
-    reportDetails.innerHTML = "<p class='error'>❌ Report non trovato.</p>";
+    reportDetails.innerHTML = "<p class='error'>Report non trovato.</p>";
     return;
   }
 

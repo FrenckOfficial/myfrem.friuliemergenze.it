@@ -195,7 +195,6 @@ async function assignBadges(db, utente_id, guadagnati) {
     );
   });
   await batch.commit();
-
-  nuovi.forEach((b) => console.log(`Badge '${b}' assegnato a ${utente_id}`));
+  
   return nuovi.length;
 }

@@ -51,7 +51,7 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
     const userDoc = await getDoc(doc(db, "users", id));
 
     if (!userDoc.exists()) {
-      document.getElementById("myfremResult").innerHTML = "❌ Nessun utente trovato.";
+      document.getElementById("myfremResult").innerHTML = "Nessun utente trovato.";
       linkedMyFremUser = null;
       return;
     }
@@ -76,7 +76,7 @@ async function loadUser() {
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-        userDetails.innerHTML = "<p>❌ Utente non trovato.</p>";
+        userDetails.innerHTML = "<p>Utente non trovato.</p>";
         return;
     }
 
@@ -140,7 +140,7 @@ document.querySelector(".editForm").addEventListener("submit", async (e) => {
 
     } catch (err) {
         console.error(err);
-        statusMsg.textContent = "❌ Errore durante il salvataggio.";
+        statusMsg.textContent = "Errore durante il salvataggio.";
         statusMsg.style.color = "#ff3b3b";
     }
 });

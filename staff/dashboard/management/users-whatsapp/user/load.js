@@ -11,7 +11,7 @@ const userId = urlParams.get("id");
 const userDataDiv = document.getElementById("userData");
 
 if (!userId) {
-  userDataDiv.innerHTML = "<p>❌ Nessun ID utente fornito.</p>";
+  userDataDiv.innerHTML = "<p>Nessun ID utente fornito.</p>";
 } else {
   loadUser();
 }
@@ -21,7 +21,7 @@ async function loadUser() {
   const snap = await getDoc(ref);
 
   if (!snap.exists()) {
-    userDataDiv.innerHTML = "<p>❌ Utente non trovato.</p>";
+    userDataDiv.innerHTML = "<p>Utente non trovato.</p>";
     return;
   }
 

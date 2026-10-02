@@ -49,7 +49,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     if (readOnly) {
-      console.log('Modalità sola lettura attivata');
       document.body.classList.add('read-only-mode');
     }
 
@@ -57,7 +56,7 @@ onAuthStateChanged(auth, async (user) => {
     await manager.ready;
     showContent();
   } catch (err) {
-    console.error('❌ Errore:', err);
+    console.error('Errore:', err);
     showLoadError('Errore di caricamento. Ricarica la pagina.');
   }
 });
@@ -357,7 +356,7 @@ class StaffNotificationsManager {
       this.renderHistory();
     } catch (error) {
       console.error('Error sending notification:', error);
-      alert('❌ Errore: ' + error.message);
+      alert('Errore: ' + error.message);
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Invia Notifica';

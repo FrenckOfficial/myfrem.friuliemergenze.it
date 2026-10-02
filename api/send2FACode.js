@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   try {
     await admin.auth().verifyIdToken(token);
   } catch (error) {
-    console.error("❌ Token verification failed:", error);
+    console.error("Token verification failed:", error);
     return res.status(401).json({ error: "Invalid token" });
   }
 
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     }
 
     if (!process.env.BREVO_API_KEY) {
-      console.error("❌ BREVO_API_KEY not configured");
+      console.error("BREVO_API_KEY not configured");
       return res.status(500).json({ error: "Configurazione server errata" });
     }
 
@@ -92,8 +92,6 @@ export default async function handler(req, res) {
         error: "Errore nell'invio della notifica" 
       });
     }
-
-    console.log("2FA code inviato a:", sanitizedEmail);
 
     return res.status(200).json({ success: true });
 

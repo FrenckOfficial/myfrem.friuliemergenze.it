@@ -240,8 +240,6 @@ uploadBtn.addEventListener("click", async (e) => {
   
       const uploadedAt = new Date().toISOString();
 
-      console.log(uploadedAt);
-
       if (uploadedAt.undefined === true) {
         console.error("uploadedAt undefined");
         continue;

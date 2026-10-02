@@ -58,7 +58,7 @@ async function loadGallery(containerId = 'gallery', refreshInterval = 5 * 60 * 1
         console.error('Errore nel caricamento della galleria:', error);
         const gallery = document.getElementById(containerId);
         if (gallery) {
-            gallery.innerHTML = `<div class="error">❌ Errore nel caricamento della galleria: ${error.message}</div>`;
+            gallery.innerHTML = `<div class="error">Errore nel caricamento della galleria: ${error.message}</div>`;
         }
     }
 }

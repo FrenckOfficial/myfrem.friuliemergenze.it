@@ -346,8 +346,8 @@ async function loadStats(currentUserData) {
       renderRecentViewedPages(),
     ]);
   } catch (err) {
-    console.error("❌ Errore caricamento statistiche:", err);
-    setStatus("❌ Errore caricamento statistiche", "error");
+    console.error("Errore caricamento statistiche:", err);
+    setStatus("Errore caricamento statistiche", "error");
     showDashboard();
   }
 }

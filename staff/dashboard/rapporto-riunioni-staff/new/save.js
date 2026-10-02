@@ -65,7 +65,7 @@ reunionForm.addEventListener("submit", async (e) => {
   try {
 
     if (!startDate || !endDate || !order || !description) {
-      statusMsg.textContent = "❌ Compila tutti i campi obbligatori!";
+      statusMsg.textContent = "Compila tutti i campi obbligatori!";
       statusMsg.className = "error";
       return;
     }
@@ -79,13 +79,13 @@ reunionForm.addEventListener("submit", async (e) => {
       createdAt: new Date()
     });
 
-    statusMsg.textContent = "✅ Report inviato e caricato con successo!";
+    statusMsg.textContent = "Report inviato e caricato con successo!";
     statusMsg.className = "success";
     reunionForm.reset();
 
   } catch (err) {
     console.error("Errore invio report:", err);
-    statusMsg.textContent = "❌ Errore nell'invio del report. Riprovare.";
+    statusMsg.textContent = "Errore nell'invio del report. Riprovare.";
     statusMsg.className = "error";
   }
 });

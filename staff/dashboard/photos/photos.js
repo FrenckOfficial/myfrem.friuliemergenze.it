@@ -360,8 +360,6 @@ async function sendNotificationApprovement(userName, userEmail, photoName) {
       setStatus(`Errore notifica: ${response.status}`, 'error');
       return;
     }
-
-    console.log('Notifica inviata');
   } catch (error) {
     console.error('Errore fetch:', error);
     setStatus('Errore invio notifica', 'error');
@@ -389,8 +387,6 @@ async function sendNotificationRejection(userName, userEmail, photoName, reason)
       setStatus(`Errore notifica: ${response.status}`, 'error');
       return;
     }
-
-    console.log('Notifica inviata');
   } catch (error) {
     console.error('Errore fetch:', error);
     setStatus('Errore invio notifica', 'error');

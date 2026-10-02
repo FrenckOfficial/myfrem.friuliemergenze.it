@@ -159,12 +159,10 @@ function generatePDF(data) {
 async function saveOnDatabase(doc) {
   try {
     const publicUrl = await uploadFile(doc, "myfrem-reports", currentUserId);
-
-    console.log("📄 PDF caricato su Database:", publicUrl);
     return publicUrl;
 
   } catch (err) {
-    console.error("❌ Errore imprevisto Database:", err);
+    console.error("Errore imprevisto Database:", err);
     return null;
   }
 }

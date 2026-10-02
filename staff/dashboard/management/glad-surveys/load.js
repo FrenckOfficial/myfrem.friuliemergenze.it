@@ -67,7 +67,6 @@ onAuthStateChanged(auth, async (user) => {
 
 async function loadSurveys() {
     try {
-        console.log("Loading surveys...");
 
         const surveysQuery = query(
             collection(db, "sondaggi_gradimento"),
@@ -98,8 +97,6 @@ async function loadSurveys() {
 
             surveyList.appendChild(row);
         });
-
-        console.log("Surveys loaded.");
     } catch (error) {
         console.error("Error loading surveys:", error);
     }

@@ -32,7 +32,7 @@ document.getElementById("linkMyFremBtn").onclick = async () => {
     document.getElementById("myfremResult").style.display = "block";
 
     if (!userDoc.exists()) {
-      document.getElementById("myfremResult").innerHTML = "❌ Nessun utente trovato.";
+      document.getElementById("myfremResult").innerHTML = "Nessun utente trovato.";
       linkedMyFremUser = null;
       return;
     }
@@ -66,7 +66,7 @@ form.addEventListener("submit", async (e) => {
     .map(t => t.value);
 
   if (!userName || !expulsionDate) {
-    statusMsg.textContent = "❌ Compila tutti i campi obbligatori!";
+    statusMsg.textContent = "Compila tutti i campi obbligatori!";
     statusMsg.className = "error";
     return;
   }
@@ -91,7 +91,7 @@ form.addEventListener("submit", async (e) => {
       timestamp: serverTimestamp()
     });
 
-    statusMsg.textContent = "✅ Utente aggiunto con successo!";
+    statusMsg.textContent = "Utente aggiunto con successo!";
     statusMsg.className = "success";
     form.reset();
     linkedMyFremUser = null;
@@ -100,7 +100,7 @@ form.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error("Errore creazione utente:", err);
-    statusMsg.textContent = "❌ Errore nella creazione dell'utente.";
+    statusMsg.textContent = "Errore nella creazione dell'utente.";
     statusMsg.className = "error";
   }
 });

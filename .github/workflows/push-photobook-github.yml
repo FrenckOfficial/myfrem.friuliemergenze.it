@@ -54,8 +54,8 @@ jobs:
 
       - name: Notify on Success
         if: success()
-        run: echo "✅ Photobook published successfully!"
+        run: echo "Photobook published successfully!"
 
       - name: Notify on Failure
         if: failure()
-        run: echo "❌ Failed to publish photobook"
+        run: echo "Failed to publish photobook"

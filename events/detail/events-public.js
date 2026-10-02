@@ -224,17 +224,4 @@ function copyToClipboard(text) {
   });
 }
 
-function shareEvent(title) {
-  const url = window.location.href;
-  if (navigator.share) {
-    navigator.share({
-      title: title,
-      url: url
-    }).catch(err => console.log("Share canceled"));
-  } else {
-    copyToClipboard(url);
-    showStatus("✓ Link copiato negli appunti", "success");
-  }
-}
-
 loadPublicEvent();

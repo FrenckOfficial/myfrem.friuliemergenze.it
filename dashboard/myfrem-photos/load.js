@@ -90,7 +90,6 @@ async function checkUserRole(uid) {
 
 async function loadAllPhotos() {
   try {
-    console.log("Caricamento foto...");
     photosContainer.innerHTML = "";
 
     const photosQuery = query(
@@ -196,8 +195,6 @@ async function loadAllPhotos() {
         dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", likeBtn, dislikeBtn));
       }
     });
-
-    console.log(`Caricate ${snapshot.size} foto`);
   } catch (err) {
     console.error("Errore caricamento foto:", err);
     setStatus("Errore caricamento foto", "error");
@@ -305,9 +302,7 @@ function updateVoteButtonStates(likeBtn, dislikeBtn, userVote) {
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  console.log("Logout in corso...");
   await auth.signOut();
-  console.log("Logout completato, redirect...");
   window.location.href = "/login/";
 });
 

@@ -26,8 +26,6 @@ const messageBox = document.getElementById("statusMsg");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
-console.log("📡 Loading sent newsletters...");
-
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
@@ -105,13 +103,13 @@ async function loadNewsletters() {
         </td>
         <td>
           ${hasImage
-            ? `<span class="has-image" title="${data.image}">✅ Sì</span>`
-            : `<span class="no-image">❌ No</span>`
+            ? `<span class="has-image" title="${data.image}">Sì</span>`
+            : `<span class="no-image">No</span>`
           }
         </td>
         <td class="link-cell">
           ${hasLink
-            ? `<a href="${data.link}" target="_blank" rel="noopener">🔗 Apri</a>`
+            ? `<a href="${data.link}" target="_blank" rel="noopener">Apri</a>`
             : `<span style="color:#aaa; font-size:13px;">—</span>`
           }
         </td>
@@ -119,7 +117,7 @@ async function loadNewsletters() {
         <td>${sentAt}</td>
         <td>
           <button class="deleteBtn" data-id="${docSnap.id}">
-            ❌ Elimina
+            Elimina
           </button>
         </td>
       `;
@@ -127,10 +125,8 @@ async function loadNewsletters() {
       tableBody.appendChild(row);
     });
 
-    console.log("✅ Newsletter caricate:", snap.size);
-
   } catch (err) {
-    console.error("❌ Errore caricamento newsletter:", err);
+    console.error("Errore caricamento newsletter:", err);
     messageBox.textContent = "Errore nel caricamento delle newsletter";
   }
 }
@@ -142,8 +138,6 @@ document.addEventListener("click", async (e) => {
     if (!confirm("Vuoi eliminare questa newsletter dallo storico?")) return;
 
     await deleteDoc(doc(db, "newsletterSent", id));
-
-    console.log("🗑️ Eliminata:", id);
 
     loadNewsletters();
   }

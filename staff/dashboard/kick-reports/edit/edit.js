@@ -53,7 +53,7 @@ async function loadReport() {
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-        reportDetails.innerHTML = "<p>❌ Report non trovato.</p>";
+        reportDetails.innerHTML = "<p>Report non trovato.</p>";
         return;
     }
 
