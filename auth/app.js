@@ -2,7 +2,7 @@ import { firebaseConfig } from "../configFirebase.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
 import "/helpers/loadIcons.js";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
@@ -353,6 +353,71 @@ if (twofaLoginCloseBtn) {
   });
 }
 
+const TEMP_PASS_RE = /^pass\d{4}$/;
+
+const changePasswordModal = document.getElementById("changePasswordModal");
+const newPasswordInput = document.getElementById("newPassword");
+const confirmNewPasswordInput = document.getElementById("confirmNewPassword");
+const changePasswordStatus = document.getElementById("changePasswordStatus");
+const changePasswordBtn = document.getElementById("changePasswordBtn");
+const closeChangePasswordModal = document.getElementById("closeChangePasswordModal");
+
+function validateNewPassword(password, confirm) {
+  if (password.length < 8) return "La password deve essere lunga almeno 8 caratteri.";
+  if (!/[A-Z]/.test(password)) return "La password deve contenere almeno una lettera maiuscola.";
+  if (!/[a-z]/.test(password)) return "La password deve contenere almeno una lettera minuscola.";
+  if (!/[0-9]/.test(password)) return "La password deve contenere almeno un numero.";
+  if (TEMP_PASS_RE.test(password)) return "Scegli una password diversa da quella temporanea.";
+  if (password !== confirm) return "Le password inserite non corrispondono.";
+  return null;
+}
+
+function requirePasswordChange(user) {
+  return new Promise((resolve, reject) => {
+    newPasswordInput.value = "";
+    confirmNewPasswordInput.value = "";
+    changePasswordStatus.textContent = "";
+    changePasswordStatus.className = "";
+
+    changePasswordModal.style.display = "";
+    changePasswordModal.classList.add("active");
+    newPasswordInput.focus();
+
+    changePasswordBtn.onclick = async () => {
+      const error = validateNewPassword(newPasswordInput.value, confirmNewPasswordInput.value);
+      if (error) {
+        changePasswordStatus.textContent = error;
+        changePasswordStatus.className = "error";
+        return;
+      }
+
+      changePasswordBtn.disabled = true;
+      changePasswordStatus.textContent = "Salvataggio in corso...";
+      changePasswordStatus.className = "";
+
+      try {
+        await updatePassword(user, newPasswordInput.value);
+        await updateDoc(doc(db, "users", user.uid), { mustChangePassword: false });
+
+        changePasswordModal.classList.remove("active");
+        resolve();
+      } catch (err) {
+        console.error("Errore cambio password:", err);
+        changePasswordStatus.textContent = "Errore nel salvataggio della password. Riprova.";
+        changePasswordStatus.className = "error";
+      } finally {
+        changePasswordBtn.disabled = false;
+      }
+    };
+
+    closeChangePasswordModal.onclick = async () => {
+      changePasswordModal.classList.remove("active");
+      await signOut(auth);
+      reject(new Error("Devi cambiare la password temporanea per accedere."));
+    };
+  });
+}
+
 async function completeLogin(user, userData) {
   try {
     const token = await auth.currentUser.getIdToken();
@@ -427,6 +492,10 @@ if (loginForm) {
       }
 
       await validateAccount(userData);
+
+      if (TEMP_PASS_RE.test(password) || userData.mustChangePassword) {
+        await requirePasswordChange(user);
+      }
 
       if (userData.twoFactorEnabled) {
         submitBtn.disabled = false;

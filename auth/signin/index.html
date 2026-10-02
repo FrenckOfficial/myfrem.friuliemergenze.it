@@ -154,6 +154,38 @@
         </div>
       </div>
     </div>
+
+    <div id="changePasswordModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close" id="closeChangePasswordModal">&times;</span>
+        <h2>Imposta una nuova password</h2>
+        <p>Hai effettuato l'accesso con una password temporanea. Per continuare scegli una nuova password.</p>
+
+        <div class="form-group">
+          <label for="newPassword">Nuova password</label>
+          <div class="password-wrapper">
+            <input type="password" id="newPassword" autocomplete="new-password" placeholder="••••••••" />
+            <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)" aria-label="Mostra o nascondi password">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmNewPassword">Conferma nuova password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirmNewPassword" autocomplete="new-password" placeholder="••••••••" />
+            <button type="button" class="toggle-password" onclick="togglePassword('confirmNewPassword', this)" aria-label="Mostra o nascondi password">
+              <i class="far fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <p id="changePasswordStatus" style="font-size:0.85rem;min-height:1.1em;"></p>
+
+        <button type="button" class="submit-btn" id="changePasswordBtn">Salva e continua</button>
+      </div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/otplib@13.4.1/dist/index.global.min.js"></script>
