@@ -293,7 +293,6 @@ auth.onAuthStateChanged(async (user) => {
     photosSnap.forEach((doc) => {
       const photo = doc.data();
       let status;
-      console.log("📸 Foto:", photo.vehicleModel, "Status:", photo.status);
       total++;
 
       if (photo.status === "Approvata ✅" || photo.status === "Approvata") approved++;
