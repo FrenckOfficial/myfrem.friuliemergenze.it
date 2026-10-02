@@ -112,7 +112,6 @@ auth.onAuthStateChanged(async (user) => {
   currentUser = user;
   currentUserId = user ? user.uid : null;
   emailjs.init("49-8564mCPRVWNmBW");
-  console.log("onAuthStateChanged triggered, user:", user);
 
   if (!user) {
     console.warn("Nessun utente loggato, redirect al login...");

@@ -5,7 +5,6 @@ import { firebaseConfig } from '/configFirebase.js';
 const STAFF_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
 
 export function initBottomNav(userData, user, role = "user") {
-  console.log("BottomNav canSwitch:", STAFF_ROLES.includes(userData?.role), "role:", userData?.role);
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   const auth = getAuth(app);
   try {

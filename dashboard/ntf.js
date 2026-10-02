@@ -46,7 +46,6 @@ class NotificationBell {
       return;
     }
 
-    console.log('User ready! Setting up listener for:', user.uid);
     this.setupListener();
   }
 
@@ -67,11 +66,9 @@ class NotificationBell {
     );
 
     this.unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log('Listener triggered! Docs:', snapshot.docs.length);
-      snapshot.docs.forEach(doc => {
-        console.log('Doc:', doc.id, doc.data());
-      });
-      
+      if (snapshot.empty) {
+        this.notificationList.innerHTML = '<div class="empty">Nessuna notifica</div>';
+      }
       const notifications = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
