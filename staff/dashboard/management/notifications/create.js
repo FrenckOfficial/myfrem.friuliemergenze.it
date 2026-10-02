@@ -16,6 +16,7 @@ const READ_ONLY_ROLES = ['testacc'];
 const USERS_CACHE_KEY = 'staffNotif:users';
 const USERS_CACHE_TTL = 10 * 60 * 1000;
 const HISTORY_LIMIT = 20;
+const BATCH_SIZE = 400;
 
 let currentUser = null;
 
@@ -23,6 +24,7 @@ function showContent() {
   loadingEl.style.display = 'none';
   contentEl.style.display = 'block';
 }
+
 
 function showLoadError(message) {
   loadingEl.textContent = message;
