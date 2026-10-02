@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
@@ -10,6 +11,8 @@ import { firebaseConfig } from "/configFirebase.js"
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app, "europe-west1");
+const adminResetPassword = httpsCallable(functions, "adminResetPassword");
 
 const usersTableBody = document.querySelector("#usersTable tbody");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -29,9 +32,9 @@ const modalClose = document.getElementById("modalClose");
 const modalOverlay = document.getElementById("modalOverlay");
 
 logoutBtn.addEventListener("click", async () => {
-  console.log("🚪 Logout in corso...");
+  console.log("Logout in corso...");
   await signOut(auth);
-  console.log("✅ Logout completato, redirect...");
+  console.log("Logout completato, redirect...");
   window.location.href = "/login/";
 });
 
@@ -127,7 +130,7 @@ async function openModal(user) {
   }
 
   document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
-  document.getElementById("modalSuspend").onclick = () => updateStatus(user.id, user.status);
+  document.getElementById("modalResetPassword").onclick = () => resetPassword(user);
   document.getElementById("modalDelete").onclick = () => deleteUser(user.id);
   document.getElementById("modalViewProfile").onclick = () => window.open(`/profile/?userid=${user.id}`, "_blank");
 
@@ -338,17 +341,24 @@ async function updateRole(userId, currentRole) {
   }
 }
 
-async function updateStatus(userId, currentStatus) {
+async function resetPassword(user) {
+  if (!confirm(`Generare una password temporanea per ${user.email}? La password attuale smetterà di funzionare.`)) return;
+
   try {
-    const newStatus = currentStatus === "attivo" ? "sospeso" : "attivo";
-    await updateDoc(doc(db, "users", userId), { status: newStatus });
-    setStatus(`Status aggiornato a ${newStatus}`, "success");
-    closeModal();
-    await loadUsers();
-    applyFilters();
+    const { data } = await adminResetPassword({ uid: user.id });
+
+    await addDoc(collection(db, "activities"), {
+      type: "user_password_reset",
+      userId: user.id,
+      resetBy: auth.currentUser.email,
+      timestamp: serverTimestamp()
+    });
+
+    try { await navigator.clipboard.writeText(data.tempPassword); } catch {}
+    setStatus(`Password temporanea per ${user.email}:\n\n${data.tempPassword}\n\n(copiata negli appunti)`);
   } catch (error) {
-    console.error("Errore nell'aggiornamento status:", error);
-    setStatus("Errore nell'aggiornamento dello status.", "error");
+    console.error("Errore nel reset password:", error);
+    setStatus("Errore nel reset della password.", "error");
   }
 }
 
