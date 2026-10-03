@@ -34,10 +34,10 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 const titleMap = {
-  photo: "📸 Nuova foto disponibile in galleria:",
-  photobook: "📚 Nuovo photobook disponibile:",
-  news: "📰 Nuova notizia da Friuli Emergenze:",
-  update: "⚙️ Aggiornamento:"
+  photo: "Nuova foto disponibile in galleria:",
+  photobook: "Nuovo photobook disponibile:",
+  news: "Nuova notizia da Friuli Emergenze:",
+  update: "Aggiornamento:"
 };
 
 let titleTouched = false;

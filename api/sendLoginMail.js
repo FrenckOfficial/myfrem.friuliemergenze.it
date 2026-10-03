@@ -71,7 +71,6 @@ export default async function handler(req, res) {
 
     const htmlContent = generateLoginNotificationHtml({
       name: sanitizedName,
-      email: sanitizedEmail,
       timestamp: formattedDate,
       userAgent: sanitizedUserAgent
     });
@@ -128,7 +127,7 @@ function sanitizeHtml(str) {
     .substring(0, 5000);
 }
 
-function generateLoginNotificationHtml({ name, email, timestamp, userAgent }) {
+function generateLoginNotificationHtml({ name, timestamp, userAgent }) {
   return `
 <!DOCTYPE html>
 <html lang="it">
@@ -257,8 +256,8 @@ body {
 <body>
 <div class="container">
   <div class="header">
-    <h1>🔐 Accesso Confermato</h1>
-    <p>Notifica di accesso a MyFrEM</p>
+    <h1>Accesso Confermato</h1>
+    <p>Notifica di accesso alla piattaforma MyFrEM</p>
   </div>
 
   <div class="content">
@@ -269,17 +268,17 @@ body {
     </div>
 
     <div class="info-box">
-      <div class="label">📅 Data e Ora</div>
+      <div class="label">Data e Ora</div>
       <div class="value">${timestamp}</div>
     </div>
 
     <div class="info-box">
-      <div class="label">🌐 Dispositivo</div>
+      <div class="label">Dispositivo</div>
       <div class="value">${userAgent}</div>
     </div>
 
     <div class="security-note">
-      <b>⚠️ Nota di Sicurezza:</b> Se non hai effettuato tu questo accesso, accedi subito al tuo account e cambia la password. Se hai dubbi sulla sicurezza del tuo account, rispondi a questa email.
+      <b>Nota di Sicurezza:</b> Se non hai effettuato tu questo accesso, accedi subito al tuo account e cambia la password. Se hai dubbi sulla sicurezza del tuo account, rispondi a questa email.
     </div>
 
     <div class="cta-link">

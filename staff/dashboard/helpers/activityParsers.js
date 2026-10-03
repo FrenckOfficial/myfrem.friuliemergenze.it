@@ -95,12 +95,14 @@ export async function parseActivity(activity, date) {
 
         case "badge_added": {
             const staff = await getNameById("users", activity.staffUserId);
-            return `[${date}] Badge aggiunto: Membro: ${activity.userId} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
+            const user = await getNameById("users", activity.userId);
+            return `[${date}] Badge aggiunto: Membro: ${user} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
         }
 
         case "badge_removed": {
             const staff = await getNameById("users", activity.staffUserId);
-            return `[${date}] Badge rimosso: Membro: ${activity.userId} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
+            const user = await getNameById("users", activity.userId);
+            return `[${date}] Badge rimosso: Membro: ${user} - Badge: ${activity.badgeId} - Staff eseguente: ${staff}.`;
         }
 
         case "user_password_reset": {

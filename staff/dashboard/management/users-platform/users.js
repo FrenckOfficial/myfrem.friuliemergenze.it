@@ -44,14 +44,6 @@ function closeModal() {
   modalOverlay.style.display = "none";
 }
 
-function isUserNew(createdAtTimestamp) {
-  if (!createdAtTimestamp) return false;
-  const createdTime = createdAtTimestamp.toMillis?.() || 0;
-  const now = Date.now();
-  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-  return (now - createdTime) < sevenDaysMs;
-}
-
 async function openModal(user) {
   const loginRef = collection(db, "logins");
   const userLoginDocs = query(loginRef, where("userId", "==", user.id), orderBy("timestamp", "desc"), limit(1));
@@ -116,16 +108,6 @@ async function openModal(user) {
   if (user.emailNotifications) prefs.push("Notifiche email");
   if (user.privateProfile) prefs.push("Profilo privato");
   document.getElementById("modalPreferences").textContent = prefs.length ? prefs.join(", ") : "Nessuna";
-
-  const isNew = isUserNew(user.createdAt);
-  const newBadgeEl = document.getElementById("modalNewBadge");
-  if (newBadgeEl) {
-    if (isNew) {
-      newBadgeEl.innerHTML = '<span class="badge-nuovo">✨ Nuovo Utente</span>';
-    } else {
-      newBadgeEl.innerHTML = '<span class="no-badge">—</span>';
-    }
-  }
 
   document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
   document.getElementById("modalResetPassword").onclick = () => resetPassword(user);
@@ -289,9 +271,6 @@ async function loadUsers() {
     tr.dataset.status = u.status || "";
     tr.dataset.verified = u.emailVerified ? "true" : "false";
     tr.dataset.whatsNewViewed = u.whatsNewViewed ? "true" : "false";
-
-    const isNew = isUserNew(u.createdAt);
-    const newBadgeHtml = isNew ? '<span class="badge-nuovo">✨ NUOVO</span>' : '<span class="no-badge">—</span>';
 
     tr.innerHTML = `
       <td>${newBadgeHtml}</td>
