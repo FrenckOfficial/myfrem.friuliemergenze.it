@@ -273,7 +273,6 @@ async function loadUsers() {
     tr.dataset.whatsNewViewed = u.whatsNewViewed ? "true" : "false";
 
     tr.innerHTML = `
-      <td>${newBadgeHtml}</td>
       <td>${u.name + " " + u.surname || ""}</td>
       <td>${u.email || ""}</td>
       <td>${u.username || ""}</td>
