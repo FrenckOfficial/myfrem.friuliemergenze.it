@@ -11,6 +11,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const createBrandNewBadge = document.getElementById("createBrandNewBadge");
 const badgeForm = document.getElementById("badgeForm");
 const badgesListEl = document.getElementById("badgesList");
 const badgeNameInput = document.getElementById("badgeName");
@@ -81,7 +82,6 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 function setupFormHandlers() {
-
   badgeColorInput.addEventListener("change", (e) => {
     badgeColorHexInput.value = e.target.value;
   });
@@ -105,6 +105,10 @@ function setupFormHandlers() {
 }
 
 async function createBadge() {
+  createBrandNewBadge.addEventListener("click", () => {
+    window.location.href = "/staff/dashboard/management/badges/";
+  });
+
   const badgeId = badgeNameInput.value
     .toLowerCase()
     .replace(/\s+/g, "-")

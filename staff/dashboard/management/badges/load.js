@@ -97,7 +97,7 @@ function setupSearch() {
     try {
       usersListEl.innerHTML = '<div style="color: var(--muted); text-align: center; padding: 2rem;">Ricerca in corso...</div>';
 
-      const q = query(collection(db, "users"), where("role", "==", "user"));
+      const q = query(collection(db, "users"), where("role", "in", ["user", "simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"]));
       const usersSnap = await getDocs(q);
 
       const results = [];

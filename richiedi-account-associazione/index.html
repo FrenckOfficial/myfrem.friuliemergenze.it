@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <title>Richiedi l'account associazione | MyFrEM  - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/richiedi-account-associazione/style.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <script type="module" src="/richiedi-account-associazione/app.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="intro">
+      <h1>Richiedi l'account associazione</h1>
+      <p>Serve a gestire la pagina della tua associazione o del tuo ente su MyFrEM. Ogni richiesta viene verificata dallo staff contattando direttamente l'ente.</p>
+    </header>
+
+    <section id="state-loading" class="box" aria-live="polite">Caricamento…</section>
+
+    <section id="state-existing" class="box" hidden aria-live="polite">
+      <h2 id="existing-title">Hai già una richiesta in corso</h2>
+      <p id="existing-text"></p>
+    </section>
+
+    <section id="state-done" class="box box-ok" hidden aria-live="polite">
+      <h2>Richiesta inviata</h2>
+      <p id="done-text"></p>
+    </section>
+
+    <form id="request-form" novalidate hidden>
+      <p class="who" id="who">Stai inviando la richiesta come <strong id="who-email"></strong>.</p>
+      <p class="who" id="login-hint" hidden>Hai un account MyFrEM? <a href="/auth/">Accedi</a> per collegare la richiesta al tuo profilo. Se preferisci, puoi inviarla anche senza account.</p>
+
+      <fieldset>
+        <legend>L'ente</legend>
+
+        <label for="nome">Nome dell'associazione o dell'ente</label>
+        <input id="nome" name="nome" type="text" maxlength="120" required autocomplete="organization">
+
+        <label for="tipo">Servizio svolto</label>
+        <select id="tipo" name="tipo" required>
+          <option value="" disabled selected>Scegli un servizio</option>
+          <option value="protezione_civile">Protezione civile</option>
+          <option value="soccorso_sanitario">Soccorso sanitario (ambulanze)</option>
+          <option value="vvf_volontari">Vigili del fuoco volontari</option>
+          <option value="soccorso_alpino">Soccorso alpino e speleologico</option>
+          <option value="croce_rossa">Croce Rossa</option>
+          <option value="altro">Altro</option>
+        </select>
+
+        <div id="tipo-altro-wrap" hidden>
+          <label for="tipoAltro">Quale servizio?</label>
+          <input id="tipoAltro" name="tipoAltro" type="text" maxlength="80">
+        </div>
+
+        <label for="comune">Comune della sede</label>
+        <input id="comune" name="comune" type="text" maxlength="80" required autocomplete="address-level2">
+
+        <label for="emailEnte">Email dell'ente</label>
+        <input id="emailEnte" name="emailEnte" type="email" maxlength="120" required autocomplete="off" aria-describedby="emailEnte-hint">
+        <p class="hint" id="emailEnte-hint">Meglio l'indirizzo istituzionale: riceverà il link per confermare la richiesta.</p>
+
+        <label for="telefonoEnte">Telefono dell'ente <span class="opt">(facoltativo)</span></label>
+        <input id="telefonoEnte" name="telefonoEnte" type="tel" maxlength="30" autocomplete="off">
+
+        <label for="sito">Sito o pagina social ufficiale <span class="opt">(facoltativo)</span></label>
+        <input id="sito" name="sito" type="url" maxlength="200" placeholder="https://" aria-describedby="sito-hint">
+        <p class="hint" id="sito-hint">Ci aiuta a verificare l'ente più in fretta.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Il referente</legend>
+
+        <div id="guest-fields" hidden>
+          <label for="guestName">Il tuo nome e cognome</label>
+          <input id="guestName" name="guestName" type="text" maxlength="120" autocomplete="name">
+
+          <label for="guestEmail">La tua email</label>
+          <input id="guestEmail" name="guestEmail" type="email" maxlength="120" autocomplete="email" aria-describedby="guestEmail-hint">
+          <p class="hint" id="guestEmail-hint">Ti scriveremo a questo indirizzo per l'esito della richiesta.</p>
+        </div>
+
+        <label for="ruolo">Il tuo ruolo nell'ente</label>
+        <input id="ruolo" name="ruolo" type="text" maxlength="80" required placeholder="Es. presidente, segretario, referente comunicazione">
+
+        <label for="note">Altro da dirci <span class="opt">(facoltativo)</span></label>
+        <textarea id="note" name="note" rows="3" maxlength="500"></textarea>
+
+        <label class="check">
+          <input id="consenso" name="consenso" type="checkbox" required>
+          <span>Dichiaro di essere autorizzato a rappresentare l'ente e accetto che questi dati siano usati dallo staff per verificare la richiesta.</span>
+        </label>
+      </fieldset>
+
+      <p id="form-error" class="error" role="alert" hidden></p>
+      <button type="submit" class="btn" id="submit-btn">Invia richiesta</button>
+    </form>
+  </main>
+</body>
+</html>

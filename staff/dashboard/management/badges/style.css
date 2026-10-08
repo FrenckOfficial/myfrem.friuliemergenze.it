@@ -97,7 +97,10 @@ textarea {
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   margin-bottom: 4px;
-  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  transition:
+    color 0.2s,
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .sidebar nav a:hover,
@@ -119,7 +122,9 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .sidebar .logout:hover {
@@ -161,8 +166,12 @@ textarea {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .main-content {
@@ -219,6 +228,20 @@ textarea {
   border: 1px solid var(--border);
 }
 
+#availableBadgesList {
+  height: 245px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-panel);
+}
+
+#earnedBadgesList {
+  height: 245px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-panel);
+}
+
 .user-search {
   width: 100%;
   padding: 12px 15px;
@@ -229,7 +252,9 @@ textarea {
   font-family: var(--font-display);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   margin-bottom: 1rem;
 }
 
@@ -254,7 +279,9 @@ textarea {
   padding: 15px;
   border-bottom: 1px solid var(--border-panel);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -304,7 +331,9 @@ textarea {
   background: var(--bg-surface);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-panel);
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .badge-item:hover {
@@ -357,7 +386,9 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   white-space: nowrap;
   margin-left: 1rem;
 }
