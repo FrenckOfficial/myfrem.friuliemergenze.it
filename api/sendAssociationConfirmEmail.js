@@ -19,7 +19,7 @@ class HttpError extends Error {
 function getAdminApp() {
   if (getApps().length) return getApps()[0];
 
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
   serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
 
   return initializeApp({ credential: cert(serviceAccount) });
@@ -44,8 +44,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!process.env.BREVO_API_KEY || !process.env.FIREBASE_SERVICE_ACCOUNT) {
-      console.error("BREVO_API_KEY o FIREBASE_SERVICE_ACCOUNT non configurate");
+    if (!process.env.BREVO_API_KEY || !process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+      console.error("BREVO_API_KEY o FIREBASE_SERVICE_ACCOUNT_JSON non configurate");
       return res.status(500).json({ error: "Configurazione server errata" });
     }
 
