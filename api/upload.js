@@ -14,6 +14,8 @@ const domainMap = {
   "myfrem-photos": "https://cdn.friuliemergenze.it",
   "myfrem-reports": "https://rpt.cdn.friuliemergenze.it",
   "profile-pics": "https://profilepics.cdn.friuliemergenze.it",
+  "associations-images": "https://cdn.enti-associazioni.friuliemergenze.it",
+  "interventi": "https://interventi.friuliemergenze.it",
 };
 
 const ALLOWED_BUCKETS = Object.keys(domainMap).concat("myfrem-staff-docs");

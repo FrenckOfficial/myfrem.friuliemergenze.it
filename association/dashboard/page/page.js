@@ -6,7 +6,7 @@ import { db, clean, EMAIL_RE, initAssociationPage } from "/association/dashboard
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
-const UPLOAD_FOLDER = "myfrem-photos/associations-images";
+const UPLOAD_FOLDER = "associations-images";
 
 const IMAGES = {
   logo: { field: "logoUrl", maxSide: 512, mime: "image/png", ext: "png", label: "logo" },
