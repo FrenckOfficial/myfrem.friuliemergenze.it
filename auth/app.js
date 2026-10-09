@@ -1,6 +1,6 @@
 import { firebaseConfig } from "../configFirebase.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -50,6 +50,8 @@ async function redirectByRole(role, userData) {
       }
     }
     openChooseDashboardModal();
+  } else if (role === "association") {
+    window.location.href = "/association/dashboard";
   } else {
     window.location.href = "/dashboard";
   }

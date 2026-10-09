@@ -4,7 +4,7 @@ import { getFirestore, collection, getDocs, getDoc, query, where, updateDoc, doc
 import { firebaseConfig } from "../../configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { getUserName } from "../../helpers/getUserName.js";

@@ -1,6 +1,6 @@
 import { firebaseConfig } from "../configFirebase.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { setStatus } from "../helpers/modals.js";
+import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, query, where, limit, getDocs, getDoc, addDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";

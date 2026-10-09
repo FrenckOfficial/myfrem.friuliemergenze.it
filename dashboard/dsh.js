@@ -1,5 +1,5 @@
 import { firebaseConfig } from "../configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../helpers/modals.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 

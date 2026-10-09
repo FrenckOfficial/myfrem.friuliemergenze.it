@@ -1,0 +1,112 @@
+.modal-field {
+  margin: 0.9rem 0 0;
+}
+ 
+.modal-field label {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0.35rem;
+}
+ 
+.modal-field input,
+.modal-field select,
+.modal-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
+ 
+.modal-field textarea {
+  resize: vertical;
+}
+ 
+.modal-field select option {
+  color: #111;
+}
+ 
+.modal-field input:focus-visible,
+.modal-field select:focus-visible,
+.modal-field textarea:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+ 
+.field-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0.4rem 0 0;
+}
+ 
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+ 
+#userModal {
+  width: min(980px, 94vw);
+  max-width: none;
+}
+ 
+.modal-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.75rem;
+  align-items: start;
+}
+ 
+.modal-col {
+  min-width: 0;
+}
+ 
+.modal-col .value {
+  overflow-wrap: anywhere;
+}
+ 
+@media (max-width: 800px) {
+  .modal-columns {
+    grid-template-columns: 1fr;
+  }
+}
+ 
+:root {
+  --modal-divider: rgba(255, 122, 0, 0.28);
+}
+ 
+.modal-col + .modal-col {
+  padding-left: 1.75rem;
+  border-left: 1px solid var(--modal-divider);
+}
+ 
+#userModal .modal-actions .modal-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+ 
+#userModal .modal-actions .btn-action {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 170px;
+}
+ 
+@media (max-width: 800px) {
+  .modal-col + .modal-col {
+    padding-left: 0;
+    border-left: 0;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--modal-divider);
+  }
+}
+ 
+@media (max-width: 600px) {
+  #userModal .modal-actions .btn-action {
+    flex: 1 1 100%;
+  }
+}

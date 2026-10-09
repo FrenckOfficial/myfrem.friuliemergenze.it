@@ -17,7 +17,7 @@ import {
 
 import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../../helpers/modals.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 

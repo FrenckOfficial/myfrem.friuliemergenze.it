@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard associazione | MyFrEM</title>
+  <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/association/dashboard/style.css">
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script defer type="module" src="/association/dashboard/dsh.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <h2>MyFrEM</h2>
+      </div>
+      <nav class="navbar">
+        <a href="/association/dashboard/" class="active">Home</a>
+        <a href="/association/dashboard/page/">La pagina</a>
+        <a href="/association/dashboard/members/">Membri</a>
+      </nav>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <h1>Ciao, <span id="assocName"></span>!</h1>
+        <p>Da qui gestisci la pagina della tua associazione e i volontari che ne fanno parte.</p>
+      </header>
+
+      <section class="cards">
+        <div class="card">
+          <h3>Stato della pagina</h3>
+          <p id="assocStatus">-</p>
+        </div>
+        <div class="card">
+          <h3>Volontari</h3>
+          <p id="membersCount">0</p>
+        </div>
+        <div class="card">
+          <h3>Richieste in attesa</h3>
+          <p id="pendingCount">0</p>
+        </div>
+      </section>
+
+      <section class="cards panel">
+        <a class="card card-link" href="/association/dashboard/page/">
+          <h3>La pagina</h3>
+          <p>Descrizione, contatti, logo e copertina</p>
+        </a>
+        <a class="card card-link" href="/association/dashboard/members/">
+          <h3>Membri</h3>
+          <p>Richieste di appartenenza e volontari</p>
+        </a>
+      </section>
+
+      <section class="panel">
+        <h2>Richieste in attesa</h2>
+        <ul id="pendingList" class="pending-list">
+          <!-- JS Loading -->
+        </ul>
+        <a class="link-more" href="/association/dashboard/members/" id="pendingLink" hidden>Gestisci le richieste</a>
+      </section>
+    </main>
+  </div>
+
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
+</body>
+</html>

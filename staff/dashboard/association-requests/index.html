@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Richieste associazioni MyFrEM | Dashboard Staff</title>
+  <link rel="stylesheet" href="/staff/dashboard/management/users-platform/style.css">
+  <link rel="stylesheet" href="/staff/dashboard/association-requests/style.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="/staff/dashboard/association-requests/requests.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <button class="menu-toggle" aria-label="Toggle navigation menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <aside class="sidebar">
+      <div class="logo">
+        <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
+        <h2>MyFrEM Staff</h2>
+      </div>
+      <nav>
+        <a href="/staff/dashboard/">Dashboard</a>
+        <a href="/staff/dashboard/photos/">Moderazione foto</a>
+        <a href="/staff/dashboard/management/">Funzionalità</a>
+        <a href="/staff/dashboard/association-requests/" class="active">Richieste associazioni</a>
+        <a href="/staff/dashboard/settings/">Impostazioni</a>
+        <br>
+        <a href="/dashboard/">Passa a dashboard utente</a>
+      </nav>
+      <button id="logoutBtn" class="logout">Logout</button>
+    </aside>
+
+    <main class="main-content">
+      <h1>Richieste associazioni MyFrEM</h1>
+
+      <p id="totalUsers"><b>Richieste totali: <span id="totalUsersCount">0</span></b></p>
+      <p id="searchResults"><b>Risultati ricerca: <span id="searchResultsCount">0</span></b></p>
+
+      <div class="gallery-search">
+        <input type="text" id="searchInput" placeholder="Cerca per ente, comune, referente...">
+
+        <select id="filterStatus">
+          <option value="">Tutti gli stati</option>
+          <option value="in_attesa">In attesa</option>
+          <option value="approvata">Approvata</option>
+          <option value="rifiutata">Rifiutata</option>
+        </select>
+
+        <select id="filterVerify">
+          <option value="">Verifica: tutte</option>
+          <option value="da_verificare">Da verificare</option>
+          <option value="verificata">Verificata</option>
+          <option value="non_confermata">Non confermata</option>
+        </select>
+
+        <select id="filterConfirmed">
+          <option value="">Email ente: tutte</option>
+          <option value="true">Confermata</option>
+          <option value="false">Non confermata</option>
+        </select>
+
+        <button type="button" id="resetFilters" class="btn-reset-filters">Reset</button>
+      </div>
+
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Ente</th>
+            <th>Servizio</th>
+            <th>Comune</th>
+            <th>Referente</th>
+            <th>Stato</th>
+            <th>Verifica</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- JS Loading -->
+        </tbody>
+      </table>
+
+      <p id="messageBox"></p>
+    </main>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay" style="display:none;"></div>
+
+  <div id="userModal" class="user-modal" style="display:none;">
+    <button id="modalClose" class="modal-close">&times;</button>
+
+    <div class="modal-content">
+      <h2 id="modalAssocName"></h2>
+
+      <div class="modal-columns">
+      <div class="modal-col">
+
+      <div class="modal-section">
+        <h3>L'ente</h3>
+        <div class="info-row"><span class="label">ID richiesta:</span><span id="modalRequestId" class="value"></span></div>
+        <div class="info-row"><span class="label">Servizio:</span><span id="modalType" class="value"></span></div>
+        <div class="info-row"><span class="label">Comune:</span><span id="modalMunicipality" class="value"></span></div>
+        <div class="info-row"><span class="label">Email ente:</span><span id="modalLAMail" class="value"></span></div>
+        <div class="info-row"><span class="label">Email confermata:</span><span id="modalConfirmedMail" class="value"></span></div>
+        <div class="info-row"><span class="label">Telefono indicato:</span><span id="modalLAPhone" class="value"></span></div>
+        <div class="info-row"><span class="label">Sito:</span><span id="modalSite" class="value"></span></div>
+        <div class="info-row"><span class="label">Data richiesta:</span><span id="modalCreatedAt" class="value"></span></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Il referente</h3>
+        <div class="info-row"><span class="label">Nome:</span><span id="modalRequester" class="value"></span></div>
+        <div class="info-row"><span class="label">Email:</span><span id="modalRequesterEmail" class="value"></span></div>
+        <div class="info-row"><span class="label">Account MyFrEM:</span><span id="modalRequesterAccount" class="value"></span></div>
+        <div class="info-row"><span class="label">Ruolo nell'ente:</span><span id="modalReferenceRole" class="value"></span></div>
+        <div class="info-row"><span class="label">Note:</span><span id="modalNote" class="value"></span></div>
+      </div>
+
+      </div>
+
+      <div class="modal-col">
+
+      <div class="modal-section">
+        <h3>Verifica telefonica</h3>
+        <p class="field-hint">Il numero da chiamare prendilo da una fonte ufficiale, non da quello indicato nel modulo.</p>
+
+        <div class="modal-field">
+          <label for="verifyStatusSelect">Esito</label>
+          <select id="verifyStatusSelect">
+            <option value="da_verificare">Da verificare</option>
+            <option value="verificata">Verificata</option>
+            <option value="non_confermata">Non confermata</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label for="calledNumber">Numero chiamato</label>
+          <input type="text" id="calledNumber" maxlength="40">
+        </div>
+        <div class="modal-field">
+          <label for="contactPerson">Con chi hai parlato</label>
+          <input type="text" id="contactPerson" maxlength="120">
+        </div>
+        <div class="modal-field">
+          <label for="verifyNote">Note (visibili solo allo staff)</label>
+          <textarea id="verifyNote" rows="3" maxlength="1000"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-section" id="approveSection">
+        <h3>Account associazione</h3>
+        <div class="modal-field">
+          <label for="accountEmail">Email dell'account</label>
+          <input type="email" id="accountEmail" maxlength="120">
+          <p class="field-hint">Di solito l'email dell'ente. Cambiala se esiste già un account con quell'indirizzo.</p>
+        </div>
+      </div>
+
+      </div>
+      </div>
+
+      <div class="modal-actions" id="modalActions">
+        <div class="modal-row">
+          <button id="modalSaveVerify" class="btn-action btn-view">Salva verifica</button>
+          <button id="modalApprove" class="btn-action btn-promote">Approva</button>
+          <button id="modalReject" class="btn-action btn-delete">Rifiuta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
+
+</body>
+</html>

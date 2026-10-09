@@ -14,7 +14,12 @@ const BottomNav = (() => {
       { id: 'utenti',      icon: 'fa-users',          href: '/staff/dashboard/management',     label: 'Funzionalità' },
       { id: 'rapporti',    icon: 'fa-file',           href: '/staff/dashboard/kick-reports',   label: 'Rapporti di espulsione' },
       { id: 'profilo',     icon: 'fa-user',           href: '/staff/dashboard/settings',       label: 'Impostazioni', avatar: true }
-    ]
+    ],
+    association: [
+      { id: 'home',   icon: 'fa-house', href: '/association/dashboard/',         label: 'Dashboard', exact: true },
+      { id: 'pagina', icon: 'fa-pen',   href: '/association/dashboard/#page',    label: 'La pagina' },
+      { id: 'membri', icon: 'fa-users', href: '/association/dashboard/#members', label: 'Membri' }
+    ],
   };
 
   const SWITCH_ITEMS = {

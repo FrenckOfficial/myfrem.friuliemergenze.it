@@ -3,7 +3,7 @@ import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, query, where,
 import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { uploadFile } from "/helpers/uploadFile.js";
 import { firebaseConfig } from "../../configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "../../helpers/modals.js";
+import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 
