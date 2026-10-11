@@ -7,7 +7,7 @@ const MAX_TEXT = 1000;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
-const UPLOAD_FOLDER = "association-images";
+const UPLOAD_FOLDER = "associations-images";
 
 const roleLabels = {
   associazione: "Associazione",
