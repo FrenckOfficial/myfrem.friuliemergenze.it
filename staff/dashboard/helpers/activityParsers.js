@@ -110,6 +110,21 @@ export async function parseActivity(activity, date) {
             return `[${date}] Password resettata per l'utente: ${user} - Staff eseguente: ${activity.resetBy}.`;
         }
 
+        case "association_verification": {
+            const requestId = await getNameById("associationRequests", activity.requestId);
+            return `[${date}] Verifica dell'associazione "${requestId}" eseguita da ${activity.staffer}. Status: ${activity.status}.`;
+        }
+
+        case "association_approved": {
+            const requestId = await getNameById("associationRequests", activity.requestId);
+            return `[${date}] Associazione "${requestId}" approvata da ${activity.staffer}.`;
+        }
+
+        case "association_rejected": {
+            const requestId = await getNameById("associationRequests", activity.requestId);
+            return `[${date}] Associazione "${requestId}" rifiutata da ${activity.staffer}.`;
+        }
+
         default:
             console.warn("Tipo attività sconosciuto:", activity);
             return `[${date}] Attività sconosciuta (${activity.type || "Tipo non definito"}).`;

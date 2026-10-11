@@ -50,6 +50,27 @@
   grid-template-columns: minmax(0, 640px) minmax(0, 440px);
   gap: 32px;
   align-items: start;
+  margin-top: 22px;
+}
+
+#feedRoot {
+  margin-top: 22px;
+}
+
+.view-page-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent, currentColor);
+}
+
+#pageLink {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent, currentColor);
 }
 
 @media (max-width: 1100px) {

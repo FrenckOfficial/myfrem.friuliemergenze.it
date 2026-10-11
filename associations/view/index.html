@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Associazione | MyFrEM - Piattaforma ufficiale di Friuli Emergenze</title>
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="/associations/style.css">
+  <script type="module" src="/associations/view/view.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="profileBanner">
+      <img id="coverImg" class="coverImg" alt="" hidden>
+    </div>
+    <main class="profileWrapper">
+      <p id="messageBox"></p>
+
+      <div class="profileCard none" id="assocCard">
+        <div class="profileTop">
+          <img id="assocLogo" class="profileAvatar" src="/assets/icons/logo.png" alt="Logo dell'associazione">
+
+          <div class="profileIdentity">
+            <h1 id="assocName">Associazione</h1>
+            <p id="assocSubtitle"></p>
+            <p id="assocDescription"></p>
+            <div class="profileBadges" id="assocBadges"></div>
+          </div>
+        </div>
+
+        <div class="profileGrid" id="infoGrid"></div>
+
+        <div class="joinBox none" id="joinBox">
+          <p id="joinText"></p>
+          <button type="button" class="btn-join" id="joinBtn">Chiedi di unirti</button>
+        </div>
+
+        <p style="margin-top:2rem;"><a href="/associations/">&larr; Tutte le associazioni</a></p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

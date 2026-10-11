@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Associazioni | MyFrEM - Piattaforma ufficiale di Friuli Emergenze</title>
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="/associations/style.css">
+  <script type="module" src="/associations/list.js"></script>
+</head>
+<body>
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="profileBanner short"></div>
+    <main class="profileWrapper">
+      <p id="messageBox"></p>
+
+      <div class="profileCard">
+        <div class="listIntro">
+          <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:800;letter-spacing:-0.02em;">Associazioni</h1>
+          <p>Le associazioni e gli enti presenti su MyFrEM. Trova la tua e chiedi di unirti.</p>
+        </div>
+
+        <div class="filters">
+          <input type="text" id="searchInput" placeholder="Cerca per nome o comune..." autocomplete="off">
+          <select id="filterType">
+            <option value="" disabled selected>Scegli un servizio</option>
+            <option value="protezione_civile">Protezione Civile</option>
+            <option value="soccorso_sanitario">Servizio Sanitario (es. Croce Rossa Italiana)</option>
+            <option value="vvf">Vigili del Fuoco</option>
+            <option value="anps">Associazione Nazionale Polizia di Stato</option>
+            <option value="altro">Altro</option>
+          </select>
+        </div>
+
+        <p id="resultsCount"></p>
+        <div class="assocGrid" id="assocGrid"></div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

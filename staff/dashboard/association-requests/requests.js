@@ -2,9 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, addDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
-import { setStatus } from "/helpers/modals.js";
+import { setStatus } from "../../../../helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { createNotification } from "/helpers/notify.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -18,10 +19,11 @@ const allowedRoles = ["modstaff", "advstaff", "advstaffplus", "superadmin"];
 const REFERENT_PERMISSIONS = ["pagina", "membri"];
 
 const typeLabels = {
-  protezione_civile: "Protezione Civile",
-  soccorso_sanitario: "Servizio Sanitario",
-  vvf: "Vigili del Fuoco",
-  anps: "Associazione Nazionale Polizia di Stato",
+  protezione_civile: "Protezione civile",
+  soccorso_sanitario: "Soccorso sanitario (ambulanze)",
+  vvf_volontari: "Vigili del fuoco volontari",
+  soccorso_alpino: "Soccorso alpino e speleologico",
+  croce_rossa: "Croce Rossa",
   altro: "Altro"
 };
 
@@ -236,6 +238,7 @@ async function loadRequests() {
     return timeB - timeA;
   });
 
+  // I dati arrivano anche da ospiti: le celle usano textContent, mai innerHTML
   requests.forEach(r => {
     const tr = document.createElement("tr");
 
@@ -362,6 +365,7 @@ approveBtn.addEventListener("click", async () => {
         sito: r.site || ""
       },
       stato: "approvata",
+      ownerUid: account.uid,
       requestId: r.id,
       createdAt: serverTimestamp(),
       aggiornatoAt: serverTimestamp()
@@ -394,6 +398,23 @@ approveBtn.addEventListener("click", async () => {
     await batch.commit();
 
     await logActivity("association_approved", { associationId: assocRef.id });
+
+    if (r.requesterUid) {
+      try {
+        await createNotification(db, {
+          userId: r.requesterUid,
+          type: "association_approved",
+          associationId: assocRef.id,
+          title: "Associazione approvata",
+          message: `La richiesta per ${r.name} è stata approvata: sei indicato come referente.`,
+          icon: "✅",
+          actionUrl: `/associations/view/?id=${assocRef.id}`,
+          actionLabel: "Vedi la pagina"
+        });
+      } catch (error) {
+        console.error("Errore invio notifica al referente:", error);
+      }
+    }
 
     try { await navigator.clipboard.writeText(account.tempPassword); } catch {}
     setStatus(`Account associazione creato per ${accountEmail}.\n\nPassword temporanea:\n${account.tempPassword}\n\n(copiata negli appunti). Comunicala all'ente: dovrà cambiarla al primo accesso.${r.requesterUid ? "" : "\n\nLa richiesta è stata inviata da un ospite: nessun referente è stato collegato."}`);

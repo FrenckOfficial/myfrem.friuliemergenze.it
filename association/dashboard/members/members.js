@@ -1,5 +1,6 @@
 import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { setStatus } from "/helpers/modals.js";
+import { createNotification } from "/helpers/notify.js";
 import { db, initAssociationPage } from "/association/dashboard/common.js";
 
 const roleLabels = {
@@ -17,6 +18,7 @@ const memberStatusLabels = {
 const membersTableBody = document.getElementById("membersTableBody");
 
 let associationId = null;
+let associationName = "";
 let isWorking = false;
 
 function addCell(tr, text) {
@@ -98,8 +100,28 @@ async function loadMembers() {
 
 initAssociationPage(async (ctx) => {
   associationId = ctx.associationId;
+  associationName = ctx.association.nome || "L'associazione";
   await loadMembers();
 });
+
+async function notifyVolunteer(uid, accepted) {
+  try {
+    await createNotification(db, {
+      userId: uid,
+      type: "association_join_decision",
+      associationId,
+      title: accepted ? "Richiesta accettata" : "Richiesta non accettata",
+      message: accepted
+        ? `${associationName} ha accettato la tua richiesta: ora fai parte dell'associazione.`
+        : `${associationName} non ha accettato la tua richiesta di appartenenza.`,
+      icon: accepted ? "✅" : "❌",
+      actionUrl: accepted ? "/dashboard/volunteers/" : "/associations/",
+      actionLabel: accepted ? "Area volontari" : "Altre associazioni"
+    });
+  } catch (error) {
+    console.error("Errore invio notifica al volontario:", error);
+  }
+}
 
 membersTableBody.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-action]");
@@ -117,9 +139,11 @@ membersTableBody.addEventListener("click", async (e) => {
 
     if (action === "accept") {
       await updateDoc(memberRef, { stato: "confermata", aggiornatoAt: serverTimestamp() });
+      await notifyVolunteer(uid, true);
       setStatus("Richiesta accettata", "success");
     } else if (action === "reject") {
       await updateDoc(memberRef, { stato: "rifiutata", aggiornatoAt: serverTimestamp() });
+      await notifyVolunteer(uid, false);
       setStatus("Richiesta rifiutata", "success");
     } else if (action === "remove") {
       await deleteDoc(memberRef);

@@ -17,6 +17,7 @@ const pageForm = document.getElementById("pageForm");
 const saveBtn = document.getElementById("saveBtn");
 const btnText = document.getElementById("btnText");
 const btnLoader = document.getElementById("btnLoader");
+const pageLink = document.getElementById("pageLink");
 
 let associationId = null;
 let association = null;
@@ -128,6 +129,8 @@ initAssociationPage(async (ctx) => {
   association = ctx.association;
   currentUser = ctx.user;
 
+  pageLink.href = `/associations/view/?id=${associationId}`;
+
   document.getElementById("assocNameInput").value = association.nome || "";
   document.getElementById("assocCity").value = association.zona || "";
   document.getElementById("assocDescription").value = association.descrizione || "";
@@ -138,7 +141,6 @@ initAssociationPage(async (ctx) => {
   showPreview("logo", association.logoUrl);
   showPreview("cover", association.copertinaUrl);
 
-  // Le regole permettono di modificare la pagina solo se è approvata
   const editable = association.stato === "approvata";
 
   document.querySelectorAll("#pageForm input, #pageForm textarea, .image-box input[type=file]").forEach((el) => {

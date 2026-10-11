@@ -87,7 +87,7 @@ exports.adminCreateAssociationAccount = onCall({ region: "europe-west1" }, async
       surname: "",
       username,
       phone: request.LAPhone || "",
-      role: "user",
+      role: "association",
       status: "attivo",
       newsSubbed: false,
       emailVerified: true,

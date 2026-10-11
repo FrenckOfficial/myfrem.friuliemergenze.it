@@ -5,6 +5,7 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { getUserName } from "/helpers/getUserName.js";
 
 import { firebaseConfig } from "/configFirebase.js"
 
@@ -66,6 +67,8 @@ async function openModal(user) {
     role = "Amministratore Avanzato"
   } else if (user.role === "superadmin") {
     role = "Super Amministratore"
+  } else if (user.role === "association") {
+    role = "Account Associazione"
   } else if (user.role === "testacc") {
     role = "Account di Test"
   } else {
@@ -109,9 +112,11 @@ async function openModal(user) {
   if (user.privateProfile) prefs.push("Profilo privato");
   document.getElementById("modalPreferences").textContent = prefs.length ? prefs.join(", ") : "Nessuna";
 
+  const userName = getUserName(user.id);
+
   document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
   document.getElementById("modalResetPassword").onclick = () => resetPassword(user);
-  document.getElementById("modalDelete").onclick = () => deleteUser(user.id);
+  document.getElementById("modalDelete").onclick = () => deleteUser(user.id, userName);
   document.getElementById("modalViewProfile").onclick = () => window.open(`/profile/?userid=${user.id}`, "_blank");
 
   modal.style.display = "block";
@@ -247,6 +252,8 @@ async function loadUsers() {
       role = "Amministratore Avanzato"
     } else if (u.role === "superadmin") {
       role = "Super Amministratore"
+    } else if (u.role === "association") {
+      role = "Account Associazione"
     } else if (u.role === "testacc") {
       role = "Account di Test"
     } else {
@@ -338,12 +345,12 @@ async function resetPassword(user) {
   }
 }
 
-async function deleteUser(userId) {
+async function deleteUser(userId, userName) {
   if (confirm("Sei sicuro di voler eliminare questo utente? L'account sarà permanentemente eliminato dopo 30 giorni.")) {
     try {
       await addDoc(collection(db, "activities"), {
         type: "user_deletion",
-        userId: userId,
+        userId: userName,
         deletedBy: auth.currentUser.email,
         timestamp: serverTimestamp()
       });
@@ -351,9 +358,7 @@ async function deleteUser(userId) {
       await updateDoc(doc(db, "users", userId), { status: "eliminato" });
       setStatus("Utente marcato come eliminato", "success");
       closeModal();
-      await loadUsers();
-      applyFilters();
-
+      
       const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
       
       setTimeout(async () => {
@@ -368,7 +373,10 @@ async function deleteUser(userId) {
           console.error("Errore nella cancellazione permanente:", error);
         }
       }, thirtyDaysMs);
-
+      
+      await loadUsers();
+      applyFilters();
+      
     } catch (error) {
       console.error("Errore nell'eliminazione:", error);
       setStatus("Errore nell'eliminazione dell'utente.", "error");
