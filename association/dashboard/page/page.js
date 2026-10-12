@@ -17,12 +17,12 @@ const pageForm = document.getElementById("pageForm");
 const saveBtn = document.getElementById("saveBtn");
 const btnText = document.getElementById("btnText");
 const btnLoader = document.getElementById("btnLoader");
-const pageLink = document.getElementById("pageLink");
 
 let associationId = null;
 let association = null;
 let currentUser = null;
 let isSaving = false;
+let isReferente = false;
 let isUploading = false;
 
 function resizeImage(file, maxSide, mime, ext) {
@@ -128,8 +128,7 @@ initAssociationPage(async (ctx) => {
   associationId = ctx.associationId;
   association = ctx.association;
   currentUser = ctx.user;
-
-  pageLink.href = `/associations/view/?id=${associationId}`;
+  isReferente = ctx.isReferente;
 
   document.getElementById("assocNameInput").value = association.nome || "";
   document.getElementById("assocCity").value = association.zona || "";
@@ -153,7 +152,12 @@ initAssociationPage(async (ctx) => {
   const notice = document.getElementById("pageNotice");
   notice.hidden = editable;
   if (!editable) notice.textContent = "La pagina è sospesa: non puoi modificarla. Contatta lo staff di MyFrEM.";
-});
+
+  if (isReferente) {
+    document.getElementById("assocNameInput").disabled = true;
+    document.getElementById("assocCity").disabled = true;
+  }
+}, { allowReferent: true, requirePerm: "pagina" });
 
 document.getElementById("logoBtn").addEventListener("click", () => uploadImage("logo"));
 document.getElementById("coverBtn").addEventListener("click", () => uploadImage("cover"));
@@ -196,13 +200,18 @@ pageForm.addEventListener("submit", async (e) => {
   btnLoader.style.display = "inline-block";
 
   try {
-    await updateDoc(doc(db, "associations", associationId), {
-      nome,
-      zona,
+    const payload = {
       descrizione,
       contatti: { email, telefono, sito },
       aggiornatoAt: serverTimestamp()
-    });
+    };
+
+    if (!isReferente) {
+      payload.nome = nome;
+      payload.zona = zona;
+    }
+
+    await updateDoc(doc(db, "associations", associationId), payload);
 
     association = { ...association, nome, zona, descrizione, contatti: { email, telefono, sito } };
 

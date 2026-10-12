@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 import { getDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { firebaseConfig } from '/configFirebase.js';
+import { firebaseConfig } from '/helpers/configFirebase.js';
 import { db } from '/helpers/getDB.js';
 
 const SURVEY_URL = 'https://go.friuliemergenze.it/sondaggiosezvol/';

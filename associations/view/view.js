@@ -3,7 +3,7 @@ import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { setStatus } from "/helpers/modals.js";
 import { createNotification } from "/helpers/notify.js";
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

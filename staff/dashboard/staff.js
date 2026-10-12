@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, getDoc, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "../../configFirebase.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";

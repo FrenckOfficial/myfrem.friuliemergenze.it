@@ -6,7 +6,7 @@ import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { mountFeed } from "/helpers/feed.js";
 
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -48,6 +48,32 @@ async function loadMemberships(uid) {
   return memberships.filter(Boolean);
 }
 
+function renderManageLinks(m) {
+  const box = document.getElementById("manageLinks");
+  box.innerHTML = "";
+
+  const permissions = m.permessi || [];
+  const links = [];
+
+  if (m.role === "referente" && permissions.includes("pagina")) {
+    links.push(["Modifica la pagina", `/association/dashboard/page/?assoc=${encodeURIComponent(m.id)}`]);
+  }
+
+  if (m.role === "referente" && permissions.includes("membri")) {
+    links.push(["Gestisci le richieste", `/association/dashboard/members/?assoc=${encodeURIComponent(m.id)}`]);
+  }
+
+  links.forEach(([label, href]) => {
+    const a = document.createElement("a");
+    a.className = "manage-link";
+    a.href = href;
+    a.textContent = label;
+    box.appendChild(a);
+  });
+
+  box.hidden = links.length === 0;
+}
+
 function showFeed(confirmed, user, userName) {
   document.getElementById("feedSection").hidden = false;
 
@@ -57,6 +83,7 @@ function showFeed(confirmed, user, userName) {
 
   const select = (m, btn) => {
     tabs.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
+    renderManageLinks(m);
 
     return mountFeed(root, {
       db,
@@ -133,7 +160,7 @@ onAuthStateChanged(auth, async (user) => {
 
     const userData = userSnap.data();
 
-    if (userData.role === "association") {
+    if (userData.accountType === "association") {
       window.location.href = "/association/dashboard/";
       return;
     }

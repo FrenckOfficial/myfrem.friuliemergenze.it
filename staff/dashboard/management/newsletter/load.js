@@ -12,7 +12,7 @@ import {
 
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
-import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
+import { firebaseConfig } from "https://myfrem.friuliemergenze.it/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";

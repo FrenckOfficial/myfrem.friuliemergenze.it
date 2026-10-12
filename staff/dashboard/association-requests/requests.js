@@ -7,7 +7,7 @@ import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { createNotification } from "/helpers/notify.js";
 
-import { firebaseConfig } from "/configFirebase.js"
+import { firebaseConfig } from "/helpers/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

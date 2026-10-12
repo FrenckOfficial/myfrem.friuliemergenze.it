@@ -1,6 +1,6 @@
 import { doc, getDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { firebaseConfig } from "https://myfrem.friuliemergenze.it/configFirebase.js";
+import { firebaseConfig } from "https://myfrem.friuliemergenze.it/helpers/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);

@@ -19,7 +19,7 @@ Disallow: /node_modules/
 Disallow: /README.md
 Disallow: /package.json
 Disallow: /package-lock.json
-Disallow: /configFirebase.js
+Disallow: /helpers/configFirebase.js
 Disallow: /configSupabase.js
 Disallow: /humans.txt
 

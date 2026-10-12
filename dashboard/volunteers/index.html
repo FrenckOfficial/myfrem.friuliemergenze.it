@@ -44,18 +44,19 @@
       </nav>
       <button id="logoutBtn" class="logout">Logout</button>
     </aside>
-
+ 
     <main class="main-content">
       <header class="header">
         <h1>Area volontari</h1>
         <p>Lo spazio riservato ai volontari delle associazioni su MyFrEM.</p>
       </header>
-
+ 
       <section id="feedSection" style="margin-top:22px" hidden>
         <div id="assocTabs" class="assoc-tabs"></div>
+        <div id="manageLinks" class="manage-links" hidden></div>
         <div id="feedRoot"></div>
       </section>
-
+ 
       <section class="wip-box" id="pendingBox" hidden>
         <h2 id="wipTitle">Area in costruzione</h2>
         <p id="wipText"></p>
@@ -66,7 +67,7 @@
       </section>
     </main>
   </div>
-
+ 
   <link rel="stylesheet" href="/bottomNav.css">
   <script src="/bottomNav.js"></script>
   <script defer type="module" src="/dashboard/ntf.js"></script>
@@ -78,17 +79,17 @@
       </svg>
       <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
     </button>
-
+ 
     <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
       <div class="dropdown-header">
         <h3>Notifiche</h3>
         <button class="close-btn" id="closeDropdownBtn">✕</button>
       </div>
-
+ 
       <div class="notification-list" id="notificationList">
         <!-- Caricato dinamicamente -->
       </div>
-
+ 
       <div class="dropdown-footer">
         <a href="/dashboard/notifications" class="view-all-link">
           Vedi tutte →

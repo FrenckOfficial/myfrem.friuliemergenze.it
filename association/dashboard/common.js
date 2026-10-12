@@ -5,7 +5,7 @@ import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -25,9 +25,26 @@ function showAccessDenied(loadingEl, contentEl, message) {
   window.location.href = "/dashboard";
 }
 
-// Controlla che l'utente sia l'account di un'associazione, poi chiama onReady
-// con { user, userData, associationId, association }.
-export function initAssociationPage(onReady) {
+function adaptSidebarForReferent(associationId) {
+  document.querySelectorAll(".navbar a").forEach((a) => {
+    const href = a.getAttribute("href");
+
+    if (href === "/association/dashboard/page/" || href === "/association/dashboard/members/") {
+      a.href = `${href}?assoc=${encodeURIComponent(associationId)}`;
+    } else {
+      a.style.display = "none";
+    }
+  });
+
+  const back = document.createElement("a");
+  back.href = "/dashboard/volunteers/";
+  back.textContent = "Area volontari";
+  document.querySelector(".navbar").appendChild(back);
+}
+
+export function initAssociationPage(onReady, options = {}) {
+  const { allowReferent = false, requirePerm = null } = options;
+
   const loadingEl = document.querySelector(".loading");
   const contentEl = document.querySelector(".content");
 
@@ -59,13 +76,21 @@ export function initAssociationPage(onReady) {
 
       const userData = userSnap.data();
 
-      if (userData.accountType !== "association" || !userData.associationId) {
-        clearTimeout(timeoutId);
-        showAccessDenied(loadingEl, contentEl, "Accesso negato: questa area è riservata agli account associazione.");
-        return;
+      let associationId = null;
+      let isReferente = false;
+
+      if (userData.accountType === "association" && userData.associationId) {
+        associationId = userData.associationId;
+      } else if (allowReferent) {
+        associationId = new URLSearchParams(window.location.search).get("assoc");
+        isReferente = true;
       }
 
-      const associationId = userData.associationId;
+      if (!associationId) {
+        clearTimeout(timeoutId);
+        showAccessDenied(loadingEl, contentEl, "Accesso negato: questa area è riservata ad account associazione e referenti.");
+        return;
+      }
 
       const [assocSnap, memberSnap] = await Promise.all([
         getDoc(doc(db, "associations", associationId)),
@@ -74,15 +99,23 @@ export function initAssociationPage(onReady) {
 
       const member = memberSnap.exists() ? memberSnap.data() : null;
 
-      if (!assocSnap.exists() || !member || member.role !== "associazione" || member.stato !== "confermata") {
+      const allowed = !!member && member.stato === "confermata" && (
+        isReferente
+          ? member.role === "referente" && (!requirePerm || (member.permessi || []).includes(requirePerm))
+          : member.role === "associazione"
+      );
+
+      if (!assocSnap.exists() || !allowed) {
         clearTimeout(timeoutId);
-        showAccessDenied(loadingEl, contentEl, "Accesso negato: non risulti account di questa associazione.");
+        showAccessDenied(loadingEl, contentEl, "Accesso negato: non hai i permessi per questa associazione.");
         return;
       }
 
-      initBottomNav(userData, user, "association");
+      initBottomNav(userData, user, isReferente ? "user" : "association");
 
-      await onReady({ user, userData, associationId, association: assocSnap.data() });
+      if (isReferente) adaptSidebarForReferent(associationId);
+
+      await onReady({ user, userData, associationId, association: assocSnap.data(), member, isReferente });
 
       clearTimeout(timeoutId);
       loadingEl.style.display = "none";

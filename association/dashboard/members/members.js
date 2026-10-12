@@ -1,7 +1,9 @@
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, deleteField, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { setStatus } from "/helpers/modals.js";
 import { createNotification } from "/helpers/notify.js";
 import { db, initAssociationPage } from "/association/dashboard/common.js";
+
+const REFERENT_PERMISSIONS = ["pagina", "membri"];
 
 const roleLabels = {
   associazione: "Account associazione",
@@ -19,6 +21,7 @@ const membersTableBody = document.getElementById("membersTableBody");
 
 let associationId = null;
 let associationName = "";
+let isReferente = false;
 let isWorking = false;
 
 function addCell(tr, text) {
@@ -84,7 +87,15 @@ async function loadMembers() {
       if (m.stato === "richiesta") {
         actions.appendChild(makeButton("Accetta", "accept", m.uid, "btn-ok"));
         actions.appendChild(makeButton("Rifiuta", "reject", m.uid, "btn-no"));
-      } else {
+      } else if (!isReferente) {
+        if (m.role === "membro" && m.stato === "confermata") {
+          actions.appendChild(makeButton("Rendi referente", "promote", m.uid, "btn-ok"));
+        }
+
+        if (m.role === "referente") {
+          actions.appendChild(makeButton("Togli ruolo", "demote", m.uid, ""));
+        }
+
         actions.appendChild(makeButton("Rimuovi", "remove", m.uid, "btn-no"));
       }
     }
@@ -101,8 +112,9 @@ async function loadMembers() {
 initAssociationPage(async (ctx) => {
   associationId = ctx.associationId;
   associationName = ctx.association.nome || "L'associazione";
+  isReferente = ctx.isReferente;
   await loadMembers();
-});
+}, { allowReferent: true, requirePerm: "membri" });
 
 async function notifyVolunteer(uid, accepted) {
   try {
@@ -123,6 +135,25 @@ async function notifyVolunteer(uid, accepted) {
   }
 }
 
+async function notifyRoleChange(uid, promoted) {
+  try {
+    await createNotification(db, {
+      userId: uid,
+      type: "association_role_change",
+      associationId,
+      title: promoted ? "Sei diventato referente" : "Ruolo di referente rimosso",
+      message: promoted
+        ? `${associationName} ti ha nominato referente: ora puoi pubblicare sulla bacheca, gestire la pagina e accettare le richieste.`
+        : `${associationName} ha rimosso il tuo ruolo di referente. Resti volontario dell'associazione.`,
+      icon: promoted ? "⭐" : "ℹ️",
+      actionUrl: "/dashboard/volunteers/",
+      actionLabel: "Area volontari"
+    });
+  } catch (error) {
+    console.error("Errore invio notifica del cambio di ruolo:", error);
+  }
+}
+
 membersTableBody.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-action]");
   if (!btn || isWorking) return;
@@ -130,6 +161,8 @@ membersTableBody.addEventListener("click", async (e) => {
   const { action, uid } = btn.dataset;
 
   if (action === "remove" && !confirm("Vuoi rimuovere questa persona dall'associazione?")) return;
+  if (action === "promote" && !confirm("Rendere questa persona referente? Potrà pubblicare sulla bacheca, modificare la pagina e accettare le richieste.")) return;
+  if (action === "demote" && !confirm("Togliere il ruolo di referente a questa persona?")) return;
 
   isWorking = true;
   btn.disabled = true;
@@ -145,6 +178,14 @@ membersTableBody.addEventListener("click", async (e) => {
       await updateDoc(memberRef, { stato: "rifiutata", aggiornatoAt: serverTimestamp() });
       await notifyVolunteer(uid, false);
       setStatus("Richiesta rifiutata", "success");
+    } else if (action === "promote") {
+      await updateDoc(memberRef, { role: "referente", permessi: REFERENT_PERMISSIONS, aggiornatoAt: serverTimestamp() });
+      await notifyRoleChange(uid, true);
+      setStatus("Ora è referente", "success");
+    } else if (action === "demote") {
+      await updateDoc(memberRef, { role: "membro", permessi: deleteField(), aggiornatoAt: serverTimestamp() });
+      await notifyRoleChange(uid, false);
+      setStatus("Ruolo di referente rimosso", "success");
     } else if (action === "remove") {
       await deleteDoc(memberRef);
       setStatus("Membro rimosso", "success");

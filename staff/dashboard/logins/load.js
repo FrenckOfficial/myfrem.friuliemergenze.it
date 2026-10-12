@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc, onSnapshot, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { firebaseConfig } from "/configFirebase.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";

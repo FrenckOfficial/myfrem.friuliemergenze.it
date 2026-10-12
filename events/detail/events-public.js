@@ -3,7 +3,7 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 
-import { firebaseConfig } from "../../configFirebase.js"
+import { firebaseConfig } from "/helpers/configFirebase.js"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
