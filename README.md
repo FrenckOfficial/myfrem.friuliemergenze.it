@@ -39,7 +39,7 @@ git clone https://github.com/FrenckOfficial/myfrem.friuliemergenze.it.git
 Entrare nella cartella del progetto:
 
 ```bash
-cd myfrem
+cd myfrem.friuliemergenze.it
 ```
 
 Installare le dipendenze:
