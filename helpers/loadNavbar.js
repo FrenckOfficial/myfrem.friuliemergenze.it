@@ -20,7 +20,7 @@ const NAV_LINKS = {
     { href: "/staff/dashboard/photos/", label: "Moderazione foto", icon: "fa-circle-check", match: ["/staff/dashboard/photos"] },
     { href: "/staff/dashboard/feed/", label: "Moderazione feed", icon: "fa-comments" },
     { href: "/staff/dashboard/management/", label: "Funzionalità", icon: "fa-toolbox", match: ["/staff/dashboard/management", "/staff/dashboard/logins", "/staff/dashboard/rapporto-riunioni-staff"] },
-    { href: "/staff/dashboard/association-requests/", label: "Richieste associazioni", icon: "fa-building-circle-check", onlyWhenActive: true },
+    { href: "/staff/dashboard/association-requests/", label: "Richieste associazioni", icon: "fa-building-circle-check" },
     { href: "/staff/dashboard/settings/", label: "Impostazioni", icon: "fa-gear" },
     { separator: true },
     { href: "/dashboard/", label: "Passa a dashboard utente", icon: "fa-right-left", className: "nav-switch" }

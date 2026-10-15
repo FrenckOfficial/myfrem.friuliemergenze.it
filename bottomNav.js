@@ -9,11 +9,13 @@ const BottomNav = (() => {
       { id: 'profilo',   icon: 'fa-user',         href: '/dashboard/settings',       label: 'Impostazioni', avatar: true, hideForStaff: true }
     ],
     staff: [
-      { id: 'dashboard',   icon: 'fa-gauge',          href: '/staff/dashboard/',               label: 'Dashboard', exact: true },
-      { id: 'moderazione', icon: 'fa-circle-check',   href: '/staff/dashboard/photos',         label: 'Moderazione foto' },
-      { id: 'utenti',      icon: 'fa-users',          href: '/staff/dashboard/management',     label: 'Funzionalità' },
-      { id: 'rapporti',    icon: 'fa-file',           href: '/staff/dashboard/kick-reports',   label: 'Rapporti di espulsione' },
-      { id: 'profilo',     icon: 'fa-user',           href: '/staff/dashboard/settings',       label: 'Impostazioni', avatar: true }
+      { id: 'dashboard',   icon: 'fa-gauge',                 href: '/staff/dashboard/',                      label: 'Dashboard', exact: true },
+      { id: 'moderazione', icon: 'fa-circle-check',          href: '/staff/dashboard/photos',                label: 'Moderazione foto' },
+      { id: 'feed',        icon: 'fa-comments',              href: '/staff/dashboard/feed',                  label: 'Moderazione feed' },
+      { id: 'utenti',      icon: 'fa-users',                 href: '/staff/dashboard/management',            label: 'Funzionalità' },
+      { id: 'rapporti',    icon: 'fa-file',                  href: '/staff/dashboard/kick-reports',          label: 'Rapporti di espulsione' },
+      { id: 'richieste',   icon: 'fa-building-circle-check', href: '/staff/dashboard/association-requests',  label: 'Richieste associazioni' },
+      { id: 'profilo',     icon: 'fa-user',                  href: '/staff/dashboard/settings',              label: 'Impostazioni', avatar: true }
     ],
     association: [
       { id: 'home',     icon: 'fa-house',    href: '/association/dashboard/',          label: 'Dashboard', exact: true },
