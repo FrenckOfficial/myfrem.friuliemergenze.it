@@ -96,7 +96,7 @@ class NotificationBell {
 
     this.notificationList.innerHTML = notifications.map(notif => `
       <div class="notification-item ${notif.read ? 'read' : 'unread'}">
-        <div class="notif-icon">${notif.icon || '📬'}</div>
+        <div class="notif-icon">${this.escapeHtml(notif.icon || '📬')}</div>
         
         <div class="notif-content">
           <div class="notif-title">${this.escapeHtml(notif.title)}</div>
@@ -105,8 +105,8 @@ class NotificationBell {
         </div>
 
         <div class="notif-actions">
-          ${notif.actionUrl ? `<a href="${notif.actionUrl}" class="notif-link">${this.escapeHtml(notif.actionLabel || 'Vai')}</a>` : ''}
-          <div class="notif-link read-toggle" data-id="${notif.id}" data-read="${notif.read}" title="${notif.read ? 'Marca non letto' : 'Marca letto'}">${notif.read ? 'Segna come non letto' : 'Segna come letto' }</div>
+          ${this.safeUrl(notif.actionUrl) ? `<a href="${this.escapeHtml(this.safeUrl(notif.actionUrl))}" class="notif-link">${this.escapeHtml(notif.actionLabel || 'Vai')}</a>` : ''}
+          <div class="notif-link read-toggle" data-id="${this.escapeHtml(notif.id)}" data-read="${notif.read}" title="${notif.read ? 'Marca non letto' : 'Marca letto'}">${notif.read ? 'Segna come non letto' : 'Segna come letto' }</div>
         </div>
       </div>
     `).join('');
@@ -149,7 +149,12 @@ class NotificationBell {
       '"': '&quot;',
       "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(text ?? '').replace(/[&<>"']/g, m => map[m]);
+  }
+
+  safeUrl(url) {
+    const value = String(url || '').trim();
+    return value.startsWith('/') && !value.startsWith('//') || /^https:\/\//i.test(value) ? value : '';
   }
 
   destroy() {

@@ -55,9 +55,8 @@ async function loadStats() {
       return;
     }
 
-    const sorted = activitiesSnap.docs.sort(
-      (a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis()
-    );
+    const millis = (d) => d.data().timestamp?.toMillis?.() || 0;
+    const sorted = activitiesSnap.docs.sort((a, b) => millis(b) - millis(a));
 
     const pStatusMsg = document.createElement("p");
     pStatusMsg.id = "statusMsg";
@@ -70,7 +69,7 @@ async function loadStats() {
 
       const li = document.createElement("li");
 
-      const date = activity.timestamp.toDate().toLocaleString();
+      const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
       const text = await parseViewedPage(activity, date);
 
       li.innerHTML = text;

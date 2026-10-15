@@ -317,7 +317,15 @@ service cloud.firestore {
     }
     
     match /viewedPages/{docId} {
-    	allow read, write: if true;
+      allow read, delete: if isStaff();
+      allow create: if isLoggedIn()
+        && request.resource.data.keys().hasOnly(['type', 'page', 'userId', 'timestamp'])
+        && request.resource.data.type == 'page_view'
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.page is string
+        && request.resource.data.page.size() <= 200
+        && request.resource.data.timestamp == request.time;
+      allow update: if false;
     }
     
     match /numeriUtili/{docId} {

@@ -273,7 +273,7 @@ async function renderRecentActivities() {
   const rows = await Promise.all(
     latest.map((docSnap) => {
       const activity = docSnap.data();
-      const date = activity.timestamp.toDate().toLocaleString("it-IT");
+      const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
       return parseActivity(activity, date);
     })
   );
@@ -296,7 +296,7 @@ async function renderRecentLogins() {
   latest.forEach((docSnap) => {
     const login = docSnap.data();
     const email = escapeHtml(login.email);
-    const date = login.timestamp.toDate().toLocaleString("it-IT");
+    const date = login.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
     const ip = escapeHtml(login.ipAddress ?? "IP sconosciuto");
     const ua = escapeHtml(login.userAgent ?? "Browser sconosciuto");
 
@@ -317,7 +317,7 @@ async function renderRecentViewedPages() {
   const rows = await Promise.all(
     latest.map((docSnap) => {
       const activity = docSnap.data();
-      const date = activity.timestamp.toDate().toLocaleString("it-IT");
+      const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
       return parseViewedPage(activity, date);
     })
   );
