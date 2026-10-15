@@ -87,6 +87,9 @@ export function addStaffLink() {
   if (!navbar || navbar.querySelector('a[href="/staff/dashboard/"]')) return;
   if (!navbar.dataset.rendered) loadNavbar();
 
+  const separator = document.createElement("hr");
+  separator.className = "nav-sep";
+  navbar.append(separator);
   const link = createLink({ href: "/staff/dashboard/", label: "Passa alla dashboard staff", icon: "fa-right-left" }, "");
   link.classList.add("nav-switch");
   navbar.append(link);
