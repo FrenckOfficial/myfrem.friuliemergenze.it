@@ -5,9 +5,9 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
-import { getUserName } from "/helpers/getUserName.js";
 
 import { firebaseConfig } from "/helpers/configFirebase.js"
+import { escapeHtml } from "/helpers/escapeHtml.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -112,7 +112,7 @@ async function openModal(user) {
   if (user.privateProfile) prefs.push("Profilo privato");
   document.getElementById("modalPreferences").textContent = prefs.length ? prefs.join(", ") : "Nessuna";
 
-  const userName = getUserName(user.id);
+  const userName = `${user.name || ""} ${user.surname || ""}`.trim() || user.username || user.id;
 
   document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
   document.getElementById("modalResetPassword").onclick = () => resetPassword(user);
@@ -280,11 +280,11 @@ async function loadUsers() {
     tr.dataset.whatsNewViewed = u.whatsNewViewed ? "true" : "false";
 
     tr.innerHTML = `
-      <td>${u.name + " " + u.surname || ""}</td>
-      <td>${u.email || ""}</td>
-      <td>${u.username || ""}</td>
-      <td>${role || "N/A"}</td>
-      <td>${status || "N/A"}</td>
+      <td>${escapeHtml(`${u.name || ""} ${u.surname || ""}`.trim())}</td>
+      <td>${escapeHtml(u.email || "")}</td>
+      <td>${escapeHtml(u.username || "")}</td>
+      <td>${escapeHtml(role || "N/A")}</td>
+      <td>${escapeHtml(status || "N/A")}</td>
     `;
 
     tr.style.cursor = "pointer";
@@ -350,30 +350,16 @@ async function deleteUser(userId, userName) {
     try {
       await addDoc(collection(db, "activities"), {
         type: "user_deletion",
-        userId: userName,
+        userId,
+        userName,
         deletedBy: auth.currentUser.email,
         timestamp: serverTimestamp()
       });
 
-      await updateDoc(doc(db, "users", userId), { status: "eliminato" });
-      setStatus("Utente marcato come eliminato", "success");
+      await updateDoc(doc(db, "users", userId), { status: "eliminato", deletedAt: serverTimestamp() });
+      setStatus("Utente marcato come eliminato::L'account verrà cancellato definitivamente tra 30 giorni.", "success");
       closeModal();
-      
-      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-      
-      setTimeout(async () => {
-        try {
-          const userDocRef = doc(db, "users", userId);
-          const userDocSnap = await getDoc(userDocRef);
-          
-          if (userDocSnap.exists() && userDocSnap.data().status === "eliminato") {
-            await deleteDoc(userDocRef);
-          }
-        } catch (error) {
-          console.error("Errore nella cancellazione permanente:", error);
-        }
-      }, thirtyDaysMs);
-      
+
       await loadUsers();
       applyFilters();
       

@@ -6,6 +6,7 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -58,6 +59,34 @@ emailjs.init("49-8564mCPRVWNmBW");
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
+
+function staffNotice() {
+  const box = document.createElement("section");
+  box.className = "panel staff-notice";
+
+  const icon = document.createElement("span");
+  icon.className = "staff-notice__icon";
+  icon.innerHTML = '<i class="fa-solid fa-user-shield" aria-hidden="true"></i>';
+
+  const title = document.createElement("h1");
+  title.textContent = "Le tue impostazioni sono nell'area staff";
+
+  const text = document.createElement("p");
+  text.textContent = "Sei un membro dello staff: i dati del tuo account, la password e l'autenticazione a due fattori si gestiscono dalle impostazioni dello staff, non da qui.";
+
+  const actions = document.createElement("div");
+  actions.className = "staff-notice__actions";
+  [["Vai alle impostazioni staff", "/staff/dashboard/settings/", "btn btn--primary"], ["Dashboard staff", "/staff/dashboard/", "btn"]].forEach(([label, href, className]) => {
+    const a = document.createElement("a");
+    a.className = className;
+    a.href = href;
+    a.textContent = label;
+    actions.appendChild(a);
+  });
+
+  box.append(icon, title, text, actions);
+  return box;
+}
 
 onAuthStateChanged(auth, async user => {
   if (!user) {
@@ -123,20 +152,9 @@ async function loadUserData(uid) {
   }
 
   if (staffRoles.includes(data.role)) {
-    const staffLinkEl = document.querySelector('.navbar');
-    const br = document.createElement('br');
-    const link = document.createElement('a');
-    link.href = '/staff/dashboard/';
-    link.textContent = 'Passa alla dashboard staff';
-    staffLinkEl.appendChild(br);
-    staffLinkEl.appendChild(link);
-    const content = document.querySelector('.main-content');
-    const settingsContainer = document.querySelector('.settings-container');
-    settingsContainer.style.display = 'none';
-    const div = document.createElement('div');
-    div.className = "staff-warning";
-    div.textContent = "Sei un membro dello staff. Non è possibile modificare i tuoi dati personali.";
-    content.appendChild(div);
+    addStaffLink();
+    document.querySelector('.settings-container').style.display = 'none';
+    document.querySelector('.app-main .app-container').appendChild(staffNotice());
   }
 
   profileIDText.innerHTML = `<b>${uid}</b>`;
@@ -266,7 +284,7 @@ saveMailBtn.addEventListener("click", async () => {
     email: newMail
   });
 
-  setStatus("E-Mail aggiornata!", "success");
+  setStatus("Email aggiornata!", "success");
 });
 
 savePhoneBtn.addEventListener("click", async () => {
@@ -585,18 +603,6 @@ async function calculateBadgeProgress(userId, badge, badgeId) {
           collection(db, "photos"),
           where("userId", "==", userId),
           where("status", "==", `${"Approvata ✅" || "Approvata"}`)
-        )
-      );
-      current = snap.size;
-      break;
-    }
-
-    case "events": {
-      const snap = await getDocs(
-        query(
-          collection(db, "events"),
-          where("userId", "==", userId),
-          where("status", "==", "Organizzato")
         )
       );
       current = snap.size;

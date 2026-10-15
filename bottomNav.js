@@ -16,9 +16,12 @@ const BottomNav = (() => {
       { id: 'profilo',     icon: 'fa-user',           href: '/staff/dashboard/settings',       label: 'Impostazioni', avatar: true }
     ],
     association: [
-      { id: 'home',   icon: 'fa-house', href: '/association/dashboard/',         label: 'Dashboard', exact: true },
-      { id: 'pagina', icon: 'fa-pen',   href: '/association/dashboard/#page',    label: 'La pagina' },
-      { id: 'membri', icon: 'fa-users', href: '/association/dashboard/#members', label: 'Membri' }
+      { id: 'home',     icon: 'fa-house',    href: '/association/dashboard/',          label: 'Dashboard', exact: true },
+      { id: 'pagina',   icon: 'fa-pen',      href: '/association/dashboard/page/',     label: 'La pagina' },
+      { id: 'bacheca',  icon: 'fa-bullhorn', href: '/association/dashboard/board/',    label: 'Bacheca' },
+      { id: 'membri',   icon: 'fa-users',    href: '/association/dashboard/members/',  label: 'Membri' },
+      { id: 'turni',    icon: 'fa-calendar-days', href: '/association/dashboard/shifts/', label: 'Turni' },
+      { id: 'impostazioni', icon: 'fa-gear', href: '/association/dashboard/settings/', label: 'Impostazioni' }
     ],
   };
 

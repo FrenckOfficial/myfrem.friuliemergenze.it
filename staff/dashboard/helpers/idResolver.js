@@ -15,8 +15,10 @@ export async function getNameById(collectionName, id) {
     const cacheKey = `${collectionName}_${id}`;
     if (cache[cacheKey]) return cache[cacheKey];
 
+    const source = collectionName === "users" ? "publicProfiles" : collectionName;
+
     try {
-        const ref = doc(db, collectionName, id);
+        const ref = doc(db, source, id);
         const snap = await getDoc(ref);
 
         if (!snap.exists()) {
@@ -25,7 +27,8 @@ export async function getNameById(collectionName, id) {
         }
 
         const data = snap.data();
-        const name = data.name + " " + data.surname || data.title || data.nome || data.fullName || data.vehicleModel || id;
+        const fullName = `${data.name || ""} ${data.surname || ""}`.trim();
+        const name = fullName || data.title || data.nome || data.fullName || data.vehicleModel || id;
 
         cache[cacheKey] = name;
         return name;

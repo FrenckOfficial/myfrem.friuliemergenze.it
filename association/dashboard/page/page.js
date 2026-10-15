@@ -2,6 +2,7 @@ import { doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebas
 import { uploadFile } from "/helpers/uploadFile.js";
 import { setStatus } from "/helpers/modals.js";
 import { db, clean, EMAIL_RE, initAssociationPage } from "/association/dashboard/common.js";
+import { el, initials } from "/association/dashboard/ui.js";
 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -9,11 +10,21 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const UPLOAD_FOLDER = "associations-images";
 
 const IMAGES = {
-  logo: { field: "logoUrl", maxSide: 512, mime: "image/png", ext: "png", label: "logo" },
-  cover: { field: "copertinaUrl", maxSide: 1600, mime: "image/jpeg", ext: "jpg", label: "copertina" }
+  logo: { field: "logoUrl", maxSide: 512, mime: "image/png", ext: "png", label: "Logo" },
+  cover: { field: "copertinaUrl", maxSide: 1600, mime: "image/jpeg", ext: "jpg", label: "Copertina" }
+};
+
+const FIELDS = {
+  nome: "assocNameInput",
+  zona: "assocCity",
+  descrizione: "assocDescription",
+  email: "assocEmail",
+  telefono: "assocPhone",
+  sito: "assocSite"
 };
 
 const pageForm = document.getElementById("pageForm");
+const saveBar = document.getElementById("saveBar");
 const saveBtn = document.getElementById("saveBtn");
 const btnText = document.getElementById("btnText");
 const btnLoader = document.getElementById("btnLoader");
@@ -24,6 +35,14 @@ let currentUser = null;
 let isSaving = false;
 let isReferente = false;
 let isUploading = false;
+let editable = false;
+let saved = {};
+
+const input = (key) => document.getElementById(FIELDS[key]);
+
+function isHttps(url) {
+  return /^https:\/\//i.test(url || "");
+}
 
 function resizeImage(file, maxSide, mime, ext) {
   return new Promise((resolve, reject) => {
@@ -59,25 +78,90 @@ function resizeImage(file, maxSide, mime, ext) {
   });
 }
 
-function showPreview(kind, url) {
-  const el = document.getElementById(`${kind}Preview`);
-  if (!url) return;
-  el.src = url;
-  el.hidden = false;
+function readForm() {
+  return Object.fromEntries(Object.keys(FIELDS).map((key) => [key, input(key).value]));
 }
 
-async function uploadImage(kind) {
-  if (isUploading) return;
+function fillForm(values) {
+  Object.entries(values).forEach(([key, value]) => { input(key).value = value; });
+  updateCounter();
+}
+
+function fromAssociation(a) {
+  return {
+    nome: a.nome || "",
+    zona: a.zona || "",
+    descrizione: a.descrizione || "",
+    email: a.contatti?.email || "",
+    telefono: a.contatti?.telefono || "",
+    sito: a.contatti?.sito || ""
+  };
+}
+
+function isDirty() {
+  const current = readForm();
+  return Object.keys(FIELDS).some((key) => current[key] !== saved[key]);
+}
+
+function updateCounter() {
+  document.getElementById("descCounter").textContent = `${input("descrizione").value.length}/1000`;
+}
+
+function refreshState() {
+  saveBar.hidden = !editable || !isDirty();
+  document.body.classList.toggle("has-savebar", !saveBar.hidden);
+  renderPreview();
+}
+
+function renderPreview() {
+  const v = readForm();
+
+  document.getElementById("previewName").textContent = clean(v.nome) || "Nome dell'associazione";
+  document.getElementById("previewZone").textContent = clean(v.zona) || "Comune della sede";
+  document.getElementById("previewDescription").textContent = v.descrizione.trim() || "Qui comparirà la descrizione della tua associazione.";
+
+  const contacts = [["fa-envelope", v.email], ["fa-phone", v.telefono], ["fa-globe", v.sito]]
+    .filter(([, value]) => clean(value))
+    .map(([iconName, value]) => {
+      const row = el("span");
+      const i = el("i", `fa-solid ${iconName}`);
+      i.setAttribute("aria-hidden", "true");
+      row.append(i, " ", clean(value));
+      return row;
+    });
+  document.getElementById("previewContacts").replaceChildren(...contacts);
+
+  const cover = document.getElementById("previewCover");
+  cover.style.backgroundImage = isHttps(association?.copertinaUrl) ? `url("${encodeURI(association.copertinaUrl)}")` : "";
+
+  const logo = document.getElementById("previewLogo");
+  if (isHttps(association?.logoUrl)) {
+    const img = el("img");
+    img.src = association.logoUrl;
+    img.alt = "";
+    logo.replaceChildren(img);
+  } else {
+    logo.textContent = initials(v.nome);
+  }
+}
+
+function showImage(kind, url) {
+  const img = document.getElementById(`${kind}Preview`);
+  const placeholder = document.getElementById(`${kind}Placeholder`);
+  const has = isHttps(url);
+
+  img.hidden = !has;
+  placeholder.hidden = has;
+  if (has) img.src = url;
+}
+
+async function uploadImage(kind, file) {
+  if (isUploading || !editable) return;
 
   const cfg = IMAGES[kind];
-  const input = document.getElementById(`${kind}Input`);
-  const btn = document.getElementById(`${kind}Btn`);
-  const file = input.files[0];
+  const drop = document.getElementById(`${kind}Drop`);
 
-  if (!file) {
-    setStatus(`Seleziona prima un'immagine per il ${cfg.label}.`, "error");
-    return;
-  }
+  if (!file) return;
 
   if (!ALLOWED_TYPES.includes(file.type)) {
     setStatus("Formato non supportato: usa PNG, JPG o WebP.", "error");
@@ -90,8 +174,7 @@ async function uploadImage(kind) {
   }
 
   isUploading = true;
-  btn.disabled = true;
-  btn.textContent = "Caricamento in corso...";
+  drop.classList.add("is-busy");
 
   try {
     const resized = await resizeImage(file, cfg.maxSide, cfg.mime, cfg.ext);
@@ -103,10 +186,10 @@ async function uploadImage(kind) {
     });
 
     association[cfg.field] = url;
-    showPreview(kind, url);
-    input.value = "";
+    showImage(kind, url);
+    renderPreview();
 
-    setStatus(`${cfg.label.charAt(0).toUpperCase()}${cfg.label.slice(1)} aggiornato`, "success");
+    setStatus(`${cfg.label} aggiornat${kind === "logo" ? "o" : "a"}`, "success");
   } catch (error) {
     console.error(`Errore upload ${cfg.label}:`, error);
 
@@ -115,13 +198,32 @@ async function uploadImage(kind) {
         setStatus("Non è stato possibile salvare l'immagine (permessi insufficienti).", "error");
         break;
       default:
-        setStatus(`C'è stato un errore durante il caricamento del ${cfg.label}.`, "error");
+        setStatus("C'è stato un errore durante il caricamento dell'immagine.", "error");
     }
   } finally {
     isUploading = false;
-    btn.disabled = association.stato !== "approvata";
-    btn.textContent = `Carica ${cfg.label}`;
+    drop.classList.remove("is-busy");
+    document.getElementById(`${kind}Input`).value = "";
   }
+}
+
+function setupDropzone(kind) {
+  const drop = document.getElementById(`${kind}Drop`);
+  const fileInput = document.getElementById(`${kind}Input`);
+
+  fileInput.addEventListener("change", () => uploadImage(kind, fileInput.files[0]));
+
+  ["dragenter", "dragover"].forEach((type) => drop.addEventListener(type, (e) => {
+    e.preventDefault();
+    drop.classList.add("is-over");
+  }));
+
+  ["dragleave", "drop"].forEach((type) => drop.addEventListener(type, () => drop.classList.remove("is-over")));
+
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadImage(kind, e.dataTransfer.files[0]);
+  });
 }
 
 initAssociationPage(async (ctx) => {
@@ -130,49 +232,61 @@ initAssociationPage(async (ctx) => {
   currentUser = ctx.user;
   isReferente = ctx.isReferente;
 
-  document.getElementById("assocNameInput").value = association.nome || "";
-  document.getElementById("assocCity").value = association.zona || "";
-  document.getElementById("assocDescription").value = association.descrizione || "";
-  document.getElementById("assocEmail").value = association.contatti?.email || "";
-  document.getElementById("assocPhone").value = association.contatti?.telefono || "";
-  document.getElementById("assocSite").value = association.contatti?.sito || "";
+  saved = fromAssociation(association);
+  fillForm(saved);
 
-  showPreview("logo", association.logoUrl);
-  showPreview("cover", association.copertinaUrl);
+  showImage("logo", association.logoUrl);
+  showImage("cover", association.copertinaUrl);
 
-  const editable = association.stato === "approvata";
+  document.getElementById("pageLink").href = `/associations/view/?id=${encodeURIComponent(associationId)}`;
 
-  document.querySelectorAll("#pageForm input, #pageForm textarea, .image-box input[type=file]").forEach((el) => {
-    el.disabled = !editable;
-  });
-  saveBtn.disabled = !editable;
-  document.getElementById("logoBtn").disabled = !editable;
-  document.getElementById("coverBtn").disabled = !editable;
+  editable = association.stato === "approvata";
+
+  pageForm.querySelectorAll("input, textarea").forEach((field) => { field.disabled = !editable; });
+  ["logoDrop", "coverDrop"].forEach((id) => document.getElementById(id).classList.toggle("is-disabled", !editable));
 
   const notice = document.getElementById("pageNotice");
   notice.hidden = editable;
   if (!editable) notice.textContent = "La pagina è sospesa: non puoi modificarla. Contatta lo staff di MyFrEM.";
 
   if (isReferente) {
-    document.getElementById("assocNameInput").disabled = true;
-    document.getElementById("assocCity").disabled = true;
+    input("nome").disabled = true;
+    input("zona").disabled = true;
+    document.getElementById("identityHint").textContent = "Nome e comune possono essere modificati solo dall'account dell'associazione.";
   }
+
+  refreshState();
 }, { allowReferent: true, requirePerm: "pagina" });
 
-document.getElementById("logoBtn").addEventListener("click", () => uploadImage("logo"));
-document.getElementById("coverBtn").addEventListener("click", () => uploadImage("cover"));
+setupDropzone("logo");
+setupDropzone("cover");
+
+pageForm.addEventListener("input", () => {
+  updateCounter();
+  refreshState();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  fillForm(saved);
+  refreshState();
+});
+
+window.addEventListener("beforeunload", (e) => {
+  if (editable && isDirty()) e.preventDefault();
+});
 
 pageForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (isSaving) return;
+  if (isSaving || !editable) return;
 
-  const nome = clean(document.getElementById("assocNameInput").value);
-  const zona = clean(document.getElementById("assocCity").value);
-  const descrizione = document.getElementById("assocDescription").value.trim();
-  const email = clean(document.getElementById("assocEmail").value);
-  const telefono = clean(document.getElementById("assocPhone").value);
-  const sito = clean(document.getElementById("assocSite").value);
+  const v = readForm();
+  const nome = clean(v.nome);
+  const zona = clean(v.zona);
+  const descrizione = v.descrizione.trim();
+  const email = clean(v.email);
+  const telefono = clean(v.telefono);
+  const sito = clean(v.sito);
 
   if (!nome) {
     setStatus("Il nome dell'associazione non può essere vuoto.", "error");
@@ -196,8 +310,8 @@ pageForm.addEventListener("submit", async (e) => {
 
   isSaving = true;
   saveBtn.disabled = true;
-  btnText.textContent = "Salvataggio in corso...";
-  btnLoader.style.display = "inline-block";
+  btnText.textContent = "Salvataggio...";
+  btnLoader.hidden = false;
 
   try {
     const payload = {
@@ -213,7 +327,10 @@ pageForm.addEventListener("submit", async (e) => {
 
     await updateDoc(doc(db, "associations", associationId), payload);
 
-    association = { ...association, nome, zona, descrizione, contatti: { email, telefono, sito } };
+    association = { ...association, ...(isReferente ? {} : { nome, zona }), descrizione, contatti: { email, telefono, sito } };
+    saved = fromAssociation(association);
+    fillForm(saved);
+    refreshState();
 
     setStatus("Pagina aggiornata", "success");
   } catch (error) {
@@ -228,8 +345,8 @@ pageForm.addEventListener("submit", async (e) => {
     }
   } finally {
     isSaving = false;
-    saveBtn.disabled = association.stato !== "approvata";
+    saveBtn.disabled = false;
     btnText.textContent = "Salva modifiche";
-    btnLoader.style.display = "none";
+    btnLoader.hidden = true;
   }
 });

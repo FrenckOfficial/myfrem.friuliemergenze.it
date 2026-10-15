@@ -6,6 +6,7 @@ import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 
 import { firebaseConfig } from "/helpers/configFirebase.js"
+import { escapeHtml } from "/helpers/escapeHtml.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -129,8 +130,8 @@ function setupSearch() {
         userItem.className = `user-item ${currentSelectedUser?.id === user.id ? 'active' : ''}`;
         userItem.innerHTML = `
           <div class="user-info">
-            <div class="user-name">${user.name}</div>
-            <div class="user-email">${user.email}</div>
+            <div class="user-name">${escapeHtml(user.name)}</div>
+            <div class="user-email">${escapeHtml(user.email)}</div>
           </div>
         `;
         userItem.addEventListener("click", () => selectUser(user, userItem));
@@ -210,8 +211,8 @@ function createBadgeCard(badgeMeta, badgeId, badgeData, isEarned) {
   card.innerHTML = `
     <div class="badge-info">
       <div class="badge-details">
-        <div class="badge-name">${badgeMeta.name}</div>
-        ${isEarned ? `<div class="badge-earned">${earnedDateStr}</div>` : `<div class="badge-earned">${badgeMeta.description || ""}</div>`}
+        <div class="badge-name">${escapeHtml(badgeMeta.name)}</div>
+        ${isEarned ? `<div class="badge-earned">${earnedDateStr}</div>` : `<div class="badge-earned">${escapeHtml(badgeMeta.description || "")}</div>`}
       </div>
     </div>
     <button class="btn-${isEarned ? 'remove' : 'add'}">${isEarned ? 'Rimuovi' : 'Aggiungi'}</button>

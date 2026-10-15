@@ -1,12 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, addDoc, doc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, addDoc, deleteDoc, doc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { mountFeed } from "/helpers/feed.js";
-
 import { firebaseConfig } from "/helpers/configFirebase.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
+import { expiringCount } from "/dashboard/volunteers/catalog.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -24,6 +25,10 @@ const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 const logoutBtn = document.getElementById("logoutBtn");
 const assocList = document.getElementById("assocList");
+const leaveBox = document.getElementById("leaveBox");
+
+let currentUser = null;
+let isLeaving = false;
 
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
@@ -63,6 +68,10 @@ function renderManageLinks(m) {
     links.push(["Gestisci le richieste", `/association/dashboard/members/?assoc=${encodeURIComponent(m.id)}`]);
   }
 
+  if (m.role === "referente" && (permissions.includes("turni") || permissions.includes("membri"))) {
+    links.push(["Gestisci i turni", `/association/dashboard/shifts/?assoc=${encodeURIComponent(m.id)}`]);
+  }
+
   links.forEach(([label, href]) => {
     const a = document.createElement("a");
     a.className = "manage-link";
@@ -74,42 +83,211 @@ function renderManageLinks(m) {
   box.hidden = links.length === 0;
 }
 
-function showFeed(confirmed, user, userName) {
+function openLeaveModal(m, labels) {
+  const modal = document.createElement("div");
+  modal.className = "modal active";
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+
+  const container = document.createElement("div");
+  container.className = "modal-container";
+
+  const step = document.createElement("div");
+  step.className = "modal-step active";
+
+  const header = document.createElement("div");
+  header.className = "modal-header";
+  const title = document.createElement("h2");
+  title.textContent = labels.title;
+  header.appendChild(title);
+
+  const body = document.createElement("div");
+  body.className = "modal-content";
+  const text = document.createElement("p");
+  text.textContent = labels.question.replace("{name}", m.name);
+  body.appendChild(text);
+
+  const footer = document.createElement("div");
+  footer.className = "modal-footer";
+  const group = document.createElement("div");
+  group.className = "button-group";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "btn-modal btn-back";
+  cancelBtn.textContent = "Annulla";
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.type = "button";
+  confirmBtn.className = "btn-modal danger";
+  confirmBtn.textContent = labels.yes;
+
+  group.append(cancelBtn, confirmBtn);
+  footer.appendChild(group);
+  step.append(header, body, footer);
+  container.appendChild(step);
+  modal.append(overlay, container);
+  document.body.appendChild(modal);
+
+  const close = () => {
+    if (isLeaving) return;
+    document.removeEventListener("keydown", onKey);
+    modal.remove();
+  };
+
+  const onKey = (e) => {
+    if (e.key === "Escape") close();
+  };
+
+  document.addEventListener("keydown", onKey);
+  overlay.addEventListener("click", close);
+  cancelBtn.addEventListener("click", close);
+
+  confirmBtn.addEventListener("click", async () => {
+    if (isLeaving || !currentUser) return;
+
+    isLeaving = true;
+    confirmBtn.disabled = true;
+    cancelBtn.disabled = true;
+    confirmBtn.textContent = "Attendi...";
+
+    try {
+      await deleteDoc(doc(db, "associations", m.id, "members", currentUser.uid));
+      setStatus(labels.done, "success");
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error) {
+      console.error("Errore uscita dall'associazione:", error);
+      setStatus("Non è stato possibile completare l'operazione. Riprova.", "error");
+      isLeaving = false;
+      confirmBtn.disabled = false;
+      cancelBtn.disabled = false;
+      confirmBtn.textContent = labels.yes;
+    }
+  });
+
+  confirmBtn.focus();
+}
+
+function buildLeaveControl(container, m, labels) {
+  container.innerHTML = "";
+
+  const askBtn = document.createElement("button");
+  askBtn.type = "button";
+  askBtn.className = "leave-btn";
+  askBtn.textContent = labels.ask;
+  askBtn.addEventListener("click", () => openLeaveModal(m, labels));
+
+  container.appendChild(askBtn);
+}
+
+function renderLeave(m) {
+  leaveBox.hidden = false;
+
+  buildLeaveControl(leaveBox, m, {
+    ask: "Lascia l'associazione",
+    title: "Lascia l'associazione",
+    question: "Vuoi davvero lasciare {name}? Non vedrai più la bacheca e per rientrare dovrai fare una nuova richiesta.",
+    yes: "Sì, lascia",
+    done: "Hai lasciato l'associazione."
+  });
+}
+
+function showFeed(confirmed, user, userData, userName) {
   document.getElementById("feedSection").hidden = false;
 
   const tabs = document.getElementById("assocTabs");
   const root = document.getElementById("feedRoot");
-  tabs.innerHTML = "";
+  tabs.replaceChildren();
+
+  const memberships = confirmed.map((m) => ({ id: m.id, name: m.name, role: m.role }));
+  const author = { name: userName, photoURL: userData.photoURL || "" };
+  const readOnly = userData.role === "testacc";
 
   const select = (m, btn) => {
     tabs.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
-    renderManageLinks(m);
+
+    if (m) {
+      renderManageLinks(m);
+      renderLeave(m);
+    } else {
+      document.getElementById("manageLinks").hidden = true;
+      leaveBox.hidden = true;
+    }
 
     return mountFeed(root, {
       db,
       user,
-      userName,
-      associationId: m.id,
-      role: m.role,
-      canPost: m.role === "referente",
+      author,
+      memberships,
+      scope: m ? { type: "association", id: m.id, name: m.name } : { type: "community" },
+      readOnly,
       canModerate: false
     });
   };
 
-  let firstBtn = null;
-
-  confirmed.forEach((m) => {
+  const addTab = (label, m, iconName) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tab";
-    btn.textContent = m.name;
+    if (iconName) {
+      const i = document.createElement("i");
+      i.className = `fa-solid ${iconName}`;
+      i.setAttribute("aria-hidden", "true");
+      btn.append(i, " ");
+    }
+    btn.append(label);
     btn.addEventListener("click", () => select(m, btn));
     tabs.appendChild(btn);
+    return btn;
+  };
 
-    if (!firstBtn) firstBtn = btn;
-  });
+  const communityBtn = addTab("Community", null, "fa-earth-europe");
+  confirmed.forEach((m) => addTab(m.name, m));
 
-  return select(confirmed[0], firstBtn);
+  return select(null, communityBtn);
+}
+
+async function showVolunteerNotice(uid) {
+  let volunteer = null;
+
+  try {
+    const snap = await getDoc(doc(db, "volunteers", uid));
+    volunteer = snap.exists() ? snap.data() : null;
+  } catch (error) {
+    console.error("Errore lettura profilo volontario:", error);
+    return;
+  }
+
+  const expiring = expiringCount(volunteer);
+  let text = "";
+  let action = "";
+
+  if (!volunteer) {
+    text = "Completa il tuo profilo volontario: la tua associazione vedrà qualifiche, mansioni e disponibilità.";
+    action = "Compila il profilo";
+  } else if (expiring) {
+    text = expiring === 1
+      ? "Hai una qualifica scaduta o in scadenza. Quando la rinnovi aggiorna la data."
+      : `Hai ${expiring} qualifiche scadute o in scadenza. Quando le rinnovi aggiorna le date.`;
+    action = "Controlla le scadenze";
+  } else {
+    return;
+  }
+
+  const notice = document.getElementById("volNotice");
+  notice.classList.toggle("notice--info", !volunteer);
+
+  const message = document.createElement("span");
+  message.textContent = text;
+
+  const link = document.createElement("a");
+  link.className = "btn btn--sm";
+  link.href = "/dashboard/volunteers/profile/";
+  link.textContent = action;
+
+  notice.replaceChildren(message, link);
+  notice.hidden = false;
 }
 
 function showPending(pending) {
@@ -132,6 +310,17 @@ function showPending(pending) {
     role.textContent = " — richiesta in attesa";
     li.appendChild(role);
 
+    const cancelWrap = document.createElement("div");
+    cancelWrap.className = "leave-box";
+    buildLeaveControl(cancelWrap, m, {
+      ask: "Annulla la richiesta",
+      title: "Annulla la richiesta",
+      question: "Vuoi annullare la richiesta a {name}?",
+      yes: "Sì, annulla",
+      done: "Richiesta annullata."
+    });
+    li.appendChild(cancelWrap);
+
     assocList.appendChild(li);
   });
 }
@@ -141,6 +330,8 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "/login/";
     return;
   }
+
+  currentUser = user;
 
   const timeoutId = setTimeout(() => {
     console.warn("Timeout caricamento, forzo visualizzazione");
@@ -175,32 +366,20 @@ onAuthStateChanged(auth, async (user) => {
     initBottomNav(userData, user, "user");
 
     if (staffRoles.includes(userData.role)) {
-      const staffLinkEl = document.querySelector(".navbar");
-      const br = document.createElement("br");
-      const link = document.createElement("a");
-      link.href = "/staff/dashboard/";
-      link.textContent = "Passa alla dashboard staff";
-      staffLinkEl.appendChild(br);
-      staffLinkEl.appendChild(link);
+      addStaffLink();
     }
 
     const memberships = await loadMemberships(user.uid);
     const confirmed = memberships.filter((m) => m.stato === "confermata");
     const pending = memberships.filter((m) => m.stato === "richiesta");
 
-    if (confirmed.length === 0 && pending.length === 0) {
-      clearTimeout(timeoutId);
-      window.location.replace("/associations/");
-      return;
-    }
-
     const userName = `${userData.name || ""} ${userData.surname || ""}`.trim() || userData.username || "Utente";
 
-    if (confirmed.length > 0) {
-      await showFeed(confirmed, user, userName);
-    } else {
-      showPending(pending);
-    }
+    if (confirmed.length > 0) showVolunteerNotice(user.uid);
+    if (pending.length > 0) showPending(pending);
+    if (confirmed.length === 0 && pending.length === 0) document.getElementById("joinBox").hidden = false;
+
+    await showFeed(confirmed, user, userData, userName);
 
     clearTimeout(timeoutId);
     loadingEl.style.display = "none";

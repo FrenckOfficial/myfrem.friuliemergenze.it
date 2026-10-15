@@ -5,6 +5,7 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { escapeHtml } from "/helpers/escapeHtml.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -74,11 +75,11 @@ async function loadUsers() {
 
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${data.email ?? "—"}</td>
+      <td>${escapeHtml(data.email ?? "—")}</td>
       <td>${timestamp}</td>
-      <td>${data.userId ?? "—"}</td>
-      <td>${data.ipAddress ?? "—"}</td>
-      <td>${data.userAgent ?? "—"}</td>
+      <td>${escapeHtml(data.userId ?? "—")}</td>
+      <td>${escapeHtml(data.ipAddress ?? "—")}</td>
+      <td>${escapeHtml(data.userAgent ?? "—")}</td>
     `;
 
     row.addEventListener("click", () => {

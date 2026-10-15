@@ -16,9 +16,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentazione MyFrEM - Friuli Emergenze</title>
   <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/app.css">
   <link rel="stylesheet" href="/docs/style.css">
 </head>
-<body>
+<body class="app">
   <nav class="navbar">
     <div class="navbar-container">
       <a href="/docs/" class="logo">MyFrEM Docs</a>
@@ -45,7 +46,6 @@
         <span class="sidebar-title">Guide Dettagliate</span>
         <a href="#" data-page="guide-registrazione" class="sidebar-link">Registrazione</a>
         <a href="#" data-page="guide-carica-foto" class="sidebar-link">Carica Foto</a>
-        <a href="#" data-page="guide-proponi-evento" class="sidebar-link">Proponi Evento</a>
         <a href="#" data-page="guide-visualizza" class="sidebar-link">Visualizza Contenuti</a>
         <a href="#" data-page="guide-profilo" class="sidebar-link">Profilo e Account</a>
       </div>
@@ -60,12 +60,12 @@
       <header class="page-header">
         <h1>Benvenuto in MyFrEM</h1>
         <p class="page-subtitle">La documentazione ufficiale della piattaforma</p>
-        <p class="page-subtitle">Ultimo aggiornamento: 16/09/2026 - 18:32</p>
+        <p class="page-subtitle">Ultimo aggiornamento: 15/10/2026</p>
       </header>
 
       <div class="content">
         <h2>Cos'è MyFrEM?</h2>
-        <p>MyFrEM è la piattaforma ufficiale di Friuli Emergenze dedicata alla condivisione di foto e alla documentazione dei mezzi di soccorso del Friuli-Venezia Giulia. È uno spazio dove fotografi dilettanti e professionisti possono condividere il loro lavoro, proporre eventi, e far parte di una community appassionata di emergenze.</p>
+        <p>MyFrEM è la piattaforma ufficiale di Friuli Emergenze dedicata alla condivisione di foto e alla documentazione dei mezzi di soccorso del Friuli-Venezia Giulia. È uno spazio dove fotografi dilettanti e professionisti possono condividere il loro lavoro e far parte di una community appassionata di emergenze. Ospita anche le associazioni di volontariato del territorio, con i loro volontari, le comunicazioni e i turni di servizio.</p>
 
         <h2>Cosa puoi fare su MyFrEM?</h2>
         <div class="feature-grid">
@@ -87,7 +87,7 @@
         <p>Se è la tua prima volta su MyFrEM, leggi la <a href="#" data-page="guide-registrazione" class="inline-link">guida alla registrazione</a>. Se cerchi una risposta veloce a una domanda specifica, consulta le <a href="#" data-page="faq" class="inline-link">FAQ</a>. Se hai un problema, controlla la sezione <a href="#" data-page="troubleshooting" class="inline-link">Troubleshooting</a>.</p>
 
         <div class="info-box">
-          <h4>💡 Suggerimento</h4>
+          <h4>Suggerimento</h4>
           <p>Usa il menu a sinistra per navigare tra tutte le guide dettagliate. Ogni sezione è approfondita e contiene tutte le informazioni che ti servono.</p>
         </div>
       </div>
@@ -106,14 +106,14 @@
           <div class="faq-item">
             <button class="faq-toggle">Come mi registro su MyFrEM?</button>
             <div class="faq-answer">
-              <p>La registrazione è semplice e gratuita. Vai su myfrem.friuliemergenze.it e clicca "Registrati". Completa il modulo in 6 step fornendo nome, username, mail, telefono e password, con la possibilità di controllare le informazioni inserite prima di creare effettivamente l'account. Infine verifica l'email ricevuta per attivare il tuo account.</p>
+              <p>La registrazione è gratuita. Vai su myfrem.friuliemergenze.it e clicca "Registrati": in due passaggi inserisci nome, cognome e username, poi email e password. Infine apri il link che ti mandiamo via email per attivare l'account. In alternativa, dalla pagina di accesso puoi usare "Continua con Google". Trovi tutti i dettagli nella <a href="#" data-page="guide-registrazione" class="inline-link">guida alla registrazione</a>.</p>
             </div>
           </div>
 
           <div class="faq-item">
             <button class="faq-toggle">Ho dimenticato la password. Cosa faccio?</button>
             <div class="faq-answer">
-              <p>Dalla pagina di login, clicca "Ho dimenticato la password?" e inserisci l'email del tuo account. Riceverai un link via email per reimpostare la password. Il link è valido per 24 ore. Se non ricevi l'email, controlla la cartella spam.</p>
+              <p>Dalla pagina di login, clicca "Ho dimenticato la password?" e inserisci l'email del tuo account. Riceverai un link via email per reimpostare la password: usalo subito, perché scade dopo poco tempo. Se non ricevi l'email, controlla la cartella spam.</p>
             </div>
           </div>
 
@@ -165,49 +165,40 @@
 
       <div class="content">
         <h2>Perché registrarsi?</h2>
-        <p>La registrazione è il primo passo per accedere a tutte le funzionalità di MyFrEM. Senza un account non potrai caricare foto, proporre eventi, o partecipare attivamente alla community. La registrazione è gratuita e richiede pochi minuti.</p>
+        <p>Con un account puoi caricare le tue foto, votare quelle degli altri, entrare nell'area volontari della tua associazione e ricevere le notifiche. La registrazione è gratuita e richiede un paio di minuti.</p>
 
-        <h2>Step 1: Accedi alla pagina di registrazione</h2>
-        <p>Vai su <b>myfrem.friuliemergenze.it</b> e clicca sul pulsante "Registrati" nella parte superiore della pagina. Verrai reindirizzato al modulo di registrazione.</p>
+        <h2>Due modi per registrarsi</h2>
+        <p>Vai su <b>myfrem.friuliemergenze.it</b> e clicca "Registrati". Puoi creare l'account con email e password, seguendo i passaggi qui sotto, oppure usare il tuo account Google.</p>
 
-        <h2>Step 2: Dati personali</h2>
-        <p>Inserisci il tuo nome e cognome. Questi dati compariranno pubblicamente accanto alle tue foto, quindi scegli come vuoi essere riconosciuto.</p>
+        <div class="info-box">
+          <h4>Con Google è ancora più veloce</h4>
+          <p>Dalla pagina di accesso clicca "Continua con Google": l'account viene creato subito, con nome ed email del tuo profilo Google, e non serve verificare l'email. Lo username viene preso dalla prima parte dell'indirizzo email e puoi cambiarlo quando vuoi dalle Impostazioni.</p>
+        </div>
 
-        <h2>Step 3: Username</h2>
-        <p>Scegli uno username che preferisci, in futuro potrai cambiarlo dalla pagina Impostazioni della dashboard.</p>
+        <h2>Passo 1: Come ti chiami</h2>
+        <p>Inserisci nome e cognome: compaiono accanto alle tue foto, quindi scegli come vuoi essere riconosciuto. Poi scegli uno username: da 3 a 20 caratteri, solo lettere minuscole, numeri, punto, trattino e underscore. Il sistema controlla subito che non sia già usato da qualcun altro. Potrai cambiarlo in seguito dalle Impostazioni.</p>
 
-        <h2>Step 4: Email</h2>
-        <p>Inserisci l'indirizzo email che utilizzerai per accedere al tuo profilo e ricevere le notifiche, se lo vorrai.</p>
+        <h2>Passo 2: Email e password</h2>
+        <p>Inserisci l'email con cui accederai e su cui riceverai le comunicazioni. Poi scegli la password e ripetila per conferma. La password deve avere almeno 8 caratteri, con almeno una lettera maiuscola, una minuscola e un numero.</p>
+        <p>Con il pulsante "Indietro" puoi tornare al passo precedente e correggere i dati prima di cliccare "Registrati".</p>
 
-        <h2>Step 5: Numero di telefono</h2>
-        <p>Inserisci il tuo numero di telefono. Non è obbligatorio ma è strettamente consigliato per la sicurezza dell'account e per utilizzarlo come metodo di verifica aggiuntiva del tuo account in fase di assistenza.</p>
-
-        <h2>Step 6: Password</h2>
-        <p>Scegli una password sicura. La password dovrebbe essere lunga almeno 12 caratteri e contenere almeno una lettera maiuscola, una minuscola, un numero e un carattere speciale. Puoi sempre cambiarla dalle impostazioni della dashboard.</p>
-
-        <h2>Step 7: Autenticazione a due fattori</h2>
-        <p>Per tutelare il tuo account MyFrEM puoi scegliere di attivare l'autenticazione a due fattori per il tuo account. Le modalità di attivazione sono due: via app (Authy, Google Authenticator) o via email all'indirizzo email associato al tuo account.</p>
-
-        <h2>Step 8: Verifica dei dati inseriti</h2>
-        <p>Controlla che tutti i dati inseriti siano corretti. In caso contrario puoi tornare indietro con il pulsante "Indietro" e modificare i dati prima di proseguire.</p>
-
-        <h2>Step 9: Verifica email</h2>
-        <p>Dopo aver completato il form, riceverai un'email di verifica all'indirizzo fornito. Clicca il link contenuto nell'email per attivare il tuo account. <b>Senza questa verifica, non potrai caricare contenuti.</b></p>
+        <h2>Passo 3: Verifica l'email</h2>
+        <p>Appena crei l'account ti mandiamo un'email con un link di conferma, valido per 24 ore. Aprilo per attivare l'account. <b>Finché non confermi l'indirizzo non puoi accedere.</b></p>
 
         <div class="warning-box">
-          <h4>⚠️ Email di verifica non ricevuta?</h4>
-          <p>Controlla la cartella spam della tua email. Se non la trovi nemmeno lì, contatta lo staff a <b>info@friuliemergenze.it</b> per ricevere un nuovo link.</p>
+          <h4>Email di verifica non ricevuta?</h4>
+          <p>Controlla le cartelle Spam, Promozioni e Posta indesiderata. Se non la trovi, dalla pagina "Controlla la tua email" clicca "Invia di nuovo l'email di conferma": puoi richiederla una volta al minuto. Se ancora non arriva, scrivi a <b>info@friuliemergenze.it</b>.</p>
         </div>
 
         <h2>Cosa succede dopo?</h2>
-        <p>Dopo la verifica email, il tuo account è attivo e pronto all'uso. Puoi fare il login con la tua email e password, e iniziare a caricare foto, proporre eventi, e interagire con la community.</p>
+        <p>Dopo la verifica l'account è attivo. Accedi con la tua email, oppure con lo username, e la password. Da lì puoi caricare foto, sfogliare la galleria e chiedere di entrare nella tua associazione dalla pagina <a href="/associations/" class="inline-link">Associazioni</a>.</p>
 
         <h2>Consigli utili</h2>
         <ul>
-          <li><b>Scegli una password forte:</b> Usa una combinazione di lettere maiuscole, minuscole, numeri e simboli.</li>
-          <li><b>Salva l'email di conferma:</b> Potrebbe servirti in futuro se dimentichi i dati.</li>
-          <li><b>Completa il profilo:</b> Dopo la registrazione, vai al tuo profilo e aggiungi una foto e una breve bio. Questo rende la tua pagina più completa e professionale.</li>
-          <li><b>Verifica le preferenze di notifica:</b> Puoi personalizzare le email che ricevi dalle impostazioni del profilo.</li>
+          <li><b>Attiva l'autenticazione a due fattori:</b> dalle Impostazioni puoi attivarla con un'app (Google Authenticator, Authy) oppure con un codice via email. È il modo migliore per proteggere l'account.</li>
+          <li><b>Scegli una password che usi solo qui:</b> lunga, con lettere, numeri e simboli.</li>
+          <li><b>Completa il profilo:</b> aggiungi una foto e una breve bio dalle Impostazioni, così la tua pagina pubblica è più completa.</li>
+          <li><b>Controlla la privacy:</b> se preferisci, dalle Impostazioni puoi rendere privato il tuo profilo.</li>
         </ul>
       </div>
     </div>
@@ -306,108 +297,17 @@
       </div>
     </div>
 
-    <!-- GUIDE: PROPONI EVENTO -->
-    <div id="page-guide-proponi-evento" class="page">
-      <header class="page-header">
-        <h1>Come Proporre un Evento su MyFrEM</h1>
-        <p class="page-subtitle">Guida completa alla creazione di un evento</p>
-        <p class="page-subtitle">Sezione a cura di: <a href="mailto:francesco@friuliemergenze.it">Francesco Vio</a></p>
-      </header>
-
-      <div class="content">
-        <h2>Cos'è un evento su MyFrEM?</h2>
-        <p>Un evento è una manifestazione, esercitazione, raduno o altra occasione dove sarà possibile fotografare mezzi di soccorso. Gli eventi proposti dalla community aiutano altri fotograffi a organizzarsi e a trovare opportunità di scattare foto interessanti.</p>
-
-        <h3>Esempi di eventi</h3>
-        <ul>
-          <li>Esercitazioni programmate (VVF, Protezione Civile, ecc.)</li>
-          <li>Raduni commemorativi (anniversari, dedicazioni)</li>
-          <li>Rassegne e gare di velocità</li>
-          <li>Inaugurazioni di nuove sedi o mezzi</li>
-          <li>Dimostrazioni pubbliche</li>
-        </ul>
-
-        <h2>Criteri per un evento valido</h2>
-        <p>Affinché un evento venga approvato, deve:</p>
-        <ul>
-          <li>Essere <b>reale e verificabile</b> (non ipotetico o immaginario)</li>
-          <li>Avere una <b>data credibile</b> (non nel passato)</li>
-          <li>Essere <b>pubblicamente accessibile</b> (non privato)</li>
-          <li>Coinvolgere <b>mezzi di soccorso visibili</b></li>
-          <li>Essere <b>rilevante per il progetto Friuli Emergenze</b></li>
-        </ul>
-
-        <h2>Step per proporre un evento</h2>
-
-        <h3>Step 1: Accedi a MyFrEM</h3>
-        <p>Fai il login e vai alla sezione "Proponi Evento" dal menu principale.</p>
-
-        <h3>Step 2: Compila i dati di base</h3>
-        <p><b>Nome dell'evento:</b> Deve essere chiaro e descrittivo. Esempi: "Esercitazione Vigili del Fuoco", "Raduno Guardia Costiera Trieste".</p>
-
-        <h3>Step 3: Scrivi una descrizione</h3>
-        <p>La descrizione è fondamentale per l'approvazione. Includi:</p>
-        <ul>
-          <li><b>Cosa succederà:</b> Descrivi l'evento (esercitazione, raduno, dimostrazione, ecc.)</li>
-          <li><b>Chi organizza:</b> Qual è l'ente responsabile?</li>
-          <li><b>Cosa fotografare:</b> Quali tipi di mezzi saranno presenti?</li>
-          <li><b>Accesso:</b> È pubblico? Sono necessari permessi?</li>
-          <li><b>Informazioni pratiche:</b> Durata, parcheggio, contatti utili</li>
-        </ul>
-        <p>Una descrizione completa aumenta la probabilità di approvazione.</p>
-        
-        <h3>Step 4: Seleziona il luogo</h3>
-        <p>Scegli la provincia e il comune dove si svolgerà l'evento. Se conosci l'indirizzo specifico, puoi anche aggiungerlo nella descrizione.</p>
-
-        <h3>Step 5: Invia la proposta</h3>
-        <p>Clicca "Proponi Evento". La tua proposta entra in coda di moderazione.</p>
-
-        <h2>Stato dell'evento</h2>
-        <p>Dopo la proposta, l'evento passa per:</p>
-        <ul>
-          <li><b>In sospeso:</b> Lo staff verifica se è reale e rilevante. Di solito 6-12 ore.</li>
-          <li><b>Approvato:</b> Pubblicato nella sezione eventi e notificato ai follower interessati.</li>
-          <li><b>Rifiutato:</b> Non conforme ai criteri. Riceverai una notifica email con il motivo.</li>
-        </ul>
-
-        <h2>Cosa succede dopo l'approvazione?</h2>
-        <p>Una volta approvato, l'evento appare nella sezione dedicata e gli utenti interessati ricevono una notifica. L'evento diventa visibile nella galleria e gli utenti possono:</p>
-        <ul>
-          <li>Visualizzare i dettagli completi</li>
-          <li>Segnalare interesse ("Parteciperò")</li>
-          <li>Caricare foto scattate durante l'evento</li>
-          <li>Condividere su social media</li>
-        </ul>
-
-        <h2>Consigli per una proposta di successo</h2>
-        <ul>
-          <li><b>Proponi con anticipo:</b> Almeno una settimana prima dell'evento. Così gli altri contributor hanno tempo di organizzarsi.</li>
-          <li><b>Sii preciso:</b> Più dettagli fornisci, più facile è per lo staff approvare.</li>
-          <li><b>Includi una fonte:</b> Un link a un comunicato ufficiale aumenta l'affidabilità della proposta.</li>
-          <li><b>Descrivi i mezzi:</b> Se sai quali corpi parteciperanno, menzionali nella descrizione.</li>
-          <li><b>Verifica l'accesso:</b>  Assicurati che l'evento sia pubblicamente accessibile o che i permessi siano chiari.</li>
-        </ul>
-
-        <h2>Se l'evento viene rifiutato</h2>
-        <p>Se ricevi una notifica di rifiuto, leggi il motivo nell'email. Puoi:</p>
-        <ol>
-          <li><b>Proporre di nuovo:</b> Correggi i problemi evidenziati e riproponi l'evento.</li>
-          <li><b>Contattare lo staff:</b> Se pensi ci sia un errore, scrivi a info@friuliemergenze.it.</li>
-        </ol>
-      </div>
-    </div>
-
     <!-- GUIDE: VISUALIZZA CONTENUTI -->
     <div id="page-guide-visualizza" class="page">
       <header class="page-header">
         <h1>Come Visualizzare i Contenuti su MyFrEM</h1>
-        <p class="page-subtitle">Guida alla galleria, agli eventi e alla ricerca</p>
+        <p class="page-subtitle">Guida alla galleria e alla ricerca</p>
         <p class="page-subtitle">Sezione a cura di: <a href="mailto:francesco@friuliemergenze.it">Francesco Vio</a></p>
       </header>
 
       <div class="content">
         <h2>La galleria di MyFrEM</h2>
-        <p>La galleria è il cuore della piattaforma. È il luogo dove trovare tutte le foto e gli eventi approvati caricati dai contributor della community.</p>
+        <p>La galleria è il cuore della piattaforma. È il luogo dove trovare tutte le foto approvate caricate dai contributor della community.</p>
 
         <h2>Accedere alla galleria</h2>
         <p>Dal menu principale di MyFrEM, clicca su "Tutte le foto" per accedere alla galleria completa. Qui troverai tutte le foto in galleria provenienti da MyFrEM.</p>
@@ -420,14 +320,16 @@
         </ul>
 
         <h2>Ricerca per parola chiave</h2>
-        <p>Usa la barra di ricerca per trovare foto o eventi specifici. Puoi cercare per:</p>
+        <p>Usa la barra di ricerca per trovare foto specifiche. Puoi cercare per:</p>
         <ul>
-          <li>Titolo della foto</li>
-          <li>Nome dell'evento</li>
-          <li>Username dell'autore</li>
-          <li>Tag aggiunto alla foto</li>
-          <li>Luogo (provincia o comune)</li>
+          <li>Modello del mezzo</li>
+          <li>Targa</li>
+          <li>Sede di appartenenza</li>
+          <li>Servizio svolto</li>
+          <li>Nome dell'autore</li>
+          <li>Note della foto</li>
         </ul>
+        <p>Con il menu accanto alla ricerca puoi anche mostrare solo le foto di un servizio (per esempio 118 o Vigili del Fuoco).</p>
 
         <h2>Visualizzare una foto</h2>
 
@@ -453,9 +355,8 @@
         <ul>
           <li>Nome e bio dell'autore</li>
           <li>Tutte le sue foto approvate</li>
-          <li>Gli eventi che ha proposto</li>
           <li>Data di iscrizione</li>
-          <li>Numero totale di foto e eventi</li>
+          <li>Numero totale di foto pubblicate</li>
         </ul>
       </div>
     </div>
@@ -525,9 +426,6 @@
           <li><b>Rifiutata:</b> Non conforme (vedi il motivo nell'email)</li>
         </ul>
 
-        <h3>I miei eventi</h3>
-        <p>Visualizza tutti gli eventi che hai proposto, con il loro stato (In sospeso / Approvato / Rifiutato).</p>
-
         <h2>Privacy e diritti</h2>
 
         <h3>Cosa vede il pubblico del tuo profilo?</h3>
@@ -537,7 +435,6 @@
           <li>Il tuo ruolo account</li>
           <li>Lo status del tuo account (Attivo / Disattivato / Eliminato)</li>
           <li>Le tue foto caricate e approvate (cliccando nel box "Foto caricate")</li>
-          <li>Gli eventi che hai proposto e che sono stati organizzati (cliccando nel box "Eventi pubblicati")</li>
           <li>I badge che hai ottenuto nel tempo</li>
         </ul>
 
@@ -550,16 +447,16 @@
         </ul>
 
         <h2>Cancellare l'account</h2>
-        <p>Se desideri cancellare il tuo account, vai alle impostazioni di account e clicca "Elimina account". Questa azione è irreversibile. Dopo l'eliminazione:</p>
+        <p>Per cancellare il tuo account scrivi allo staff a <b>info@friuliemergenze.it</b> dall'indirizzo email collegato all'account. Lo staff disattiva subito l'account e, dopo <b>30 giorni</b>, viene cancellato definitivamente.</p>
         <ul>
-          <li>Il tuo profilo non sarà più visibile</li>
-          <li>Le tue foto verranno rimosse dalla galleria</li>
-          <li>I tuoi dati verranno cancellati dal sistema</li>
+          <li><b>Subito:</b> non puoi più accedere e il tuo profilo pubblico non è più visibile.</li>
+          <li><b>Dopo 30 giorni:</b> vengono cancellati i dati dell'account, il profilo volontario, lo storico dei turni, le adesioni alle associazioni e le notifiche.</li>
+          <li><b>Le foto già pubblicate restano nella galleria.</b> Se vuoi che vengano rimosse anche loro, indicalo nella richiesta e lo staff le eliminerà.</li>
         </ul>
 
         <div class="warning-box">
           <h4>⚠️ Attenzione</h4>
-          <p>L'eliminazione dell'account è permanente. Se hai foto che desideri conservare, scaricale prima di procedere.</p>
+          <p>Trascorsi i 30 giorni la cancellazione è definitiva e non può essere annullata. Se cambi idea prima della scadenza, scrivi allo staff il prima possibile.</p>
         </div>
 
         <h2>Consigli per la gestione del profilo</h2>

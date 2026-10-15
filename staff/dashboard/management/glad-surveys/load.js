@@ -15,6 +15,7 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { escapeHtml } from "/helpers/escapeHtml.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -87,11 +88,11 @@ async function loadSurveys() {
 
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${surveyId}</td>
-                <td>${survey.nome}</td>
-                <td><a href="mailto:${survey.email}">${survey.email}</a></td>
-                <td>${survey.valutazione}</td>
-                <td>${survey.commento || "No comment was provided"}</td>
+                <td>${escapeHtml(surveyId)}</td>
+                <td>${escapeHtml(survey.nome)}</td>
+                <td><a href="mailto:${encodeURIComponent(survey.email || "")}">${escapeHtml(survey.email)}</a></td>
+                <td>${escapeHtml(survey.valutazione)}</td>
+                <td>${escapeHtml(survey.commento || "Nessun commento")}</td>
                 <td>${createdAt}</td>
             `;
 

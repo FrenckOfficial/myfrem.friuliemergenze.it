@@ -263,6 +263,7 @@ async function generatePhotobookHtml(slug, photobookData) {
     <title>${escapeHtml(photobookData.title)} - Photobook | Friuli Emergenze</title>
 
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/site.css" />
     <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="/assets/logo.png" type="image/png" />
     <link

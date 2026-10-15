@@ -6,6 +6,7 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -28,6 +29,11 @@ const progressText = document.getElementById("progressText");
 const previewContainer = document.getElementById("previewContainer");
 const preview = document.getElementById("preview");
 const deletePreviewBtn = document.getElementById("deletePreviewBtn");
+const rulesCheck = document.getElementById("rulesCheck");
+const dropZone = document.getElementById("dropZone");
+
+const NO_FILE_TEXT = "Nessun file selezionato";
+let isUploading = false;
 
 let currentUser = null;
 let isReadOnlyMode = false;
@@ -85,13 +91,7 @@ onAuthStateChanged(auth, async (user) => {
       }
 
       if (staffRoles.includes(userData.role)) {
-        const staffLinkEl = document.querySelector('.navbar');
-        const br = document.createElement('br');
-        const link = document.createElement('a');
-        link.href = '/staff/dashboard/';
-        link.textContent = 'Passa alla dashboard staff';
-        staffLinkEl.appendChild(br);
-        staffLinkEl.appendChild(link);
+        addStaffLink();
       }
 
       initBottomNav(userData, user, "user");
@@ -111,7 +111,8 @@ onAuthStateChanged(auth, async (user) => {
 
 fileInput.addEventListener("change", async () => {
   if (fileInput.files.length > 0) {
-    fileNameSpan.textContent = `📸 ${fileInput.files.length} foto selezionate`;
+    const count = fileInput.files.length;
+    fileNameSpan.textContent = count === 1 ? `1 foto selezionata: ${fileInput.files[0].name}` : `${count} foto selezionate`;
     
     try {
       const firstFile = fileInput.files[0];
@@ -129,22 +130,26 @@ fileInput.addEventListener("change", async () => {
       previewContainer.style.display = "none";
     }
   } else {
-    fileNameSpan.textContent = "Nessun file";
+    fileNameSpan.textContent = NO_FILE_TEXT;
     previewContainer.style.display = "none";
   }
 });
 
+["dragenter", "dragover"].forEach((type) => dropZone.addEventListener(type, () => dropZone.classList.add("is-over")));
+["dragleave", "drop"].forEach((type) => dropZone.addEventListener(type, () => dropZone.classList.remove("is-over")));
+
 deletePreviewBtn.addEventListener("click", () => {
   fileInput.value = "";
-  fileNameSpan.textContent = "Nessun file";
+  fileNameSpan.textContent = NO_FILE_TEXT;
   preview.src = "";
   previewContainer.style.display = "none";
-  setStatus("Preview eliminato");
 });
 
 uploadBtn.addEventListener("click", async (e) => {
   e.preventDefault();
-  
+
+  if (isUploading) return;
+
   if (isReadOnlyMode) {
     return setStatus("Non puoi caricare foto in modalità sola lettura");
   }
@@ -157,13 +162,33 @@ uploadBtn.addEventListener("click", async (e) => {
     return setStatus("La sede di appartenenza è obbligatoria");
   }
   if (serviceTypeInput.value === "none") {
-    return setStatus("Seleziona una tipologia di servizio");
+    return setStatus("Seleziona il servizio svolto dal mezzo");
   }
 
   const files = fileInput.files;
   if (files.length === 0) return setStatus("Seleziona almeno una foto");
+  if (!rulesCheck.checked) return setStatus("Conferma di aver letto le regole prima di inviare le foto", "warning");
 
-  setStatus("Upload foto in corso...");
+  isUploading = true;
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "Caricamento in corso...";
+
+  try {
+    await uploadPhotos(files);
+  } catch (error) {
+    console.error("Errore caricamento foto:", error);
+    setStatus("Caricamento non riuscito::Controlla la connessione e riprova. Le foto già inviate restano salvate.", "error");
+    progressBar.style.display = "none";
+    progressText.style.display = "none";
+  } finally {
+    isUploading = false;
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Invia per la revisione";
+  }
+});
+
+async function uploadPhotos(files) {
+  setStatus("Caricamento delle foto in corso...");
   progressBar.style.display = "block";
   progressText.style.display = "block";
   progressBar.value = 0;
@@ -224,65 +249,14 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 90;
     progressText.textContent = "90%";
 
-    const userRef = doc(db, "users", currentUser.uid);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
-
-    if (!userData) {
-      console.error("userData è undefined");
-      continue;
-    }
-
-    if (userData.emailNotifications === true) {
-      const userEmail = userData.email
-      const userName = userData.name
-      const htmlContent = await buildStaffEmail(userEmail, userName, titleInput.value, fileUrl);
-  
-      const uploadedAt = new Date().toISOString();
-
-      if (uploadedAt.undefined === true) {
-        console.error("uploadedAt undefined");
-        continue;
-      }
-  
-      const response = await fetch("/api/sendPhotoNotification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userEmail: userEmail,
-          userName: userName,
-          photoName: titleInput.value + (licensePlateInput.value ? ` - ${licensePlateInput.value}` : "") + (locationInput.value ? ` - ${locationInput.value}` : ""),
-          uploadedAt: uploadedAt
-        })
-      })
-
-      if (!response.ok) {
-        console.error("Errore invio notifica email:", response.status);
-      }
-
-      const staffResponse = await fetch("/api/sendStaffNewPhotoEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          photoName: titleInput.value,
-          userName: userName,
-          htmlContent
-        })
-      })
-
-      if (!staffResponse.ok) {
-        console.error("Errore invio email staff:", staffResponse.status);
-      }
-    }
+    await notifyNewPhoto(ptDoc.id);
   }
 
-  setStatus(`Caricate ${uploadedCount}/${files.length} foto!`);
+  setStatus(uploadedCount === files.length
+    ? `${uploadedCount === 1 ? "Foto inviata" : `${uploadedCount} foto inviate`}::Lo staff la revisionerà a breve. Trovi lo stato in I miei contenuti.`
+    : `Inviate ${uploadedCount} foto su ${files.length}::Alcune foto non sono state elaborate, riprova con quelle mancanti.`, uploadedCount ? "success" : "error");
   fileInput.value = "";
-  fileNameSpan.textContent = "Nessun file";
+  fileNameSpan.textContent = NO_FILE_TEXT;
   progressText.textContent = "100%";
   progressBar.value = 100;
   setTimeout(() => {
@@ -292,13 +266,37 @@ uploadBtn.addEventListener("click", async (e) => {
     progressBar.value = 0;
     previewContainer.style.display = "none";
     preview.src = "";
+    progressBar.style.display = "none";
+    progressText.style.display = "none";
   }, 1500);
-});
+}
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await auth.signOut();
   window.location.href = "/login/";
 });
+
+async function notifyNewPhoto(photoId) {
+  let token;
+  try {
+    token = await currentUser.getIdToken();
+  } catch (error) {
+    console.error("Token non disponibile, notifiche non inviate:", error);
+    return;
+  }
+
+  const request = (path) => fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+    body: JSON.stringify({ photoId })
+  })
+    .then((response) => {
+      if (!response.ok) console.error(`Errore ${path}:`, response.status);
+    })
+    .catch((error) => console.error(`Errore ${path}:`, error));
+
+  await Promise.all([request("/api/sendPhotoNotification"), request("/api/sendStaffNewPhotoEmail")]);
+}
 
 async function addWatermarkToImage(file, logoUrl = null) {
   return new Promise((resolve, reject) => {
@@ -364,42 +362,4 @@ function finalizCanvas(canvas, originalFile, resolve) {
     );
     resolve(watermarkedFile);
   }, "image/jpeg", 0.95);
-}
-
-function buildStaffEmail(userEmail, userName, photoName, photoLink) {
-  return `
-    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="center">
-            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-              <tr>
-                <td style="padding:35px;text-align:center;">
-                  <img src="https://www.friuliemergenze.it/assets/logo.png" style="width:80px;margin-bottom:20px;" loading="lazy">
-                  
-                  <h1 style="color:#00d4e8;margin:0;font-size:28px;">Nuova foto caricata</h1>
-
-                  <p style="font-size:16px;color:#333;margin-top:25px;text-align:left;">
-                    <b>Utente:</b> ${userName}<br>
-                    <b>Email:</b> ${userEmail}<br>
-                    <b>Foto:</b> ${photoName}
-                  </p>
-
-                  <p style="text-align:center;margin-top:30px;">
-                    <img src="${photoLink}" style="width:100%;max-width:400px;">
-                  </p>
-
-                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
-                    MyFrEM · Friuli Emergenze<br>
-                    <a href="https://friuliemergenze.it" style="color:#00d4e8;text-decoration:none;">friuliemergenze.it</a> · 
-                    <a href="mailto:info@friuliemergenze.it" style="color:#00d4e8;text-decoration:none;">info@friuliemergenze.it</a>
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </div>
-  `;
 }

@@ -238,7 +238,6 @@ async function loadRequests() {
     return timeB - timeA;
   });
 
-  // I dati arrivano anche da ospiti: le celle usano textContent, mai innerHTML
   requests.forEach(r => {
     const tr = document.createElement("tr");
 

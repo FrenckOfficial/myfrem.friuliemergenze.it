@@ -1,88 +1,38 @@
-export default async (request, response) => {
+import { preflight, requireStaff, db, fail, HttpError } from "./_lib/server.js";
+
+const WORKFLOW_URL = "https://api.github.com/repos/FrenckOfficial/myfrem.friuliemergenze.it/actions/workflows/push-vehicle-github.yml/dispatches";
+
+export default async function handler(request, response) {
+  if (!preflight(request, response)) return;
+
   try {
+    await requireStaff(request);
 
-    let rawBody;
-    
-    if (request.body instanceof Buffer) {
-      rawBody = request.body.toString('utf-8');
-    } else if (typeof request.body === 'string') {
-      rawBody = request.body;
-    } else if (request.body && typeof request.body === 'object') {
-      rawBody = JSON.stringify(request.body);
-    } else {
-      try {
-        rawBody = await request.text();
-      } catch (e) {
-        console.error("Non riesco a leggere il body:", e);
-        return response.status(400).json({ error: "Body non valido" });
-      }
-    }
+    const draftId = String(request.body?.draftId || "");
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(draftId)) throw new HttpError(400, "draftId non valido");
 
-    if (!rawBody) {
-      return response.status(400).json({ error: "Body vuoto" });
-    }
+    const draft = await db().doc(`vehiclesDraft/${draftId}`).get();
+    if (!draft.exists) throw new HttpError(404, "Bozza non trovata");
 
-    let draftId;
     const token = process.env.GT_TOKEN;
+    if (!token) throw new HttpError(500, "Token GitHub non configurato");
 
-    try {
-      const parsed = JSON.parse(rawBody);
-      draftId = parsed.draftId;
-    } catch (err) {
-      console.error("JSON non valido:", err);
-      return response.status(400).json({ error: "JSON non valido" });
-    }
+    const githubResponse = await fetch(WORKFLOW_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ref: "main", inputs: { draftId } })
+    });
 
-    if (!draftId) {
-      console.error("draftId mancante");
-      return response.status(400).json({ error: "draftId mancante" });
-    }
-
-    if (!token) {
-      console.error("GITHUB_PAT non configurato");
-      return response.status(500).json({ error: "Token GitHub non configurato" });
-    }
-
-    const githubResponse = await fetch(
-      "https://api.github.com/repos/FrenckOfficial/myfrem.friuliemergenze.it/actions/workflows/push-vehicle-github.yml/dispatches",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          ref: "main",
-          inputs: {
-            draftId: String(draftId)
-          }
-        })
-      }
-    );
+    if (githubResponse.status === 204) return response.status(204).send("");
 
     const body = await githubResponse.text();
-
-    if (githubResponse.status === 204) {
-      return response.status(204).send("");
-    }
-
-    if (!githubResponse.ok) {
-      console.error("GitHub API Error:", githubResponse.status, body);
-      return response.status(githubResponse.status).json({
-        error: `GitHub API error: ${githubResponse.status}`,
-        details: body
-      });
-    }
-
-    return response.status(githubResponse.status).json(body);
-
+    console.error("GitHub API Error:", githubResponse.status, body);
+    throw new HttpError(502, `GitHub API error: ${githubResponse.status}`);
   } catch (error) {
-    console.error("Errore non gestito:", error.message);
-    console.error("Stack:", error.stack);
-    return response.status(500).json({
-      error: "Errore interno della funzione",
-      message: error.message
-    });
+    return fail(response, error);
   }
-};
+}

@@ -26,16 +26,18 @@ export default async function handler(req, res) {
   }
 
   const token = authHeader.split(' ')[1];
-    
+  let decoded;
+
   try {
-    await admin.auth().verifyIdToken(token);
+    decoded = await admin.auth().verifyIdToken(token);
   } catch (error) {
     console.error("Token verification failed:", error);
     return res.status(401).json({ error: "Invalid token" });
   }
 
   try {
-    const { email, name, timestamp, userAgent } = req.body;
+    const { name, timestamp, userAgent } = req.body || {};
+    const email = decoded.email;
 
     if (!email || !name) {
       return res.status(400).json({ 

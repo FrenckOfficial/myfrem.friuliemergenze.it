@@ -14,59 +14,68 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Le mie Foto | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Tutte le foto | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
   <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script defer type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
   <script defer type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
   <script defer type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
 </head>
-<body>
+<body class="app">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
-        <h2>MyFrEM</h2>
-      </div>
-      <nav class="navbar">
-        <a href="/dashboard">Home</a>
-        <a href="/dashboard/upload">Carica una foto</a>
-        <a href="/dashboard/my-content">I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos" class="active">Tutte le foto</a>
-        <a href="/dashboard/settings/">Impostazioni</a>
-      </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
 
-    <div class="main-content">
-      <div class="content-box" style="max-width:none;">
-        <h1>Tutte le foto</h1>
-        
-          
-          
-        </p>
-        <div class="gallery-search" style="margin-top: 10px;">
-          <input type="text" id="searchInput" placeholder="Cerca..." style="
-            width: 50%;
-            padding: 0.75rem;
-            margin: 1rem 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-          ">
+    <div class="main-content app-main">
+      <div class="app-container">
+        <header class="page-head">
+          <div>
+            <h1>Tutte le foto</h1>
+            <p>Le foto dei mezzi di soccorso approvate dallo staff. Vota quelle che ti piacciono di più.</p>
+          </div>
+        </header>
+
+        <div class="notice" id="readOnlyNotice" hidden>
+          <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          <span>Modalità sola lettura: puoi solo visualizzare i contenuti.</span>
         </div>
-        <div id="photosContainer" class="photos-grid">
-          <!-- Qui verranno generate le foto con JS -->
-        </div>
+
+        <section class="panel">
+          <div class="toolbar">
+            <label class="search">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <input type="search" id="searchInput" placeholder="Cerca per modello, targa, sede, autore" aria-label="Cerca tra le foto">
+            </label>
+            <select class="input select-compact" id="serviceFilter" aria-label="Filtra per servizio">
+              <option value="">Tutti i servizi</option>
+            </select>
+          </div>
+          <div class="panel__body">
+            <p class="hint results-count" id="resultsCount"></p>
+            <div id="photosContainer" class="pgrid"></div>
+          </div>
+        </section>
       </div>
+    </div>
     </div>
   </div>
   <script defer type="module" src="/dashboard/myfrem-photos/load.js"></script>
@@ -75,20 +84,6 @@
   <script src="/bottomNav.js"></script>
   
   
-  <script>
-    const searchInput = document.getElementById("searchInput");
-    const tableBody = document.getElementById("photosContainer");
-
-    searchInput.addEventListener("keyup", () => {
-      const filter = searchInput.value.toLowerCase();
-      const rows = tableBody.querySelectorAll(".photo-card");
-
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
-      });
-    });
-  </script>
   
   <div class="notification-bell-floating">
     <button class="bell-button" id="bellButton" aria-label="Notifiche">

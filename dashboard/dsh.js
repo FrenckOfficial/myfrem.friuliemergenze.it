@@ -2,6 +2,8 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
+import { photoStatus, STATUS, filled, formatDate, safeUrl } from "/dashboard/photos.js";
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -9,7 +11,6 @@ const db = firebase.firestore();
 
 let currentUser = null;
 let currentUserId = null;
-let allPhotos = [];
 
 const userNameEl = document.getElementById("userName");
 const totalPhotosEl = document.getElementById("totalPhotos");
@@ -30,81 +31,6 @@ const notificationStatusIcon = document.getElementById("notification-status-icon
 const notificationStatusText = document.getElementById("notification-status-text");
 const notificationStatusDesc = document.getElementById("notification-status-desc");
 const goToSurveyBtn = document.getElementById("goToSurveyBtn");
-
-const statsModal = document.getElementById("statsModal");
-const statsModalTitle = document.getElementById("statsModalTitle");
-const statsModalList = document.getElementById("statsModalList");
-const closeStatsModal = document.getElementById("closeStatsModal");
-const closeStatsModalBtn = document.getElementById("closeStatsModalBtn");
-const statsOverlay = statsModal ? statsModal.querySelector(".modal-overlay") : null;
-
-const filterLabels = {
-  all: "Tutte le foto caricate",
-  approved: "Foto approvate",
-  pending: "Foto in attesa",
-  rejected: "Foto rifiutate",
-};
-
-function matchesFilter(photo, filter) {
-  if (filter === "all") return true;
-  if (filter === "approved") return photo.status === "Approvata ✅" || photo.status === "Approvata";
-  if (filter === "pending") return photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛";
-  if (filter === "rejected") return photo.status === "Rifiutata ❌" || photo.status === "Rifiutata";
-  return false;
-}
-
-function getReadableStatus(photo) {
-  if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
-    return "Approvata";
-  } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
-    return "In attesa";
-  } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
-    return "Rifiutata";
-  }
-  return photo.status || "Sconosciuto";
-}
-
-function openStatsModal(filter) {
-  const filtered = allPhotos.filter((photo) => matchesFilter(photo, filter));
-
-  statsModalTitle.textContent = filterLabels[filter] || "Foto";
-  statsModalList.innerHTML = "";
-
-  if (filtered.length === 0) {
-    statsModalList.innerHTML = "<li>Nessuna foto in questa categoria.</li>";
-  } else {
-    filtered.forEach((photo) => {
-      const status = getReadableStatus(photo);
-
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <p><b>${photo.vehicleModel || "Foto"}</b><br>
-        Caricata il <em>${photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"}</em><br>
-        Revisionata il <em>${photo.reviewedAt?.toDate().toLocaleString() || "non ancora revisionata"}</em><br>
-        Stato: <em>${status}</em></p>
-      `;
-      statsModalList.appendChild(li);
-    });
-  }
-
-  statsModal.classList.add("active");
-}
-
-function closeStatsModalFn() {
-  statsModal.classList.remove("active");
-}
-
-if (statsModal) {
-  document.querySelectorAll(".card-clickable").forEach((card) => {
-    card.addEventListener("click", () => {
-      openStatsModal(card.dataset.filter);
-    });
-  });
-
-  closeStatsModal?.addEventListener("click", closeStatsModalFn);
-  closeStatsModalBtn?.addEventListener("click", closeStatsModalFn);
-  statsOverlay?.addEventListener("click", closeStatsModalFn);
-}
 
 auth.onAuthStateChanged(async (user) => {
   currentUser = user;
@@ -216,7 +142,7 @@ auth.onAuthStateChanged(async (user) => {
       }
     });
 
-    document.addEventListener("DOMContentLoaded", checkNotificationStatus);
+    checkNotificationStatus();
 
     const staffRoles = [
       "simplestaff",
@@ -246,20 +172,10 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     if (staffRoles.includes(userData.role)) {
-      const staffLinkEl = document.querySelector(".navbar");
-      const br = document.createElement("br");
-      const link = document.createElement("a");
-      link.href = "/staff/dashboard/";
-      link.textContent = "Passa alla dashboard staff";
-      staffLinkEl.appendChild(br);
-      staffLinkEl.appendChild(link);
+      addStaffLink();
     }
 
-    if (userData) {
-      userNameEl.textContent = `${userData.name} (${userData.username})`;
-    } else {
-      userNameEl.textContent = "Utente";
-    }
+    userNameEl.textContent = filled(userData?.name) || filled(userData?.username) || "volontario";
 
     if (userData.newsSubbed === false) {
       newsBannerEl.style.display = "block";
@@ -273,53 +189,21 @@ auth.onAuthStateChanged(async (user) => {
       .orderBy("createdAt", "desc")
       .get();
 
-    let total = 0,
-      approved = 0,
-      pending = 0,
-      rejected = 0;
-    let displayCount = 0;
-    activityListEl.innerHTML = "";
-    allPhotos = [];
+    const counts = { approved: 0, pending: 0, rejected: 0 };
+    const recent = [];
 
     photosSnap.forEach((doc) => {
       const photo = doc.data();
-      let status;
-      total++;
-
-      if (photo.status === "Approvata ✅" || photo.status === "Approvata") approved++;
-      if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") pending++;
-      if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") rejected++;
-
-      if (photo.status === "Approvata ✅" || photo.status === "Approvata") {
-        status = "Approvata";
-      } else if (photo.status === "Foto in attesa di approvazione" || photo.status === "Foto in attesa di approvazione ⌛") {
-        status = "In attesa";
-      } else if (photo.status === "Rifiutata ❌" || photo.status === "Rifiutata") {
-        status = "Rifiutata";
-      }
-
-      allPhotos.push(photo);
-
-      if (displayCount < 5) {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <p>Foto caricata il ${
-            photo.createdAt?.toDate().toLocaleString() || "data sconosciuta"
-          } - Stato: <b>${photo.status}</b></p>
-        `;
-        activityListEl.appendChild(li);
-        displayCount++;
-      }
+      counts[photoStatus(photo)]++;
+      if (recent.length < 5) recent.push(photo);
     });
 
-    totalPhotosEl.textContent = total;
-    approvedPhotosEl.textContent = approved;
-    pendingPhotosEl.textContent = pending;
-    rejectedPhotosEl.textContent = rejected;
+    totalPhotosEl.textContent = photosSnap.size;
+    approvedPhotosEl.textContent = counts.approved;
+    pendingPhotosEl.textContent = counts.pending;
+    rejectedPhotosEl.textContent = counts.rejected;
 
-    if (total === 0) {
-      activityListEl.innerHTML = "<li>Nessuna attività recente.</li>";
-    }
+    renderRecentPhotos(recent);
 
     if (isReadOnlyMode) {
       newsletterBtn.disabled = true;
@@ -389,6 +273,52 @@ auth.onAuthStateChanged(async (user) => {
     contentEl.style.display = "block";
   }
 });
+
+function renderRecentPhotos(photos) {
+  if (photos.length === 0) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.innerHTML = '<i class="fa-solid fa-camera" aria-hidden="true"></i>Non hai ancora caricato foto. <a href="/dashboard/upload">Carica la prima</a>.';
+    activityListEl.replaceChildren(li);
+    return;
+  }
+
+  activityListEl.replaceChildren(...photos.map((photo) => {
+    const li = document.createElement("li");
+    li.className = "row";
+
+    const thumb = document.createElement("span");
+    thumb.className = "avatar avatar--square";
+    const url = safeUrl(photo.url);
+    if (url) {
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "";
+      img.loading = "lazy";
+      thumb.append(img);
+    } else {
+      thumb.innerHTML = '<i class="fa-solid fa-image" aria-hidden="true"></i>';
+    }
+
+    const main = document.createElement("div");
+    main.className = "row__main";
+    const title = document.createElement("div");
+    title.className = "row__title";
+    title.textContent = filled(photo.vehicleModel) || "Foto";
+    const sub = document.createElement("div");
+    sub.className = "row__sub";
+    sub.textContent = [filled(photo.location), formatDate(photo.createdAt)].filter(Boolean).join(" · ");
+    main.append(title, sub);
+
+    const status = STATUS[photoStatus(photo)];
+    const chip = document.createElement("span");
+    chip.className = `chip ${status.chip}`;
+    chip.textContent = status.label;
+
+    li.append(thumb, main, chip);
+    return li;
+  }));
+}
 
 let currentStep = 1;
 const PHONE_STEP = 5;

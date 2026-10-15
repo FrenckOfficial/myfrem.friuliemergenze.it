@@ -1,9 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { setReferentNavbar, setNavCount } from "/helpers/loadNavbar.js";
 
 import { firebaseConfig } from "/helpers/configFirebase.js";
 
@@ -18,28 +19,21 @@ export function clean(value) {
   return String(value || "").trim().replace(/\s+/g, " ");
 }
 
+async function showPendingCount(associationId) {
+  try {
+    const pending = query(collection(db, "associations", associationId, "members"), where("stato", "==", "richiesta"));
+    const snap = await getCountFromServer(pending);
+    setNavCount("/association/dashboard/members/", snap.data().count);
+  } catch (error) {
+    console.error("Errore conteggio richieste in attesa:", error);
+  }
+}
+
 function showAccessDenied(loadingEl, contentEl, message) {
   loadingEl.style.display = "none";
   contentEl.style.display = "block";
   setStatus(message, "error");
   window.location.href = "/dashboard";
-}
-
-function adaptSidebarForReferent(associationId) {
-  document.querySelectorAll(".navbar a").forEach((a) => {
-    const href = a.getAttribute("href");
-
-    if (href === "/association/dashboard/page/" || href === "/association/dashboard/members/") {
-      a.href = `${href}?assoc=${encodeURIComponent(associationId)}`;
-    } else {
-      a.style.display = "none";
-    }
-  });
-
-  const back = document.createElement("a");
-  back.href = "/dashboard/volunteers/";
-  back.textContent = "Area volontari";
-  document.querySelector(".navbar").appendChild(back);
 }
 
 export function initAssociationPage(onReady, options = {}) {
@@ -101,7 +95,7 @@ export function initAssociationPage(onReady, options = {}) {
 
       const allowed = !!member && member.stato === "confermata" && (
         isReferente
-          ? member.role === "referente" && (!requirePerm || (member.permessi || []).includes(requirePerm))
+          ? member.role === "referente" && (!requirePerm || [].concat(requirePerm).some((perm) => (member.permessi || []).includes(perm)))
           : member.role === "associazione"
       );
 
@@ -113,7 +107,12 @@ export function initAssociationPage(onReady, options = {}) {
 
       initBottomNav(userData, user, isReferente ? "user" : "association");
 
-      if (isReferente) adaptSidebarForReferent(associationId);
+      if (isReferente) {
+        setReferentNavbar(associationId);
+        document.querySelector(".app-brand")?.setAttribute("href", "/dashboard/volunteers/");
+      }
+
+      if (!isReferente || (member.permessi || []).includes("membri")) showPendingCount(associationId);
 
       await onReady({ user, userData, associationId, association: assocSnap.data(), member, isReferente });
 

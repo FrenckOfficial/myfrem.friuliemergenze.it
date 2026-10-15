@@ -16,56 +16,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Area volontari | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
-  <link rel="stylesheet" href="/helpers/feed.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
   <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script defer type="module" src="/dashboard/volunteers/volunteers.js"></script>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
 </head>
-<body>
+<body class="app">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
-        <h2>MyFrEM</h2>
-      </div>
-      <nav class="navbar">
-        <a href="/dashboard">Home</a>
-        <a href="/dashboard/upload">Carica una foto</a>
-        <a href="/dashboard/my-content">I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos">Tutte le foto</a>
-        <a href="/dashboard/volunteers/" class="active">Area volontari</a>
-        <a href="/dashboard/settings/">Impostazioni</a>
-      </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
  
-    <main class="main-content">
-      <header class="header">
-        <h1>Area volontari</h1>
-        <p>Lo spazio riservato ai volontari delle associazioni su MyFrEM.</p>
+    <main class="main-content app-main">
+      <div class="app-container">
+      <header class="page-head">
+        <div>
+          <h1>Area volontari</h1>
+          <p>Il feed della community e le bacheche delle associazioni di cui fai parte.</p>
+        </div>
+        <div class="head-actions">
+          <a class="btn" href="/dashboard/volunteers/shifts/"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i>Turni e ore</a>
+          <a class="btn" href="/dashboard/volunteers/profile/"><i class="fa-solid fa-id-badge" aria-hidden="true"></i>Il mio profilo volontario</a>
+        </div>
       </header>
- 
-      <section id="feedSection" style="margin-top:22px" hidden>
-        <div id="assocTabs" class="assoc-tabs"></div>
-        <div id="manageLinks" class="manage-links" hidden></div>
-        <div id="feedRoot"></div>
-      </section>
- 
+
+      <div class="notice vol-cta" id="volNotice" hidden></div>
+
+      <div class="notice notice--info vol-cta" id="joinBox" hidden>
+        <span>Non fai ancora parte di un'associazione. Unisciti alla tua per vedere la sua bacheca, i turni e le comunicazioni ufficiali.</span>
+        <a class="btn btn--sm" href="/associations/">Trova la tua associazione</a>
+      </div>
+
       <section class="wip-box" id="pendingBox" hidden>
-        <h2 id="wipTitle">Area in costruzione</h2>
+        <h2 id="wipTitle">Richiesta in attesa</h2>
         <p id="wipText"></p>
-        <ul id="assocList" class="assoc-list">
-          <!-- JS Loading -->
-        </ul>
+        <ul id="assocList" class="assoc-list"></ul>
         <a class="link-more" href="/associations/">Vedi tutte le associazioni</a>
       </section>
+
+      <section id="feedSection" class="board-col" hidden>
+        <div id="assocTabs" class="assoc-tabs"></div>
+        <div id="manageLinks" class="manage-links" hidden></div>
+        <section id="feedRoot"></section>
+        <div id="leaveBox" class="leave-box" hidden></div>
+      </section>
+      </div>
     </main>
+    </div>
   </div>
  
   <link rel="stylesheet" href="/bottomNav.css">

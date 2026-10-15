@@ -1,18 +1,43 @@
+const SDK_VERSIONS = ["10.13.0", "11.10.0", "10.7.0"];
+
+async function currentIdToken() {
+  for (const version of SDK_VERSIONS) {
+    try {
+      const { getApps } = await import(`https://www.gstatic.com/firebasejs/${version}/firebase-app.js`);
+      if (!getApps().length) continue;
+
+      const { getAuth } = await import(`https://www.gstatic.com/firebasejs/${version}/firebase-auth.js`);
+      const user = getAuth(getApps()[0]).currentUser;
+      if (user) return user.getIdToken();
+    } catch (error) {
+      console.warn(`SDK Firebase ${version} non disponibile:`, error);
+    }
+  }
+
+  throw new Error("Devi aver effettuato l'accesso per caricare file.");
+}
+
 export async function uploadFile(file, bucket, uid) {
   try {
+    const token = await currentIdToken();
+
     const urlResponse = await fetch('https://myfrem.friuliemergenze.it/api/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         fileName: file.name,
         contentType: file.type,
-        uid,
+        size: file.size,
         bucket,
       }),
     });
 
     if (!urlResponse.ok) {
-      throw new Error(`Richiesta URL fallita: ${urlResponse.status}`);
+      const detail = await urlResponse.json().catch(() => ({}));
+      throw new Error(detail.error || `Richiesta URL fallita: ${urlResponse.status}`);
     }
 
     const { uploadUrl, publicUrl } = await urlResponse.json();

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turni e ore | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script defer type="module" src="/dashboard/volunteers/shifts/shifts.js"></script>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+</head>
+<body class="app">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
+ 
+    <main class="main-content app-main">
+      <div class="app-container">
+        <header class="page-head">
+          <div>
+            <h1>Turni e ore</h1>
+            <p>Candidati ai turni delle tue associazioni e tieni il conto delle ore di servizio confermate.</p>
+          </div>
+          <div class="head-actions">
+            <a class="btn" href="/dashboard/volunteers/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Area volontari</a>
+            <a class="btn btn--primary" id="certificateLink" href="/dashboard/volunteers/attestato/"><i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>Attestato ore</a>
+          </div>
+        </header>
+
+        <div class="notice notice--info vol-cta" id="noAssocNotice" hidden>
+          <span>I turni sono organizzati dalle associazioni. Unisciti alla tua per vedere quelli disponibili.</span>
+          <a class="btn btn--sm" href="/associations/">Trova la tua associazione</a>
+        </div>
+
+        <section class="stats">
+          <div class="stat"><span class="stat__icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></span><div><div class="stat__value" id="statYear">0</div><div class="stat__label" id="statYearLabel">Ore quest'anno</div></div></div>
+          <div class="stat"><span class="stat__icon"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i></span><div><div class="stat__value" id="statMonth">0</div><div class="stat__label">Ore questo mese</div></div></div>
+          <div class="stat"><span class="stat__icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><div><div class="stat__value" id="statDone">0</div><div class="stat__label">Turni svolti</div></div></div>
+          <div class="stat"><span class="stat__icon"><i class="fa-solid fa-forward" aria-hidden="true"></i></span><div><div class="stat__value stat__value--sm" id="statNext">—</div><div class="stat__label">Prossimo turno</div></div></div>
+        </section>
+
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel__head">
+              <h2>Turni disponibili</h2>
+              <span class="hint" id="openHint"></span>
+            </div>
+            <ul class="rows" id="openList"></ul>
+          </section>
+
+          <aside class="stack">
+            <section class="panel">
+              <div class="panel__head">
+                <h2>I miei prossimi turni</h2>
+              </div>
+              <ul class="rows" id="mineList"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="panel__head">
+                <h2>Storico</h2>
+                <select class="input filter-select" id="yearSelect" aria-label="Anno"></select>
+              </div>
+              <ul class="rows" id="historyList"></ul>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+    </div>
+  </div>
+ 
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
+  <script defer type="module" src="/dashboard/ntf.js"></script>
+  <div class="notification-bell-floating">
+    <button class="bell-button" id="bellButton" aria-label="Notifiche">
+      <svg class="bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
+    </button>
+ 
+    <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
+      <div class="dropdown-header">
+        <h3>Notifiche</h3>
+        <button class="close-btn" id="closeDropdownBtn">✕</button>
+      </div>
+ 
+      <div class="notification-list" id="notificationList">
+        <!-- Caricato dinamicamente -->
+      </div>
+ 
+      <div class="dropdown-footer">
+        <a href="/dashboard/notifications" class="view-all-link">
+          Vedi tutte →
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

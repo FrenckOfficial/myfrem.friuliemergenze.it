@@ -15,8 +15,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Impostazioni utente | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <title>Impostazioni | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <!-- Necessario per la generazione/verifica TOTP (2FA) -->
   <script src="https://cdn.jsdelivr.net/npm/otplib@13.4.1/dist/index.global.min.js"></script>
@@ -142,40 +144,45 @@
       flex-wrap: wrap;
     }
   </style>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
 </head>
 
-<body>
+<body class="app">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
-        <h2>MyFrEM</h2>
-      </div>
-      <nav class="navbar">
-        <a href="/dashboard">Home</a>
-        <a href="/dashboard/upload">Carica una foto</a>
-        <a href="/dashboard/my-content">I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos">Tutte le foto</a>
-        <a href="/dashboard/settings/" class="active">Impostazioni</a>
-      </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
 
-    <div class="main-content">
+    <div class="main-content app-main">
+      <div class="app-container">
       <div class="readOnlyStatusBox" style="display:none;">
         <span id="readOnlyStatus"></span>
         <button id="closeReadOnlyStatus">&times;</button>
       </div>
       <div class="settings-container">
-          <h1 class="title">Impostazioni account</h1>
+          <header class="page-head settings-head">
+            <div>
+              <h1 class="title">Impostazioni</h1>
+              <p>Gestisci il tuo profilo, l'accesso all'account e le preferenze.</p>
+            </div>
+          </header>
 
+          <h2 class="settings-group">Profilo pubblico</h2>
           <div class="settings-row">
             <section class="settings-card">
-              <h2>Foto Profilo</h2>
+              <h2>Foto profilo</h2>
               <div class="profile-upload">
                 <div class="pfpStatusBox" style="display:none;">
                   <span id="pfpStatus"></span>
@@ -187,11 +194,11 @@
                   <label>Carica nuova immagine</label>
                   <input type="file" id="profilePicInput" accept="image/*">
                   <button type="submit" class="btn" id="uploadProfilePicBtn">Carica foto</button>
-                  <button type="button" class="btn" id="deleteProfPicBtn" style="background-color:red;">Elimina foto</button>
+                  <button type="button" class="btn btn--danger" id="deleteProfPicBtn">Elimina foto</button>
                 </form>
               </div>
             </section>
-    
+
             <section class="settings-card">
               <div class="profileStatusBox" style="display:none;">
                 <span id="profileStatus"></span>
@@ -229,13 +236,29 @@
               <input type="text" id="usernameInput" class="input">
               <button id="saveUsernameBtn" class="btn">Salva username</button>
             </section>
-    
+
+            <section class="settings-card">
+              <div class="bioStatusBox" style="display:none;">
+                <span id="bioStatus"></span>
+                <button id="closeBioStatus">&times;</button>
+              </div>
+              <h2>Biografia</h2>
+              <p id="bio">La tua biografia è:
+                  <span id="bioText"></span>
+              </p>
+              <textarea id="bioInput" class="textarea"></textarea>
+              <button id="saveBioBtn" class="btn">Salva bio</button>
+            </section>
+          </div>
+
+          <h2 class="settings-group">Contatti e accesso</h2>
+          <div class="settings-row">
             <section class="settings-card">
               <div class="mailStatusBox" style="display:none;">
                 <span id="mailStatus"></span>
                 <button id="closeMailStatus">&times;</button>
               </div>
-              <h2>E-Mail</h2>
+              <h2>Email</h2>
               <p id="mail">La tua mail di accesso è
                   <span id="mailText"></span>
               </p>
@@ -249,7 +272,7 @@
                 <button id="closePhoneStatus">&times;</button>
               </div>
               <h2>Telefono</h2>
-              <p id="phone">Il tuo numero di telefono é
+              <p id="phone">Il tuo numero di telefono è
                   <span id="phoneText"></span>
               </p>
               <input type="text" id="phoneInput" class="input">
@@ -258,19 +281,6 @@
           </div>
 
           <div class="settings-row">
-            <section class="settings-card">
-              <div class="bioStatusBox" style="display:none;">
-                <span id="bioStatus"></span>
-                <button id="closeBioStatus">&times;</button>
-              </div>
-              <h2>Biografia</h2>
-              <p id="bio">La tua biografia è:
-                  <span id="bioText"></span>
-              </p>
-              <textarea id="bioInput" class="textarea"></textarea>
-              <button id="saveBioBtn" class="btn">Salva bio</button>
-            </section>
-    
             <section class="settings-card" id="passwordCard">
               <div class="pswStatusBox" style="display:none;">
                 <span id="pswStatus"></span>
@@ -285,9 +295,7 @@
               <br>
               <button id="savePasswordBtn" class="btn">Invia link via email</button>
             </section>
-          </div>
 
-          <div class="settings-row">
             <section class="settings-card">
               <div class="twofaStatusBox" style="display:none;">
                 <span id="twofaStatus"></span>
@@ -312,16 +320,17 @@
                     Disabilita 2FA
                   </button>
                   <button type="button" id="regenerate-recovery-btn" class="btn btn-secondary" style="display:none;">
-                    Rigenera Recovery Codes
+                    Rigenera i codici di recupero
                   </button>
                 </div>
               </div>
             </section>
           </div>
 
+          <h2 class="settings-group">Preferenze</h2>
           <div class="settings-row">
             <section class="settings-card preferences-card">
-              <h2>⚙️ Preferenze account</h2>
+              <h2>Notifiche e privacy</h2>
               <div class="prefStatusBox" style="display:none;">
                 <span id="prefStatus"></span>
                 <button id="closePrefStatus">&times;</button>
@@ -357,7 +366,9 @@
             </section>
           </div>
         </div>
+        </div>
       </div>
+    </div>
     </div>
 
     <!-- ===== Modal: Abilita 2FA ===== -->
@@ -506,12 +517,12 @@
       </div>
     </div>
 
-    <!-- ===== Modal: Rigenera Recovery Codes ===== -->
+    <!-- ===== Modal: Rigenera i codici di recupero ===== -->
     <div id="regenerate-modal" class="twofa-modal">
       <div class="twofa-modal-overlay"></div>
       <div class="twofa-modal-content">
         <div class="twofa-modal-header">
-          <h3>Rigenera Recovery Codes</h3>
+          <h3>Rigenera i codici di recupero</h3>
           <button type="button" id="close-regenerate-modal" class="twofa-modal-close">✕</button>
         </div>
 

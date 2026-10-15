@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Attestato ore di servizio | MyFrEM</title>
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/volunteers/attestato/style.css">
+  <script type="module" src="/dashboard/volunteers/attestato/attestato.js"></script>
+</head>
+<body class="app attestato">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Preparazione dell'attestato...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="cert-toolbar">
+      <a class="btn btn--ghost" href="/dashboard/volunteers/shifts/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Turni e ore</a>
+      <div class="cert-toolbar__right">
+        <select class="input filter-select" id="yearSelect" aria-label="Anno"></select>
+        <button class="btn btn--primary" id="printBtn" type="button"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i>Stampa o salva PDF</button>
+      </div>
+    </div>
+
+    <article class="certificate">
+      <header class="cert-head">
+        <img src="/assets/icons/logo.png" alt="Logo Friuli Emergenze">
+        <div>
+          <strong>MyFrEM · Friuli Emergenze</strong>
+          <span>myfrem.friuliemergenze.it</span>
+        </div>
+      </header>
+
+      <h1>Attestato delle ore di servizio</h1>
+      <p class="cert-intro">Si attesta che <strong id="certName"></strong> ha svolto nel <strong id="certYear"></strong> le attività di volontariato riportate di seguito, confermate dalle associazioni di appartenenza.</p>
+
+      <div class="cert-total">
+        <div><span>Ore di servizio</span><strong id="certTotal">0</strong></div>
+        <div><span>Turni svolti</span><strong id="certCount">0</strong></div>
+        <div><span>Associazioni</span><strong id="certAssocCount">0</strong></div>
+      </div>
+
+      <h2>Riepilogo per associazione</h2>
+      <table class="cert-table">
+        <thead><tr><th>Associazione</th><th>Turni</th><th>Ore</th></tr></thead>
+        <tbody id="assocRows"></tbody>
+      </table>
+
+      <h2>Dettaglio dei turni</h2>
+      <table class="cert-table">
+        <thead><tr><th>Data</th><th>Associazione</th><th>Turno</th><th>Orario</th><th>Ore</th></tr></thead>
+        <tbody id="shiftRows"></tbody>
+      </table>
+
+      <footer class="cert-foot">
+        <p>Documento generato il <span id="certDate"></span> sulla base dei turni confermati dalle associazioni su MyFrEM. Non sono conteggiati i turni annullati e le assenze segnalate dall'associazione.</p>
+        <p>Codice documento: <span id="certCode"></span></p>
+      </footer>
+    </article>
+  </div>
+</body>
+</html>

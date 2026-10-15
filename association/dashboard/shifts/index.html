@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turni dell'associazione | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+  <script defer type="module" src="/association/dashboard/shifts/shifts.js"></script>
+</head>
+<body class="app">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+
+  <div class="content" style="display:none;">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/association/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area associazione</small></span>
+        </a>
+        <nav class="app-nav" data-area="association" aria-label="Menu associazione"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-container">
+          <header class="page-head">
+            <div>
+              <h1>Turni</h1>
+              <p>Pubblica i turni da coprire: i volontari ricevono una notifica e si candidano, tu confermi chi fa il servizio. Le ore confermate finiscono nel loro attestato.</p>
+            </div>
+            <button class="btn btn--primary" id="newShiftBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i>Nuovo turno</button>
+          </header>
+
+          <div class="notice" id="shiftsNotice" hidden>
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>La pagina è sospesa: puoi vedere i turni ma non pubblicarne di nuovi.</span>
+          </div>
+
+          <section class="panel">
+            <div class="toolbar">
+              <div class="tabs" role="tablist" id="shiftTabs">
+                <button class="tab active" type="button" role="tab" data-tab="upcoming">In programma <span class="count" data-count="upcoming">0</span></button>
+                <button class="tab" type="button" role="tab" data-tab="past">Svolti <span class="count" data-count="past">0</span></button>
+                <button class="tab" type="button" role="tab" data-tab="cancelled">Annullati <span class="count" data-count="cancelled">0</span></button>
+              </div>
+            </div>
+            <div class="shift-list" id="shiftList"></div>
+            <div class="empty" id="shiftEmpty" hidden><i class="fa-regular fa-calendar" aria-hidden="true"></i><span id="shiftEmptyText"></span></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="notification-bell-floating">
+    <button class="bell-button" id="bellButton" aria-label="Notifiche">
+      <svg class="bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
+    </button>
+
+    <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
+      <div class="dropdown-header">
+        <h3>Notifiche</h3>
+        <button class="close-btn" id="closeDropdownBtn" aria-label="Chiudi">✕</button>
+      </div>
+
+      <div class="notification-list" id="notificationList"></div>
+
+      <div class="dropdown-footer">
+        <a href="/dashboard/notifications" class="view-all-link">Vedi tutte →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/bottomNav.js"></script>
+  <script defer type="module" src="/dashboard/ntf.js"></script>
+</body>
+</html>

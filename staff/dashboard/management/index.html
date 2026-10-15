@@ -19,28 +19,27 @@
     <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <script type="module" src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
+  <link rel="stylesheet" href="/staff/dashboard/theme.css">
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="logo">
-          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="MyFrEM Logo" loading="lazy">
-          <h2>MyFrEM Staff</h2>
+<body class="app app--staff">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/staff/dashboard/">
+          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="">
+          <span>MyFrEM<small>Area staff</small></span>
+        </a>
+        <nav class="app-nav" data-area="staff" aria-label="Menu staff"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
         </div>
-        <nav>
-          <a href="/staff/">Dashboard</a>
-          <a href="/staff/dashboard/photos/">Moderazione foto</a>
-          <a href="/staff/dashboard/management/" class="active">Funzionalità</a>
-    
-          <a href="/staff/dashboard/settings/">Impostazioni</a>
-          <br>
-          <a href="/dashboard/">Passa a dashboard utente</a>
-        </nav>
-        <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
-    <div class="main-content">
+      </aside>
+    <div class="main-content app-main">
+      <div class="app-container">
         <h1>Funzionalità</h1>
         <h2>Scegli il tipo di funzionalità su cui accedere:</h2>
         <h2><b>ATTENZIONE:</b> Tenere conto del <a href="/assets/docs/sistemiMyFrEM_Abilitazione.pdf">PDF contenente</a> la lista dei servizi ai quali ogni ruolo può accedere.</h2>
@@ -89,7 +88,7 @@
                         14H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2z"/></svg>
                     </div>
                     <div class="option-text">Gestione documenti</div>
-                    <p class="option-text-mini" style="margin-top: 20px;">(Tutti i ruoli)</p>
+                    <p class="option-text-mini">(Tutti i ruoli)</p>
                 </div>
             </a>
             <a href="/staff/dashboard/management/glad-surveys/" class="option-box">
@@ -119,16 +118,16 @@
                         </svg>
                     </div>
                     <div class="option-text">Gestione newsletter</div>
-                    <p class="option-text-mini" style="margin-top: 20px;">(Solo advstaffplus)</p>
+                    <p class="option-text-mini">(Solo advstaffplus)</p>
                 </div>
             </a>
             <a href="/staff/dashboard/management/vehicle-drafts/" class="option-box">
-                <div class="option-content" style="height: 158px">
+                <div class="option-content">
                     <div class="option-icon">
                         <svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                     </div>
                     <div class="option-text">Gestione bozze veicoli</div>
-                    <p class="option-text-mini" style="margin-top: 18px;">(Tutti i ruoli)</p>
+                    <p class="option-text-mini">(Tutti i ruoli)</p>
                 </div>
             </a>
             <a href="/staff/dashboard/management/notifications/" class="option-box">
@@ -140,11 +139,11 @@
                             14H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2z"/></svg>
                     </div>
                     <div class="option-text">Gestione notifiche</div>
-                    <p class="option-text-mini" style="margin-top: 20px;">(Tutti i ruoli)</p>
+                    <p class="option-text-mini">(Tutti i ruoli)</p>
                 </div>        
             </a>
             <a href="/staff/dashboard/management/badges/" class="option-box">
-                <div class="option-content" style="height: 158px">
+                <div class="option-content">
                     <div class="option-icon">
                         <svg viewBox="0 0 24 24"><path d="M20 3H4c-1.1 0-2 
                             .9-2 2v14c0 1.1.9 2 2 2h16c1.1 
@@ -152,10 +151,12 @@
                             14H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2z"/></svg>
                     </div>
                     <div class="option-text">Gestione badges</div>
-                    <p class="option-text-mini" style="margin-top: 18px;">(Solo advstaffplus)</p>    
+                    <p class="option-text-mini">(Solo advstaffplus)</p>    
                 </div>
             </a>
         </div>
+      </div>
+    </div>
     </div>
 
     <link rel="stylesheet" href="/bottomNav.css">

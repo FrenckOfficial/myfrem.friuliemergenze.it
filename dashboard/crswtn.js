@@ -70,7 +70,6 @@ class WhatsNewCarousel {
     this.slides.forEach(slide => slide.classList.remove('active'));
     this.slides[this.currentSlide].classList.add('active');
 
-    // Ogni slide ha il proprio indicatore: accendo i pallini fino alla slide corrente
     this.slides[this.currentSlide].querySelectorAll('.step-dot').forEach((dot, i) => {
       dot.classList.toggle('active', i <= this.currentSlide);
     });

@@ -1,0 +1,300 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* Tema delle pagine pubbliche (homepage, verifica email, photobook): si carica dopo /style.css
+   e lo allinea allo stile di app.css, mantenendo un layout da sito e non da dashboard. */
+
+:root {
+  --primary: #1fc8db;
+  --primary-dark: #12aebf;
+  --bg: #0b0f14;
+  --card: #141b23;
+  --card-2: #1a232d;
+  --text: #e9eef3;
+  --text-2: #a9b6c4;
+  --muted: #74859a;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-hard: rgba(255, 255, 255, 0.13);
+  --primary-soft: rgba(31, 200, 219, 0.12);
+  --signal-red: #f2555a;
+  --signal-amber: #f5b544;
+  --font-display: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+/* ── Base ── */
+
+body {
+  background: var(--bg);
+  background-image: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+body *,
+body *::before,
+body *::after {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+a {
+  color: var(--primary);
+}
+
+/* ── Pulsanti ── */
+
+.btn,
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #04191c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover,
+.cta-btn:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #04191c;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn.secondary,
+.cta .btn.secondary {
+  background: transparent;
+  border-color: var(--border-hard);
+  color: var(--text);
+}
+
+.btn.secondary:hover,
+.cta .btn.secondary:hover {
+  background: var(--card);
+  border-color: var(--border-hard);
+  color: var(--text);
+}
+
+/* ── Hero ── */
+
+.hero {
+  padding: 96px 20px 72px;
+  background:
+    radial-gradient(ellipse at top, rgba(31, 200, 219, 0.14), transparent 60%),
+    var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.hero::after {
+  display: none;
+}
+
+.hero .logo {
+  width: 92px;
+  height: 92px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.hero h1 {
+  margin-top: 18px;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em !important;
+  color: var(--text);
+  text-shadow: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.hero .subtitle {
+  max-width: 640px;
+  margin: 14px auto 0;
+  color: var(--text-2);
+  font-size: 1.08rem;
+  line-height: 1.6;
+}
+
+.hero .subtitle b,
+.hero .subtitle strong {
+  color: var(--text);
+}
+
+.hero .actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.hero-sub-link,
+.hero-sub-link a {
+  color: var(--text-2);
+  font-size: 0.92rem;
+}
+
+.hero-sub-link a:hover {
+  color: var(--primary);
+}
+
+/* ── Sezioni ── */
+
+section {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 56px;
+  padding-bottom: 8px;
+}
+
+section h2 {
+  color: var(--text);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em !important;
+}
+
+section h2::after {
+  display: none;
+}
+
+section p {
+  color: var(--text-2);
+}
+
+/* ── Card ── */
+
+.stat-card,
+.features .card,
+.how-it-works .card,
+.process-step,
+.recent-item,
+.faq-item,
+.testimonial,
+.gallery-item,
+.pwa-banner,
+.nuntii-proximi {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: none;
+}
+
+.stat-card:hover,
+.features .card:hover,
+.how-it-works .card:hover,
+.recent-item:hover,
+.faq-item:hover,
+.gallery-item:hover {
+  transform: none;
+  border-color: var(--border-hard);
+  box-shadow: none;
+}
+
+.stat-number {
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+
+/* ── Processo ── */
+
+.step-number {
+  border: none;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.step-content h4 {
+  color: var(--text);
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.step-content p {
+  color: var(--text-2);
+}
+
+/* ── Ultime foto ── */
+
+.recent-item {
+  overflow: hidden;
+}
+
+.recent-user {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.recent-date {
+  color: var(--muted);
+}
+
+/* ── FAQ ── */
+
+.faq-question {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.faq-toggle:checked + .faq-question {
+  color: var(--primary);
+}
+
+.faq-answer,
+.faq-answer p {
+  color: var(--text-2);
+}
+
+.faq-icon {
+  color: var(--muted);
+}
+
+/* ── Footer ── */
+
+footer {
+  margin-top: 64px;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+
+footer p {
+  color: var(--muted);
+}
+
+footer a {
+  color: var(--text-2);
+}
+
+footer a:hover {
+  color: var(--primary);
+}
+
+/* ── Verifica email ── */
+
+#statusBox {
+  border: 1px solid var(--border);
+  background: var(--card);
+}

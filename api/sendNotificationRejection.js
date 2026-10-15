@@ -1,83 +1,31 @@
+import { preflight, requireStaff, getUser, getPhoto, photoStatus, sendMail, fullName, fail, HttpError } from "./_lib/server.js";
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (!preflight(req, res)) return;
 
   try {
-    const { userName, userEmail, photoName, reason } = req.body;
+    await requireStaff(req);
+    const { photo } = await getPhoto(req.body?.photoId);
 
-    if (!userName || !userEmail) {
-      return res.status(400).json({ 
-        error: "Email e nome sono obbligatori" 
-      });
-    }
+    if (photoStatus(photo) !== "rejected") throw new HttpError(409, "La foto non risulta rifiutata");
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userEmail)) {
-      return res.status(400).json({ error: "Email non valida" });
-    }
+    const owner = await getUser(photo.userId);
+    if (!owner?.email) throw new HttpError(404, "Autore della foto non trovato");
 
-    if (!process.env.BREVO_API_KEY) {
-      console.error("BREVO_API_KEY not configured");
-      return res.status(500).json({ error: "Configurazione server errata" });
-    }
-
-    const sanitizedName = sanitizeHtml(userName);
-    const sanitizedEmail = sanitizeHtml(userEmail);
-    const sanitizedPhotoName = sanitizeHtml(photoName);
-    const sanitizedReason = sanitizeHtml(reason);
-
-    const htmlContent = generateMailHtml({
-      name: sanitizedName,
-      photoName: sanitizedPhotoName,
-      reason: sanitizedReason
-    });
-
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY
-      },
-      body: JSON.stringify({
-        sender: {
-          name: "Friuli Emergenze",
-          email: "autosystem@friuliemergenze.it"
-        },
-        to: [{ email: sanitizedEmail, name: sanitizedName }],
-        subject: `[${sanitizedPhotoName}] - C'è un aggiornamento sullo stato di una foto MyFrEM!`,
-        htmlContent,
-        replyTo: { 
-          name: "Friuli Emergenze",
-          email: "info@friuliemergenze.it" 
-        }
+    await sendMail({
+      to: owner.email,
+      toName: fullName(owner),
+      subject: `[${photo.vehicleModel || "Foto"}] - C'è un aggiornamento sullo stato di una foto MyFrEM!`,
+      htmlContent: generateMailHtml({
+        name: sanitizeHtml(fullName(owner)),
+        photoName: sanitizeHtml(photo.vehicleModel || "Foto"),
+        reason: sanitizeHtml(photo.rejectionReason || "Non specificata")
       })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Brevo API error", errorData);
-      return res.status(response.status).json({ 
-        error: "Errore nell'invio della notifica" 
-      });
-    }
-
     return res.status(200).json({ success: true });
-
   } catch (error) {
-    console.error("Server error:", error.message);
-    return res.status(500).json({ 
-      success: false,
-      error: "Errore interno del server"
-    });
+    return fail(res, error);
   }
 }
 

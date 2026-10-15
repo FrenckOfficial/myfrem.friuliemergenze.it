@@ -5,6 +5,7 @@ import { firebaseConfig } from "https://myfrem.friuliemergenze.it/helpers/config
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { escapeHtml } from "/helpers/escapeHtml.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -89,16 +90,16 @@ async function loadUsers() {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${data.name || "-"}</td>
-        <td>${data.email}</td>
+        <td>${escapeHtml(data.name || "-")}</td>
+        <td>${escapeHtml(data.email)}</td>
         <td>${date}</td>
         <td style="font-size:12px; word-break:break-all;">
-          ${data.token || "-"}
+          ${escapeHtml(data.token || "-")}
         </td>
         <td>${isVerified}</td>
         <td>${isEnabled}</td>
         <td>
-          <button class="deleteBtn" data-id="${docSnap.id}">
+          <button class="deleteBtn" data-id="${escapeHtml(docSnap.id)}">
             Rimuovi
           </button>
         </td>

@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
 import { firebaseConfig } from "/helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
@@ -9,6 +10,38 @@ import { initBottomNav } from "/helpers/initBottomNav.js";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app, "europe-west1");
+const send2FACodeCall = httpsCallable(functions, "send2FACode");
+const verify2FACodeCall = httpsCallable(functions, "verify2FACode");
+
+function friendlyError(error, fallback) {
+  return ["functions/permission-denied", "functions/invalid-argument", "functions/resource-exhausted", "functions/failed-precondition"].includes(error?.code)
+    ? error.message
+    : fallback;
+}
+
+async function verifyEmailCode(purpose, code) {
+  await verify2FACodeCall({ purpose, code });
+  return true;
+}
+
+async function sendManageCodeIfEmail(statusEl) {
+  const snap = await getDoc(doc(db, "users", currentUserId));
+  if (snap.data()?.twoFactorMethod !== "email") return;
+
+  statusEl.textContent = "Invio del codice via email...";
+  statusEl.style.color = "var(--text-secondary, #b8c5d6)";
+
+  try {
+    await send2FACodeCall({ purpose: "manage" });
+    statusEl.textContent = "Ti abbiamo inviato un codice via email.";
+    statusEl.style.color = "#4fca7a";
+  } catch (error) {
+    console.error("Errore invio codice 2FA:", error);
+    statusEl.textContent = friendlyError(error, "Errore nell'invio del codice.");
+    statusEl.style.color = "#e84855";
+  }
+}
 
 let currentUser = null;
 let currentUserId = null;
@@ -26,24 +59,12 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-async function getIpAddress() {
-  try {
-    const response = await fetch("https://api.ipify.org?format=json");
-    const data = await response.json();
-    return data.ip;
-  } catch (error) {
-    console.error("Errore nel recupero IP:", error);
-    return "Non disponibile";
-  }
-}
-
 let settings2FASetup = {
   method: null,
   emailVerified: false,
   totpVerified: false,
   totpSecret: null,
   recoveryCodes: [],
-  emailCode: null
 };
 
 async function load2FAStatus(user) {
@@ -113,8 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
         totpVerified: false,
         totpSecret: null,
         recoveryCodes: [],
-        emailCode: null
-      };
+            };
     });
   }
 
@@ -152,36 +172,14 @@ document.addEventListener("DOMContentLoaded", () => {
       status.style.color = "var(--text-secondary, #b8c5d6)";
 
       try {
-        settings2FASetup.emailCode = String(Math.floor(100000 + Math.random() * 900000));
-        
-        const response = await fetch("/api/send2FACode", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
-            email: currentUser.email,
-            ip: await getIpAddress(),
-            code: settings2FASetup.emailCode
-          })
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Errore ${response.status}:`, errorText);
-          status.textContent = `Errore invio codice: ${response.status}`;
-          status.style.color = "#e84855";
-          return;
-        }
+        await send2FACodeCall({ purpose: "setup" });
 
         status.textContent = "Codice inviato!";
         status.style.color = "#4fca7a";
         form.style.display = "block";
       } catch (error) {
         console.error("Errore invio email:", error);
-        status.textContent = "Errore nell'invio del codice";
+        status.textContent = friendlyError(error, "Errore nell'invio del codice");
         status.style.color = "#e84855";
       } finally {
         btn.disabled = false;
@@ -191,11 +189,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const emailVerifyBtn = document.getElementById("settings-email-verify");
   if (emailVerifyBtn) {
-    emailVerifyBtn.addEventListener("click", () => {
+    emailVerifyBtn.addEventListener("click", async () => {
       const inputCode = document.getElementById("settings-email-code").value.trim();
       const status = document.getElementById("settings-email-status");
 
-      if (inputCode === settings2FASetup.emailCode) {
+      let valid = false;
+      try {
+        valid = await verifyEmailCode("setup", inputCode);
+      } catch (error) {
+        status.textContent = friendlyError(error, "Errore durante la verifica");
+        status.style.color = "#e84855";
+        return;
+      }
+
+      if (valid) {
         settings2FASetup.emailVerified = true;
         document.getElementById("settings-email-form").style.display = "none";
         document.getElementById("settings-email-send").style.display = "none";
@@ -316,6 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (disableBtn) {
     disableBtn.addEventListener("click", () => {
       document.getElementById("disable-twofa-modal").style.display = "flex";
+      sendManageCodeIfEmail(document.getElementById("disable-verify-status"));
     });
   }
 
@@ -359,7 +367,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (userData.twoFactorMethod === "totp") {
           verified = await verifyTOTPCode(userData.totpSecret, code);
         } else if (userData.twoFactorMethod === "email") {
-          verified = true;
+          try {
+            verified = await verifyEmailCode("manage", code);
+          } catch (error) {
+            status.textContent = friendlyError(error, "Errore durante la verifica");
+            status.style.color = "#e84855";
+            btn.disabled = false;
+            return;
+          }
         }
 
         if (verified) {
@@ -393,6 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (regenerateBtn) {
     regenerateBtn.addEventListener("click", () => {
       document.getElementById("regenerate-modal").style.display = "flex";
+      sendManageCodeIfEmail(document.getElementById("regenerate-status"));
     });
   }
 
@@ -434,10 +450,16 @@ document.addEventListener("DOMContentLoaded", () => {
         let verified = false;
 
         if (userData.twoFactorMethod === "totp") {
-          // FIX: aggiunto "await"
           verified = await verifyTOTPCode(userData.totpSecret, code);
         } else if (userData.twoFactorMethod === "email") {
-          verified = true;
+          try {
+            verified = await verifyEmailCode("manage", code);
+          } catch (error) {
+            status.textContent = friendlyError(error, "Errore durante la verifica");
+            status.style.color = "#e84855";
+            btn.disabled = false;
+            return;
+          }
         }
 
         if (verified) {

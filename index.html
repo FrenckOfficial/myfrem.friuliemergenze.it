@@ -26,8 +26,8 @@
   <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/site.css" />
   <link rel="manifest" href="/manifest.json">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
   <meta property="og:title" content="Home | MyFrEM - Piattaforma ufficiale di Friuli Emergenze" />
@@ -143,6 +143,12 @@
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    .associations-cta .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -156,6 +162,9 @@
       <a class="btn" href="/login/signin" aria-label="Accedi alla piattaforma MyFrEM">Accedi</a>
       <a class="btn secondary" href="/login/signup" aria-label="Registrati gratuitamente a MyFrEM">Registrati gratis</a>
     </div>
+    <p class="hero-sub-link">
+      <a href="/richiedi-account-associazione/">Rappresenti un'associazione? Richiedi l'account associazione →</a>
+    </p>
     <p class="hero-sub-link">
       <a href="https://friuliemergenze.it" target="_blank" rel="noopener noreferrer">Visita il sito ufficiale di Friuli Emergenze →</a>
     </p>
@@ -364,6 +373,16 @@
     <a class="btn" href="/docs/">Accedi alle docs →</a>
   </section>
 
+  <section class="nuntii-proximi associations-cta">
+    <h2>Sei un'associazione o un ente?</h2>
+    <p>Porta la tua associazione su MyFrEM: una pagina pubblica, i volontari in un unico posto, comunicazioni ufficiali e turni di servizio da organizzare. Ogni richiesta viene verificata dallo staff contattando direttamente l'ente.</p>
+    <div class="actions">
+      <a class="btn" href="/richiedi-account-associazione/">Richiedi l'account associazione</a>
+      <a class="btn secondary" href="/associations/guide/">Come funziona</a>
+      <a class="btn secondary" href="/associations/">Le associazioni su MyFrEM</a>
+    </div>
+  </section>
+
   <section class="about">
     <h2>Cos'è MyFrEM?</h2>
     <p>
@@ -381,8 +400,8 @@
         <p>Carica i tuoi scatti e contribuisci alla documentazione dei mezzi nel territorio. Per essere pubblicate, le foto devono essere approvate dallo staff.</p>
       </div>
       <div class="card">
-        <h3>Proporre degli eventi</h3>
-        <p>Scopri gli eventi organizzati dalla community e partecipa direttamente dalla piattaforma.</p>
+        <h3>Entrare nella tua associazione</h3>
+        <p>Unisciti alla tua associazione per leggere le comunicazioni ufficiali, candidarti ai turni e tenere il conto delle ore di servizio.</p>
       </div>
       <div class="card">
         <h3>Restare in contatto</h3>

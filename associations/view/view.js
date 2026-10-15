@@ -258,6 +258,9 @@ async function joinAssociation() {
 
     setStatus("Richiesta inviata con successo!", "success");
     setJoinState("Richiesta inviata: l'associazione deve ancora confermarla.", null);
+    setTimeout(() => {
+      window.location.href = "/dashboard/";
+    }, 5000);
   } catch (error) {
     console.error("Errore invio richiesta di appartenenza:", error);
 

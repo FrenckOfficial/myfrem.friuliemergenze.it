@@ -139,21 +139,42 @@ async function loadPendingPhotos() {
  
         const tr = document.createElement("tr");
         const userName = await getUserName(photo.userId) || "Sconosciuto";
-        tr.innerHTML = `
-          <td><img src="${photo.url}" class="preview" loading="lazy" /></td>
-          <td>${photo.vehicleModel || "Non inserito"}</td>
-          <td>${photo.sponsor || "Non inserito"}</td>
-          <td>${photo.licensePlate || "Non inserita"}</td>
-          <td>${serviceType}</td>
-          <td>${photo.location || "Non inserita"}</td>
-          <td>${userName}</td>
-          <td>${photo.createdAt?.toDate().toLocaleString() || "-"}</td>
-          <td>${photo.notes || "Non inserite"}</td>
-          <td>
-            <button class="approve" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>Approva</button>
-            <button class="reject" data-id="${docSnap.id}" data-photo='${JSON.stringify(photo)}'>Rifiuta</button>
-          </td>
-        `;
+        const cell = (value) => {
+          const td = document.createElement("td");
+          td.textContent = value;
+          return td;
+        };
+
+        const previewCell = document.createElement("td");
+        const preview = document.createElement("img");
+        preview.className = "preview";
+        preview.loading = "lazy";
+        preview.alt = photo.vehicleModel || "Foto";
+        if (/^https:\/\//i.test(photo.url || "")) preview.src = photo.url;
+        previewCell.append(preview);
+
+        const actions = document.createElement("td");
+        [["approve", "Approva"], ["reject", "Rifiuta"]].forEach(([cls, label]) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = cls;
+          btn.dataset.id = docSnap.id;
+          btn.textContent = label;
+          actions.append(btn);
+        });
+
+        tr.append(
+          previewCell,
+          cell(photo.vehicleModel || "Non inserito"),
+          cell(photo.sponsor || "Non inserito"),
+          cell(photo.licensePlate || "Non inserita"),
+          cell(serviceType),
+          cell(photo.location || "Non inserita"),
+          cell(userName),
+          cell(photo.createdAt?.toDate ? photo.createdAt.toDate().toLocaleString("it-IT") : "-"),
+          cell(photo.notes || "Non inserite"),
+          actions
+        );
         const img = tr.querySelector('img');
         img.style.cursor = 'pointer';
         img.addEventListener('click', () => openLightbox(img, photo.vehicleModel || 'Foto'));
@@ -200,7 +221,7 @@ photosTableBody.addEventListener("click", async (e) => {
 
     if (userData.emailNotifications === true) {
       if (isApprove) {
-        await sendNotificationApprovement(userName, userEmail, photoName);
+        await sendNotificationApprovement(photoId);
       }
     }
 
@@ -256,7 +277,7 @@ function openRejectionModal(userName, userEmail, photoName, photoId) {
             rejectionReason: rejectionReason
           });
 
-          await sendNotificationRejection(userName, userEmail, photoName, rejectionReason);
+          await sendNotificationRejection(photoId);
           rejectionModal.classList.remove("active");
         }
       });
@@ -341,25 +362,22 @@ async function createVehicleDraft() {
   }
 }
 
-async function sendNotificationApprovement(userName, userEmail, photoName) {
+async function sendPhotoDecisionMail(endpoint, photoId) {
   try {
-    const response = await fetch('/api/sendNotificationApprovement', {
+    const token = await auth.currentUser.getIdToken();
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({
-        userName,
-        userEmail,
-        photoName
-      })
+      body: JSON.stringify({ photoId })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Errore ${response.status}:`, errorText);
       setStatus(`Errore notifica: ${response.status}`, 'error');
-      return;
     }
   } catch (error) {
     console.error('Errore fetch:', error);
@@ -367,31 +385,12 @@ async function sendNotificationApprovement(userName, userEmail, photoName) {
   }
 }
 
-async function sendNotificationRejection(userName, userEmail, photoName, reason) {
-  try {
-    const response = await fetch('/api/sendNotificationRejection', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        userName,
-        userEmail,
-        photoName,
-        reason
-      })
-    });
+function sendNotificationApprovement(photoId) {
+  return sendPhotoDecisionMail('/api/sendNotificationApprovement', photoId);
+}
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Errore ${response.status}:`, errorText);
-      setStatus(`Errore notifica: ${response.status}`, 'error');
-      return;
-    }
-  } catch (error) {
-    console.error('Errore fetch:', error);
-    setStatus('Errore invio notifica', 'error');
-  }
+function sendNotificationRejection(photoId) {
+  return sendPhotoDecisionMail('/api/sendNotificationRejection', photoId);
 }
 
 function extractFileName(url) {

@@ -17,118 +17,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
   <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
 </head>
-<body>
+<body class="app">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
-        <h2>MyFrEM</h2>
-      </div>
-      <nav class="navbar">
-        <a href="/dashboard" class="active">Home</a>
-        <a href="/dashboard/upload">Carica una foto</a>
-        <a href="/dashboard/my-content">I miei contenuti</a>
-        <a href="/dashboard/myfrem-photos">Tutte le foto</a>
-        <a href="/dashboard/settings/">Impostazioni</a>
-      </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
 
-    <main class="main-content">
-      <header class="header">
-        <h1>Ciao, <span id="userName"></span>!</h1>
-        <p>Benvenuto nella tua dashboard personale.</p>
-      </header>
-
-      <section class="newsletter-banner" id="newsBanner" style="display:none;">
-        <div class="newsletter-content">
+    <main class="main-content app-main">
+      <div class="app-container">
+        <header class="page-head">
           <div>
-            <h2>Newsletter Friuli Emergenze</h2>
-            <p>
-              Ricevi aggiornamenti sugli eventi,
-              nuove funzionalità e attività di Friuli Emergenze.
-            </p>
+            <h1>Ciao, <span id="userName">volontario</span>!</h1>
+            <p>Ecco come stanno andando le tue foto su MyFrEM.</p>
           </div>
-
-          <button id="newsletterBtn">
-            <span id="btnText">Iscriviti</span>
-            <span id="btnLoader" class="loader" style="display:none;"></span>
-          </button>
-
-          <div class="statusBox" style="display:none;">
-            
-            
+          <div class="head-actions">
+            <a class="btn" href="/dashboard/myfrem-photos"><i class="fa-solid fa-photo-film" aria-hidden="true"></i>Tutte le foto</a>
+            <a class="btn btn--primary" href="/dashboard/upload"><i class="fa-solid fa-camera" aria-hidden="true"></i>Carica una foto</a>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <section class="cards">
-        <div class="card card-clickable" data-filter="all">
-          <h3>Foto caricate</h3>
-          <p id="totalPhotos">0</p>
-        </div>
-        <div class="card card-clickable" data-filter="approved">
-          <h3>Foto approvate</h3>
-          <p id="approvedPhotos">0</p>
-        </div>
-        <div class="card card-clickable" data-filter="pending">
-          <h3>In attesa</h3>
-          <p id="pendingPhotos">0</p>
-        </div>
-        <div class="card card-clickable" data-filter="rejected">
-          <h3>Foto rifiutate</h3>
-          <p id="rejectedPhotos">0</p>
-        </div>
-      </section>
-
-      <section id="eventsList1">
-        <h2>Eventi</h2>
-        <section id="eventsList">
-          <p>Nessun evento disponibile per l'iscrizione.</p>
+        <section class="newsletter-banner" id="newsBanner" style="display:none;">
+          <div class="newsletter-content">
+            <div>
+              <h2>Newsletter Friuli Emergenze</h2>
+              <p>Ricevi aggiornamenti su eventi, nuove funzionalità e attività di Friuli Emergenze.</p>
+            </div>
+            <button id="newsletterBtn" type="button">
+              <span id="btnText">Iscriviti</span>
+              <span id="btnLoader" class="loader" style="display:none;"></span>
+            </button>
+            <div class="statusBox" style="display:none;"></div>
+          </div>
         </section>
-      </section>
 
-      <section class="activity" style="margin-top: 40px;">
-        <h2>Ultime attività</h2>
-        <ul id="activityList">
-          <!-- Le attività verranno inserite qui tramite JavaScript -->
-        </ul>
-      </section>
-    </main>
-  </div>
+        <section class="stats">
+          <a class="stat" href="/dashboard/my-content/">
+            <span class="stat__icon"><i class="fa-solid fa-images" aria-hidden="true"></i></span>
+            <span><span class="stat__value" id="totalPhotos">0</span><br><span class="stat__label">Foto caricate</span></span>
+          </a>
+          <a class="stat" href="/dashboard/my-content/?stato=approved">
+            <span class="stat__icon stat__icon--success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+            <span><span class="stat__value" id="approvedPhotos">0</span><br><span class="stat__label">Approvate</span></span>
+          </a>
+          <a class="stat" href="/dashboard/my-content/?stato=pending">
+            <span class="stat__icon stat__icon--warning"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></span>
+            <span><span class="stat__value" id="pendingPhotos">0</span><br><span class="stat__label">In attesa di revisione</span></span>
+          </a>
+          <a class="stat" href="/dashboard/my-content/?stato=rejected">
+            <span class="stat__icon stat__icon--danger"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i></span>
+            <span><span class="stat__value" id="rejectedPhotos">0</span><br><span class="stat__label">Rifiutate</span></span>
+          </a>
+        </section>
 
-  <div id="statsModal" class="modal">
-    <div class="modal-overlay"></div>
-    <div class="modal-container">
-      <div class="modal-step active">
-        <div class="modal-header">
-          <h2 id="statsModalTitle">Foto</h2>
-        </div>
-        <div class="modal-content">
-          <ul id="statsModalList" style="list-style:none; padding:0; max-height:400px; overflow-y:auto;">
-            <!-- popolato via JS -->
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-modal btn-finish" id="closeStatsModalBtn">Chiudi</button>
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel__head">
+              <h2>Le tue ultime foto</h2>
+              <a href="/dashboard/my-content/">Vedi tutte</a>
+            </div>
+            <ul class="rows" id="activityList"></ul>
+          </section>
+
+          <section class="panel">
+            <div class="panel__head">
+              <h2>Come funziona</h2>
+            </div>
+            <ol class="steps">
+              <li>
+                <span class="steps__icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span>
+                <div><strong>Carica la foto</strong><span>Indica modello, sede e servizio del mezzo.</span></div>
+              </li>
+              <li>
+                <span class="steps__icon"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></span>
+                <div><strong>Lo staff la revisiona</strong><span>Controlliamo che rispetti le regole sulla privacy.</span></div>
+              </li>
+              <li>
+                <span class="steps__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
+                <div><strong>Viene pubblicata</strong><span>Compare in "Tutte le foto" e in galleria, dove gli altri possono votarla.</span></div>
+              </li>
+            </ol>
+          </section>
         </div>
       </div>
+    </main>
     </div>
   </div>
+
 
   <div id="firstAccessModal" class="modal">
     <div class="modal-overlay"></div>

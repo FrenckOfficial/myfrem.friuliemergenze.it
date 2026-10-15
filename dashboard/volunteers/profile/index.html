@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il mio profilo volontario | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
+  <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script defer type="module" src="/dashboard/volunteers/profile/profile.js"></script>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+</head>
+<body class="app">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
+ 
+    <main class="main-content app-main">
+      <div class="app-container">
+        <header class="page-head">
+          <div>
+            <h1>Il mio profilo volontario</h1>
+            <p>Qualifiche, mansioni e disponibilità che vedono le associazioni di cui fai parte.</p>
+          </div>
+          <a class="btn" href="/dashboard/volunteers/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Area volontari</a>
+        </header>
+
+        <div class="notice" id="readOnlyNotice" hidden><i class="fa-solid fa-eye" aria-hidden="true"></i><span>Modalità sola lettura: puoi vedere la pagina ma non salvare modifiche.</span></div>
+
+        <div class="grid-2">
+          <form id="volunteerForm" class="panel" novalidate>
+            <div class="panel__body">
+              <section class="form-section">
+                <h3>Qualifiche e brevetti</h3>
+                <p class="hint">Aggiungi i corsi che hai fatto. Se hanno una scadenza ti avvisiamo un mese prima e il giorno stesso.</p>
+                <ul class="qual-list" id="qualList"></ul>
+                <button type="button" class="btn btn--sm" id="addQualBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i>Aggiungi qualifica</button>
+              </section>
+
+              <section class="form-section">
+                <h3>Mansioni</h3>
+                <p class="hint">Cosa sai fare o fai abitualmente in servizio.</p>
+                <div class="choice-chips" id="mansioniBox"></div>
+              </section>
+
+              <section class="form-section">
+                <h3>Disponibilità settimanale</h3>
+                <p class="hint">Indicativa: aiuta la tua associazione a organizzare i turni.</p>
+                <div class="avail-grid" id="availGrid"></div>
+              </section>
+
+              <section class="form-section">
+                <h3>Per la tua associazione</h3>
+                <p class="hint">Visibili solo all'account e ai referenti delle associazioni di cui fai parte.</p>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="phoneInput">Telefono</label>
+                    <input class="input" id="phoneInput" type="tel" maxlength="30" autocomplete="tel">
+                  </div>
+                  <div class="field field--full">
+                    <label for="noteInput">Presentazione</label>
+                    <textarea class="input" id="noteInput" rows="4" maxlength="500" placeholder="Da quanto fai volontariato, in quali servizi, cosa ti piacerebbe fare..."></textarea>
+                    <span class="counter" id="noteCounter">0/500</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <h3>Profilo pubblico</h3>
+                <p class="hint">Cosa mostrare a tutta la community. Scadenze, disponibilità e telefono non sono mai pubblici. Se il tuo profilo è privato non viene mostrato nulla.</p>
+                <div class="switch-row">
+                  <div><strong>Qualifiche</strong><span class="hint">Solo quelle non scadute, senza date.</span></div>
+                  <label class="switch"><input type="checkbox" id="pubQualifiche" aria-label="Mostra le qualifiche nel profilo pubblico"><span></span></label>
+                </div>
+                <div class="switch-row">
+                  <div><strong>Mansioni</strong></div>
+                  <label class="switch"><input type="checkbox" id="pubMansioni" aria-label="Mostra le mansioni nel profilo pubblico"><span></span></label>
+                </div>
+                <div class="switch-row">
+                  <div><strong>Associazioni di cui fai parte</strong></div>
+                  <label class="switch"><input type="checkbox" id="pubAssociazioni" aria-label="Mostra le associazioni nel profilo pubblico"><span></span></label>
+                </div>
+              </section>
+            </div>
+
+            <div class="savebar" id="saveBar" hidden>
+              <span>Hai modifiche non salvate.</span>
+              <div>
+                <button type="button" class="btn btn--ghost" id="resetBtn">Annulla</button>
+                <button type="submit" class="btn btn--primary" id="saveBtn">Salva profilo</button>
+              </div>
+            </div>
+          </form>
+
+          <aside class="stack">
+            <section class="panel">
+              <div class="panel__head">
+                <h2>Disponibile adesso</h2>
+              </div>
+              <div class="panel__body">
+                <div class="switch-row">
+                  <div>
+                    <strong id="nowTitle">Non disponibile</strong>
+                    <span class="hint" id="nowText">Avvisa la tua associazione che puoi coprire un servizio adesso.</span>
+                  </div>
+                  <label class="switch"><input type="checkbox" id="nowSwitch" aria-label="Disponibile adesso"><span></span></label>
+                </div>
+                <div class="field">
+                  <label for="nowHours">Per quanto tempo</label>
+                  <select class="input" id="nowHours">
+                    <option value="2">2 ore</option>
+                    <option value="4" selected>4 ore</option>
+                    <option value="8">8 ore</option>
+                    <option value="12">12 ore</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel__head">
+                <h2>Scadenze</h2>
+              </div>
+              <ul class="rows" id="expiryList"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="panel__head">
+                <h2>Chi vede cosa</h2>
+              </div>
+              <div class="panel__body">
+                <ul class="who-sees">
+                  <li><i class="fa-solid fa-building-shield" aria-hidden="true"></i><span><strong>La tua associazione</strong> vede tutto il profilo, con scadenze, disponibilità e telefono.</span></li>
+                  <li><i class="fa-solid fa-earth-europe" aria-hidden="true"></i><span><strong>La community</strong> vede solo quello che attivi in "Profilo pubblico".</span></li>
+                  <li><i class="fa-solid fa-user-shield" aria-hidden="true"></i><span><strong>Lo staff MyFrEM</strong> può vedere il profilo per moderazione e assistenza.</span></li>
+                </ul>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+    </div>
+  </div>
+ 
+  <link rel="stylesheet" href="/bottomNav.css">
+  <script src="/bottomNav.js"></script>
+  <script defer type="module" src="/dashboard/ntf.js"></script>
+  <div class="notification-bell-floating">
+    <button class="bell-button" id="bellButton" aria-label="Notifiche">
+      <svg class="bell-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
+    </button>
+ 
+    <div class="notification-dropdown" id="notificationDropdown" style="display: none;">
+      <div class="dropdown-header">
+        <h3>Notifiche</h3>
+        <button class="close-btn" id="closeDropdownBtn">✕</button>
+      </div>
+ 
+      <div class="notification-list" id="notificationList">
+        <!-- Caricato dinamicamente -->
+      </div>
+ 
+      <div class="dropdown-footer">
+        <a href="/dashboard/notifications" class="view-all-link">
+          Vedi tutte →
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

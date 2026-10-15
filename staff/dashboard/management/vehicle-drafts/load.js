@@ -654,10 +654,12 @@ class VehicleDraftsManager {
     async triggerGithubWorkflow(draftId) {
 
         try {
+            const idToken = await auth.currentUser.getIdToken();
             const response = await fetch("/api/triggerVehicleWorkflow", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${idToken}`
                     },
                     body: JSON.stringify({
                         draftId: String(draftId)

@@ -301,7 +301,7 @@ async function renderRecentLogins() {
     const ua = escapeHtml(login.userAgent ?? "Browser sconosciuto");
 
     const li = document.createElement("li");
-    li.innerHTML = `Accesso di <a href="mailto:${email}">${email}</a> in data ${date} (${ip} - ${ua})`;
+    li.innerHTML = `Accesso di <a href="mailto:${encodeURIComponent(email || "")}">${escapeHtml(email)}</a> in data ${escapeHtml(date)} (${escapeHtml(ip)} - ${escapeHtml(ua)})`;
     recentLoginsListEl.appendChild(li);
   });
 

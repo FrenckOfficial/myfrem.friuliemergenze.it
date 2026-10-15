@@ -23,7 +23,7 @@
   />
 
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#e53935" />
+  <meta name="theme-color" content="#0b0f14" />
 
   <link
     rel="shortcut icon"
@@ -34,150 +34,137 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap"
-    rel="stylesheet"
-  />
+  <link rel="stylesheet" href="/app.css" />
 
   <style>
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, "Space Mono", sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
+    body.app {
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      background:
+        radial-gradient(800px 420px at 50% -10%, rgba(31, 200, 219, 0.12), transparent 60%),
+        var(--bg);
     }
 
     .container {
       width: 100%;
-      max-width: 650px;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 50px 35px;
+      max-width: 520px;
+      padding: 40px 32px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
       text-align: center;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.08);
     }
 
     .logo {
-      width: 90px;
-      margin-bottom: 25px;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 20px;
+      border-radius: 14px;
     }
 
     .code {
-      font-size: 90px;
-      font-weight: 700;
-      color: #e53935;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: 4.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
       line-height: 1;
-      margin-bottom: 10px;
     }
 
     h1 {
-      font-size: 34px;
-      margin-bottom: 18px;
-      color: #111;
+      margin: 0 0 12px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
-    p {
-      color: #555;
-      line-height: 1.7;
-      font-size: 16px;
-      margin-bottom: 18px;
+    .container p {
+      margin: 0 0 10px;
+      color: var(--text-2);
+      line-height: 1.65;
     }
 
     .actions {
-      margin-top: 35px;
       display: flex;
-      justify-content: center;
-      gap: 15px;
       flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 26px;
     }
 
-    .btn {
+    .app .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 14px 24px;
-      border-radius: 12px;
+      min-width: 170px;
+      min-height: 44px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
       text-decoration: none;
-      font-weight: 600;
-      transition: 0.2s ease;
-      min-width: 180px;
+      transition: background var(--t-fast);
     }
 
-    .btn-primary {
-      background: #e53935;
-      color: white;
+    .app .btn-primary {
+      background: var(--accent);
+      color: var(--on-accent);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
+    .app .btn-primary:hover {
+      background: var(--accent-strong);
     }
 
-    .btn-secondary {
-      background: #f1f1f1;
-      color: #222;
+    .app .btn-secondary {
+      border: 1px solid var(--line-strong);
+      color: var(--text);
     }
 
-    .btn-secondary:hover {
-      background: #e7e7e7;
+    .app .btn-secondary:hover {
+      background: var(--surface-hover);
     }
 
     .footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #888;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--text-3);
+      font-size: 0.85rem;
       line-height: 1.6;
     }
 
-    .footer a {
-      color: #e53935;
+    .app .footer a {
+      color: var(--accent);
       text-decoration: none;
     }
 
     @media (max-width: 640px) {
-
       .container {
-        padding: 40px 25px;
+        padding: 32px 20px;
       }
 
       .code {
-        font-size: 72px;
-      }
-
-      h1 {
-        font-size: 28px;
+        font-size: 3.6rem;
       }
 
       .actions {
         flex-direction: column;
       }
 
-      .btn {
+      .app .btn {
         width: 100%;
       }
-
     }
-
   </style>
 </head>
 
-<body>
+<body class="app">
 
   <main class="container">
 
     <img
-      src="https://www.friuliemergenze.it/assets/logo.png"
+      src="/assets/icons/logo.png"
       alt="Logo Friuli Emergenze"
       class="logo"
     />

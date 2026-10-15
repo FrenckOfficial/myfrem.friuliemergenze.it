@@ -1,0 +1,192 @@
+body.attestato {
+  background: var(--bg);
+}
+
+.cert-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 16px;
+}
+
+.cert-toolbar__right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.certificate {
+  max-width: 860px;
+  margin: 0 auto 48px;
+  padding: 48px 56px;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  color: #1a2230;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cert-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #12aebf;
+}
+
+.cert-head img {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+}
+
+.cert-head div {
+  display: flex;
+  flex-direction: column;
+}
+
+.cert-head strong {
+  font-size: 1.05rem;
+}
+
+.cert-head span {
+  color: #5d6b7c;
+  font-size: 0.85rem;
+}
+
+.certificate h1 {
+  margin: 28px 0 10px;
+  font-size: 1.7rem;
+  letter-spacing: -0.01em;
+}
+
+.certificate h2 {
+  margin: 28px 0 10px;
+  font-size: 1.02rem;
+}
+
+.cert-intro {
+  margin: 0;
+  color: #333f4f;
+  font-size: 1rem;
+}
+
+.cert-total {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.cert-total div {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #eef9fb;
+  border: 1px solid #c6eef3;
+}
+
+.cert-total span {
+  color: #5d6b7c;
+  font-size: 0.8rem;
+}
+
+.cert-total strong {
+  font-size: 1.4rem;
+  color: #0a7f8c;
+}
+
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cert-table th,
+.cert-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e3e8ee;
+  text-align: left;
+  vertical-align: top;
+}
+
+.cert-table th {
+  background: #f5f7fa;
+  color: #4a5768;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.cert-table td:last-child,
+.cert-table th:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cert-table .cert-empty {
+  padding: 18px 10px;
+  color: #7a8796;
+  text-align: center;
+}
+
+.cert-foot {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e3e8ee;
+  color: #6a7686;
+  font-size: 0.8rem;
+}
+
+.cert-foot p {
+  margin: 0 0 4px;
+}
+
+@media (max-width: 700px) {
+  .certificate {
+    margin: 0 8px 32px;
+    padding: 28px 20px;
+  }
+
+  .cert-total {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cert-table {
+    font-size: 12px;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+
+  body.attestato {
+    background: #fff;
+  }
+
+  .cert-toolbar,
+  .notification-bell-floating,
+  .status-message,
+  .loading {
+    display: none !important;
+  }
+
+  .certificate {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .cert-table tr {
+    break-inside: avoid;
+  }
+}

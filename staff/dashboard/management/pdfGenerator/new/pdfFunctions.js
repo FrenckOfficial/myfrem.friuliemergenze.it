@@ -23,11 +23,11 @@ export function buildPDF(data) {
     type = "Altro";
   } else type = "Documento";
   
-  const primaryColor = [41, 128, 185];    // Blu
-  const secondaryColor = [52, 73, 94];    // Grigio scuro
-  const accentColor = [230, 126, 34];     // Arancione
-  const lightGray = [236, 240, 241];      // Grigio chiaro
-  const darkText = [44, 62, 80];          // Testo scuro
+  const primaryColor = [41, 128, 185];
+  const secondaryColor = [52, 73, 94];
+  const accentColor = [230, 126, 34];
+  const lightGray = [236, 240, 241];
+  const darkText = [44, 62, 80];
   
   const marginLeft = 20;
   const marginRight = 20;

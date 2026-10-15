@@ -6,6 +6,7 @@ import { db } from '/helpers/getDB.js';
 import { showSuccess, showError, showWarning, showInfo, setStatus } from '/helpers/modals.js';
 import '/helpers/loadIcons.js';
 import { initBottomNav } from '/helpers/initBottomNav.js';
+import { addStaffLink } from '/helpers/loadNavbar.js';
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
@@ -63,13 +64,7 @@ onAuthStateChanged(auth, async (user) => {
           }
   
           if (staffRoles.includes(userData.role)) {
-            const staffLinkEl = document.querySelector('.navbar');
-            const br = document.createElement('br');
-            const link = document.createElement('a');
-            link.href = '/staff/dashboard/';
-            link.textContent = 'Passa alla dashboard staff';
-            staffLinkEl.appendChild(br);
-            staffLinkEl.appendChild(link);
+            addStaffLink();
           }
           initBottomNav(userData, user, "user");
         } catch (err) {
@@ -155,8 +150,8 @@ class NotificationsPage {
       if (this.allNotifications.length === 0) {
         this.notificationsList.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">🔔</div>
-            <div class="empty-state-text">Nessuna notifica</div>
+            <div class="empty-state-icon"><i class="fa-regular fa-bell" aria-hidden="true"></i></div>
+            <div class="empty-state-text">Nessuna notifica per ora. Ti avviseremo qui quando le tue foto vengono revisionate.</div>
           </div>
         `;
         return;
@@ -165,7 +160,7 @@ class NotificationsPage {
       this.applyFilter();
     } catch (error) {
       console.error('Error loading notifications:', error);
-      this.notificationsList.innerHTML = `<div class="empty-state"><div class="empty-state-text">Errore: ${error.message}</div></div>`;
+      this.notificationsList.innerHTML = `<div class="empty-state"><div class="empty-state-text">Non è stato possibile caricare le notifiche. Ricarica la pagina per riprovare.</div></div>`;
     }
   }
 
@@ -190,8 +185,8 @@ class NotificationsPage {
     if (pageNotifications.length === 0) {
       this.notificationsList.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">📭</div>
-          <div class="empty-state-text">Nessuna notifica in questa categoria</div>
+          <div class="empty-state-icon"><i class="fa-regular fa-folder-open" aria-hidden="true"></i></div>
+          <div class="empty-state-text">Nessuna notifica in questa categoria.</div>
         </div>
       `;
       this.paginationContainer.innerHTML = '';

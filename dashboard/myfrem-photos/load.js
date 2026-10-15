@@ -2,352 +2,272 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, getDocs, getDoc, doc, setDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/helpers/configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
+import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
+import { photoCard, photoStatus, serviceLabel, filled, emptyState } from "/dashboard/photos.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const STAFF_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
 const photosContainer = document.getElementById("photosContainer");
+const searchInput = document.getElementById("searchInput");
+const serviceFilter = document.getElementById("serviceFilter");
+const resultsCount = document.getElementById("resultsCount");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
 let currentUserId = null;
+let isReadOnly = false;
+let photos = [];
+const userNames = new Map();
+
+function showContent() {
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
+}
 
 onAuthStateChanged(auth, async (user) => {
-  const timeoutId = setTimeout(() => {
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
-  }, 5000);
+  if (!user) {
+    window.location.href = "/login/";
+    return;
+  }
 
-  await addDoc(collection(db, "viewedPages"), {
+  const timeoutId = setTimeout(showContent, 5000);
+  currentUserId = user.uid;
+
+  addDoc(collection(db, "viewedPages"), {
     type: "page_view",
     timestamp: serverTimestamp(),
     userId: user.uid,
     page: window.location.pathname
-  });
+  }).catch((error) => console.error("Errore viewedPages:", error));
 
   try {
-    if (!user) {
-      clearTimeout(timeoutId);
-      window.location.href = "/login/";
-      return;
-    }
-
-    currentUserId = user.uid;
-    await checkUserRole(currentUserId);
+    await checkUserRole(user);
     await loadAllPhotos();
-
-    clearTimeout(timeoutId);
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";;
   } catch (err) {
     console.error("Errore:", err);
+    setStatus("Errore nel caricamento delle foto.", "error");
+  } finally {
     clearTimeout(timeoutId);
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";;
+    showContent();
   }
 });
 
-async function checkUserRole(uid) {
+async function checkUserRole(user) {
   try {
-    const userDocSnap = await getDoc(doc(db, "users", uid));
-    if (userDocSnap.exists()) {
-      const staffRoles = [
-        "simplestaff",
-        "modstaff",
-        "advstaff",
-        "advstaffplus",
-        "superadmin",
-      ];
+    const userDocSnap = await getDoc(doc(db, "users", user.uid));
+    if (!userDocSnap.exists()) return;
 
-      const userData = userDocSnap.data();
-      if (userData.role === "testacc") {
-        document.body.classList.add("read-only-mode");
-        const banner = document.createElement("div");
-        banner.style.cssText = "background-color:#fff3cd;color:#856404;padding:10px;margin-bottom:10px;border-radius:4px;text-align:center;";
-        banner.textContent = "Modalità sola lettura";
-        photosContainer.parentElement.insertBefore(banner, photosContainer);
-      }
+    const userData = userDocSnap.data();
 
-      if (staffRoles.includes(userData.role)) {
-        const staffLinkEl = document.querySelector('.navbar');
-        const br = document.createElement('br');
-        const link = document.createElement('a');
-        link.href = '/staff/dashboard/';
-        link.textContent = 'Passa alla dashboard staff';
-        staffLinkEl.appendChild(br);
-        staffLinkEl.appendChild(link);
-      }
-      initBottomNav(userData, auth.currentuser, "user");
+    if (userData.role === "testacc") {
+      isReadOnly = true;
+      document.body.classList.add("read-only-mode");
+      document.getElementById("readOnlyNotice").hidden = false;
     }
+
+    if (STAFF_ROLES.includes(userData.role)) addStaffLink();
+
+    initBottomNav(userData, user, "user");
   } catch (err) {
     console.error("Errore verifica ruolo:", err);
   }
 }
 
-async function loadAllPhotos() {
-  try {
-    photosContainer.innerHTML = "";
+async function authorName(userId) {
+  if (!userId) return "";
+  if (userNames.has(userId)) return userNames.get(userId);
 
-    const photosQuery = query(
-      collection(db, "photos"),
-      orderBy("createdAt", "desc")
-    );
+  const pending = getDoc(doc(db, "publicProfiles", userId))
+    .then((snap) => {
+      const u = snap.exists() ? snap.data() : {};
+      return `${u.name || ""} ${u.surname || ""}`.trim() || "Utente";
+    })
+    .catch(() => "Utente");
 
-    const snapshot = await getDocs(photosQuery);
-
-    if (snapshot.empty) {
-      photosContainer.innerHTML = "<p>Nessuna foto caricata.</p>";
-      setStatus("", "");
-      return;
-    }
-
-    const photoDocs = [];
-    snapshot.forEach((doc) => {
-      photoDocs.push(doc);
-    });
-
-    const photoPromises = photoDocs.map(async (docs) => {
-      const data = docs.data();
-      const photoId = docs.id;
-
-      if (!((data.status === "Approvata ✅" || data.status === "Approvata") && data.published === true)) {
-        return null;
-      }
-
-      const service = getServiceLabel(data.serviceType);
-
-      let userName = data.userId;
-      const userDocSnap = await getDoc(doc(db, "users", userName));
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        userName = userData.name + " " + userData.surname || "Sconosciuto";
-      }
-
-      const voteCounts = await getVoteCounts(photoId);
-      const userVote = await getUserVote(photoId);
-
-      const isOwnPhoto = data.userId === currentUserId;
-
-      return { photoId, data, service, userName, voteCounts, userVote, isOwnPhoto };
-    });
-
-    const allPhotos = await Promise.all(photoPromises);
-
-    allPhotos.forEach((photoData) => {
-      if (!photoData) return;
-
-      const { photoId, data, service, userName, voteCounts, userVote, isOwnPhoto } = photoData;
-      const card = document.createElement("div");
-      card.className = "photo-card";
-
-      card.innerHTML = `
-        <div class="photo-info">
-          <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
-          <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
-          <p><b>Targa:</b> ${data.licensePlate || "Non disponibile / Non inserito"}</p>
-          <p><b>Posizione:</b> ${data.location || "Non disponibile / Non inserito"}</p>
-          <p><b>Servizio:</b> ${service || "Non disponibile / Non inserito"}</p>
-          <p><b>Note:</b> ${data.notes || "Non disponibile / Non inserito"}</p>
-          <p><b>Publisher:</b> <a href="/profile/?userid=${data.userId}" target="_blank" style="font-size: var(--text-sm);color: var(--muted);margin: 0 0 var(--space-md) 0;line-height: 1.5;">${userName || "Non disponibile / Non inserito"}</a></p>
-
-          ${isOwnPhoto ? `
-            <div class="vote-container disabled">
-              <p class="own-photo-notice">Non puoi votare la tua foto</p>
-            </div>
-          ` : `
-            <div class="vote-container">
-              <button class="vote-btn like-btn" data-photo-id="${photoId}" data-vote-type="like" data-user-vote="${userVote}">
-                <i class="fas fa-thumbs-up"></i>
-                <span class="vote-count">${voteCounts.likes}</span>
-              </button>
-              <button class="vote-btn dislike-btn" data-photo-id="${photoId}" data-vote-type="dislike" data-user-vote="${userVote}">
-                <i class="fas fa-thumbs-down"></i>
-                <span class="vote-count">${voteCounts.dislikes}</span>
-              </button>
-            </div>
-          `}
-
-          ${
-            data.vehicleLink
-              ? `
-                <a href="${data.vehicleLink}" target="_blank" class="gallery-link">
-                  Vai al mezzo in galleria
-                </a>
-              `
-              : ""
-          }
-        </div>
-      `;
-
-      photosContainer.appendChild(card);
-
-      if (!isOwnPhoto) {
-        const likeBtn = card.querySelector(".like-btn");
-        const dislikeBtn = card.querySelector(".dislike-btn");
-
-        updateVoteButtonStates(likeBtn, dislikeBtn, userVote);
-
-        likeBtn.addEventListener("click", () => handleVote(photoId, "like", likeBtn, dislikeBtn));
-        dislikeBtn.addEventListener("click", () => handleVote(photoId, "dislike", likeBtn, dislikeBtn));
-      }
-    });
-  } catch (err) {
-    console.error("Errore caricamento foto:", err);
-    setStatus("Errore caricamento foto", "error");
-  }
+  userNames.set(userId, pending);
+  return pending;
 }
 
-async function getVoteCounts(photoId) {
+async function getVotes(photoId) {
   try {
-    const votesQuery = query(
-      collection(db, "photos", photoId, "votes")
-    );
-    const snapshot = await getDocs(votesQuery);
-
+    const snapshot = await getDocs(collection(db, "photos", photoId, "votes"));
     let likes = 0;
     let dislikes = 0;
+    let mine = null;
 
-    snapshot.forEach((doc) => {
-      const voteData = doc.data();
-      if (voteData.voteType === "like") likes++;
-      else if (voteData.voteType === "dislike") dislikes++;
+    snapshot.forEach((voteDoc) => {
+      const { voteType } = voteDoc.data();
+      if (voteType === "like") likes++;
+      else if (voteType === "dislike") dislikes++;
+      if (voteDoc.id === currentUserId) mine = voteType;
     });
 
-    return { likes, dislikes };
+    return { likes, dislikes, mine };
   } catch (err) {
-    console.error("Errore caricamento conteggio voti:", err);
-    return { likes: 0, dislikes: 0 };
+    console.error("Errore caricamento voti:", err);
+    return { likes: 0, dislikes: 0, mine: null };
   }
 }
 
-async function getUserVote(photoId) {
-  try {
-    const voteDoc = await getDoc(
-      doc(db, "photos", photoId, "votes", currentUserId)
-    );
-    if (voteDoc.exists()) {
-      return voteDoc.data().voteType;
-    }
-    return null;
-  } catch (err) {
-    console.error("Errore caricamento voto utente:", err);
-    return null;
-  }
+function voteButton(type, count) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `vote-btn ${type}-btn`;
+  btn.dataset.voteType = type;
+  btn.setAttribute("aria-label", type === "like" ? "Mi piace" : "Non mi piace");
+
+  const icon = document.createElement("i");
+  icon.className = `fa-solid ${type === "like" ? "fa-thumbs-up" : "fa-thumbs-down"}`;
+  icon.setAttribute("aria-hidden", "true");
+
+  const value = document.createElement("span");
+  value.className = "vote-count";
+  value.textContent = count;
+
+  btn.append(icon, value);
+  return btn;
 }
 
-// likeBtnEl e dislikeBtnEl sono sempre i bottoni reali like/dislike
-// della card corrente, non "cliccato/altro": in questo modo
-// updateVoteButtonStates riceve sempre i parametri nell'ordine corretto.
-async function handleVote(photoId, voteType, likeBtnEl, dislikeBtnEl) {
-  try {
-    const voteRef = doc(db, "photos", photoId, "votes", currentUserId);
-    const currentVote = await getUserVote(photoId);
+function paintVotes(state) {
+  state.like.classList.toggle("voted", state.mine === "like");
+  state.dislike.classList.toggle("voted", state.mine === "dislike");
+  state.like.setAttribute("aria-pressed", String(state.mine === "like"));
+  state.dislike.setAttribute("aria-pressed", String(state.mine === "dislike"));
+  state.like.querySelector(".vote-count").textContent = state.likes;
+  state.dislike.querySelector(".vote-count").textContent = state.dislikes;
+}
 
-    if (currentVote === voteType) {
+function cardFooter(photoId, data, author, votes) {
+  const box = document.createElement("div");
+  box.className = "pcard__info pcard__info--row";
+
+  const by = document.createElement("span");
+  by.append("Pubblicata da ");
+  const link = document.createElement("a");
+  link.href = `/profile/?userid=${encodeURIComponent(data.userId || "")}`;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = author;
+  by.append(link);
+  box.append(by);
+
+  const votesBox = document.createElement("div");
+  votesBox.className = "vote-container";
+
+  if (data.userId === currentUserId) {
+    votesBox.classList.add("disabled");
+    const note = document.createElement("span");
+    note.className = "own-photo-notice";
+    note.textContent = "La tua foto";
+    votesBox.append(note);
+  } else {
+    const state = { photoId, ...votes, like: voteButton("like", votes.likes), dislike: voteButton("dislike", votes.dislikes), busy: false };
+    votesBox.append(state.like, state.dislike);
+    paintVotes(state);
+
+    [state.like, state.dislike].forEach((btn) => btn.addEventListener("click", () => handleVote(state, btn.dataset.voteType)));
+  }
+
+  box.append(votesBox);
+  return box;
+}
+
+async function handleVote(state, voteType) {
+  if (state.busy) return;
+  if (isReadOnly) {
+    setStatus("Non puoi votare in modalità sola lettura.", "warning");
+    return;
+  }
+
+  state.busy = true;
+  const voteRef = doc(db, "photos", state.photoId, "votes", currentUserId);
+
+  try {
+    if (state.mine === voteType) {
       await deleteDoc(voteRef);
-      updateVoteButtonStates(likeBtnEl, dislikeBtnEl, null);
     } else {
-      await setDoc(voteRef, {
-        voteType,
-        createdAt: serverTimestamp()
-      });
-      updateVoteButtonStates(likeBtnEl, dislikeBtnEl, voteType);
+      await setDoc(voteRef, { voteType, createdAt: serverTimestamp() });
     }
 
-    const voteCounts = await getVoteCounts(photoId);
-    document.querySelector(`[data-photo-id="${photoId}"].like-btn .vote-count`).textContent = voteCounts.likes;
-    document.querySelector(`[data-photo-id="${photoId}"].dislike-btn .vote-count`).textContent = voteCounts.dislikes;
-
+    const fresh = await getVotes(state.photoId);
+    Object.assign(state, fresh);
+    paintVotes(state);
   } catch (err) {
     console.error("Errore durante il voto:", err);
     setStatus("Errore durante il voto", "error");
+  } finally {
+    state.busy = false;
   }
 }
 
-function updateVoteButtonStates(likeBtn, dislikeBtn, userVote) {
-  const allLikeBtns = document.querySelectorAll(".like-btn");
-  const allDislikeBtns = document.querySelectorAll(".dislike-btn");
+function render() {
+  const q = searchInput.value.trim().toLowerCase();
+  const service = serviceFilter.value;
+  const shown = photos.filter((p) => (!service || p.service === service) && (!q || p.text.includes(q)));
 
-  allLikeBtns.forEach(btn => {
-    const btnUserVote = btn.dataset.userVote;
-    if (btnUserVote === "like") {
-      btn.classList.add("voted");
-    } else {
-      btn.classList.remove("voted");
-    }
-  });
+  resultsCount.textContent = photos.length
+    ? `${shown.length} foto su ${photos.length}`
+    : "";
 
-  allDislikeBtns.forEach(btn => {
-    const btnUserVote = btn.dataset.userVote;
-    if (btnUserVote === "dislike") {
-      btn.classList.add("voted");
-    } else {
-      btn.classList.remove("voted");
-    }
-  });
-
-  if (likeBtn && dislikeBtn && userVote) {
-    if (userVote === "like") {
-      likeBtn.classList.add("voted");
-      dislikeBtn.classList.remove("voted");
-    } else if (userVote === "dislike") {
-      dislikeBtn.classList.add("voted");
-      likeBtn.classList.remove("voted");
-    }
+  if (photos.length === 0) {
+    photosContainer.replaceChildren(emptyState("fa-images", "Ancora nessuna foto pubblicata", "Le foto compaiono qui dopo l'approvazione dello staff."));
+    return;
   }
+
+  if (shown.length === 0) {
+    photosContainer.replaceChildren(emptyState("fa-magnifying-glass", "Nessun risultato", "Prova a cambiare la ricerca o il filtro del servizio."));
+    return;
+  }
+
+  photosContainer.replaceChildren(...shown.map((p) => p.card));
 }
+
+function fillServiceFilter() {
+  const labels = [...new Set(photos.map((p) => p.service).filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
+  labels.forEach((label) => {
+    const option = document.createElement("option");
+    option.value = label;
+    option.textContent = label;
+    serviceFilter.append(option);
+  });
+  serviceFilter.hidden = labels.length < 2;
+}
+
+async function loadAllPhotos() {
+  const snapshot = await getDocs(query(collection(db, "photos"), orderBy("createdAt", "desc")));
+
+  const published = snapshot.docs.filter((d) => {
+    const data = d.data();
+    return photoStatus(data) === "approved" && data.published === true;
+  });
+
+  photos = await Promise.all(published.map(async (d) => {
+    const data = d.data();
+    const [author, votes] = await Promise.all([authorName(data.userId), getVotes(d.id)]);
+    const service = serviceLabel(data.serviceType);
+
+    return {
+      service,
+      text: [data.vehicleModel, data.licensePlate, data.location, data.notes, service, author].map(filled).join(" ").toLowerCase(),
+      card: photoCard(data, { footer: cardFooter(d.id, data, author, votes) })
+    };
+  }));
+
+  fillServiceFilter();
+  render();
+}
+
+searchInput.addEventListener("input", render);
+serviceFilter.addEventListener("change", render);
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await auth.signOut();
   window.location.href = "/login/";
 });
-
-function getServiceLabel(service) {
-  switch (service) {
-    case "ordine-pubblico":
-      return "Ordine Pubblico";
-
-    case "carabinieri":
-      return "Carabinieri";
-
-    case "polizia-locale":
-      return "Polizia Locale / Municipale";
-
-    case "polizia-di-stato":
-      return "Polizia di Stato";
-
-    case "soccorso-alpino":
-      return "Soccorso Alpino e Speleologico";
-
-    case "corpo-forestale-regionale":
-      return "Corpo Forestale Regionale";
-
-    case "guardia-di-finanza":
-      return "Guardia di Finanza";
-
-    case "emergenza-sanitaria":
-      return "Soccorso Sanitario";
-
-    case "ambulanza":
-      return "Soccorso Sanitario";
-
-    case "pompieri":
-      return "Vigili del Fuoco";
-
-    case "guardia-costiera":
-      return "Guardia Costiera";
-
-    case "protezione-civile":
-      return "Protezione Civile";
-
-    case "ausiliari":
-      return "Soccorso Stradale / Autostradale";
-
-    default:
-      return service || "N/A";
-  }
-}

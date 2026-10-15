@@ -8,14 +8,14 @@ const db = getFirestore(app);
 
 
 async function getUserName(userId) {
-  const userSnap = await getDoc(doc(db, "users", userId));
+  const userSnap = await getDoc(doc(db, "publicProfiles", userId));
 
   if (!userSnap.exists()) {
     return "Utente sconosciuto";
   }
 
   const userData = userSnap.data();
-  const userName = userData.name + " " + userData.surname;
+  const userName = `${userData.name || ""} ${userData.surname || ""}`.trim() || userData.username || "Utente";
 
   return userName;
 }

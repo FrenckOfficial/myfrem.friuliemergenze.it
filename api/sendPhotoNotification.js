@@ -1,94 +1,59 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { preflight, requireUser, getUser, getPhoto, sendMail, fullName, fail, HttpError } from "./_lib/server.js";
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (!preflight(req, res)) return;
 
   try {
-    const { userEmail, userName, photoName, uploadedAt } = req.body;
+    const decoded = await requireUser(req);
+    const { ref, photo } = await getPhoto(req.body?.photoId);
 
-    if (!userEmail || !userName) {
-      return res.status(400).json({ 
-        error: "Email e nome sono obbligatori" 
-      });
-    }
+    if (photo.userId !== decoded.uid) throw new HttpError(403, "Puoi ricevere conferme solo per le tue foto");
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userEmail)) {
-      return res.status(400).json({ error: "Email non valida" });
-    }
+    const user = await getUser(decoded.uid);
+    if (user?.emailNotifications !== true) return res.status(200).json({ success: true, skipped: true });
 
-    if (!process.env.BREVO_API_KEY) {
-      console.error("BREVO_API_KEY not configured");
-      return res.status(500).json({ error: "Configurazione server errata" });
-    }
+    const to = user.email || decoded.email;
+    if (!to) throw new HttpError(400, "Nessuna email associata all'account");
 
-    const sanitizedName = sanitizeHtml(userName);
-    const sanitizedEmail = sanitizeHtml(userEmail);
-    const sanitizedPhotoName = sanitizeHtml(photoName);
-
-    const date = uploadedAt ? new Date(uploadedAt) : new Date();
-    const formatter = new Intl.DateTimeFormat('it-IT', {
-      timeZone: 'Europe/Rome',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-    const formattedDate = formatter.format(date);
-
-    const htmlContent = generateMailHtml({
-      name: sanitizedName,
-      photoName: sanitizedPhotoName,
-      uploadedAt: formattedDate
+    const claimed = await ref.firestore.runTransaction(async (tx) => {
+      const fresh = await tx.get(ref);
+      if (fresh.data()?.uploadMailSentAt) return false;
+      tx.update(ref, { uploadMailSentAt: FieldValue.serverTimestamp() });
+      return true;
     });
 
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY
-      },
-      body: JSON.stringify({
-        sender: {
-          name: "Friuli Emergenze",
-          email: "autosystem@friuliemergenze.it"
-        },
-        to: [{ email: sanitizedEmail, name: sanitizedName }],
-        subject: `${photoName}: Foto caricata correttamente!`,
-        htmlContent,
-        replyTo: { 
-          name: "Info - Friuli Emergenze",
-          email: "info@friuliemergenze.it" 
-        }
+    if (!claimed) return res.status(200).json({ success: true, alreadySent: true });
+
+    const created = photo.createdAt?.toDate ? photo.createdAt.toDate() : new Date();
+    const formattedDate = new Intl.DateTimeFormat("it-IT", {
+      timeZone: "Europe/Rome",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(created);
+
+    const photoLabel = [photo.vehicleModel, photo.licensePlate, photo.location]
+      .map((v) => String(v || "").trim())
+      .filter((v) => v && v !== "-")
+      .join(" - ") || "Foto";
+
+    await sendMail({
+      to,
+      toName: fullName(user),
+      subject: `${photoLabel}: Foto caricata correttamente!`,
+      htmlContent: generateMailHtml({
+        name: sanitizeHtml(fullName(user)),
+        photoName: sanitizeHtml(photoLabel),
+        uploadedAt: formattedDate
       })
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Brevo API error", errorData);
-      return res.status(response.status).json({ 
-        error: "Errore nell'invio della notifica" 
-      });
-    }
-
     return res.status(200).json({ success: true });
-
   } catch (error) {
-    console.error("Server error:", error.message);
-    return res.status(500).json({ 
-      success: false,
-      error: "Errore interno del server"
-    });
+    return fail(res, error);
   }
 }
 

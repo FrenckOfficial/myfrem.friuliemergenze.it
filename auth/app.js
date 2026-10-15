@@ -3,12 +3,20 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app, "europe-west1");
+const sendVerificationEmailCall = httpsCallable(functions, "sendVerificationEmail");
+const resendVerificationEmailCall = httpsCallable(functions, "resendVerificationEmail");
+const send2FACodeCall = httpsCallable(functions, "send2FACode");
+const verify2FACodeCall = httpsCallable(functions, "verify2FACode");
+const resolveLoginEmailCall = httpsCallable(functions, "resolveLoginEmail");
+const checkUsernameAvailableCall = httpsCallable(functions, "checkUsernameAvailable");
 
 const allowedRoles = [
   "simplestaff",
@@ -88,20 +96,14 @@ function openChooseDashboardModal() {
   });
 }
 
-async function getUserByUsername(username) {
-  const q = query(
-    collection(db, "users"),
-    where("username", "==", username),
-    limit(1)
-  );
-
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
-    return null;
+async function getEmailByUsername(username) {
+  try {
+    const { data } = await resolveLoginEmailCall({ username });
+    return data?.email || null;
+  } catch (error) {
+    if (error.code === "functions/not-found") return null;
+    throw error;
   }
-
-  return snap.docs[0].data();
 }
 
 async function getUserDoc(uid) {
@@ -178,33 +180,14 @@ async function sendLoginEmailCode() {
   if (!twofaLoginStatus || !pendingLogin) return;
 
   try {
-    pendingLogin.emailCode = String(Math.floor(100000 + Math.random() * 900000));
-
-    const token = await pendingLogin.user.getIdToken();
-
-    const response = await fetch("/api/send2FACode", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        userName: `${pendingLogin.userData.name} ${pendingLogin.userData.surname}`,
-        email: pendingLogin.userData.email,
-        ip: await getIpAddress(),
-        code: pendingLogin.emailCode
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error("Invio codice fallito");
-    }
-
+    await send2FACodeCall({ purpose: "login" });
     twofaLoginStatus.textContent = "Codice inviato via email.";
     twofaLoginStatus.className = "success";
   } catch (error) {
     console.error("Errore invio codice 2FA login:", error);
-    twofaLoginStatus.textContent = "Errore nell'invio del codice.";
+    twofaLoginStatus.textContent = error.code === "functions/resource-exhausted"
+      ? error.message
+      : "Errore nell'invio del codice.";
     twofaLoginStatus.className = "error";
   }
 }
@@ -215,7 +198,7 @@ function start2FAChallenge(user, userData) {
     return;
   }
 
-  pendingLogin = { user, userData, usingRecovery: false, emailCode: null };
+  pendingLogin = { user, userData, usingRecovery: false };
 
   twofaLoginCodeInput.value = "";
   twofaLoginCodeInput.maxLength = 6;
@@ -274,7 +257,16 @@ if (twofaLoginVerifyBtn) {
       } else if (pendingLogin.userData.twoFactorMethod === "totp") {
         verified = await verifyTOTPLoginCode(pendingLogin.userData.totpSecret, code);
       } else if (pendingLogin.userData.twoFactorMethod === "email") {
-        verified = code === pendingLogin.emailCode;
+        try {
+          await verify2FACodeCall({ purpose: "login", code });
+          verified = true;
+        } catch (error) {
+          twofaLoginStatus.textContent = error.code === "functions/permission-denied" || error.code === "functions/invalid-argument"
+            ? error.message
+            : "Errore durante la verifica.";
+          twofaLoginStatus.className = "error";
+          return;
+        }
       }
 
       if (!verified) {
@@ -469,9 +461,8 @@ if (loginForm) {
       let email = identifier;
 
       if (!identifier.includes("@")) {
-        const userData = await getUserByUsername(identifier);
-        if (!userData) throw new Error("Credenziali errate.");
-        email = userData.email;
+        email = await getEmailByUsername(identifier);
+        if (!email) throw new Error("Credenziali errate.");
       }
 
       const cred = await signInWithEmailAndPassword(auth, email, password);
@@ -683,10 +674,8 @@ if (registerForm) {
   }
 
   async function isUsernameTaken(username) {
-    const snap = await getDocs(
-      query(collection(db, "users"), where("username", "==", username), limit(1))
-    );
-    return !snap.empty;
+    const { data } = await checkUsernameAvailableCall({ username });
+    return data?.available === false;
   }
 
   async function validateStep(step) {
@@ -824,9 +813,6 @@ if (registerForm) {
       createdUser = cred.user;
       const uid = createdUser.uid;
 
-      const token = crypto.randomUUID();
-      const verifyLink = `https://myfrem.friuliemergenze.it/verify-email?token=${token}`;
-
       const batch = writeBatch(db);
 
       batch.set(doc(db, "users", uid), {
@@ -839,18 +825,10 @@ if (registerForm) {
         status: "inattivo",
         newsSubbed: false,
         emailVerified: false,
-        verifyLink: verifyLink,
         createdAt: serverTimestamp(),
         firstAccess: true,
         twoFactorEnabled: false,
         twoFactorMethod: null
-      });
-
-      batch.set(doc(db, "emailVerifications", token), {
-        email,
-        userId: uid,
-        expiresAt: Date.now() + 86400000,
-        used: false
       });
 
       batch.set(doc(collection(db, "activities")), {
@@ -862,40 +840,19 @@ if (registerForm) {
       await batch.commit();
       committed = true;
 
-      const htmlContent = buildEmail({ verifyLink, email, name });
-      const staffContent = buildStaffEmail({ name, surname, email, username, phone, verifyLink });
+      let mailSent = true;
 
-      const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userName: `${name} ${surname}`,
-          userEmail: email,
-          htmlContent
-        })
-      });
-
-      fetch("/api/sendStaffNewUserEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userName: `${name} ${surname}`,
-          staffContent
-        })
-      })
-        .then((r) => {
-          if (!r.ok) console.error("Errore invio email staff:", r.status);
-        })
-        .catch((err) => console.error("Errore invio email staff:", err));
+      try {
+        await sendVerificationEmailCall();
+      } catch (mailError) {
+        console.error("Errore invio email di verifica:", mailError);
+        mailSent = false;
+      }
 
       await signOut(auth);
       localStorage.setItem("email", email);
 
-      if (!response.ok) {
+      if (!mailSent) {
         setStatus("Account creato, ma l'invio dell'email di verifica non è riuscito. Nella prossima pagina potrai richiederne un nuovo invio.", "error");
         setTimeout(() => {
           window.location.href = "/auth/confirm-email";
@@ -954,43 +911,19 @@ resendEmailBtn?.addEventListener("click", async () => {
     return;
   }
 
+  if (resendEmailBtn.dataset.busy === "1") return;
+  resendEmailBtn.dataset.busy = "1";
+
   try {
-    const userQuery = query(collection(db, "users"), where("email", "==", email), limit(1));
-    const userSnap = await getDocs(userQuery);
+    await resendVerificationEmailCall({ email });
 
-    if (userSnap.empty) {
-      setStatus("Utente non trovato.", "error");
-      return;
-    }
-
-    const userDoc = userSnap.docs[0];
-    const userData = userDoc.data();
-
-    if (!userData?.verifyLink || !userData?.email) {
-      setStatus("Dati utente incompleti.", "error");
-      return;
-    }
-
-    const response = await fetch("https://myfrem.api.friuliemergenze.it/api/sendVerificationEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userName: `${userData.name} ${userData.surname}`,
-        userEmail: userData.email,
-        htmlContent: buildEmail({ verifyLink: userData.verifyLink, email: userData.email, name: userData.name })
-      })
-    });
-
-    if (!response.ok) {
-      setStatus("Errore reinvio email di verifica.", "error");
-      return;
-    }
-
-    setStatus("Email reinviata! Controlla la tua casella di posta elettronica.", "success");
+    setStatus("Richiesta ricevuta::Se l'account non è ancora verificato, riceverai una nuova email. Controlla anche lo spam; puoi richiederne un'altra tra 60 secondi.", "info");
+    setTimeout(() => { delete resendEmailBtn.dataset.busy; }, 60000);
 
   } catch (error) {
     setStatus("Errore durante il reinvio.", "error");
     console.error(error);
+    delete resendEmailBtn.dataset.busy;
   }
 });
 
@@ -1039,161 +972,3 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 });
-
-function buildEmail({ verifyLink, email, name }) {
-  return `
-    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="center">
-
-            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-              <tr>
-                <td style="padding:35px;text-align:center;">
-
-                  <img
-                    src="https://www.friuliemergenze.it/assets/logo.png"
-                    style="width:80px;margin-bottom:20px;"
-                    loading="lazy"
-                  >
-
-                  <h1 style="color:#ff3b3b;margin:0;font-size:28px;">
-                    Verifica il tuo account
-                  </h1>
-
-                  <p style="font-size:18px;color:#333;margin-top:25px;">
-                    Ciao <b>${name}</b>,
-                  </p>
-
-                  <p style="color:#555;line-height:1.7;font-size:17px;margin-top:20px;">
-                    Benvenuto su <b>MyFrEM</b>.<br><br>
-
-                    Per completare la registrazione e verificare l'indirizzo email
-                    <b>${email}</b>,
-                    clicca sul pulsante qui sotto.
-                  </p>
-
-                  <a
-                    href="${verifyLink}"
-                    style="
-                      display:inline-block;
-                      padding:15px 24px;
-                      background:#ff3b3b;
-                      color:#ffffff;
-                      text-decoration:none;
-                      border-radius:10px;
-                      font-weight:bold;
-                      margin-top:25px;
-                      font-size:16px;
-                    "
-                  >
-                    Verifica account
-                  </a>
-
-                  <p style="color:#888;font-size:13px;margin-top:25px;line-height:1.6;">
-                    Se il pulsante non funziona, copia questo link nel browser:
-                    <br><br>
-
-                    <a
-                      href="${verifyLink}"
-                      style="color:#ff3b3b;"
-                    >
-                      ${verifyLink}
-                    </a>
-                  </p>
-
-                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
-                    MyFrEM · Friuli Emergenze<br>
-                    Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
-                    Se non sei stato tu, puoi ignorare questa email.
-                    <br><br>
-
-                    <a href="https://friuliemergenze.it">
-                      friuliemergenze.it
-                    </a>
-
-                    ·
-
-                    <a href="mailto:info@friuliemergenze.it">
-                      info@friuliemergenze.it
-                    </a>
-                  </p>
-
-                </td>
-              </tr>
-            </table>
-
-          </td>
-        </tr>
-      </table>
-    </div>
-  `;
-}
-
-function buildStaffEmail({ name, surname, email, username, phone, verifyLink }) {
-  return `
-    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="center">
-
-            <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-              <tr>
-                <td style="padding:35px;text-align:center;">
-
-                  <img
-                    src="https://www.friuliemergenze.it/assets/logo.png"
-                    style="width:80px;margin-bottom:20px;"
-                    loading="lazy"
-                  >
-
-                  <h1 style="color:#ff3b3b;margin:0;font-size:28px;">
-                    Nuovo utente registrato
-                  </h1>
-
-                  <p style="font-size:18px;color:#333;margin-top:25px;">
-                    <b>Nome:</b> ${name + " " + surname}<br>
-                    <b>Email:</b> ${email}<br>
-                    <b>Username:</b> ${username}<br>
-                    <b>Telefono:</b> ${phone}
-                  </p>
-
-                  <p style="color:#888;font-size:13px;margin-top:25px;line-height:1.6;">
-                    Il link di conferma che è stato inviato a ${name} utente è:
-                    <br><br>
-
-                    <a
-                      href="#"
-                      style="color:#ff3b3b;"
-                    >
-                      ${verifyLink}
-                    </a>
-                  </p>
-
-                  <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">
-                    MyFrEM · Friuli Emergenze<br>
-                    Hai ricevuto questa email perché è stato creato un account con questo indirizzo.<br>
-                    Se non sei stato tu, puoi ignorare questa email.
-                    <br><br>
-
-                    <a href="https://friuliemergenze.it">
-                      friuliemergenze.it
-                    </a>
-
-                    ·
-
-                    <a href="mailto:info@friuliemergenze.it">
-                      info@friuliemergenze.it
-                    </a>
-                  </p>
-
-                </td>
-              </tr>
-            </table>
-
-          </td>
-        </tr>
-      </table>
-    </div>
-  `;
-}

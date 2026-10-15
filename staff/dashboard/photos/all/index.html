@@ -18,38 +18,37 @@
   <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/staff/dashboard/staff.css">
   <script type="module" src="/staff/dashboard/photos/all/all-photos.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
+  <link rel="stylesheet" href="/staff/dashboard/theme.css">
 </head>
-<body>
+<body class="app app--staff">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <button class="menu-toggle" aria-label="Toggle navigation menu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <aside class="sidebar">
-      <div class="logo">
-        <img src="https://www.friuliemergenze.it/assets/logo.png" loading="lazy">
-        <h2>MyFrEM Staff</h2>
-      </div>
-      <nav>
-        <a href="/staff/dashboard/">Dashboard</a>
-        <a href="/staff/dashboard/photos/" class="active">Moderazione foto</a>
-        <a href="/staff/dashboard/management/">Funzionalità</a>
-        <a href="/staff/dashboard/settings/">Impostazioni</a>
-        <br>
-        <a href="/dashboard/">Passa a dashboard utente</a>
-      </nav>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/staff/dashboard/">
+          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="">
+          <span>MyFrEM<small>Area staff</small></span>
+        </a>
+        <nav class="app-nav" data-area="staff" aria-label="Menu staff"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
   
-    <div class="main-content">
+    <div class="main-content app-main">
+      <div class="app-container">
       <h1>Tutte le foto caricate</h1>
+      <a id="backPhotoModeration" onclick="window.history.back()">Torna alla moderazione delle foto</a>
+      <div class="table-scroll">
       <table class="photos-table">
         <thead>
           <tr>
@@ -70,8 +69,10 @@
         <tbody id="photosTbody">
           <tr><td colspan="6">Caricamento...</td></tr>
         </tbody>
-        <a id="backPhotoModeration" onclick="window.history.back()">Torna alla moderazione delle foto</a>
       </table>
+      </div>
+      </div>
+    </div>
     </div>
 
     <div class="first-access-modal" id="votesModal">

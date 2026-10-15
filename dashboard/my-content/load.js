@@ -2,124 +2,91 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore, collection, query, where, orderBy, getDocs, getDoc, doc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/helpers/configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
+import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { addStaffLink } from "/helpers/loadNavbar.js";
+import { photoCard, photoStatus, serviceLabel, formatDate, filled, emptyState } from "/dashboard/photos.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+const STAFF_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+const FILTERS = ["all", "pending", "approved", "rejected"];
+
 const photosContainer = document.getElementById("photosContainer");
+const statusTabs = document.getElementById("statusTabs");
+const searchInput = document.getElementById("searchInput");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
-const logoutBtn = document.getElementById("logoutBtn");
 
-const tabButtons = document.querySelectorAll(".tab-btn");
-const tabContents = document.querySelectorAll(".tab-content");
+const requested = new URLSearchParams(window.location.search).get("stato");
+let filter = FILTERS.includes(requested) ? requested : "all";
+let photos = [];
 
-tabButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    tabButtons.forEach(b => b.classList.remove("active"));
-    tabContents.forEach(tc => tc.classList.remove("active"));
-    
-    btn.classList.add("active");
-    const target = btn.getAttribute("data-tab");
-    document.getElementById(target).classList.add("active");
-  });
-});
+function showContent() {
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
+}
 
-logoutBtn.addEventListener("click", async () => {
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "/login";
 });
 
 onAuthStateChanged(auth, async (user) => {
-  const timeoutId = setTimeout(() => {
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
-  }, 5000);
+  if (!user) {
+    window.location.href = "/login";
+    return;
+  }
 
-  await addDoc(collection(db, "viewedPages"), {
+  const timeoutId = setTimeout(showContent, 5000);
+
+  addDoc(collection(db, "viewedPages"), {
     type: "page_view",
     timestamp: serverTimestamp(),
     userId: user.uid,
     page: window.location.pathname
-  });
+  }).catch((error) => console.error("Errore viewedPages:", error));
 
   try {
-    if (!user) {
-      clearTimeout(timeoutId);
-      window.location.href = "/login";
-      return;
-    }
-
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (!userDoc.exists()) {
       setStatus("Errore: utente non trovato.", "error");
-      clearTimeout(timeoutId);
-      loadingEl.style.display = "none";
-      contentEl.style.display = "block";
       return;
     }
 
-    const staffRoles = [
-      "simplestaff",
-      "modstaff",
-      "advstaff",
-      "advstaffplus",
-      "superadmin",
-    ];
-
     const userData = userDoc.data();
-    
+
     if (userData.role === "testacc") {
       document.body.classList.add("read-only-mode");
-      const banner = document.createElement("div");
-      banner.style.cssText = "background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 10px; border-radius: 4px; text-align: center;";
-      banner.textContent = "Modalità sola lettura";
-      document.querySelector(".content").insertBefore(banner, document.querySelector(".content").firstChild);
+      document.getElementById("readOnlyNotice").hidden = false;
     }
 
-    if (staffRoles.includes(userData.role)) {
-      const staffLinkEl = document.querySelector('.navbar');
-      const br = document.createElement('br');
-      const link = document.createElement('a');
-      link.href = '/staff/dashboard/';
-      link.textContent = 'Passa alla dashboard staff';
-      staffLinkEl.appendChild(br);
-      staffLinkEl.appendChild(link);
-    }
+    if (STAFF_ROLES.includes(userData.role)) addStaffLink();
 
     initBottomNav(userData, user, "user");
     await loadPhotos(user.uid);
-
-    clearTimeout(timeoutId);
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
   } catch (err) {
     console.error("Errore:", err);
     setStatus("Errore nel caricamento.", "error");
+  } finally {
     clearTimeout(timeoutId);
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+    showContent();
   }
 });
 
 async function getVoteCounts(photoId) {
   try {
-    const votesQuery = query(
-      collection(db, "photos", photoId, "votes")
-    );
-    const snapshot = await getDocs(votesQuery);
-
+    const snapshot = await getDocs(collection(db, "photos", photoId, "votes"));
     let likes = 0;
     let dislikes = 0;
 
-    snapshot.forEach((doc) => {
-      const voteData = doc.data();
-      if (voteData.voteType === "like") likes++;
-      else if (voteData.voteType === "dislike") dislikes++;
+    snapshot.forEach((voteDoc) => {
+      const { voteType } = voteDoc.data();
+      if (voteType === "like") likes++;
+      else if (voteType === "dislike") dislikes++;
     });
 
     return { likes, dislikes };
@@ -129,116 +96,99 @@ async function getVoteCounts(photoId) {
   }
 }
 
-async function loadPhotos(userId) {
-  try {
-    photosContainer.innerHTML = "";
+function cardFooter(photo, votes) {
+  const box = document.createElement("div");
+  box.className = "pcard__info";
 
-    const photosQuery = query(
-      collection(db, "photos"),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
+  const lines = [];
+  const uploaded = formatDate(photo.createdAt);
+  if (uploaded) lines.push(`Caricata il ${uploaded}`);
 
-    const snapshot = await getDocs(photosQuery);
+  const reviewer = filled(photo.updater);
+  const reviewed = formatDate(photo.updatedAt) || formatDate(photo.reviewedAt);
+  if (reviewer) lines.push(`Revisionata da ${reviewer}${reviewed ? ` il ${reviewed}` : ""}`);
 
-    if (snapshot.empty) {
-      photosContainer.innerHTML = "<p>Nessuna foto caricata.</p>";
-      return;
-    }
+  lines.forEach((text) => {
+    const line = document.createElement("span");
+    line.textContent = text;
+    box.append(line);
+  });
 
-    const photoPromises = [];
-    snapshot.forEach((docSnap) => {
-      photoPromises.push(
-        getVoteCounts(docSnap.id).then(votes => ({
-          docSnap,
-          votes
-        }))
-      );
-    });
-
-    const photosWithVotes = await Promise.all(photoPromises);
-
-    photosWithVotes.forEach(({ docSnap, votes }) => {
-      const data = docSnap.data();
-      const card = document.createElement("div");
-      card.className = "photo-card";
-
-      const status = data.status.includes("Approvata") ? "approved" :
-                     data.status.includes("Rifiutata") ? "rejected" :
-                     "pending";
-
-      const statusText = data.status.includes("Approvata") ? "Approvata" :
-                         data.status.includes("Rifiutata") ? "Rifiutata" :
-                         "Non disponibile";
-
-      const service = getServiceLabel(data.serviceType);
-
-      card.innerHTML = `
-        <div class="photo-info">
-          <img src="${data.url}" alt="Foto utente" class="photo-img" loading="lazy" />
-          <h4>${data.vehicleModel || data.fileName || "Foto"}</h4>
-          <p><b>Targa:</b> ${data.licensePlate || "Non disponibile / Non inserito"}</p>
-          <p><b>Allestitore:</b> ${data.sponsor || "Non disponibile / Non inserito"}</p>
-          <p><b>Posizione:</b> ${data.location || "Non disponibile / Non inserito"}</p>
-          <p><b>Servizio:</b> ${service || "Non disponibile / Non inserito"}</p>
-          <p><b>Note:</b> ${data.notes || "Non disponibile / Non inserito"}</p>
-          <p>
-            <b>Stato:</b>
-            <span class="status ${status}">${statusText || "In attesa"}</span>
-          </p>
-          <p>
-            <b>Caricata:</b>
-            ${data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString("it-IT") : "Non disponibile / Non inserito"}
-          </p>
-          ${data.updater ? `
-            <p><b>Revisionata da</b> ${data.updater} <b>il:</b> ${
-              data.updatedAt?.toDate
-                ? data.updatedAt.toDate().toLocaleString("it-IT")
-                : data.reviewedAt?.toDate
-                  ? data.reviewedAt.toDate().toLocaleString("it-IT")
-                  : "Non disponibile / Non inserito"
-            }</p>
-          ` : ""}
-          
-          ${status === "approved" ? `
-            <div class="vote-stats">
-              <span class="vote-count">
-                <i class="fas fa-thumbs-up"></i> ${votes.likes}
-              </span>
-              <span class="vote-count">
-                <i class="fas fa-thumbs-down"></i> ${votes.dislikes}
-              </span>
-            </div>
-          ` : ""}
-
-          ${data.vehicleLink ? `<a href="${data.vehicleLink}" target="_blank" class="gallery-link">Vai al mezzo in galleria</a>` : ""}
-        </div>
-      `;
-
-      photosContainer.appendChild(card);
-    });
-  } catch (err) {
-    console.error("Errore caricamento foto:", err);
-    setStatus("Errore caricamento foto", "error");
+  if (votes) {
+    const stats = document.createElement("span");
+    stats.className = "pcard__votes";
+    stats.innerHTML = '<i class="fa-solid fa-thumbs-up" aria-hidden="true"></i> <b></b> &nbsp; <i class="fa-solid fa-thumbs-down" aria-hidden="true"></i> <b></b>';
+    const [likes, dislikes] = stats.querySelectorAll("b");
+    likes.textContent = votes.likes;
+    dislikes.textContent = votes.dislikes;
+    box.append(stats);
   }
+
+  return box;
 }
 
-function getServiceLabel(service) {
-  const services = {
-    "ordine-pubblico": "Ordine Pubblico",
-    "carabinieri": "Carabinieri",
-    "polizia-locale": "Polizia Locale / Municipale",
-    "polizia-di-stato": "Polizia di Stato",
-    "soccorso-alpino": "Soccorso Alpino e Speleologico",
-    "corpo-forestale-regionale": "Corpo Forestale Regionale",
-    "guardia-di-finanza": "Guardia di Finanza",
-    "emergenza-sanitaria": "Soccorso Sanitario",
-    "ambulanza": "Soccorso Sanitario",
-    "pompieri": "Vigili del Fuoco",
-    "guardia-costiera": "Guardia Costiera",
-    "protezione-civile": "Protezione Civile",
-    "ausiliari": "Soccorso Stradale / Autostradale"
-  };
-
-  return services[service] || service || "N/A";
+function searchText(photo) {
+  return [photo.vehicleModel, photo.licensePlate, photo.sponsor, photo.location, photo.notes, serviceLabel(photo.serviceType)]
+    .map(filled)
+    .join(" ")
+    .toLowerCase();
 }
+
+function render() {
+  const q = searchInput.value.trim().toLowerCase();
+  const shown = photos.filter((p) => (filter === "all" || p.status === filter) && (!q || p.text.includes(q)));
+
+  statusTabs.querySelectorAll(".tab").forEach((tab) => {
+    const active = tab.dataset.status === filter;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+
+  statusTabs.querySelectorAll("[data-count]").forEach((badge) => {
+    const key = badge.dataset.count;
+    badge.textContent = key === "all" ? photos.length : photos.filter((p) => p.status === key).length;
+  });
+
+  if (photos.length === 0) {
+    photosContainer.replaceChildren(emptyState("fa-camera", "Non hai ancora caricato foto", "Carica la tua prima foto di un mezzo di soccorso: lo staff la revisionerà prima di pubblicarla.", { label: "Carica una foto", href: "/dashboard/upload" }));
+    return;
+  }
+
+  if (shown.length === 0) {
+    photosContainer.replaceChildren(emptyState("fa-filter", "Nessuna foto qui", q ? "Nessun risultato per questa ricerca." : "Non ci sono foto con questo stato."));
+    return;
+  }
+
+  photosContainer.replaceChildren(...shown.map((p) => p.card));
+}
+
+async function loadPhotos(userId) {
+  const snapshot = await getDocs(query(
+    collection(db, "photos"),
+    where("userId", "==", userId),
+    orderBy("createdAt", "desc")
+  ));
+
+  photos = await Promise.all(snapshot.docs.map(async (docSnap) => {
+    const data = docSnap.data();
+    const status = photoStatus(data);
+    const votes = status === "approved" ? await getVoteCounts(docSnap.id) : null;
+
+    return {
+      status,
+      text: searchText(data),
+      card: photoCard(data, { showStatus: true, footer: cardFooter(data, votes) })
+    };
+  }));
+
+  render();
+}
+
+statusTabs.addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  filter = tab.dataset.status;
+  render();
+});
+
+searchInput.addEventListener("input", render);

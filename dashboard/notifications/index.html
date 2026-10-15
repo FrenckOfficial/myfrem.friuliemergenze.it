@@ -17,40 +17,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notifiche | MyFrEM - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
   <link rel="stylesheet" href="/dashboard/dsh.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
   <link rel="shortcut icon" href="/assets/icons/logo.png" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <script>
     
   </script>
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
   
 </head>
-<body>
+<body class="app">
   <div class="loading">
     <div class="loader"></div>
     <p>Caricamento in corso...</p>
   </div>
   <div class="content" style="display:none;">
-    <aside class="sidebar">
-        <div class="logo">
-          <img src="/assets/icons/logo.png" alt="MyFrEM Logo" loading="lazy">
-          <h2>MyFrEM</h2>
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/dashboard/">
+          <img src="/assets/icons/logo.png" alt="">
+          <span>MyFrEM<small>Area personale</small></span>
+        </a>
+        <nav class="app-nav" data-area="user" aria-label="Menu principale"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
         </div>
-        <nav class="navbar">
-          <a href="/dashboard">Home</a>
-          <a href="/dashboard/upload">Carica una foto</a>
-          <a href="/dashboard/my-content">I miei contenuti</a>
-          <a href="/dashboard/myfrem-photos">Tutte le foto</a>
-          <a href="/dashboard/settings/">Impostazioni</a>
-        </nav>
-        <button id="logoutBtn" class="logout">Logout</button>
-    </aside>
-    <div class="main-content">
+      </aside>
+    <div class="main-content app-main">
+      <div class="app-container">
     
       <header class="notifications-header">
-        <h1>Notifiche</h1>
+        <div>
+          <h1>Notifiche</h1>
+          <p class="page-sub">Aggiornamenti sulle tue foto, sulle associazioni e dalla piattaforma.</p>
+        </div>
         <button id="markAllReadBtn" class="btn-mark-all">Segna tutto come letto</button>
       </header>
 
@@ -70,6 +73,8 @@
       <div class="pagination" id="pagination">
         <!-- Caricato dinamicamente -->
       </div>
+      </div>
+    </div>
     </div>
   </div>
 

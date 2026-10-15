@@ -28,14 +28,12 @@ async function loadPublicReport() {
 
   const data = docSnap.data();
 
-  let staffEmail = "-";
   let staffName = "-"
   if (data.reportedBy) {
-    const userRef = doc(db, "users", data.reportedBy);
+    const userRef = doc(db, "publicProfiles", data.reportedBy);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      staffEmail = userData.email || "-";
       staffName = userData.name || "-"
     }
   }

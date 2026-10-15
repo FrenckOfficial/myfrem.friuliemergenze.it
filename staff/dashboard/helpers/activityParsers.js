@@ -59,6 +59,10 @@ export async function parseActivity(activity, date) {
             return `[${date}] L'utente "${activity.userName}" è stato eliminato.`;
         }
 
+        case "user_permanent_deletion": {
+            return `[${date}] L'account di "${escapeHtml(activity.userName)}" è stato cancellato definitivamente.`;
+        }
+
         case "user_creation_whatsapp": {
             return `[${date}] Nuovo utente WhatsApp registrato: "${activity.userName}".`;
         }
@@ -125,8 +129,18 @@ export async function parseActivity(activity, date) {
             return `[${date}] Associazione "${requestId}" rifiutata da ${activity.staffer}.`;
         }
 
+        case "association_deactivation_request": {
+            const name = escapeHtml(activity.associationName || "Associazione sconosciuta");
+            const email = escapeHtml(activity.email || "-");
+            return `[${date}] L'associazione "${name}" ha richiesto la disattivazione. Contatto: ${email}.`;
+        }
+
         default:
             console.warn("Tipo attività sconosciuto:", activity);
             return `[${date}] Attività sconosciuta (${activity.type || "Tipo non definito"}).`;
     }
+}
+
+function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[c]));
 }

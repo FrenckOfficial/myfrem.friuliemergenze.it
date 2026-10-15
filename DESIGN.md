@@ -193,7 +193,6 @@ Use semantic tokens first. Raw values from frontmatter are source values, not pe
 ### Text Selection
 - Use this style-specific `::selection` treatment for Dashboard. It should follow the selected color tokens and stay readable.
 ```css
-/* Dashboard selection: calm data highlight. */
 ::selection {
   background-color: existing soft primary color;
   color: existing text color;
