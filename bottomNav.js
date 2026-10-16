@@ -13,7 +13,6 @@ const BottomNav = (() => {
       { id: 'moderazione', icon: 'fa-circle-check',          href: '/staff/dashboard/photos',                label: 'Moderazione foto' },
       { id: 'feed',        icon: 'fa-comments',              href: '/staff/dashboard/feed',                  label: 'Moderazione feed' },
       { id: 'utenti',      icon: 'fa-users',                 href: '/staff/dashboard/management',            label: 'Funzionalità' },
-      { id: 'rapporti',    icon: 'fa-file',                  href: '/staff/dashboard/kick-reports',          label: 'Rapporti di espulsione' },
       { id: 'richieste',   icon: 'fa-building-circle-check', href: '/staff/dashboard/association-requests',  label: 'Richieste associazioni' },
       { id: 'profilo',     icon: 'fa-user',                  href: '/staff/dashboard/settings',              label: 'Impostazioni', avatar: true }
     ],
