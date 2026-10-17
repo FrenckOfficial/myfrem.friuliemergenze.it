@@ -1,16 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, query, orderBy, getDocs, doc, getDoc, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { collection, getDocs, doc, getDoc, addDoc, deleteDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { auth, db } from "/helpers/firebase.js";
 import { getUserName } from "/helpers/getUserName.js";
-import { firebaseConfig } from "/helpers/configFirebase.js";
 import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
-import { createPager } from "/staff/dashboard/helpers/pager.js";
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+import { createFilteredList, resolveUserByEmailOrUid } from "/staff/dashboard/helpers/filteredList.js";
 
 const photosTableBody = document.getElementById("photosTbody");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -48,6 +43,20 @@ const STATUS_STYLES = [
   { match: "Foto in attesa di approvazione", label: "Foto in attesa di approvazione", color: "orange" }
 ];
 const STATUS_UNKNOWN = { label: "Sconosciuto", color: "blue" };
+
+const STATUS_TABS = [
+  { id: "all", label: "Tutte", values: null },
+  { id: "attesa", label: "In attesa", icon: "fa-hourglass-half", values: ["Foto in attesa di approvazione", "Foto in attesa di approvazione ⌛"] },
+  { id: "approvate", label: "Approvate", icon: "fa-circle-check", values: ["Approvata", "Approvata ✅"] },
+  { id: "rifiutate", label: "Rifiutate", icon: "fa-circle-xmark", values: ["Rifiutata", "Rifiutata ❌"] }
+].map((t) => ({ ...t, constraints: t.values ? () => [where("status", "in", t.values)] : null }));
+
+const SERVICE_OPTIONS = Object.entries(
+  Object.entries(SERVICE_LABELS).reduce((acc, [key, label]) => {
+    (acc[label] ||= []).push(key);
+    return acc;
+  }, {})
+).map(([label, values]) => ({ value: values[0], label, values }));
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -221,47 +230,29 @@ function buildRow({ id, photo, userName, votes }) {
   return tr;
 }
 
-function showEmptyRow() {
-  photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Nessuna foto trovata</td></tr>`;
+function renderEmpty(text) {
+  const tr = document.createElement("tr");
+  tr.className = "activity-empty";
+  const td = document.createElement("td");
+  td.colSpan = TABLE_COLUMNS;
+  td.textContent = text;
+  tr.append(td);
+  return tr;
 }
 
-const pager = createPager({
-  ref: collection(db, "photos"),
-  field: "createdAt",
-  pageSize: 50,
-  list: photosTableBody,
-  anchor: photosTableBody.closest(".table-scroll") || photosTableBody.closest("table") || photosTableBody,
-  moreLabel: "Carica altre foto",
-  renderEmpty: () => {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = TABLE_COLUMNS;
-    td.textContent = "Nessuna foto trovata";
-    tr.append(td);
-    return tr;
-  },
-  renderItem: async (docSnap) => {
-    const photo = docSnap.data();
-    const id = docSnap.id;
-    const [votes, userName] = await Promise.all([
-      fetchVotes(id).catch((err) => {
-        console.error("Errore caricamento voti foto " + id + ":", err);
-        return [];
-      }),
-      getCachedUserName(photo.userId)
-    ]);
-    return buildRow({ id, photo, userName, votes });
-  }
-});
+let photosList = null;
 
-async function loadAllPhotos() {
-  try {
-    await pager.load(true);
-  } catch (err) {
-    console.error("Errore caricamento foto:", err);
-    photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Errore nel caricamento delle foto</td></tr>`;
-    setStatus("Errore caricamento foto", "error");
-  }
+async function renderPhotoRow(docSnap) {
+  const photo = docSnap.data();
+  const id = docSnap.id;
+  const [votes, userName] = await Promise.all([
+    fetchVotes(id).catch((err) => {
+      console.error("Errore caricamento voti foto " + id + ":", err);
+      return [];
+    }),
+    getCachedUserName(photo.userId)
+  ]);
+  return buildRow({ id, photo, userName, votes });
 }
 
 async function deletePhoto(photoId, rowElement) {
@@ -288,8 +279,7 @@ async function deletePhoto(photoId, rowElement) {
     console.error("Errore registrazione attività:", err);
   }
 
-  rowElement.remove();
-  if (photosTableBody.children.length === 0) showEmptyRow();
+  photosList?.removed(rowElement);
 
   setStatus("Foto eliminata con successo", "success");
 }
@@ -325,15 +315,27 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const timeoutId = setTimeout(() => {
-    console.warn("Timeout caricamento, forzo visualizzazione");
-    showContent();
-  }, 7000);
+  showContent();
 
-  try {
-    await loadAllPhotos();
-  } finally {
-    clearTimeout(timeoutId);
-    showContent();
-  }
+  photosList = createFilteredList({
+    db,
+    ref: collection(db, "photos"),
+    field: "createdAt",
+    panel: document.getElementById("photosPanel"),
+    list: photosTableBody,
+    frame: document.getElementById("photosFrame"),
+    categories: STATUS_TABS,
+    selects: [{ id: "servizio", label: "Servizio", field: "serviceType", allLabel: "Tutti i servizi", options: SERVICE_OPTIONS }],
+    person: {
+      label: "Utente",
+      placeholder: "Email o UID",
+      resolve: resolveUserByEmailOrUid,
+      notFound: "Nessun utente registrato con questa email."
+    },
+    renderItem: renderPhotoRow,
+    renderEmpty,
+    emptyText: "Nessuna foto con questi filtri.",
+    unit: "foto"
+  });
+  photosList.start();
 });

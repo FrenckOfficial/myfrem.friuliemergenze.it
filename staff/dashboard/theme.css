@@ -491,20 +491,6 @@
   overflow-wrap: anywhere;
 }
 
-.app--staff .pager-more {
-  display: flex;
-  margin: 16px auto 4px;
-}
-
-.app--staff .pager-info {
-  margin: 0 0 16px;
-  text-align: center;
-}
-
-.app--staff .pager-info:empty {
-  display: none;
-}
-
 .app--staff .activity-panel {
   padding: 0;
   overflow: hidden;
@@ -542,8 +528,18 @@
   justify-self: end;
 }
 
-.app--staff .activity-filters--person {
-  grid-template-columns: minmax(0, 260px) repeat(3, minmax(0, 160px)) auto;
+.app--staff .activity-filters--wide {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.app--staff .activity-filters--wide .field {
+  flex: 1 1 150px;
+  max-width: 240px;
+}
+
+.app--staff .activity-filters--wide .activity-reset {
+  margin-left: auto;
 }
 
 .app--staff .activity-list .activity-row--compact {
@@ -620,12 +616,18 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .app--staff .activity-filters--person {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .app--staff .activity-filters--wide .field {
+    flex-basis: calc(50% - 6px);
+    max-width: none;
   }
 
-  .app--staff .activity-filters--person .field:first-child {
-    grid-column: 1 / -1;
+  .app--staff .activity-filters--wide .field:first-child {
+    flex-basis: 100%;
+  }
+
+  .app--staff .activity-filters--wide .activity-reset {
+    flex-basis: 100%;
+    margin-left: 0;
   }
 
   .app--staff .activity-list .activity-row--compact {

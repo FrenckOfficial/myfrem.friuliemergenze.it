@@ -41,6 +41,7 @@ export function createFilteredList({
   field: timeField = "timestamp",
   categories = null,
   person = null,
+  selects = [],
   renderItem,
   renderEmpty,
   emptyText = "Nessun elemento con questi filtri.",
@@ -51,6 +52,7 @@ export function createFilteredList({
     from: "",
     to: "",
     person: "",
+    selects: Object.fromEntries(selects.map((f) => [f.id, ""])),
     size: 25,
     page: 0,
     total: 0,
@@ -68,11 +70,16 @@ export function createFilteredList({
   const to = el("input", { className: "input", type: "date" });
   const size = el("select", { className: "input" }, PAGE_SIZES.map((n) => el("option", { value: String(n), textContent: String(n) })));
   const personInput = person ? el("input", { className: "input", type: "search", placeholder: person.placeholder || "Email o UID", autocomplete: "off" }) : null;
+  const selectEls = selects.map((f) => el("select", { className: "input" }, [
+    el("option", { value: "", textContent: f.allLabel || "Tutti" }),
+    ...f.options.map((o) => el("option", { value: o.value, textContent: o.label }))
+  ]));
   const reset = el("button", { className: "btn btn--ghost activity-reset", type: "button" }, [icon("fa-solid fa-rotate-left"), "Azzera filtri"]);
 
   const uid = Math.random().toString(36).slice(2, 7);
-  const filtersBox = el("div", { className: "activity-filters" + (person ? " activity-filters--person" : "") }, [
+  const filtersBox = el("div", { className: "activity-filters" + (person || selects.length ? " activity-filters--wide" : "") }, [
     ...(person ? [field(`flPerson${uid}`, person.label || "Utente", personInput)] : []),
+    ...selects.map((f, i) => field(`flSel${f.id}${uid}`, f.label, selectEls[i])),
     field(`flFrom${uid}`, "Dal", from),
     field(`flTo${uid}`, "Al", to),
     field(`flSize${uid}`, "Per pagina", size),
@@ -97,12 +104,16 @@ export function createFilteredList({
     if (DATE_RE.test(p.get("al") || "")) state.to = p.get("al");
     if (PAGE_SIZES.includes(Number(p.get("n")))) state.size = Number(p.get("n"));
     if (person && p.get("utente")) state.person = p.get("utente").trim().slice(0, 200);
+    for (const f of selects) {
+      if (f.options.some((o) => o.value === p.get(f.id))) state.selects[f.id] = p.get(f.id);
+    }
   }
 
   function writeUrl() {
     const p = new URLSearchParams();
     if (categories && state.category !== categories[0].id) p.set("cat", state.category);
     if (state.person) p.set("utente", state.person);
+    for (const f of selects) if (state.selects[f.id]) p.set(f.id, state.selects[f.id]);
     if (state.from) p.set("dal", state.from);
     if (state.to) p.set("al", state.to);
     if (state.size !== 25) p.set("n", String(state.size));
@@ -132,6 +143,12 @@ export function createFilteredList({
     const out = [];
     const cat = categories?.find((c) => c.id === state.category);
     if (cat?.constraints) out.push(...cat.constraints());
+    for (const f of selects) {
+      const opt = f.options.find((o) => o.value === state.selects[f.id]);
+      if (!opt) continue;
+      const values = opt.values || [opt.value];
+      out.push(values.length > 1 ? where(f.field, "in", values) : where(f.field, "==", values[0]));
+    }
     if (state.personConstraint) out.push(state.personConstraint);
     if (state.from) out.push(where(timeField, ">=", Timestamp.fromDate(new Date(`${state.from}T00:00:00`))));
     if (state.to) {
@@ -258,6 +275,10 @@ export function createFilteredList({
     to.value = state.to;
     size.value = String(state.size);
     if (personInput) personInput.value = state.person;
+    selects.forEach((f, i) => {
+      selectEls[i].value = state.selects[f.id];
+      selectEls[i].addEventListener("change", () => { state.selects[f.id] = selectEls[i].value; apply(); });
+    });
     renderTabs();
 
     from.addEventListener("change", () => { state.from = from.value; apply(); });
@@ -278,6 +299,7 @@ export function createFilteredList({
       state.size = 25;
       from.value = to.value = "";
       if (personInput) personInput.value = "";
+      selects.forEach((f, i) => { state.selects[f.id] = ""; selectEls[i].value = ""; });
       size.value = "25";
       renderTabs();
       apply();
