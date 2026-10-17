@@ -504,3 +504,117 @@
 .app--staff .pager-info:empty {
   display: none;
 }
+
+.app--staff .activity-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.app--staff .activity-toolbar {
+  padding: 10px 12px;
+}
+
+.app--staff .activity-tabs {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app--staff .activity-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.app--staff .activity-tabs .tab {
+  flex: none;
+  white-space: nowrap;
+}
+
+.app--staff .activity-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 180px)) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app--staff .activity-reset {
+  justify-self: end;
+}
+
+.app--staff .activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app--staff .activity-list[aria-busy="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.app--staff .activity-list .activity-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: default;
+}
+
+.app--staff .activity-chip {
+  justify-self: start;
+}
+
+.app--staff .activity-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.app--staff .activity-del {
+  color: var(--text-3);
+}
+
+.app--staff .activity-del:hover {
+  color: var(--danger);
+}
+
+.app--staff .activity-list .activity-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-3);
+  cursor: default;
+}
+
+.app--staff .activity-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 720px) {
+  .app--staff .activity-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app--staff .activity-reset {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: center;
+  }
+
+  .app--staff .activity-list .activity-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .app--staff .activity-chip {
+    grid-column: 1 / -1;
+  }
+
+  .app--staff .activity-pager .btn {
+    padding-inline: 10px;
+  }
+}
