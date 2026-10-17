@@ -48,25 +48,30 @@
   
     <main class="main-content app-main">
       <div class="app-container">
-      <h1>Tutti i logins</h1>
+      <h1>Tutti gli accessi</h1>
       <div class="statusBox" style="display:none;">
         
         
       </div>
   
-      <table id="usersTable">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Data e ora accesso</th>
-            <th>UID</th>
-            <th>Provenienza</th>
-            <th>User-Agent</th>
-          </tr>
-        </thead>
-        <tbody id="usersTableBody">
-        </tbody>
-      </table>
+      <section class="panel activity-panel" id="loginsPanel">
+        <div class="table-scroll" id="loginsList">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Data e ora accesso</th>
+                <th>UID</th>
+                <th>Provenienza</th>
+                <th>User-Agent</th>
+                <th aria-label="Azioni"></th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+            </tbody>
+          </table>
+        </div>
+      </section>
       </div>
     </main>
     </div>

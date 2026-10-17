@@ -542,6 +542,26 @@
   justify-self: end;
 }
 
+.app--staff .activity-filters--person {
+  grid-template-columns: minmax(0, 260px) repeat(3, minmax(0, 160px)) auto;
+}
+
+.app--staff .activity-list .activity-row--compact {
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+
+.app--staff .activity-panel .table-scroll {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.app--staff .activity-panel tr.activity-empty td {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-3);
+}
+
 .app--staff .activity-list {
   margin: 0;
   padding: 0;
@@ -598,6 +618,18 @@
 @media (max-width: 720px) {
   .app--staff .activity-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app--staff .activity-filters--person {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app--staff .activity-filters--person .field:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .app--staff .activity-list .activity-row--compact {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .app--staff .activity-reset {

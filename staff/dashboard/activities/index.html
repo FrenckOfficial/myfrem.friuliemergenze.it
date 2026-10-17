@@ -42,35 +42,8 @@
     <div class="main-content app-main">
       <div class="app-container">
       <h1>Tutte le attività</h1>
-      <section class="panel activity-panel">
-        <div class="toolbar activity-toolbar">
-          <div class="tabs activity-tabs" id="activityTabs" role="tablist" aria-label="Categoria"></div>
-        </div>
-        <div class="activity-filters">
-          <div class="field">
-            <label for="filterFrom">Dal</label>
-            <input class="input" type="date" id="filterFrom">
-          </div>
-          <div class="field">
-            <label for="filterTo">Al</label>
-            <input class="input" type="date" id="filterTo">
-          </div>
-          <div class="field">
-            <label for="filterSize">Per pagina</label>
-            <select class="input" id="filterSize">
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-          <button class="btn btn--ghost activity-reset" type="button" id="filterReset"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>Azzera filtri</button>
-        </div>
+      <section class="panel activity-panel" id="activitiesPanel">
         <ul class="activity activity-list" id="activitiesList"></ul>
-        <div class="activity-pager">
-          <button class="btn btn--ghost btn--sm" type="button" id="pagePrev" disabled><i class="fa-solid fa-chevron-left" aria-hidden="true"></i>Precedente</button>
-          <span class="hint" id="pageInfo" aria-live="polite"></span>
-          <button class="btn btn--ghost btn--sm" type="button" id="pageNext" disabled>Successiva<i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-        </div>
       </section>
       </div>
     </div>

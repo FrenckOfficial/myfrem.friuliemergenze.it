@@ -1,101 +1,90 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc, onSnapshot, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { firebaseConfig } from "/helpers/configFirebase.js";
-import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { collection, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+import { auth, db } from "/helpers/firebase.js";
+import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
-import { escapeHtml } from "/helpers/escapeHtml.js";
-import { createPager } from "/staff/dashboard/helpers/pager.js";
+import { createFilteredList, deleteButton } from "/staff/dashboard/helpers/filteredList.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const STAFF_ROLES = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
+
 const loginTable = document.getElementById("usersTableBody");
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
+function showContent() {
+  loadingEl.style.display = "none";
+  contentEl.style.display = "block";
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
   window.location.href = "/login";
 });
 
+function cell(text) {
+  const td = document.createElement("td");
+  td.textContent = text ?? "—";
+  return td;
+}
+
+function renderEmpty(text) {
+  const row = document.createElement("tr");
+  row.className = "activity-empty";
+  const td = cell(text);
+  td.colSpan = 6;
+  row.append(td);
+  return row;
+}
+
+function renderRow(docSnap, list) {
+  const data = docSnap.data();
+  const timestamp = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString("it-IT") : "—";
+
+  const row = document.createElement("tr");
+  const actions = document.createElement("td");
+  actions.append(deleteButton("Elimina accesso", async () => {
+    if (!confirm("Sei sicuro di voler eliminare definitivamente questo accesso dal database? Questa azione è irreversibile.")) return false;
+    await deleteDoc(doc(db, "logins", docSnap.id));
+    list.removed(row);
+    setStatus("Accesso eliminato.", "success");
+    return true;
+  }));
+
+  row.append(cell(data.email), cell(timestamp), cell(data.userId), cell(data.ipAddress), cell(data.userAgent), actions);
+  return row;
+}
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "/login";
-    return;
-  }
+  if (!user) return (window.location.href = "/login");
 
-  const userDoc = await getDocs(
-    query(collection(db, "users"), where("__name__", "==", user.uid))
-  );
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+  const userData = userSnap.exists() ? userSnap.data() : null;
 
-  initBottomNav(userDoc.docs[0].data(), user, "staff");
-
-  const allowedRoles = ["simplestaff", "modstaff", "advstaff", "advstaffplus", "superadmin"];
-
-  if (userDoc.empty || !allowedRoles.includes(userDoc.docs[0].data().role)) {
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
+  if (!userData || !STAFF_ROLES.includes(userData.role)) {
+    showContent();
     setStatus("Accesso negato: non sei staff!", "error");
-    window.location.href = "/dashboard";
-    return;
+    return (window.location.href = "/dashboard");
   }
 
-  const timeoutId = setTimeout(() => {
-    console.warn("Timeout caricamento, forzo visualizzazione");
-    loadingEl.style.display = "none";
-    contentEl.style.display = "block";
-  }, 7000);
+  initBottomNav(userData, user, "staff");
+  showContent();
 
-  await loadUsers();
-
-  clearTimeout(timeoutId);
-  loadingEl.style.display = "none";
-  contentEl.style.display = "block";
+  createFilteredList({
+    db,
+    ref: collection(db, "logins"),
+    panel: document.getElementById("loginsPanel"),
+    list: loginTable,
+    frame: document.getElementById("loginsList"),
+    person: {
+      label: "Utente",
+      placeholder: "Email o UID",
+      resolve: async (value) => (value.includes("@") ? { field: "email", value } : { field: "userId", value })
+    },
+    renderItem: renderRow,
+    renderEmpty,
+    emptyText: "Nessun accesso con questi filtri.",
+    unit: "accessi"
+  }).start();
 });
-
-const pager = createPager({
-  ref: collection(db, "logins"),
-  list: loginTable,
-  anchor: loginTable.closest("table") || loginTable,
-  moreLabel: "Carica altri accessi",
-  renderEmpty: () => {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = 5;
-    cell.textContent = "Nessun login trovato.";
-    row.append(cell);
-    return row;
-  },
-  renderItem: (docSnap) => {
-    const data = docSnap.data();
-    const timestamp = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString("it-IT") : "—";
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${escapeHtml(data.email ?? "—")}</td>
-      <td>${escapeHtml(timestamp)}</td>
-      <td>${escapeHtml(data.userId ?? "—")}</td>
-      <td>${escapeHtml(data.ipAddress ?? "—")}</td>
-      <td>${escapeHtml(data.userAgent ?? "—")}</td>
-    `;
-    row.addEventListener("click", () => deleteDB(docSnap.id, row));
-    return row;
-  }
-});
-
-async function loadUsers() {
-  await pager.load(true);
-}
-
-async function deleteDB(loginId, row) {
-  if (!confirm("Sei sicuro di voler eliminare definitivamente questo login dal database? Questa azione è irreversibile.")) return;
-  try {
-    await deleteDoc(doc(db, "logins", loginId));
-    row.remove();
-    setStatus("Login eliminato.", "success");
-  } catch (err) {
-    console.error("Errore eliminazione login:", err);
-    setStatus("Non è stato possibile eliminare il login.", "error");
-  }
-}
