@@ -1,6 +1,7 @@
-import { collection, query, where, onSnapshot, orderBy, limit, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { collection, query, where, onSnapshot, orderBy, limit, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 import { db } from '/helpers/getDB.js';
 import { getCurrentUser } from '/helpers/auth.js';
+import { BottomNav } from '/bottomNav.js';
 
 class NotificationBell {
   constructor() {
@@ -79,6 +80,7 @@ class NotificationBell {
 
   render(notifications) {
     const unreadCount = notifications.filter(n => !n.read).length;
+    BottomNav.setBadge('notifiche', unreadCount);
     
     if (unreadCount > 0) {
       this.unreadBadge.textContent = unreadCount;

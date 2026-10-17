@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="stylesheet" href="/modals.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z4DJJRR7BY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-Z4DJJRR7BY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revisione numeri utili | Dashboard Staff - La migliore piattaforma in Friuli-Venezia Giulia nel caricamento foto inerenti l'emergenza</title>
+  <link rel="stylesheet" href="/staff/dashboard/staff.css">
+  <link rel="shortcut icon" href="https://www.friuliemergenze.it/assets/logo.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <script type="module" src="/staff/dashboard/management/numeri-utili/numeri.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script defer type="module" src="/helpers/loadNavbar.js"></script>
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/dashboard/theme.css">
+  <link rel="stylesheet" href="/staff/dashboard/theme.css">
+</head>
+<body class="app app--staff">
+  <div class="loading">
+    <div class="loader"></div>
+    <p>Caricamento in corso...</p>
+  </div>
+  <div class="content" style="display:none;">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <a class="app-brand" href="/staff/dashboard/">
+          <img src="https://www.friuliemergenze.it/assets/logo.png" alt="">
+          <span>MyFrEM<small>Area staff</small></span>
+        </a>
+        <nav class="app-nav" data-area="staff" aria-label="Menu staff"></nav>
+        <div class="app-sidebar-footer">
+          <button id="logoutBtn" class="btn btn--ghost btn--block" type="button"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Esci</button>
+        </div>
+      </aside>
+    <main class="main-content app-main">
+      <div class="app-container">
+        <header class="page-head">
+          <div>
+            <h1>Revisione numeri utili</h1>
+            <p>Segnalazioni e correzioni inviate dal pubblico per l'elenco dei numeri utili su friuliemergenze.it. Nulla viene pubblicato senza approvazione.</p>
+          </div>
+          <a class="btn" href="https://www.friuliemergenze.it/numeri-utili/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>Elenco pubblico</a>
+        </header>
+
+        <section class="panel">
+          <div class="panel__head">
+            <h2>Nuove segnalazioni</h2>
+            <span class="hint" id="pendingCount"></span>
+          </div>
+          <div class="nu-list" id="pendingList"></div>
+          <div class="empty" id="pendingEmpty" hidden><i class="fa-regular fa-circle-check" aria-hidden="true"></i><span>Nessuna segnalazione in attesa. Tutto revisionato!</span></div>
+        </section>
+
+        <section class="panel" style="margin-top:18px">
+          <div class="panel__head">
+            <h2>Modifiche proposte</h2>
+            <span class="hint" id="editsCount"></span>
+          </div>
+          <ul class="rows" id="editsList"></ul>
+          <div class="empty" id="editsEmpty" hidden><i class="fa-regular fa-circle-check" aria-hidden="true"></i><span>Nessuna modifica proposta in attesa.</span></div>
+        </section>
+      </div>
+    </main>
+    </div>
+  </div>
+  <link rel="stylesheet" href="/bottomNav.css">
+</body>
+</html>

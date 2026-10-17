@@ -6,6 +6,7 @@ import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpe
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { escapeHtml } from "/helpers/escapeHtml.js";
+import { createPager } from "/staff/dashboard/helpers/pager.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -53,47 +54,48 @@ onAuthStateChanged(auth, async (user) => {
   contentEl.style.display = "block";
 });
 
-async function loadUsers() {
-  const ref = collection(db, "logins");
-  const q = query(ref, orderBy("timestamp", "desc"));
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
-    loginTable.innerHTML = "<p>Nessun login trovato.</p>";
-    return;
-  }
-
-  loginTable.innerHTML = "";
-
-  snap.forEach(docSnap => {
+const pager = createPager({
+  ref: collection(db, "logins"),
+  list: loginTable,
+  anchor: loginTable.closest("table") || loginTable,
+  moreLabel: "Carica altri accessi",
+  renderEmpty: () => {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.textContent = "Nessun login trovato.";
+    row.append(cell);
+    return row;
+  },
+  renderItem: (docSnap) => {
     const data = docSnap.data();
-
-    let timestamp = "—";
-    if (data.timestamp?.toDate) {
-      timestamp = data.timestamp.toDate().toLocaleString();
-    }
+    const timestamp = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString("it-IT") : "—";
 
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${escapeHtml(data.email ?? "—")}</td>
-      <td>${timestamp}</td>
+      <td>${escapeHtml(timestamp)}</td>
       <td>${escapeHtml(data.userId ?? "—")}</td>
       <td>${escapeHtml(data.ipAddress ?? "—")}</td>
       <td>${escapeHtml(data.userAgent ?? "—")}</td>
     `;
+    row.addEventListener("click", () => deleteDB(docSnap.id, row));
+    return row;
+  }
+});
 
-    row.addEventListener("click", () => {
-      deleteDB(docSnap.id);
-    });
-
-    loginTable.appendChild(row);
-  });
+async function loadUsers() {
+  await pager.load(true);
 }
 
-async function deleteDB(userId) {
-  if (confirm("Sei sicuro di voler eliminare definitivamente questo login dal database? Questa azione è irreversibile.")) {
-    await deleteDoc(doc(db, "logins", userId));
+async function deleteDB(loginId, row) {
+  if (!confirm("Sei sicuro di voler eliminare definitivamente questo login dal database? Questa azione è irreversibile.")) return;
+  try {
+    await deleteDoc(doc(db, "logins", loginId));
+    row.remove();
     setStatus("Login eliminato.", "success");
-    window.location.reload();
+  } catch (err) {
+    console.error("Errore eliminazione login:", err);
+    setStatus("Non è stato possibile eliminare il login.", "error");
   }
 }

@@ -4,6 +4,7 @@ import { getFirestore, collection, doc, getDoc, addDoc, serverTimestamp } from "
 import { firebaseConfig } from "./helpers/configFirebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "./helpers/modals.js";
 import "/helpers/loadIcons.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 class AuthManager {
   constructor() {
@@ -110,12 +111,14 @@ class AuthManager {
 
   async logPageView(uid) {
     try {
-      await addDoc(collection(this.db, "viewedPages"), {
-        type: "page_view",
-        timestamp: serverTimestamp(),
-        userId: uid,
-        page: window.location.pathname
-      });
+      if (shouldTrackPageView(uid)) {
+        await addDoc(collection(this.db, "viewedPages"), {
+          type: "page_view",
+          timestamp: serverTimestamp(),
+          userId: uid,
+          page: window.location.pathname
+        });
+      }
     } catch (err) {
       console.warn("Errore logging page view:", err);
     }

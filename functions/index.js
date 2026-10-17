@@ -1324,3 +1324,115 @@ exports.purgeDeletedUsers = onSchedule({ schedule: "15 4 * * *", timeZone: "Euro
 
   console.log(`Account eliminati definitivamente: ${purged}`);
 });
+
+const NEWSLETTER_SITE = "https://www.friuliemergenze.it";
+const NEWSLETTER_RESEND_MS = 2 * 60 * 1000;
+
+function newsletterEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  if (email.length > 200 || !EMAIL_RE.test(email)) throw new HttpsError("invalid-argument", "Indirizzo email non valido.");
+  return email;
+}
+
+function newsletterConfirmHtml({ name, link }) {
+  return `
+    <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px;">
+      <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+        <table style="max-width:520px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+          <tr><td style="padding:35px;text-align:center;">
+            <img src="https://www.friuliemergenze.it/assets/logo.png" style="width:80px;margin-bottom:20px;" loading="lazy">
+            <h1 style="color:#ff3b3b;margin:0;font-size:28px;">Conferma l'iscrizione</h1>
+            <p style="font-size:18px;color:#333;margin-top:25px;">Ciao <b>${esc(name || "")}</b>,</p>
+            <p style="color:#555;line-height:1.7;font-size:17px;margin-top:20px;">Grazie per esserti iscritto alla newsletter di <b>Friuli Emergenze</b>.<br><br>Per iniziare a riceverla conferma il tuo indirizzo email con il pulsante qui sotto.</p>
+            <a href="${link}" style="display:inline-block;padding:15px 24px;background:#ff3b3b;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:bold;margin-top:25px;font-size:16px;">Conferma iscrizione</a>
+            <p style="color:#888;font-size:13px;margin-top:25px;line-height:1.6;">Se il pulsante non funziona, copia questo link nel browser:<br><br><a href="${link}" style="color:#ff3b3b;">${link}</a></p>
+            <p style="font-size:11px;color:#999;margin-top:25px;line-height:1.5;">Friuli Emergenze<br>Hai ricevuto questa email perché qualcuno ha iscritto questo indirizzo alla newsletter.<br>Se non sei stato tu, ignora questa email: senza conferma non riceverai nulla.<br><br><a href="https://friuliemergenze.it">friuliemergenze.it</a> · <a href="mailto:info@friuliemergenze.it">info@friuliemergenze.it</a></p>
+          </td></tr>
+        </table>
+      </td></tr></table>
+    </div>`;
+}
+
+async function findSubscription(field, value) {
+  const snap = await admin.firestore().collection("newsletterSubs").where(field, "==", value).limit(1).get();
+  return snap.empty ? null : snap.docs[0];
+}
+
+async function setUserNewsletterFlag(email, subscribed) {
+  const users = await admin.firestore().collection("users").where("email", "==", email).limit(5).get();
+  await Promise.all(users.docs.map((d) => d.ref.update({ newsSubbed: subscribed }).catch(() => {})));
+}
+
+exports.newsletterSubscribe = onCall({ region: "europe-west1", secrets: [BREVO_API_KEY], maxInstances: 5 }, async (req) => {
+  const email = newsletterEmail(req.data?.email);
+  const name = cleanLine(req.data?.name, 80);
+  const existing = await findSubscription("email", email);
+
+  if (existing?.data().subscribed) return { status: "already" };
+
+  if (existing && Date.now() - (existing.data().lastMailAt?.toMillis?.() || 0) < NEWSLETTER_RESEND_MS) {
+    return { status: "sent" };
+  }
+
+  const token = crypto.randomUUID();
+  const fields = {
+    email,
+    name: name || existing?.data().name || "",
+    verified: false,
+    subscribed: false,
+    verifiedAt: null,
+    token,
+    lastMailAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  if (existing) await existing.ref.update(fields);
+  else await admin.firestore().collection("newsletterSubs").add({ ...fields, createdAt: admin.firestore.FieldValue.serverTimestamp() });
+
+  await sendBrevoMail({
+    to: email,
+    toName: fields.name,
+    subject: "Conferma l'iscrizione alla newsletter di Friuli Emergenze",
+    htmlContent: newsletterConfirmHtml({ name: fields.name, link: `${NEWSLETTER_SITE}/newsletter/confirm/?token=${encodeURIComponent(token)}` })
+  });
+
+  return { status: "sent" };
+});
+
+exports.newsletterConfirm = onCall({ region: "europe-west1", maxInstances: 5 }, async (req) => {
+  const token = String(req.data?.token || "");
+  if (!/^[0-9a-f-]{36}$/i.test(token)) return { status: "invalid" };
+
+  const sub = await findSubscription("token", token);
+  if (!sub) return { status: "invalid" };
+
+  if (!sub.data().subscribed) {
+    await sub.ref.update({
+      subscribed: true,
+      verified: true,
+      verifiedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    await setUserNewsletterFlag(sub.data().email, true);
+  }
+
+  return { status: "confirmed" };
+});
+
+exports.newsletterStatus = onCall({ region: "europe-west1", maxInstances: 5 }, async (req) => {
+  const sub = await findSubscription("email", newsletterEmail(req.data?.email));
+  if (!sub) return { found: false };
+  return { found: true, verified: sub.data().verified === true, subscribed: sub.data().subscribed === true };
+});
+
+exports.newsletterUnsubscribe = onCall({ region: "europe-west1", maxInstances: 5 }, async (req) => {
+  const email = newsletterEmail(req.data?.email);
+  const sub = await findSubscription("email", email);
+  if (!sub) return { status: "not_found" };
+
+  await sub.ref.update({
+    subscribed: false,
+    unsubscribedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await setUserNewsletterFlag(email, false);
+
+  return { status: "unsubscribed" };
+});

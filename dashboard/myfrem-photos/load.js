@@ -7,6 +7,7 @@ import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
 import { photoCard, photoStatus, serviceLabel, filled, emptyState } from "/dashboard/photos.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -40,12 +41,14 @@ onAuthStateChanged(auth, async (user) => {
   const timeoutId = setTimeout(showContent, 5000);
   currentUserId = user.uid;
 
-  addDoc(collection(db, "viewedPages"), {
-    type: "page_view",
-    timestamp: serverTimestamp(),
-    userId: user.uid,
-    page: window.location.pathname
-  }).catch((error) => console.error("Errore viewedPages:", error));
+  if (shouldTrackPageView(user.uid)) {
+    addDoc(collection(db, "viewedPages"), {
+      type: "page_view",
+      timestamp: serverTimestamp(),
+      userId: user.uid,
+      page: window.location.pathname
+    }).catch((error) => console.error("Errore viewedPages:", error));
+  }
 
   try {
     await checkUserRole(user);
@@ -151,7 +154,7 @@ function cardFooter(photoId, data, author, votes) {
   const by = document.createElement("span");
   by.append("Pubblicata da ");
   const link = document.createElement("a");
-  link.href = `/profile/?userid=${encodeURIComponent(data.userId || "")}`;
+  link.href = `https://account.friuliemergenze.it/?usp=${encodeURIComponent(data.userId || "")}`;
   link.target = "_blank";
   link.rel = "noopener";
   link.textContent = author;

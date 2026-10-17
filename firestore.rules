@@ -128,8 +128,9 @@ service cloud.firestore {
         || isAdminPlus()
       allow delete: if isStaff();
       match /badges/{badgeId} {
-        allow read, write: if true;
-    	}
+        allow read: if true;
+        allow write: if isStaff();
+      }
     }
     
     match /publicProfiles/{userId} {
@@ -159,15 +160,8 @@ service cloud.firestore {
       allow delete: if isLoggedIn() && request.auth.uid == uid;
     }
 
-    match /users_whatsapp/{userId} {
-      allow create: if true;
-      allow read, list: if true;
-      allow update: if isLoggedIn()
-        && request.auth.uid == userId
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.createdAt == resource.data.createdAt;
-
-      allow write: if isStaff();
+    match /users_whatsapp/{docId} {
+      allow read, write: if isStaff();
     }
 
     match /photos/{photoId} {
@@ -205,29 +199,49 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /messages/{msgId} {
-      allow create: if true;
-      allow read: if isLoggedIn()
-        && resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isStaff();
+    match /messages/{docId} {
+      allow read, write: if isStaff();
     }
 
     match /candidatureStaff/{docId} {
-      allow read, write: if true;
+      allow read, delete: if isStaff();
+      allow create: if request.resource.data.keys().hasOnly(['nome', 'eta', 'email', 'motivazione', 'timestamp'])
+        && request.resource.data.nome is string && request.resource.data.nome.size() > 0 && request.resource.data.nome.size() <= 120
+        && request.resource.data.eta is string && request.resource.data.eta.size() <= 10
+        && request.resource.data.email is string && request.resource.data.email.size() <= 200
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.motivazione is string && request.resource.data.motivazione.size() <= 5000
+        && request.resource.data.timestamp is timestamp;
+      allow update: if false;
     }
 
     match /sondaggi_gradimento/{docId} {
-      allow read, write: if true;
+      allow read, update, delete: if isStaff();
+      allow create: if request.resource.data.size() <= 40;
     }
 
     match /expulsionReports/{docId} {
-      allow read, write: if true;
+      allow read, write: if isStaff();
     }
 
     match /activities/{docId} {
-      allow create: if true;
-      allow read: if isStaff();
-      allow delete: if true
+      allow read, delete: if isStaff();
+      allow create: if isLoggedIn()
+        && request.resource.data.type is string
+        && request.resource.data.timestamp == request.time
+        && (isStaff()
+            || (request.resource.data.type == 'user_creation'
+                && request.resource.data.keys().hasOnly(['type', 'userName', 'timestamp'])
+                && request.resource.data.userName is string
+                && request.resource.data.userName.size() <= 200)
+            || (request.resource.data.type == 'photo_submission'
+                && request.resource.data.keys().hasOnly(['type', 'userId', 'timestamp'])
+                && request.resource.data.userId == request.auth.uid)
+            || (request.resource.data.type == 'association_deactivation_request'
+                && request.resource.data.keys().hasOnly(['type', 'associationId', 'associationName', 'userId', 'email', 'timestamp'])
+                && request.resource.data.userId == request.auth.uid
+                && isAssocAccount(request.resource.data.associationId)));
+      allow update: if false;
     }
 
     match /emailVerifications/{docId} {
@@ -235,73 +249,78 @@ service cloud.firestore {
     }
     
     match /logins/{docId} {
-    	allow read, write: if true;
+      allow read, delete: if isStaff();
+      allow create: if isLoggedIn()
+        && request.resource.data.keys().hasOnly(['userId', 'email', 'userAgent', 'ipAddress', 'timestamp'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.userAgent is string && request.resource.data.userAgent.size() <= 500
+        && request.resource.data.ipAddress is string && request.resource.data.ipAddress.size() <= 60
+        && request.resource.data.timestamp == request.time;
+      allow update: if false;
     }
     
     match /email_logs/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /reunionsReports/{docId} {
-    	allow read, write: if true
+      allow get: if true;
+      allow list, write: if isStaff();
     }
     
     match /staffDocUploads/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
-    match /groupPermissions/{userId} {
-      allow create: if true;
-      allow read, list: if true;
-      allow update: if isLoggedIn()
-        && request.auth.uid == userId
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.createdAt == resource.data.createdAt;
-      allow write: if isStaff();
+    match /groupPermissions/{docId} {
+      allow read, write: if isStaff();
     }
     
     match /newsletterSubs/{docId} {
-    	allow read, write: if true
+      allow read, update, delete: if isStaff();
+      allow create: if false;
     }
     
     match /newsletterDrafts/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /newsletterSent/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /pdfTemplates/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /generatedDocuments/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /staffers/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /vehiclesDraft/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /newsDrafts/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /photobooksDraft/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /surveys/{docId} {
-    	allow read, write: if true
+      allow read, write: if isStaff();
     }
     
     match /badges/{docId} {
-    	allow read, write: if true
+      allow read: if true;
+      allow write: if isStaff();
     }
     
     match /notifications/{docId} {
@@ -319,7 +338,9 @@ service cloud.firestore {
     match /viewedPages/{docId} {
       allow read, delete: if isStaff();
       allow create: if isLoggedIn()
-        && request.resource.data.keys().hasOnly(['type', 'page', 'userId', 'timestamp'])
+        && request.resource.data.keys().hasOnly(['type', 'page', 'userId', 'associationId', 'timestamp'])
+        && request.resource.data.get('associationId', '') is string
+        && request.resource.data.get('associationId', '').size() <= 40
         && request.resource.data.type == 'page_view'
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.page is string
@@ -329,15 +350,46 @@ service cloud.firestore {
     }
     
     match /numeriUtili/{docId} {
-    	allow read, write: if true;
+      allow get, list: if resource.data.approvato == true || isStaff();
+      allow create: if request.resource.data.keys().hasOnly(['nome', 'categoria', 'telefono', 'email', 'descrizione', 'approvato', 'createdAt'])
+        && request.resource.data.approvato == false
+        && request.resource.data.nome is string && request.resource.data.nome.size() > 0 && request.resource.data.nome.size() <= 150
+        && request.resource.data.categoria is string && request.resource.data.categoria.size() <= 80
+        && request.resource.data.telefono is string && request.resource.data.telefono.size() <= 40
+        && (request.resource.data.email == null || (request.resource.data.email is string && request.resource.data.email.size() <= 200))
+        && (request.resource.data.descrizione == null || (request.resource.data.descrizione is string && request.resource.data.descrizione.size() <= 2000))
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if isStaff();
+    }
+
+    match /modificheProposte/{docId} {
+      allow read, delete: if isStaff();
+      allow create: if request.resource.data.keys().hasOnly(['numeroId', 'nomeRealta', 'campo', 'valoreAttuale', 'valoreProposto', 'createdAt'])
+        && request.resource.data.numeroId is string && request.resource.data.numeroId.size() <= 40
+        && exists(/databases/$(database)/documents/numeriUtili/$(request.resource.data.numeroId))
+        && request.resource.data.campo in ['nome', 'categoria', 'telefono', 'email', 'descrizione']
+        && request.resource.data.nomeRealta is string && request.resource.data.nomeRealta.size() <= 150
+        && (request.resource.data.valoreAttuale == null || (request.resource.data.valoreAttuale is string && request.resource.data.valoreAttuale.size() <= 2000))
+        && request.resource.data.valoreProposto is string && request.resource.data.valoreProposto.size() > 0 && request.resource.data.valoreProposto.size() <= 2000
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
     }
 
     match /feedback/{docId} {
-    	allow read, write: if true;
+      allow read, update, delete: if isStaff();
+      allow create: if request.resource.data.keys().hasOnly(['rating', 'category', 'message', 'timestamp', 'userAgent', 'referrer', 'createdAt', 'status'])
+        && request.resource.data.rating is int && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.category is string && request.resource.data.category.size() <= 60
+        && request.resource.data.message is string && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 5000
+        && request.resource.data.timestamp is string && request.resource.data.timestamp.size() <= 40
+        && request.resource.data.userAgent is string && request.resource.data.userAgent.size() <= 500
+        && request.resource.data.referrer is string && request.resource.data.referrer.size() <= 500
+        && request.resource.data.status == 'nuovo'
+        && request.resource.data.createdAt == request.time;
     }
 
     match /testimonials/{docId} {
-    	allow read, write: if true;
+      allow read, write: if isStaff();
     }
     
     function feedPostPath(postId) {

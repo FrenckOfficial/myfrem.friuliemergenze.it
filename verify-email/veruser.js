@@ -1,9 +1,8 @@
-import { firebaseConfig } from "/helpers/configFirebase.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+import { app } from "/helpers/firebase.js";
 import { setStatus } from "/helpers/modals.js";
 
-firebase.initializeApp(firebaseConfig);
-
-const verifyEmailCall = firebase.app().functions("europe-west1").httpsCallable("verifyEmail");
+const verifyEmailCall = httpsCallable(getFunctions(app, "europe-west1"), "verifyEmail");
 
 const token = new URLSearchParams(window.location.search).get("token");
 const statusBox = document.getElementById("statusBox");

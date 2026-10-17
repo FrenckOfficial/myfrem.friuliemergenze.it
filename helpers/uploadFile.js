@@ -1,20 +1,9 @@
-const SDK_VERSIONS = ["10.13.0", "11.10.0", "10.7.0"];
+import { auth } from "/helpers/firebase.js";
 
 async function currentIdToken() {
-  for (const version of SDK_VERSIONS) {
-    try {
-      const { getApps } = await import(`https://www.gstatic.com/firebasejs/${version}/firebase-app.js`);
-      if (!getApps().length) continue;
-
-      const { getAuth } = await import(`https://www.gstatic.com/firebasejs/${version}/firebase-auth.js`);
-      const user = getAuth(getApps()[0]).currentUser;
-      if (user) return user.getIdToken();
-    } catch (error) {
-      console.warn(`SDK Firebase ${version} non disponibile:`, error);
-    }
-  }
-
-  throw new Error("Devi aver effettuato l'accesso per caricare file.");
+  await auth.authStateReady();
+  if (!auth.currentUser) throw new Error("Devi aver effettuato l'accesso per caricare file.");
+  return auth.currentUser.getIdToken();
 }
 
 export async function uploadFile(file, bucket, uid) {

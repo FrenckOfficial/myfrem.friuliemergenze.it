@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, query, where, orderBy, limit, getCountFromServer, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "/helpers/configFirebase.js";
 import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
@@ -33,6 +33,7 @@ const staffStatsModalList = document.getElementById("staffStatsModalList");
 const closeStaffStatsModalBtn = document.getElementById("closeStaffStatsModalBtn");
 const staffStatsOverlay = document.getElementById("staffStatsOverlay");
 
+const RECENT_LIMIT = 5;
 let allUsersData = [];
 let pendingPhotosData = [];
 let approvedPhotosData = [];
@@ -76,10 +77,6 @@ function formatDate(ts, fallback = "data sconosciuta") {
 
 function byCreatedAtDesc(a, b) {
   return (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0);
-}
-
-function byTimestampDesc(a, b) {
-  return (b.data().timestamp?.toMillis?.() || 0) - (a.data().timestamp?.toMillis?.() || 0);
 }
 
 function getStatusInfo(photo) {
@@ -247,14 +244,14 @@ onAuthStateChanged(auth, async (user) => {
 async function loadPhotoStats() {
   const photosRef = collection(db, "photos");
 
-  const [photosSnap, pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
-    getDocs(photosRef),
+  const [photosCount, pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
+    getCountFromServer(photosRef),
     getDocs(query(photosRef, where("status", "in", PENDING_STATUSES))),
     getDocs(query(photosRef, where("status", "in", APPROVED_STATUSES))),
     getDocs(query(photosRef, where("status", "in", REJECTED_STATUSES))),
   ]);
 
-  totalPhotosEl.textContent = photosSnap.size;
+  totalPhotosEl.textContent = photosCount.data().count;
   pendingPhotosEl.textContent = pendingSnap.size;
   approvedPhotosEl.textContent = approvedSnap.size;
   rejectedPhotosEl.textContent = rejectedSnap.size;
@@ -265,10 +262,10 @@ async function loadPhotoStats() {
 }
 
 async function renderRecentActivities() {
-  const snap = await getDocs(collection(db, "activities"));
+  const snap = await getDocs(query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(RECENT_LIMIT)));
   recentActivityListEl.innerHTML = "";
 
-  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+  const latest = snap.docs;
 
   const rows = await Promise.all(
     latest.map((docSnap) => {
@@ -288,10 +285,10 @@ async function renderRecentActivities() {
 }
 
 async function renderRecentLogins() {
-  const snap = await getDocs(collection(db, "logins"));
+  const snap = await getDocs(query(collection(db, "logins"), orderBy("timestamp", "desc"), limit(RECENT_LIMIT)));
   recentLoginsListEl.innerHTML = "";
 
-  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+  const latest = snap.docs;
 
   latest.forEach((docSnap) => {
     const login = docSnap.data();
@@ -309,10 +306,10 @@ async function renderRecentLogins() {
 }
 
 async function renderRecentViewedPages() {
-  const snap = await getDocs(collection(db, "viewedPages"));
+  const snap = await getDocs(query(collection(db, "viewedPages"), orderBy("timestamp", "desc"), limit(RECENT_LIMIT)));
   recentPageViewedListEl.innerHTML = "";
 
-  const latest = snap.docs.sort(byTimestampDesc).slice(0, 5);
+  const latest = snap.docs;
 
   const rows = await Promise.all(
     latest.map((docSnap) => {

@@ -442,3 +442,65 @@
   margin: 4px 0 8px;
   text-decoration: none;
 }
+
+.app--staff .nu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.app--staff .nu-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app--staff .nu-card:last-child {
+  border-bottom: none;
+}
+
+.app--staff .nu-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.app--staff .nu-change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+.app--staff .nu-change i {
+  color: var(--text-3);
+}
+
+.app--staff .nu-change__old {
+  color: var(--text-3);
+  text-decoration: line-through;
+  overflow-wrap: anywhere;
+}
+
+.app--staff .nu-change__new {
+  color: var(--text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.app--staff .pager-more {
+  display: flex;
+  margin: 16px auto 4px;
+}
+
+.app--staff .pager-info {
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.app--staff .pager-info:empty {
+  display: none;
+}

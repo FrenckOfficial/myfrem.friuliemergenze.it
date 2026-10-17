@@ -1,10 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, addDoc, collection, query, where, getCountFromServer, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { setReferentNavbar, setNavCount } from "/helpers/loadNavbar.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 import { firebaseConfig } from "/helpers/configFirebase.js";
 
@@ -105,7 +106,17 @@ export function initAssociationPage(onReady, options = {}) {
         return;
       }
 
-      initBottomNav(userData, user, isReferente ? "user" : "association");
+      initBottomNav(userData, user, isReferente ? "referent" : "association", { associationId });
+
+      if (shouldTrackPageView(user.uid)) {
+        addDoc(collection(db, "viewedPages"), {
+          type: "page_view",
+          timestamp: serverTimestamp(),
+          userId: user.uid,
+          associationId,
+          page: window.location.pathname
+        }).catch((error) => console.error("Errore viewedPages:", error));
+      }
 
       if (isReferente) {
         setReferentNavbar(associationId);

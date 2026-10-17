@@ -1,10 +1,10 @@
 import { firebaseConfig } from "/helpers/configFirebase.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
-import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, deleteUser, updatePassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js";
+import { getFirestore, collection, query, where, limit, getDocs, getDoc, setDoc, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 
@@ -129,10 +129,6 @@ async function createLoginLog(user) {
     ipAddress: await getIpAddress(),
     timestamp: serverTimestamp()
   });
-
-  console.table(
-    (await getDocs(collection(db, "logins"))).docs.map((doc) => doc.data())
-  );
 }
 
 async function validateAccount(userData) {
@@ -433,7 +429,11 @@ async function completeLogin(user, userData) {
     console.error("Errore notifica:", error);
   }
 
-  await createLoginLog(user);
+  try {
+    await createLoginLog(user);
+  } catch (error) {
+    console.error("Errore registrazione accesso:", error);
+  }
 
   redirectByRole(userData.role, userData);
 }

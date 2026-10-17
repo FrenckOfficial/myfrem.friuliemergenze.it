@@ -6,6 +6,7 @@ import { parseViewedPage } from "/staff/dashboard/helpers/parseViewedPage.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { createPager } from "/staff/dashboard/helpers/pager.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -43,46 +44,23 @@ onAuthStateChanged(auth, async (user) => {
   loadStats();
 });
 
+const pager = createPager({
+  ref: collection(db, "viewedPages"),
+  list: recentActivityListEl,
+  emptyText: "Nessuna pagina visualizzata di recente.",
+  moreLabel: "Carica altre visite",
+  renderItem: async (docSnap) => {
+    const activity = docSnap.data();
+    const li = document.createElement("li");
+    const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
+    li.innerHTML = await parseViewedPage(activity, date);
+    return li;
+  }
+});
+
 async function loadStats() {
   try {
-    const activitiesSnap = await getDocs(collection(db, "viewedPages"));
-    recentActivityListEl.innerHTML = "";
-
-    if (activitiesSnap.empty) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna pagina visualizzata di recente.";
-      recentActivityListEl.appendChild(li);
-      return;
-    }
-
-    const millis = (d) => d.data().timestamp?.toMillis?.() || 0;
-    const sorted = activitiesSnap.docs.sort((a, b) => millis(b) - millis(a));
-
-    const pStatusMsg = document.createElement("p");
-    pStatusMsg.id = "statusMsg";
-    pStatusMsg.className = "statusBox info";
-    pStatusMsg.style.display = "none";
-    recentActivityListEl.appendChild(pStatusMsg);
-
-    for (const docSnap of sorted) {
-      const activity = docSnap.data();
-
-      const li = document.createElement("li");
-
-      const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
-      const text = await parseViewedPage(activity, date);
-
-      li.innerHTML = text;
-
-      recentActivityListEl.appendChild(li);
-    }
-
-    if (recentActivityListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentActivityListEl.appendChild(li);
-    }
-
+    await pager.load(true);
   } catch (err) {
     console.error("Errore caricamento statistiche:", err);
   }

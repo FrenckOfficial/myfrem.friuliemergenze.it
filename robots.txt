@@ -9,17 +9,17 @@ Allow: /staff/
 Disallow: /login/
 Disallow: /riunione-staff/
 Disallow: /verify-email/
-Disallow: /kick-reports/
 Disallow: /api/
 Disallow: /.github/
 Disallow: /.netlify/
+Disallow: /.claude/
+Disallow: /.vscode/
 Disallow: /netlify/
 Disallow: /node_modules/
 Disallow: /README.md
 Disallow: /package.json
 Disallow: /package-lock.json
 Disallow: /helpers/configFirebase.js
-Disallow: /configSupabase.js
 Disallow: /humans.txt
 
 Sitemap: https://myfrem.friuliemergenze.it/sitemap.xml

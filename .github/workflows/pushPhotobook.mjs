@@ -256,11 +256,11 @@ async function generatePhotobookHtml(slug, photobookData) {
   <head>
   <link rel="stylesheet" href="/modals.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
-    <script src="https://embeds.iubenda.com/widgets/46908651-d6da-462f-b037-e6ef97c84795.js"><\/script>
     <script src="/heading.js"><\/script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title>${escapeHtml(photobookData.title)} - Photobook | Friuli Emergenze</title>
+    <meta name="fe:breadcrumb-title" content="${escapeHtml(photobookData.title)}" />
 
     <link rel="stylesheet" href="/style.css" />
     <link rel="stylesheet" href="/site.css" />

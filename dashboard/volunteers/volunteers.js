@@ -8,6 +8,7 @@ import { mountFeed } from "/helpers/feed.js";
 import { firebaseConfig } from "/helpers/configFirebase.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
 import { expiringCount } from "/dashboard/volunteers/catalog.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -356,12 +357,14 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    addDoc(collection(db, "viewedPages"), {
-      type: "page_view",
-      timestamp: serverTimestamp(),
-      userId: user.uid,
-      page: window.location.pathname
-    }).catch((error) => console.error("Errore viewedPages:", error));
+    if (shouldTrackPageView(user.uid)) {
+      addDoc(collection(db, "viewedPages"), {
+        type: "page_view",
+        timestamp: serverTimestamp(),
+        userId: user.uid,
+        page: window.location.pathname
+      }).catch((error) => console.error("Errore viewedPages:", error));
+    }
 
     initBottomNav(userData, user, "user");
 

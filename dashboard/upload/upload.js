@@ -7,6 +7,7 @@ import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpe
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -58,12 +59,14 @@ onAuthStateChanged(auth, async (user) => {
     contentEl.style.display = "block";;
   }, 5000);
 
-  await addDoc(collection(db, "viewedPages"), {
-    type: "page_view",
-    timestamp: serverTimestamp(),
-    userId: user.uid,
-    page: window.location.pathname
-  });
+  if (shouldTrackPageView(user.uid)) {
+    await addDoc(collection(db, "viewedPages"), {
+      type: "page_view",
+      timestamp: serverTimestamp(),
+      userId: user.uid,
+      page: window.location.pathname
+    });
+  }
 
   try {
     const staffRoles = [

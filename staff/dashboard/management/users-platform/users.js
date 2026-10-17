@@ -117,7 +117,7 @@ async function openModal(user) {
   document.getElementById("modalPromote").onclick = () => updateRole(user.id, user.role);
   document.getElementById("modalResetPassword").onclick = () => resetPassword(user);
   document.getElementById("modalDelete").onclick = () => deleteUser(user.id, userName);
-  document.getElementById("modalViewProfile").onclick = () => window.open(`/profile/?userid=${user.id}`, "_blank");
+  document.getElementById("modalViewProfile").onclick = () => window.open(`https://account.friuliemergenze.it/?usp=${user.id}`, "_blank");
 
   modal.style.display = "block";
   modalOverlay.style.display = "block";

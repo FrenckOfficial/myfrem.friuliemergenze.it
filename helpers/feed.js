@@ -253,7 +253,8 @@ export async function mountFeed(root, ctx) {
     const body = el("div", "comment__body");
     const head = el("div", "comment__head");
     const name = el("a", "comment__author", c.authorName || "Utente");
-    name.href = `/profile/?userid=${encodeURIComponent(c.authorUid || "")}`;
+    name.href = `https://account.friuliemergenze.it/?usp=${encodeURIComponent(c.authorUid || "")}`;
+    name.target = "_blank";
     head.append(name, el("span", "comment__date", timeAgo(c.createdAt)));
     body.append(head, el("p", "comment__text", c.text || ""));
     row.append(body);
@@ -358,7 +359,7 @@ export async function mountFeed(root, ctx) {
     const meta = el("div", "post-meta");
     const top = el("div", "post-meta__top");
     const name = el("a", "post-author", p.authorName || "Utente");
-    name.href = `/profile/?userid=${encodeURIComponent(p.authorUid || "")}`;
+    name.href = `https://account.friuliemergenze.it/?usp=${encodeURIComponent(p.authorUid || "")}`;
     top.append(name);
     if (ROLE_LABELS[p.authorRole]) top.append(el("span", "post-role", ROLE_LABELS[p.authorRole]));
     if (p.official) {

@@ -1,12 +1,13 @@
-import { collection, query, where, getDoc, getDocs, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { collection, query, where, getDoc, getDocs, orderBy, updateDoc, doc, deleteDoc, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
 import { firebaseConfig } from '/helpers/configFirebase.js';
 import { db } from '/helpers/getDB.js';
 import { showSuccess, showError, showWarning, showInfo, setStatus } from '/helpers/modals.js';
 import '/helpers/loadIcons.js';
 import { initBottomNav } from '/helpers/initBottomNav.js';
 import { addStaffLink } from '/helpers/loadNavbar.js';
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const loadingEl = document.querySelector(".loading");
 const contentEl = document.querySelector(".content");
@@ -23,12 +24,14 @@ onAuthStateChanged(auth, async (user) => {
       contentEl.style.display = "block";
     }, 5000);
 
-    await addDoc(collection(db, "viewedPages"), {
-      type: "page_view",
-      timestamp: serverTimestamp(),
-      userId: user.uid,
-      page: window.location.pathname
-    });
+    if (shouldTrackPageView(user.uid)) {
+      await addDoc(collection(db, "viewedPages"), {
+        type: "page_view",
+        timestamp: serverTimestamp(),
+        userId: user.uid,
+        page: window.location.pathname
+      });
+    }
   
     try {
       if (user) {

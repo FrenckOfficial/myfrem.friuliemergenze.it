@@ -110,6 +110,7 @@ async function updateGalleryJson(vehicleData, slug, photoUrl, sourcePhotoId) {
   }
 
   const service = getServiceLabel(vehicleData.service);
+  const album = getAlbum(vehicleData.service);
 
   const photoDoc = await db.collection("photos").doc(sourcePhotoId).get();
   const photoData = photoDoc.data();
@@ -234,6 +235,23 @@ function getServiceLabel(service) {
   }
 }
 
+const ALBUMS = {
+  "carabinieri": { slug: "carabinieri", label: "Carabinieri" },
+  "polizia-locale": { slug: "polizia-locale", label: "Polizia Locale" },
+  "polizia-di-stato": { slug: "polizia-di-stato", label: "Polizia di Stato" },
+  "guardia-di-finanza": { slug: "guardia-di-finanza", label: "Guardia di Finanza" },
+  "emergenza-sanitaria": { slug: "soccorso-sanitario", label: "Soccorso Sanitario" },
+  "ambulanza": { slug: "soccorso-sanitario", label: "Soccorso Sanitario" },
+  "pompieri": { slug: "vigili-del-fuoco", label: "Vigili del Fuoco" },
+  "guardia-costiera": { slug: "guardia-costiera", label: "Guardia Costiera" },
+  "protezione-civile": { slug: "protezione-civile", label: "Protezione Civile" },
+  "ausiliari": { slug: "soccorso-stradale-", label: "Soccorso Stradale / Autostradale" },
+};
+
+function getAlbum(service) {
+  return ALBUMS[service] || null;
+}
+
 async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, photoUrl) {
   const pageUrl = `https://friuliemergenze.it/gallery/scheda/${slug}`;
   const service = getServiceLabel(vehicleData.service);
@@ -277,11 +295,11 @@ async function generateVehicleHtml(staffId, vehicleData, sourcePhotoId, slug, ph
   <head>
   <link rel="stylesheet" href="/modals.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
-    <script src="https://embeds.iubenda.com/widgets/46908651-d6da-462f-b037-e6ef97c84795.js"><\/script>
     <script src="/heading.js"><\/script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title>${escapeHtml(vehicleData.title)} | Friuli Emergenze</title>
+    ${album ? `<meta name="fe:breadcrumb-parent" content="/gallery/albums/${album.slug}/|${escapeHtml(album.label)}" />` : ""}
   </head>
   <body>
     <div id="donate-float" style="position: fixed !important; bottom: 2rem !important; left: 2rem !important; z-index: 999999 !important; display: block !important; width: auto !important; height: auto !important;">

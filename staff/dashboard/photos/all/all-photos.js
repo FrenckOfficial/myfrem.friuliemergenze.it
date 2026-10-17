@@ -6,6 +6,7 @@ import { firebaseConfig } from "/helpers/configFirebase.js";
 import { setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { createPager } from "/staff/dashboard/helpers/pager.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -224,38 +225,38 @@ function showEmptyRow() {
   photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Nessuna foto trovata</td></tr>`;
 }
 
+const pager = createPager({
+  ref: collection(db, "photos"),
+  field: "createdAt",
+  pageSize: 50,
+  list: photosTableBody,
+  anchor: photosTableBody.closest(".table-scroll") || photosTableBody.closest("table") || photosTableBody,
+  moreLabel: "Carica altre foto",
+  renderEmpty: () => {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = TABLE_COLUMNS;
+    td.textContent = "Nessuna foto trovata";
+    tr.append(td);
+    return tr;
+  },
+  renderItem: async (docSnap) => {
+    const photo = docSnap.data();
+    const id = docSnap.id;
+    const [votes, userName] = await Promise.all([
+      fetchVotes(id).catch((err) => {
+        console.error("Errore caricamento voti foto " + id + ":", err);
+        return [];
+      }),
+      getCachedUserName(photo.userId)
+    ]);
+    return buildRow({ id, photo, userName, votes });
+  }
+});
+
 async function loadAllPhotos() {
   try {
-    const snapshot = await getDocs(
-      query(collection(db, "photos"), orderBy("createdAt", "desc"))
-    );
-
-    if (snapshot.empty) {
-      showEmptyRow();
-      setStatus("Nessuna foto trovata");
-      return;
-    }
-
-    const rows = await Promise.all(
-      snapshot.docs.map(async (docSnap) => {
-        const photo = docSnap.data();
-        const id = docSnap.id;
-
-        const [votes, userName] = await Promise.all([
-          fetchVotes(id).catch((err) => {
-            console.error("Errore caricamento voti foto " + id + ":", err);
-            return [];
-          }),
-          getCachedUserName(photo.userId)
-        ]);
-
-        return { id, photo, userName, votes };
-      })
-    );
-
-    const fragment = document.createDocumentFragment();
-    rows.forEach(row => fragment.appendChild(buildRow(row)));
-    photosTableBody.replaceChildren(fragment);
+    await pager.load(true);
   } catch (err) {
     console.error("Errore caricamento foto:", err);
     photosTableBody.innerHTML = `<tr><td colspan="${TABLE_COLUMNS}">Errore nel caricamento delle foto</td></tr>`;

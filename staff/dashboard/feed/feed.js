@@ -144,7 +144,7 @@ function renderPost(d) {
   const head = el("div", "mod-post__head");
   const who = el("div");
   const name = el("a", "mod-post__author", p.authorName || "Utente");
-  name.href = `/profile/?userid=${encodeURIComponent(p.authorUid || "")}`;
+  name.href = `https://account.friuliemergenze.it/?usp=${encodeURIComponent(p.authorUid || "")}`;
   name.target = "_blank";
   name.rel = "noopener";
   who.append(name);

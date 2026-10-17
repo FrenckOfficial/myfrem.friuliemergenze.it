@@ -4,6 +4,7 @@ import { getFirestore, collection, getDocs, getDoc, doc } from "https://www.gsta
 import { firebaseConfig } from "/helpers/configFirebase.js";
 import { setStatus } from "/helpers/modals.js";
 import { isShiftOver, formatShiftDate, formatHours } from "/helpers/shifts.js";
+import { initBottomNav } from "/helpers/initBottomNav.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -85,6 +86,7 @@ onAuthStateChanged(auth, async (user) => {
       getDocs(collection(db, "volunteerShifts", user.uid, "turni"))
     ]);
     const u = userSnap.exists() ? userSnap.data() : {};
+    initBottomNav(u, user, "user");
     userName = `${u.name || ""} ${u.surname || ""}`.trim() || u.username || "Volontario";
 
     done = itemsSnap.docs

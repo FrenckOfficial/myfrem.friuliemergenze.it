@@ -7,6 +7,7 @@ import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
 import { QUALIFICHE, MANSIONI, GIORNI, FASCE, emptyVolunteer, qualificaName, expiryState, availableUntil } from "/dashboard/volunteers/catalog.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -280,12 +281,14 @@ onAuthStateChanged(auth, async (user) => {
     if (STAFF_ROLES.includes(userData.role)) addStaffLink();
     initBottomNav(userData, user, "user");
 
-    addDoc(collection(db, "viewedPages"), {
-      type: "page_view",
-      timestamp: serverTimestamp(),
-      userId: user.uid,
-      page: window.location.pathname
-    }).catch((error) => console.error("Errore viewedPages:", error));
+    if (shouldTrackPageView(user.uid)) {
+      addDoc(collection(db, "viewedPages"), {
+        type: "page_view",
+        timestamp: serverTimestamp(),
+        userId: user.uid,
+        page: window.location.pathname
+      }).catch((error) => console.error("Errore viewedPages:", error));
+    }
 
     const volSnap = await getDoc(doc(db, "volunteers", user.uid));
     saved = fromDoc(volSnap.exists() ? volSnap.data() : null);

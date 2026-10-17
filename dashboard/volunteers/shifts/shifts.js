@@ -8,6 +8,7 @@ import { initBottomNav } from "/helpers/initBottomNav.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
 import { QUALIFICHE, MANSIONI, expiryState } from "/dashboard/volunteers/catalog.js";
 import { todayIso, isShiftOver, formatShiftDate, formatHours, shiftHours } from "/helpers/shifts.js";
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -306,12 +307,14 @@ onAuthStateChanged(auth, async (user) => {
     if (STAFF_ROLES.includes(userData.role)) addStaffLink();
     initBottomNav(userData, user, "user");
 
-    addDoc(collection(db, "viewedPages"), {
-      type: "page_view",
-      timestamp: serverTimestamp(),
-      userId: user.uid,
-      page: window.location.pathname
-    }).catch((error) => console.error("Errore viewedPages:", error));
+    if (shouldTrackPageView(user.uid)) {
+      addDoc(collection(db, "viewedPages"), {
+        type: "page_view",
+        timestamp: serverTimestamp(),
+        userId: user.uid,
+        page: window.location.pathname
+      }).catch((error) => console.error("Errore viewedPages:", error));
+    }
 
     const [vol, mine, assocs] = await Promise.all([
       getDoc(doc(db, "volunteers", user.uid)).then((s) => (s.exists() ? s.data() : null)).catch(() => null),

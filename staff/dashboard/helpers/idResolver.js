@@ -1,11 +1,14 @@
-import { doc, getDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { firebaseConfig } from "https://myfrem.friuliemergenze.it/helpers/configFirebase.js";
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { doc, getDoc, getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { firebaseConfig } from "/helpers/configFirebase.js";
 
 const cache = {};
+let db = null;
+
+function database() {
+    if (!db) db = getFirestore(getApps()[0] || initializeApp(firebaseConfig));
+    return db;
+}
 
 export async function getNameById(collectionName, id) {
     if (!id) return "Sconosciuto";
@@ -18,12 +21,11 @@ export async function getNameById(collectionName, id) {
     const source = collectionName === "users" ? "publicProfiles" : collectionName;
 
     try {
-        const ref = doc(db, source, id);
-        const snap = await getDoc(ref);
+        const snap = await getDoc(doc(database(), source, id));
 
         if (!snap.exists()) {
             cache[cacheKey] = id;
-            return id; 
+            return id;
         }
 
         const data = snap.data();

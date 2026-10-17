@@ -1,13 +1,12 @@
-import { firebaseConfig } from "/helpers/configFirebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, addDoc, collection, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { auth, db } from "/helpers/firebase.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
 import { addStaffLink } from "/helpers/loadNavbar.js";
 import { photoStatus, STATUS, filled, formatDate, safeUrl } from "/dashboard/photos.js";
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+import { shouldTrackPageView } from "/helpers/pageViews.js";
 
 let currentUser = null;
 let currentUserId = null;
@@ -32,10 +31,9 @@ const notificationStatusText = document.getElementById("notification-status-text
 const notificationStatusDesc = document.getElementById("notification-status-desc");
 const goToSurveyBtn = document.getElementById("goToSurveyBtn");
 
-auth.onAuthStateChanged(async (user) => {
+onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   currentUserId = user ? user.uid : null;
-  emailjs.init("49-8564mCPRVWNmBW");
 
   if (!user) {
     console.warn("Nessun utente loggato, redirect al login...");
@@ -50,20 +48,22 @@ auth.onAuthStateChanged(async (user) => {
     contentEl.style.display = "block";
   }, 5000);
 
-  await db.collection("viewedPages").add({
-    type: "page_view",
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    userId: user.uid,
-    page: window.location.pathname
-  });
+  if (shouldTrackPageView(user.uid)) {
+    await addDoc(collection(db, "viewedPages"), {
+      type: "page_view",
+      timestamp: serverTimestamp(),
+      userId: user.uid,
+      page: window.location.pathname
+    });
+  }
 
-  await db.collection("users").doc(user.uid).update({
+  await updateDoc(doc(db, "users", user.uid), {
     lastDashSelected: "user",
   });
 
   try {
-    const userDoc = await db.collection("users").doc(user.uid).get();
-    const userData = userDoc.exists ? userDoc.data() : null;
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const userData = userDoc.exists() ? userDoc.data() : null;
 
     initBottomNav(userData, user, "user");
 
@@ -110,7 +110,7 @@ auth.onAuthStateChanged(async (user) => {
 
         if (permission === "granted") {
           if (currentUserId) {
-            await db.collection("users").doc(currentUserId).update({ notificationsEnabled: true, notificationsEnabledAt: new Date() });
+            await updateDoc(doc(db, "users", currentUserId), { notificationsEnabled: true, notificationsEnabledAt: new Date() });
           }
 
           notificationStatusText.textContent = "Notifiche abilitate!";
@@ -183,11 +183,7 @@ auth.onAuthStateChanged(async (user) => {
       newsBannerEl.style.display = "none";
     }
 
-    const photosSnap = await db
-      .collection("photos")
-      .where("userId", "==", user.uid)
-      .orderBy("createdAt", "desc")
-      .get();
+    const photosSnap = await getDocs(query(collection(db, "photos"), where("userId", "==", user.uid), orderBy("createdAt", "desc")));
 
     const counts = { approved: 0, pending: 0, rejected: 0 };
     const recent = [];
@@ -218,38 +214,23 @@ auth.onAuthStateChanged(async (user) => {
         btnLoader.style.display = "inline-block";
 
         try {
-          const userRef = db.collection("users").doc(user.uid);
-          const userDoc = await userRef.get();
+          const userRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userRef);
           const userData = userDoc.data();
 
-          await userRef.update({ newsSubbed: true });
+          const response = await fetch("https://europe-west1-friuli-emergenze.cloudfunctions.net/newsletterSubscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: { email: userData.email, name: userData.name || "" } })
+          });
+          const body = await response.json();
+          if (!response.ok || body.error) throw new Error(body.error?.message || `HTTP ${response.status}`);
 
-          const existingQuery = await db
-            .collection("newsletterSubs")
-            .where("email", "==", userData.email)
-            .get();
-
-          if (existingQuery.empty) {
-            const token = crypto.randomUUID();
-            await db.collection("newsletterSubs").add({
-              email: userData.email,
-              name: userData.name,
-              verified: false,
-              subscribed: false,
-              verifiedAt: null,
-              token: token,
-              createdAt: new Date(),
-            });
-
-            await emailjs.send("service_ngxrsq8", "template_32nd0dv", {
-              email: userData.email,
-              name: userData.name,
-              link: `https://www.friuliemergenze.it/newsletter/confirm/?token=${token}`,
-            });
-
-            setStatus("E-mail di conferma inviata!", "success");
-          } else {
+          if (body.result.status === "already") {
+            await updateDoc(userRef, { newsSubbed: true });
             setStatus("Email già iscritta.", "warning");
+          } else {
+            setStatus("E-mail di conferma inviata!", "success");
           }
         } catch (error) {
           console.error("Errore:", error);
@@ -369,7 +350,7 @@ async function savePhoneIfPresent(userId) {
   }
 
   try {
-    await db.collection("users").doc(userId).update({ phone });
+    await updateDoc(doc(db, "users", userId), { phone });
     return true;
   } catch (error) {
     console.error("Errore salvataggio telefono:", error);
@@ -426,7 +407,7 @@ async function closeFirstAccessModal(userId) {
   const modal = getFirstAccessModal();
 
   try {
-    await db.collection("users").doc(userId).update({ firstAccess: false });
+    await updateDoc(doc(db, "users", userId), { firstAccess: false });
 
     modal.classList.remove("active");
 
@@ -440,6 +421,6 @@ async function closeFirstAccessModal(userId) {
 }
 
 logoutBtn.addEventListener("click", async () => {
-  await auth.signOut();
+  await signOut(auth);
   window.location.href = "/login/";
 });

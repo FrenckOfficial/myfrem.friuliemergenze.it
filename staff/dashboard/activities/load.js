@@ -20,6 +20,7 @@ import { parseActivity } from "/staff/dashboard/helpers/activityParsers.js";
 import { showSuccess, showError, showWarning, showInfo, setStatus } from "/helpers/modals.js";
 import "/helpers/loadIcons.js";
 import { initBottomNav } from "/helpers/initBottomNav.js";
+import { createPager } from "/staff/dashboard/helpers/pager.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -57,56 +58,37 @@ onAuthStateChanged(auth, async (user) => {
   loadStats();
 });
 
+const pager = createPager({
+  ref: collection(db, "activities"),
+  list: recentActivityListEl,
+  emptyText: "Nessuna attività recente.",
+  moreLabel: "Carica altre attività",
+  renderItem: async (docSnap) => {
+    const activity = docSnap.data();
+    const li = document.createElement("li");
+    li.style.cursor = "pointer";
+
+    const date = activity.timestamp?.toDate?.().toLocaleString("it-IT") || "data sconosciuta";
+    li.innerHTML = await parseActivity(activity, date);
+
+    li.addEventListener("click", async () => {
+      if (!confirm("Vuoi eliminare questa attività?")) return;
+      try {
+        await deleteDoc(doc(db, "activities", docSnap.id));
+        li.remove();
+        setStatus("Attività eliminata!", "success");
+      } catch (err) {
+        console.error("Errore eliminazione:", err);
+      }
+    });
+
+    return li;
+  }
+});
+
 async function loadStats() {
   try {
-    const activitiesSnap = await getDocs(collection(db, "activities"));
-    recentActivityListEl.innerHTML = "";
-
-    const sorted = activitiesSnap.docs.sort(
-      (a, b) => b.data().timestamp.toMillis() - a.data().timestamp.toMillis()
-    );
-
-    const pStatusMsg = document.createElement("p");
-    pStatusMsg.id = "statusMsg";
-    pStatusMsg.className = "statusBox info";
-    pStatusMsg.style.display = "none";
-    recentActivityListEl.appendChild(pStatusMsg);
-
-    for (const docSnap of sorted) {
-      const activity = docSnap.data();
-
-      const li = document.createElement("li");
-      li.style.cursor = "pointer";
-
-      const date = activity.timestamp.toDate().toLocaleString();
-      const text = await parseActivity(activity, date);
-
-      li.innerHTML = text;
-
-      li.addEventListener("click", async () => {
-        const ok = confirm("Vuoi eliminare questa attività?");
-        if (!ok) return;
-
-        try {
-          await deleteDoc(doc(db, "activities", docSnap.id));
-
-          li.remove();
-          setStatus("Attività eliminata!", "success");
-
-        } catch (err) {
-          console.error("Errore eliminazione:", err);
-        }
-      });
-
-      recentActivityListEl.appendChild(li);
-    }
-
-    if (recentActivityListEl.children.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "Nessuna attività recente.";
-      recentActivityListEl.appendChild(li);
-    }
-
+    await pager.load(true);
   } catch (err) {
     console.error("Errore caricamento statistiche:", err);
   }
